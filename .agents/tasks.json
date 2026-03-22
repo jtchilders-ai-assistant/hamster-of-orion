@@ -141,9 +141,10 @@
       "id": "spec-016",
       "title": "Council Voting Algorithm",
       "description": "Document exact algorithm for: vote allocation by population, voting behavior by relationship, victory threshold, abstention rules. Update design/diplomacy/council.md",
-      "status": "in_progress",
+      "status": "pending_verification",
       "priority": 16,
-      "output_file": "design/diplomacy/council.md"
+      "output_file": "design/diplomacy/council.md",
+      "completed": "2026-03-22"
     },
     {
       "id": "spec-017",

@@ -752,3 +752,79 @@ Created comprehensive diplomacy relationship mathematics specification including
 - **Output**: design/diplomacy/council.md
 - **State**: WORKING
 - **Action**: Spawning worker sub-agent
+
+---
+
+### 2026-03-22 11:08 - spec-016: Council Voting Algorithm ✅
+**Completed:** `design/diplomacy/council.md`
+
+**Summary:**
+Created comprehensive Council voting algorithm specification including:
+- **Council Formation:**
+  - 50% colonized planets trigger
+  - 25-turn interval between meetings
+  - Mandatory attendance for all living races
+- **Vote Allocation Formula:**
+  - Population-based vote weight calculation
+  - Percentage of galactic population = vote percentage
+  - Two-candidate selection (top two populations)
+  - Tie-breaking rules
+- **Victory Threshold:**
+  - 2/3 majority (66.67%) of effective votes
+  - Abstentions excluded from total
+  - Quorum requirement (50% minimum participation)
+- **Voting Behavior Algorithm:**
+  - 5-factor vote score calculation:
+    - Relation Factor (weight 0.5)
+    - Fear Factor (military intimidation)
+    - Bribery Factor (BC + tech value)
+    - Racial Factor (natural affinities)
+    - Reputation Factor
+  - Per-race fear modifiers (Guinea Pigs 0.1× → Rabbits 2.0×)
+  - Per-race bribe modifiers (Guinea Pigs 0.3× → Rabbits 1.5×)
+  - Hamster council bonus (+5 from all voters)
+- **Abstention Rules:**
+  - Mandatory: At war with both candidates
+  - AI-triggered: Both scores negative, scores too close
+  - Racial tendencies (Hermit Crabs 25% base abstention)
+  - Abstention weight formula
+- **Player Interactions:**
+  - Pre-vote lobbying (5 turns before)
+  - Bribery interface
+  - Vote request mechanics
+  - Accept/Reject victory options
+  - Galactic War on rejection
+- **Special Cases:**
+  - Two-race galaxy rules
+  - Single-race (Survival Victory)
+  - Alliance voting loyalty (80% base, Chameleons 50%)
+  - Mid-vote candidate elimination
+- **Complete JSON Data Schemas:**
+  - racial_vote_modifiers (10 races)
+  - racial_affinities (18 pairs)
+  - reputation_penalties (5 types)
+  - council_outcomes (5 results)
+  - council_constants (20 values)
+- **Worked Examples:**
+  - Standard council vote (6 races, detailed calculations)
+  - Bribery changing outcome
+  - Abstention scenario
+- **Edge Cases:**
+  - War with both candidates
+  - Zero votes for candidate
+  - 50% exact split
+  - Alliance with enemy candidate
+- **Complete Algorithm:**
+  - ResolveCouncil pseudocode
+  - ProcessPlayerResponse pseudocode
+  - DetermineVote with all factors
+
+**Files Updated:**
+- `design/diplomacy/council.md` (30KB, 800+ lines, complete rewrite)
+
+**Notes:**
+- Integrates with relationship-formulas.md for relation values
+- Integrates with ai-personalities.md for racial behaviors
+- All 10 races have documented voting modifiers
+- MOO1-faithful 2/3 majority threshold
+- Ready for implementation with complete formulas and JSON schemas
