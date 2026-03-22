@@ -265,3 +265,67 @@ Created comprehensive ship components database specification including:
 - Ready for ship design implementation
 
 ---
+
+### 2026-03-22 07:25 - spec-008: Combat Damage Resolution Algorithm ✅
+**Completed:** `design/ships/combat-algorithm.md`
+
+**Summary:**
+Created comprehensive combat system algorithm specification including:
+- **Combat Initialization**
+  - Battle setup and ship state initialization
+  - Combat grid creation
+- **Turn Structure**
+  - Initiative → Action → Missile → End phases
+  - Per-ship action order
+- **Initiative System**
+  - Formula: Base + Engine + Computer + Racial + Experience + Random
+  - Tie-breaking rules
+- **Movement System**
+  - Combat speed and movement points
+  - Hex-based pathfinding
+- **Attack Resolution**
+  - Beam weapon hit chance formula
+  - Attack modifiers (computer, experience, range, size)
+  - Defense modifiers (maneuver, specials, cloaking)
+- **Damage Application**
+  - Shields → Armor → Hull sequence
+  - Shield absorption per hit
+  - Armor HP multipliers
+- **Critical Hits**
+  - 5% base chance, system damage effects
+- **Missile Combat**
+  - Launch, tracking, point defense intercept
+  - ECM effects on missiles
+- **Torpedo Mechanics**
+  - No interception, 2-turn cooldown
+- **Special Weapon Effects**
+  - 12 special effect implementations
+  - Multi-attack, armor-piercing, chain lightning, etc.
+- **Special Systems in Combat**
+  - Cloaking, Repair, Stasis, Teleporter, Displacement
+- **Retreat Mechanics**
+  - Retreat chance formula
+  - Warp Dissipator prevention
+- **Victory Conditions**
+  - Attacker/Defender victory, mutual destruction
+- **Experience System**
+  - Rookie → Elite progression
+  - Accuracy and damage bonuses
+- **Combat AI**
+  - Target selection scoring
+  - Movement logic
+- **Planetary Bombardment**
+  - Damage distribution (population, factories, defenses)
+- Complete pseudocode for all systems
+- JSON state schema for combat
+
+**Files Created:**
+- `design/ships/combat-algorithm.md` (26KB, 700+ lines)
+
+**Notes:**
+- Fully implementable combat system specification
+- Integrates with weapons-complete.md and components-complete.md
+- All formulas documented with examples
+- Completes the combat system specification
+
+---

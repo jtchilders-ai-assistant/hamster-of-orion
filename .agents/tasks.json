@@ -70,9 +70,10 @@
       "id": "spec-008",
       "title": "Combat Damage Resolution Algorithm",
       "description": "Document complete combat algorithm: initiative order, movement resolution, firing sequence, damage application (shields→armor→hull), critical hits, retreat mechanics. Update design/ships/combat-algorithm.md",
-      "status": "pending",
+      "status": "done",
       "priority": 8,
-      "output_file": "design/ships/combat-algorithm.md"
+      "output_file": "design/ships/combat-algorithm.md",
+      "completed": "2026-03-22"
     },
     {
       "id": "spec-009",
