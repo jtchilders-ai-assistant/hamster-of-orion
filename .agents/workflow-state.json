@@ -1,10 +1,10 @@
 {
-  "state": "WORKING",
+  "state": "VERIFYING",
   "current_task": "spec-013",
   "current_task_started_at": "2026-03-22T10:46:00-05:00",
   "retry_count": 0,
   "max_retries": 3,
-  "last_updated": "2026-03-22T10:46:00-05:00",
-  "last_action": "assigned spec-013 to worker",
+  "last_updated": "2026-03-22T10:50:00-05:00",
+  "last_action": "verifier spawned",
   "verification_issues": []
 }
