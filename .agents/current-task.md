@@ -1,51 +1,25 @@
-# Current Task: spec-021
+# Current Task: spec-022
 
 ## Title
-Random Events System
+Victory Condition Checks
 
 ## Description
-Document all random events: trigger conditions, probability, effects, duration. Include space monsters, discoveries, disasters, opportunities. Update design/game-mechanics/random-events.md
+Document exact algorithms for: domination check (population threshold), council victory, conquest victory, Orion guardian defeat, transcendence detection. Update design/game-mechanics/victory-conditions.md
 
 ## Output File
-design/game-mechanics/random-events.md
+design/game-mechanics/victory-conditions.md
 
 ## Priority
-21
+22
 
 ## Requirements
-- Complete list of all random events from MOO1
-- Trigger conditions for each event
-- Probability/frequency of occurrence
-- Effects (positive/negative/neutral)
-- Duration if applicable
-- Space monsters (Guardian, Space Amoeba, Space Crystal)
-- Discoveries (Orion, artifacts, derelicts)
-- Disasters (plague, rebellion, comet)
-- Opportunities (leaders, technology finds)
-- JSON data structures where appropriate
-
----
-
-## ⚠️ REVISION REQUIRED (Attempt 2/3)
-
-Verification failed with score 52/100. Please address these issues:
-
-### Critical (must fix):
-1. **Add probability weights** - Include EVENT_WEIGHTS JSON with probability for each event type and selection algorithm
-2. **Add trigger conditions** - Each event needs: turn requirements, tech prerequisites, galaxy state requirements
-3. **Add missing MOO1 events**:
-   - Guardian of Orion (guards Orion system)
-   - Space Pirates (random fleet raids)
-   - Comet (can destroy planet)
-   - Rebellion (colony revolt)
-   - Supernova (star death, destroys system)
-   - Leader/Scientist recruitment events
-
-### Major (should fix):
-4. **Add JSON data structures** - EVENT_TYPES, MONSTER_STATS, DISASTER_EFFECTS constants
-5. **Add duration fields** - Specify how long ongoing effects last in turns
-
-### Minor:
-6. **Pet-themed names** - Rename monsters per LORE.md conventions
-
-Revise `design/game-mechanics/random-events.md` to address all issues.
+- Exact algorithm for each victory type
+- Population thresholds for domination victory
+- Council voting mechanics (who votes, vote weights, timing)
+- Conquest victory conditions (all enemies eliminated)
+- Orion Guardian defeat special victory
+- Transcendence victory (if applicable to MOO1)
+- Turn-by-turn checking logic
+- Edge cases (ties, simultaneous victories)
+- JSON data structures for victory configuration
+- Pet-themed flavor where appropriate per LORE.md
