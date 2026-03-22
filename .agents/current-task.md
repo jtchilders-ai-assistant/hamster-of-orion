@@ -1,20 +1,23 @@
-# Current Task: spec-018
+# Current Task: spec-019
 
 ## Title
-AI Decision Scoring Functions
+Galaxy Generation Algorithm
 
 ## Description
-Document AI algorithms for: threat assessment scoring, expansion priority, research selection, fleet deployment, diplomatic stance. Update design/technical/ai-implementation.md
+Document exact algorithm for: star placement, cluster formation, planet assignment, resource distribution, home world placement. Update design/galaxy/generation-algorithm.md
 
 ## Output File
-design/technical/ai-implementation.md
+design/galaxy/generation-algorithm.md
 
 ## Requirements
-- Threat assessment scoring algorithm
-- Expansion priority scoring
-- Research selection algorithm
-- Fleet deployment decisions
-- Diplomatic stance calculations
-- All formulas must be implementation-ready with exact constants
-- Include worked examples
-- JSON data tables where appropriate
+- Detailed algorithm for procedural star placement with clustering behavior
+- Cluster formation rules and parameters
+- Planet count assignment per star system
+- Resource distribution algorithms (minerals, special resources)
+- Home world placement logic ensuring balanced starts
+- Pseudo-code or step-by-step procedural descriptions
+- Configuration parameters with default values
+- Edge cases and constraints
+
+## Context
+This is part of the galaxy generation system. Reference existing specs in design/galaxy/ if available.
