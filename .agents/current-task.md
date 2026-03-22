@@ -1,33 +1,28 @@
-# Current Task
+# Current Task: review-001
 
-**Status**: COMPLETED
-
-**Task ID**: spec-025
-**Title**: JSON Data Schemas
-**Priority**: 25
+## Title
+Comprehensive Gap Analysis vs MOO1 Manual
 
 ## Description
-Create TypeScript/JSON schemas for all game data: races, technologies, weapons, ships, planets, events.
+Compare ALL design documents against the original MOO1 manual PDF. Identify any missing mechanics, systems, or details. Create a gap report listing:
+1. Missing systems entirely
+2. Incomplete specifications  
+3. Deviations from MOO1 (intentional vs unintentional)
 
 ## Output File
-`design/technical/data-schemas.md`
+`design/review/gap-analysis-manual.md`
 
-## Completion Status
-✅ **COMPLETED** - 2026-03-22 12:00 CDT
+## Priority
+1 (Highest)
 
-Created comprehensive 54KB specification covering:
-- 15 core enums and 8 base types
-- 50+ TypeScript interfaces for all game entities
-- 4 JSON Schema Draft-07 definitions for validation
-- Game constants and difficulty configurations
-- Validation rules and cross-reference checks
-- Usage examples and implementation guidance
-- Complete file organization structure
+## Instructions
+1. Read the MOO1 manual PDF from `reference/MOO1_Manual.pdf` (or reference materials)
+2. Compare against all existing design documents in `design/` directory
+3. Create a comprehensive gap analysis report identifying:
+   - Systems mentioned in manual but missing from our docs
+   - Systems that are partially documented
+   - Any deviations from the original (mark if intentional)
+4. Output should be well-organized markdown with clear sections
 
-## All Specification Tasks Complete
-
-With spec-025 completed, all 25 specification tasks in the project are now done:
-- spec-001 through spec-024: ✅ DONE
-- spec-025: ✅ DONE (pending verification)
-
-The Hamster of Orion game design specification is now complete and ready for implementation.
+## Started
+2026-03-22T12:43:00-05:00
