@@ -1,19 +1,25 @@
-# Current Task: ui-009
+# Current Task: ui-010
 
-## High Council UI - ASCII Wireframe
-
-**Priority**: 13
-**Output File**: design/ui-ux/wireframes/high-council.md
+## Title
+Reports & Statistics UI - ASCII Wireframe
 
 ## Description
-Create detailed ASCII wireframe for Galactic Council screen matching MOO1. Include: voting display, candidate banners, vote tallies, speech/response.
+Create detailed ASCII wireframe for Reports screen matching MOO1. Include: empire comparison, graphs, military rankings, tech levels, production stats.
+
+## Output File
+`design/ui-ux/wireframes/reports.md`
 
 ## Requirements
-- Match MOO1 Galactic Council mechanics and feel
-- Show council chamber layout with all empire delegates
-- Voting interface with candidate selection
-- Vote tallies display (votes based on population)
-- Speech/response dialog for diplomatic interactions
-- Victory conditions display (elected galactic emperor)
-- Abstain and defiance options
-- Pet-themed naming per LORE.md
+- Create detailed ASCII wireframe for the Reports/Statistics screen
+- Match Master of Orion 1 style and mechanics
+- Include empire comparison charts
+- Include graphs (population, production, etc.)
+- Include military rankings
+- Include tech level comparisons
+- Include production statistics
+- Follow the format of existing wireframes in design/ui-ux/wireframes/
+
+## Reference
+- Look at existing wireframes for format consistency
+- Reference MOO1 game mechanics documentation
+- Check design/game-mechanics/ for relevant game systems
