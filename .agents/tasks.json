@@ -223,9 +223,10 @@
       "id": "spec-025",
       "title": "JSON Data Schemas",
       "description": "Create TypeScript/JSON schemas for all game data: races, technologies, weapons, ships, planets, events. Create design/technical/data-schemas.md",
-      "status": "in_progress",
+      "status": "pending_verification",
       "priority": 25,
-      "output_file": "design/technical/data-schemas.md"
+      "output_file": "design/technical/data-schemas.md",
+      "completed": "2026-03-22"
     }
   ]
 }

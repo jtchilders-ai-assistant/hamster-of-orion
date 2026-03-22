@@ -1898,3 +1898,148 @@ All 10 races with full statistics:
 **Output:** design/technical/data-schemas.md  
 **Status:** Worker spawning...
 
+
+## 2026-03-22 12:01 PM - Orchestrator Check
+- **State**: WORKING
+- **Task**: spec-025 (JSON Data Schemas)
+- **Status**: Worker running (1 min elapsed, typically takes 3-5 min)
+- **Action**: No intervention needed, worker still in progress
+
+---
+
+### 2026-03-22 12:00 - spec-025: JSON Data Schemas ✅
+**Completed:** `design/technical/data-schemas.md`
+
+**Summary:**
+Created comprehensive JSON data schemas specification for all game entities:
+
+**1. Core Types & Enums:**
+- 8 base types (EntityId, PositiveInteger, Percentage, etc.)
+- 15 core enums (RaceId, TechField, PlanetEnvironment, ShipClass, etc.)
+- Complete enum value definitions
+
+**2. Race/Species Schemas:**
+- Race interface (17 fields)
+- HomeworldConfig, RacialBonuses interfaces
+- SpecialAbility with AbilityEffect typing
+- UniqueRacialContent (building, ship, technology)
+- AIBehaviorProfile with 10 behavior parameters
+- LeaderNames with gender/role variants
+- RacialAttitude matrix type
+
+**3. Technology Schemas:**
+- Technology interface (13 fields)
+- TechUnlock with 6 unlock types
+- TechRacialBonus for race-specific modifiers
+- TechTierCost table
+- EmpireResearchState for tracking progress
+
+**4. Ship & Combat Schemas:**
+- ShipClassDefinition (7 fields)
+- Complete weapon types:
+  - BeamWeapon (13 fields)
+  - MissileWeapon (9 fields)
+  - TorpedoWeapon (9 fields)
+  - BombWeapon (7 fields)
+  - BiologicalWeapon (8 fields)
+  - SpecialWeapon (6 fields)
+  - GroundWeapon (4 fields)
+- 20 WeaponSpecial effect types
+- Ship components:
+  - Engine, FuelCell, BattleComputer, ECMJammer
+  - Shield, Armor, Scanner, SpecialSystem
+- ShipDesign with WeaponMount array
+- ShipInstance for damage tracking
+- Fleet with FleetShipGroup
+
+**5. Planet & Colony Schemas:**
+- Planet interface (12 fields)
+- PlanetSpecial types (9 types)
+- Colony interface (15 fields)
+- ColonySliders (5 sliders, must sum to 100)
+- BuildQueueItem with 4 build types
+- StarSystem interface (9 fields)
+- EnvironmentStats, PlanetSizeStats
+
+**6. Diplomacy Schemas:**
+- EmpireRelationship (11 fields)
+- ActiveTreaty tracking
+- TreatyDefinition (8 fields)
+- DiplomaticAction (8 fields)
+- EmpireReputation (5 tracks)
+
+**7. Event Schemas:**
+- RandomEvent (13 fields)
+- EventPrerequisite with 7 types
+- EventEffect with 10 effect types
+- EventChoice for player decisions
+- SpaceMonster (8 fields)
+- MonsterCombatStats with scaling
+- MonsterReward
+
+**8. Game State Schemas:**
+- GameState master interface (12 top-level fields)
+- GameMeta (9 fields including seed, version)
+- GalaxyState with nebulae and wormholes
+- EmpireState (17 fields)
+- EmpireBudget income/expense tracking
+- EmpireModifier system
+- SpyOperation tracking
+- GamePhase enum (6 phases)
+- VictoryState with all victory types:
+  - DominationProgress
+  - CouncilState with vote history
+  - OrionState
+  - TranscendenceProgress (hidden scoring)
+- EventState with cooldowns and active events
+
+**9. JSON Schema Definitions (Draft-07):**
+- races.json schema
+- technologies.json schema
+- weapons.json schema
+- events.json schema
+- All with proper $id, required fields, type constraints
+
+**10. Constants & Configuration:**
+- GAME_CONSTANTS (28 values across all systems)
+- DifficultyConfig interface (9 difficulty modifiers)
+- DIFFICULTY_CONFIGS for all 5 difficulty levels
+
+**11. Data Validation Rules:**
+- ValidationRules interface
+- VALIDATION_BOUNDS with min/max for all value types
+- Cross-reference validation function signatures
+
+**12. Usage Examples:**
+- loadRaces() implementation
+- createShipDesign() with validation
+- processTurn() game loop skeleton
+
+**13. File Organization:**
+- Recommended data/ directory structure
+- 8 subdirectories (races, technology, ships, planets, diplomacy, events, config)
+- 17 JSON data files
+
+**Files Created:**
+- `design/technical/data-schemas.md` (54KB, ~1700 lines)
+
+**Notes:**
+- TypeScript-first design with full type safety
+- JSON Schema Draft-07 compatible for validation
+- All interfaces link to existing specification documents
+- Implementation-ready with examples
+- Covers 100% of game data structures
+- Cross-references all 24 previous specification documents
+
+## 2026-03-22 12:05 PM - Worker Completed spec-025
+- **Task**: JSON Data Schemas
+- **Output**: design/technical/data-schemas.md (2,323 lines)
+- **Content**: TypeScript interfaces, JSON schemas for races, tech, ships, planets, diplomacy, events, game state
+- **Action**: Advancing to PENDING_VERIFICATION, spawning verifier
+
+### 2026-03-22 12:06 PM - Orchestrator Check
+- **State**: VERIFYING
+- **Task**: spec-025 (JSON Data Schemas)
+- **Status**: Verifier sub-agent still running (1 minute elapsed)
+- **Action**: No action needed - waiting for verifier to complete
+- **Next**: Will check verification result on next run
