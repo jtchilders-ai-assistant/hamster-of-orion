@@ -1,39 +1,74 @@
-# Hamster of Orion - Complete Game Specification
+# Hamster of Orion - Phase 2: Gap Analysis & UI Specification
 
 ## Goal
-Complete the mathematical formulas, algorithms, constants, and API specifications needed to fully implement Hamster of Orion. The game should faithfully recreate Master of Orion (1993) mechanics while using the unique pet-themed lore.
+Thoroughly review all existing design documents, identify gaps compared to the original Master of Orion, and create detailed ASCII wireframes for all UI screens that faithfully recreate MOO1's interface behavior.
+
+## Phase 2 Objectives
+
+### 1. Gap Analysis (Tasks review-001 to review-004)
+- Compare ALL specs against MOO1 manual PDF
+- Cross-reference with StrategyWiki pages
+- Create coverage matrix showing what's documented
+- Identify inconsistencies across our spec documents
+
+### 2. UI Specification (Tasks ui-001 to ui-012)
+- Inventory all MOO1 screens vs our current UI docs
+- Create detailed ASCII wireframes for each screen
+- Match original MOO1 layout and behavior
+- Document all interactions and state transitions
+
+### 3. Resolution (Tasks fix-001 to fix-002)
+- Address all gaps found in analysis
+- Fix consistency issues across specs
 
 ## Reference Materials
-- `design/` folder contains existing design documents
-- Original MOO1 manual (PDF) for reference
-- MOO1 wiki resources for exact formulas
+
+### Primary Sources
+- Original MOO1 Manual PDF (in project)
+- StrategyWiki: https://strategywiki.org/wiki/Master_of_Orion/Table_of_Contents
+- Archive.org Strategy Guide: https://archive.org/stream/MasterOfOrionStrategyGuide/MasterOfOrionStrategyGuide_opt_djvu.txt
+
+### Existing UI Docs to Review/Update
+- `design/ui-ux/UI_OVERVIEW.md` - General UI principles
+- `design/ui-ux/main-screens.md` - Main screen layouts
+- `design/ui-ux/tactical-combat-ui.md` - Combat screen
+- `design/ui-ux/information-displays.md` - Info panels
+
+## Output Requirements
+
+### Gap Analysis Reports
+```markdown
+# Gap Analysis Report
+
+## Summary
+- Total gaps found: X
+- Critical gaps: X
+- Minor gaps: X
+
+## Detailed Findings
+
+### [System Name]
+- **Status**: Missing / Incomplete / Deviation
+- **MOO1 Reference**: [manual page or wiki section]
+- **Our Coverage**: [file and section]
+- **Gap Description**: What's missing or wrong
+- **Recommended Fix**: How to address
+```
+
+### ASCII Wireframes
+```
+Each wireframe should include:
+1. Full screen layout with borders
+2. All UI elements labeled
+3. Multiple states (selected/unselected, different modes)
+4. Exact button/control positions
+5. Information panel contents
+6. How it matches MOO1 behavior
+```
 
 ## Success Criteria
-- [ ] All economic formulas documented with exact constants
-- [ ] Complete tech tree with all stats, costs, and effects
-- [ ] Combat system fully specified with damage tables
-- [ ] AI decision-making algorithms detailed
-- [ ] Galaxy generation algorithm specified
-- [ ] All random events with triggers and effects
-- [ ] API/data structures ready for implementation
-
-## Output Format
-For each system, create or update markdown files with:
-1. **Formulas** - Exact mathematical equations
-2. **Constants** - All magic numbers with explanations
-3. **Algorithms** - Pseudocode for complex logic
-4. **Data Tables** - Complete stat tables (JSON-ready)
-5. **Edge Cases** - How to handle special situations
-
-## Working Method
-1. Read existing design docs to understand current state
-2. Research MOO1 mechanics from the manual and wikis
-3. Write complete specifications for ONE system at a time
-4. Update progress.md after each completed specification
-5. Mark task as done in tasks.json
-
-## Notes
-- Follow MOO1 exactly for mechanics (not MOO2)
-- Use the pet-themed naming from LORE.md
-- Specifications should be implementation-ready
-- Include JSON schemas where applicable
+- [ ] Complete gap analysis with all discrepancies documented
+- [ ] All 10+ UI screens have detailed ASCII wireframes
+- [ ] Wireframes match MOO1 layout and behavior
+- [ ] All gaps resolved with updated specs
+- [ ] Consistency issues fixed across all documents
