@@ -1,23 +1,25 @@
-# Current Task: spec-019
+# Current Task: spec-020
 
 ## Title
-Galaxy Generation Algorithm
+Planet Generation Tables
 
 ## Description
-Document exact algorithm for: star placement, cluster formation, planet assignment, resource distribution, home world placement. Update design/galaxy/generation-algorithm.md
+Document exact tables for: planet type probability by star type, size distribution, mineral richness, special features. Create design/planets/generation-tables.md with JSON data
 
 ## Output File
-design/galaxy/generation-algorithm.md
+design/planets/generation-tables.md
+
+## Priority
+20
 
 ## Requirements
-- Detailed algorithm for procedural star placement with clustering behavior
-- Cluster formation rules and parameters
-- Planet count assignment per star system
-- Resource distribution algorithms (minerals, special resources)
-- Home world placement logic ensuring balanced starts
-- Pseudo-code or step-by-step procedural descriptions
-- Configuration parameters with default values
-- Edge cases and constraints
+- Planet type probability tables by star type (Blue, White, Yellow, Orange, Red)
+- Size distribution tables (Tiny, Small, Medium, Large, Huge)
+- Mineral richness probabilities (Ultra Poor, Poor, Abundant, Rich, Ultra Rich)
+- Special features tables (artifacts, gold deposits, natives, etc.)
+- All data in JSON format for implementation
+- Must be consistent with MOO1 mechanics
+- Cross-reference with galaxy generation algorithm (design/galaxy/generation-algorithm.md)
 
-## Context
-This is part of the galaxy generation system. Reference existing specs in design/galaxy/ if available.
+## Started
+2026-03-22T11:31:00-05:00

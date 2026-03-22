@@ -1183,3 +1183,9 @@ Created comprehensive galaxy generation algorithm specification including:
 - Region names need cross-verification with space-regions.md
 
 Proceeding to next task...
+
+## 2026-03-22 11:31 - Starting spec-020
+
+**Task**: Planet Generation Tables
+**Output**: design/planets/generation-tables.md
+**Action**: Spawning worker agent
