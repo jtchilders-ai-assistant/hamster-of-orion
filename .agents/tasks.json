@@ -61,9 +61,10 @@
       "id": "spec-007",
       "title": "Complete Ship Components Table", 
       "description": "Create complete component stats: engines, computers, ECM, shields, armor, specials with all stats and costs. Update design/ships/components-complete.md with JSON data",
-      "status": "pending",
+      "status": "done",
       "priority": 7,
-      "output_file": "design/ships/components-complete.md"
+      "output_file": "design/ships/components-complete.md",
+      "completed": "2026-03-22"
     },
     {
       "id": "spec-008",

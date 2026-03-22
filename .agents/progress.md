@@ -220,3 +220,48 @@ Created comprehensive weapons database specification including:
 - All weapons ready for implementation with JSON schema
 
 ---
+
+### 2026-03-22 07:22 - spec-007: Complete Ship Components Table ✅
+**Completed:** `design/ships/components-complete.md`
+
+**Summary:**
+Created comprehensive ship components database specification including:
+- **10 Engines** (Retro → Hyper-X Drive)
+  - Speed, combat speed, space, cost, maneuver rating
+- **9 Fuel Cells** (Standard → Thorium/Infinite)
+  - Range extension options
+- **11 Battle Computers** (+1 to +11 Attack Rating)
+  - Accuracy improvement per level
+- **10 ECM Jammers** (+1 to +10 Missile Defense)
+  - Missile interception chances
+- **15 Deflector Shields** (Class I-XV)
+  - Damage absorption per hit
+- **7 Armor Types** (Titanium → Neutronium)
+  - HP multipliers (1.0× to 4.0×)
+  - Ground combat bonuses
+- **5 Scanners** (Deep Space → Hyper)
+  - Detection ranges from colonies and ships
+- **Battle Scanner** (initiative and targeting)
+- **Special Systems:**
+  - 3 Cloaking devices
+  - 2 Repair systems
+  - 9 Tactical systems (stabilizers, teleporter, stasis, etc.)
+  - 3 Boarding/Transporter systems
+- **4 Planetary Shields** (Class V-XX)
+- **Ground Combat Gear** (shields and armor)
+- **Robotic Controls** (factory ratios)
+- Base HP by ship class
+- Component space by ship class
+- Racial component modifiers
+- Complete JSON data schema
+
+**Files Created:**
+- `design/ships/components-complete.md` (23KB, 620+ lines)
+
+**Notes:**
+- Pairs with weapons-complete.md for full ship loadout data
+- All components include tech level, space, and cost
+- Racial modifiers affect component effectiveness
+- Ready for ship design implementation
+
+---
