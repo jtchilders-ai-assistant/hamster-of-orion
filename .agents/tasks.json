@@ -7,9 +7,10 @@
       "id": "spec-001",
       "title": "Factory & Production Formulas",
       "description": "Document exact formulas for: factory output (BC/turn), factory construction cost, factory maintenance, production efficiency by population, racial modifiers. Create design/economy/factory-formulas.md",
-      "status": "pending",
+      "status": "done",
       "priority": 1,
-      "output_file": "design/economy/factory-formulas.md"
+      "output_file": "design/economy/factory-formulas.md",
+      "completed": "2026-03-21"
     },
     {
       "id": "spec-002", 
