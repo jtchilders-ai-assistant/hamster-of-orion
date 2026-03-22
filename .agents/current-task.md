@@ -1,21 +1,20 @@
-# Current Task: spec-014
+# Current Task: spec-015
 
 ## Title
-Complete Tech Tree - Planetology Field
+Diplomacy Relationship Mathematics
 
 ## Description
-Document all planetology technologies: terraforming, colonization, pollution control, bio weapons. Include tier, cost, effect for each. Update design/technology/planetology.md with JSON data
+Document exact formulas for: relationship value changes, treaty effects on relations, war weariness, racial diplomacy modifiers. Create design/diplomacy/relationship-formulas.md
 
 ## Output File
-design/technology/planetology.md
+design/diplomacy/relationship-formulas.md
+
+## Priority
+15
 
 ## Requirements
-- Complete technology tree for Planetology research field
-- All terraforming technologies (Terraforming +10 through Gaia Transformation)
-- Colonization technologies (all environment types)
-- Pollution control systems
-- Biological weapons (all tiers)
-- Each tech needs: tier, research cost, effect description
-- Valid JSON data schema
-- MOO1-accurate mechanics
-- Integration with existing specs
+- Exact mathematical formulas for relationship value calculations
+- Treaty effects and their impact on diplomatic relations
+- War weariness accumulation and effects
+- Racial diplomacy modifiers (bonuses/penalties between races)
+- All values should be concrete numbers, not placeholders

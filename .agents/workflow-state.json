@@ -1,10 +1,10 @@
 {
-  "state": "IDLE",
-  "current_task": null,
-  "current_task_started_at": null,
+  "state": "WORKING",
+  "current_task": "spec-015",
+  "current_task_started_at": "2026-03-22T11:01:00-05:00",
   "retry_count": 0,
   "max_retries": 3,
-  "last_updated": "2026-03-22T10:57:00-05:00",
-  "last_action": "spec-014 verification PASSED (92/100), marked done",
+  "last_updated": "2026-03-22T11:01:00-05:00",
+  "last_action": "Assigned spec-015 (Diplomacy Relationship Mathematics) to worker",
   "verification_issues": []
 }
