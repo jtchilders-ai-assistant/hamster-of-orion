@@ -1185,3 +1185,90 @@ Created comprehensive High Council wireframe specification with detailed ASCII a
 - Spawning worker agent
 ---
 **[2026-03-22 14:33:48]** Orchestrator check: Task ui-010 still in progress. Worker started at 14:28, output file not yet created. Waiting for worker to complete.
+
+## 2026-03-22 14:35 - Worker Completed ui-010 ✅
+
+**Task:** ui-010 - Reports & Statistics UI - ASCII Wireframe
+**Output:** design/ui-ux/wireframes/reports.md (78KB, ~1900 lines)
+**Status:** pending_verification
+
+### Summary:
+Created comprehensive Reports & Statistics (F7) wireframe specification with detailed ASCII art:
+
+**Main Wireframes Created:**
+1. Main Reports Hub - Rankings Tab (power rankings table with sortable columns)
+2. Graphs Tab - Population History (50-turn line graph with 6 empires)
+3. Graphs Tab - Production History (BC/turn trends)
+4. Graphs Tab - Technology Progress (tech level comparison)
+5. Graphs Tab - Military Strength (fleet power over time)
+6. Empire Summary Tab (your empire statistics and colony breakdown)
+7. Tech Status Tab (technology level comparison by field, 6 fields × 6+ empires)
+8. Military Intel Tab (fleet composition, threat assessment, defensive installations)
+9. Pie Chart - Population Distribution (galactic proportion by empire)
+10. Bar Chart - Production Comparison (empire-wide BC/turn comparison)
+11. Victory Progress Tracking (all 5 victory paths with progress bars)
+12. Detailed Empire Breakdown Popup (full intelligence report on selected empire)
+
+**Tab Structure:**
+- RANKINGS - Power rankings table with sortable columns
+- GRAPHS - Historical line/pie/bar charts
+- EMPIRE SUMMARY - Your empire's detailed statistics
+- TECH STATUS - Technology comparison across empires
+- MILITARY INTEL - Fleet and defense analysis
+
+**Key Features Documented:**
+
+**Rankings Tab:**
+- Overall power ranking with weighted components (Pop 18%, Prod 20%, Tech 15%, Mil 35%, Colonies 12%)
+- Sortable by any column
+- Color-coded power bars
+- Empire detail popups on click
+
+**Graphs Tab:**
+- Line graphs with multiple empire series
+- Pie charts for distribution
+- Bar charts for comparisons
+- Time range controls (All Time, 50/25/10 turns)
+- Zoom, pan, export controls
+- Legend with show/hide toggles
+
+**Empire Summary:**
+- Complete economic overview (income, expenses, net)
+- Colony breakdown table
+- Production allocation visualization
+
+**Tech Status:**
+- 6-field comparison matrix
+- Tech level bars per empire per field
+- Gap analysis (technologies they have that you don't)
+
+**Military Intel:**
+- Fleet power rankings with threat levels
+- Ship composition tables (yours vs intelligence estimates)
+- Intel accuracy based on spy network level
+- Defensive installations summary
+
+**Victory Progress:**
+- Domination (66% population)
+- Discovery (Orion breach)
+- Diplomatic (Council vote)
+- Survival (elimination)
+- Transcendence (hidden)
+
+**Additional Specifications:**
+- Keyboard shortcuts (F7, 1-5 tabs, P/L/B chart types, E export)
+- Empire color coding table (10 races with symbols)
+- Status color coding (positive/warning/danger/neutral)
+- Tooltip specifications (power ranking, data points, tech cells)
+- Data display formulas (power ranking calculation)
+- Intelligence accuracy table by spy network level
+- JSON data structures (empire statistics, victory progress)
+- Responsive behavior (Desktop, Laptop, Tablet)
+- Animation specifications
+- Accessibility features
+
+**References Used:**
+- MOO1 (1993) Reports/Graphs Screen
+- design/game-mechanics/victory-conditions.md
+- design/game-mechanics/difficulty.md
+- Existing wireframe styling patterns

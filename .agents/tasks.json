@@ -111,7 +111,7 @@
       "id": "ui-010",
       "title": "Reports & Statistics UI - ASCII Wireframe",
       "description": "Create detailed ASCII wireframe for Reports screen matching MOO1. Include: empire comparison, graphs, military rankings, tech levels, production stats. Output: design/ui-ux/wireframes/reports.md",
-      "status": "pending",
+      "status": "pending_verification",
       "priority": 14,
       "output_file": "design/ui-ux/wireframes/reports.md"
     },
