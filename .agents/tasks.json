@@ -47,7 +47,7 @@
       "id": "ui-002",
       "title": "Main Galaxy Map UI - ASCII Wireframe",
       "description": "Create detailed ASCII wireframe for Galaxy Map matching MOO1 behavior. Include: star display, fleet indicators, selection mechanics, info panels, all buttons. Show multiple states (nothing selected, star selected, fleet selected). Output: design/ui-ux/wireframes/galaxy-map.md",
-      "status": "in_progress",
+      "status": "pending_verification",
       "priority": 6,
       "output_file": "design/ui-ux/wireframes/galaxy-map.md"
     },

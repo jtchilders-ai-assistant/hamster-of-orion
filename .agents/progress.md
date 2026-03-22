@@ -443,3 +443,60 @@ Created comprehensive UI screen inventory comparing ALL MOO1 screens against HoO
 - **Output**: design/ui-ux/wireframes/galaxy-map.md
 - **State**: WORKING
 - **Action**: Spawning worker subagent
+
+## 2026-03-22 13:20 - Worker Completed ui-002 ✅
+
+**Task:** ui-002 - Main Galaxy Map UI - ASCII Wireframe
+**Output:** design/ui-ux/wireframes/galaxy-map.md (36KB, 980+ lines)
+**Status:** pending_verification
+
+### Summary:
+Created comprehensive Galaxy Map wireframe specification with detailed ASCII art for all states:
+
+**Wireframes Created:**
+1. Default View (nothing selected)
+2. Star Selected State (with system info panel)
+3. Fleet Selected State (with range circle and fleet info)
+4. Fleet Moving / Route Display
+
+### Key Features Documented:
+
+**Star Display System:**
+- 5 star types (Yellow ★, Blue ✦, Red ✴, White ✵, Unexplored ·)
+- Colony indicators (Your ●, Enemy ◉, Neutral ◈)
+- Fleet indicators (Your ▲/▷, Enemy △)
+
+**Interactive Elements:**
+- Selection mechanics (click, right-click, drag)
+- Keyboard shortcuts (F1-F7, arrows, Tab, etc.)
+- Context menus for stars, fleets, empty space
+- Zoom levels (5 levels from strategic to tactical)
+
+**Information Panels:**
+- Left: Empire Summary (always visible)
+- Right: Legend (collapsible)
+- Bottom: Context-sensitive info/selection details
+- Top: Navigation bar with F2-F7 buttons
+
+**Additional Specifications:**
+- Range display mechanics with visual range circles
+- Fleet destination selection workflow
+- Fog of war / exploration states
+- Tooltip specifications for all elements
+- Special visual states (Orion, Combat, Blockade)
+- Responsive behavior (Desktop, Laptop, Tablet)
+- Animation specifications
+- Accessibility features
+- Technical notes (performance targets, data requirements)
+
+### References Used:
+- MOO1 (1993) galaxy map interface
+- main-screens.md existing documentation
+- UI_OVERVIEW.md design guidelines
+- screen-inventory.md gap analysis
+- LORE.md for pet-themed naming
+
+### 2026-03-22 13:23:52 - Orchestrator Check
+- **State**: WORKING → PENDING_VERIFICATION
+- **Task**: ui-002 (Galaxy Map UI Wireframe)
+- **Action**: Output file detected (756 lines), initiating verification
