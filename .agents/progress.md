@@ -1304,3 +1304,9 @@ Created comprehensive planet generation tables specification including:
 - **Notes**: All JSON valid, probability tables correct, consistent with galaxy algorithm
 - **Minor issues**: Average modifier calculations slightly off in summary table; Blue/White colonizable percentages marginally off
 - **State**: → IDLE
+
+## 2026-03-22 11:37 - Starting New Task
+- **Task**: spec-021 (Random Events System)
+- **Output**: design/game-mechanics/random-events.md
+- **State**: IDLE → WORKING
+- **Action**: Spawning worker agent

@@ -1,25 +1,25 @@
-# Current Task: spec-020
+# Current Task: spec-021
 
 ## Title
-Planet Generation Tables
+Random Events System
 
 ## Description
-Document exact tables for: planet type probability by star type, size distribution, mineral richness, special features. Create design/planets/generation-tables.md with JSON data
+Document all random events: trigger conditions, probability, effects, duration. Include space monsters, discoveries, disasters, opportunities. Update design/game-mechanics/random-events.md
 
 ## Output File
-design/planets/generation-tables.md
+design/game-mechanics/random-events.md
 
 ## Priority
-20
+21
 
 ## Requirements
-- Planet type probability tables by star type (Blue, White, Yellow, Orange, Red)
-- Size distribution tables (Tiny, Small, Medium, Large, Huge)
-- Mineral richness probabilities (Ultra Poor, Poor, Abundant, Rich, Ultra Rich)
-- Special features tables (artifacts, gold deposits, natives, etc.)
-- All data in JSON format for implementation
-- Must be consistent with MOO1 mechanics
-- Cross-reference with galaxy generation algorithm (design/galaxy/generation-algorithm.md)
-
-## Started
-2026-03-22T11:31:00-05:00
+- Complete list of all random events from MOO1
+- Trigger conditions for each event
+- Probability/frequency of occurrence
+- Effects (positive/negative/neutral)
+- Duration if applicable
+- Space monsters (Guardian, Space Amoeba, Space Crystal)
+- Discoveries (Orion, artifacts, derelicts)
+- Disasters (plague, rebellion, comet)
+- Opportunities (leaders, technology finds)
+- JSON data structures where appropriate
