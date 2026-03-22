@@ -71,3 +71,37 @@ Created comprehensive population growth specification including:
 - Links to factory-formulas.md for production integration
 
 ---
+
+### 2026-03-21 22:29 - spec-003: Research Point Calculation ✅
+**Completed:** `design/technology/research-formulas.md`
+
+**Summary:**
+Created comprehensive research and technology system specification including:
+- RP per scientist formula (1.0 base × lab multiplier × racial modifier)
+- Research building progression (Research Lab → Supercomputer → Autolab → Galactic Cybernet)
+- Building multipliers (1.5× to 6.0× cumulative)
+- Racial research modifiers (Rats +50%, Mice +15%, Guinea Pigs -20%)
+- Empire-wide RP pooling mechanism
+- Tech cost scaling by tier (50 RP → 100,000 RP across 20 tiers)
+- Galaxy size cost modifiers (0.75× to 1.50×)
+- Difficulty modifiers for AI research
+- Miniaturization formula (5% size/cost reduction per tier, 80% maximum)
+- Tech selection system (2-3 random choices per tier)
+- Research treaty bonuses (+10% of partner's RP)
+- Special bonuses (Artifacts +25%, Orion +400%)
+- Tech stealing and trading mechanics
+- Reverse engineering rules
+- Complete JSON data schemas
+- Pseudocode algorithms for empire research and miniaturization
+- Worked examples (Hamsters, Rats comparison, miniaturization, galaxy size)
+- Edge cases (overflow, no scientists, completed fields)
+
+**Files Created:**
+- `design/technology/research-formulas.md` (18KB, 500+ lines)
+
+**Notes:**
+- Rats get 50% more effective research (game-changing advantage)
+- Miniaturization caps at 80% reduction (20% minimum size)
+- Research buildings are cumulative (not replacement)
+
+---

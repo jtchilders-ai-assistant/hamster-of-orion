@@ -25,9 +25,10 @@
       "id": "spec-003",
       "title": "Research Point Calculation",
       "description": "Document exact formulas for: RP per scientist, research building bonuses, tech cost scaling, miniaturization formula, racial research modifiers. Update design/technology/research-formulas.md",
-      "status": "pending",
+      "status": "done",
       "priority": 3,
-      "output_file": "design/technology/research-formulas.md"
+      "output_file": "design/technology/research-formulas.md",
+      "completed": "2026-03-21"
     },
     {
       "id": "spec-004",
