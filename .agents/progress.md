@@ -1506,3 +1506,104 @@ Major revision addressing all critical, major, and minor verification issues:
 - Starting spec-023: Difficulty Level Modifiers
 - State: IDLE → WORKING
 - Spawning worker
+
+---
+
+### 2026-03-22 11:46 - spec-022: Victory Condition Checks ✅
+**Completed:** `design/game-mechanics/victory-conditions.md`
+
+**Summary:**
+Created comprehensive victory conditions algorithm specification including:
+
+**1. Victory Check Algorithm:**
+- Turn-by-turn checking logic with priority order
+- Check phase: Start of turn after production
+- Priority: Survival > Discovery > Domination > Diplomatic > Transcendence
+
+**2. Domination Victory (2/3 Population):**
+- Exact formula: `(Empire_Population / Galaxy_Total_Population) >= 0.6667`
+- Integer math check: `(empire_pop × 3) >= (galaxy_pop × 2)`
+- Population counting rules (colonies, transports, rebels)
+- Complete algorithm with edge cases
+- Worked example progression (Turn 100 → Turn 175)
+
+**3. Discovery Victory (Orion Guardian Defeat):**
+- Complete Guardian statistics (3000 HP, 12 attack, 10 defense, Class XV shields)
+- 4 weapons: Death Ray, Scatter Pack Missiles (×5), Plasma Torpedo (×3), Heavy Beam (×4)
+- Special systems: Damper Field, High Energy Focus, Advanced Targeting
+- 8 immunities (bio weapons, stasis, black hole generator, etc.)
+- Guardian combat algorithm with targeting priority
+- Minimum fleet requirements table
+- Respawn mechanics (50 turns if not colonized)
+- Victory trigger on Orion colonization
+
+**4. Diplomatic Victory (Council Vote):**
+- References council.md for full mechanics
+- 50% colonization threshold for Council formation
+- 25-turn intervals between meetings
+- 2/3 vote threshold (66.67%)
+- Accept/Reject victory mechanics
+- Galactic War on rejection
+
+**5. Survival Victory (Conquest):**
+- Last empire standing condition
+- Empire elimination rules (no colonies, no colony ships)
+- Colony ships in transit exception
+- Mutual destruction handling
+
+**6. Transcendence Victory (Hidden):**
+- 6-component scoring system:
+  - Technology mastery (0-100)
+  - Military strength (0-100)
+  - Economic power (0-100)
+  - Diplomatic standing (0-100)
+  - Population size (0-100)
+  - Wisdom/time factor (0-100)
+- Balance multiplier (0.5× to 1.5×)
+- Atrocity penalties (bio weapons -50, genocide -100)
+- Threshold: 500 points with balance multiplier ≥ 1.0
+- Minimum turn 150
+- Hidden from player (no progress display)
+
+**7. Simultaneous Victory Resolution:**
+- Priority-based tiebreaking
+- Same-priority tiebreakers documented
+
+**8. Victory Progress Tracking:**
+- Player-visible progress display format
+- Update frequencies per victory type
+
+**9. Victory Screen and Aftermath:**
+- Victory screen components
+- Hall of Fame entry schema
+- Post-victory options (continue, new game, replay, exit)
+
+**10. Complete JSON Data Schemas:**
+- victory_check_constants
+- victory_state_schema
+- victory_progress_schema
+- guardian_state_schema
+- VICTORY_CONSTANTS (all 25+ constants)
+
+**11. Worked Examples:**
+- Domination victory progression
+- Discovery victory combat sequence
+- Council victory vote calculation
+
+**12. Edge Cases:**
+- Zero population galaxy
+- Population shift during turn
+- Colony ships only
+- 100% abstention
+- Atrocity after high transcendence score
+
+**Files Created:**
+- `design/game-mechanics/victory-conditions.md` (39KB, ~1100 lines, complete rewrite)
+
+**Notes:**
+- Fully replaces previous conceptual victory document
+- All 5 victory types with exact algorithms
+- Guardian combat fully specified
+- Transcendence scoring system complete (hidden mechanic)
+- MOO1-faithful thresholds (2/3 population, 2/3 Council)
+- Ready for implementation
