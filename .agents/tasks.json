@@ -97,8 +97,9 @@
       "id": "spec-011",
       "title": "Complete Tech Tree - Construction Field",
       "description": "Document all construction technologies: armor types, factory bonuses, ship size increases. Include tier, cost, effect for each. Update design/technology/construction.md with JSON data",
-      "status": "pending",
+      "status": "done",
       "priority": 11,
+      "completed": "2026-03-22",
       "output_file": "design/technology/construction.md"
     },
     {

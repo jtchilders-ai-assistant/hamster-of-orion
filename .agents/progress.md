@@ -420,3 +420,47 @@ Created complete Propulsion technology tree specification including:
 - Thorium Cells (infinite range) is game-changing
 
 ---
+
+### 2026-03-22 07:34 - spec-011: Complete Tech Tree - Construction Field ✅
+**Completed:** `design/technology/construction.md`
+
+**Summary:**
+Created complete Construction technology tree specification including:
+- **14+ Technology Tiers** (50 RP to 50,000 RP)
+- **28 Total Technologies:**
+  - 7 Armor Types (Titanium → Neutronium)
+  - 8 Industrial Tech levels (10 BC → 2 BC factory cost)
+  - 5 Pollution Control levels (100% → 0% waste)
+  - 4 Ship Hull unlocks (Cruiser → Titan)
+  - 2 Repair Systems (15% → 30% HP/turn)
+  - 3 Ground Combat Equipment
+- **Armor Progression:**
+  - HP ×1.0 (Titanium) → HP ×4.0 (Neutronium)
+  - Ground combat bonuses: +0 → +30
+- **Industrial Tech:**
+  - Factory cost: 10 BC → 2 BC (80% savings)
+- **Pollution Control:**
+  - Waste Elimination at Tech Level 45
+- **Ship Hull Unlocks:**
+  - Cruiser (500): Tech 15
+  - Battle Cruiser (1000): Tech 20
+  - Dreadnought (1500): Tech 30
+  - Titan (2500): Tech 40
+- **Racial Bonuses:**
+  - Ants: +50% production
+  - Mice: +25% production
+  - Guinea Pigs: +50% ground combat
+  - Hermit Crabs: +25% armor HP
+- Strategic importance by game phase
+- Complete JSON data schema
+
+**Files Created:**
+- `design/technology/construction.md` (23KB, 620+ lines)
+
+**Notes:**
+- Third of six technology field specifications
+- Industrial Tech critical for economic snowball
+- Ship hull unlocks are major power spikes
+- Starting techs: Titanium Armor + Standard Construction
+
+---
