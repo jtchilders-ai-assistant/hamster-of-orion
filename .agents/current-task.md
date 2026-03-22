@@ -1,20 +1,27 @@
-# Current Task: spec-015
+# Current Task: spec-016
 
 ## Title
-Diplomacy Relationship Mathematics
+Council Voting Algorithm
 
 ## Description
-Document exact formulas for: relationship value changes, treaty effects on relations, war weariness, racial diplomacy modifiers. Create design/diplomacy/relationship-formulas.md
+Document exact algorithm for: vote allocation by population, voting behavior by relationship, victory threshold, abstention rules. Update design/diplomacy/council.md
 
 ## Output File
-design/diplomacy/relationship-formulas.md
-
-## Priority
-15
+design/diplomacy/council.md
 
 ## Requirements
-- Exact mathematical formulas for relationship value calculations
-- Treaty effects and their impact on diplomatic relations
-- War weariness accumulation and effects
-- Racial diplomacy modifiers (bonuses/penalties between races)
-- All values should be concrete numbers, not placeholders
+1. Complete mathematical formulas (no placeholders)
+2. MOO1-faithful mechanics adapted to Hamster of Orion theme
+3. Implementation-ready with pseudocode
+4. JSON data tables for all constants
+5. Edge cases documented
+6. Use pet-themed race names per LORE.md
+
+## Key Topics to Cover
+- Vote allocation formula (population-based)
+- Voting behavior based on diplomatic relationships
+- Victory threshold calculation
+- Abstention rules and conditions
+- Council election timing and frequency
+- Veto mechanics (if applicable)
+- Council dissolution conditions

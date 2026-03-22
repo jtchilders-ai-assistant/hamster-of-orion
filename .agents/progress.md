@@ -746,3 +746,9 @@ Created comprehensive diplomacy relationship mathematics specification including
   - First contact gift value clarification
   - Guinea Pigs vs Hamsters attitude value discrepancy
 - **State**: Reset to IDLE, ready for next task
+
+## 2026-03-22 11:07 - Starting spec-016
+- **Task**: Council Voting Algorithm
+- **Output**: design/diplomacy/council.md
+- **State**: WORKING
+- **Action**: Spawning worker sub-agent

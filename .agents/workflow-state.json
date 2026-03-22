@@ -1,10 +1,10 @@
 {
-  "state": "IDLE",
-  "current_task": null,
-  "current_task_started_at": null,
+  "state": "WORKING",
+  "current_task": "spec-016",
+  "current_task_started_at": "2026-03-22T11:07:00-05:00",
   "retry_count": 0,
   "max_retries": 3,
-  "last_updated": "2026-03-22T11:06:30-05:00",
-  "last_action": "spec-015 verified and marked done (score: 92/100)",
+  "last_updated": "2026-03-22T11:07:00-05:00",
+  "last_action": "Spawning worker for spec-016 (Council Voting Algorithm)",
   "verification_issues": []
 }
