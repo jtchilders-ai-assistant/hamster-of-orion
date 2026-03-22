@@ -1750,3 +1750,40 @@ Complete rewrite of difficulty system specification with comprehensive modifiers
 
 **3 tasks completed this cycle!**
 
+---
+
+### 2026-03-22 11:52 - spec-023 REVISION: Difficulty Level Modifiers ✅
+**Revision (Attempt 2):** `design/game-mechanics/difficulty.md`
+
+**Summary:**
+Addressed verification failure by adding comprehensive JSON data structures:
+
+**Added:**
+1. **Custom Difficulty Parameters Schema** - 30 parameters with:
+   - id, name, category, type
+   - min, max, default, step values
+   - Covers all game systems (production, research, combat, growth, espionage, events, diplomacy, AI, starting conditions, guardian)
+   - Custom difficulty score calculation algorithm
+
+2. **Monster Stats JSON Data** - Complete structured data for all 3 space monsters:
+   - Cosmic Blob, Crystal Horror, Void Wyrm
+   - Base stats with difficulty scaling multipliers
+   - Abilities documented
+
+3. **Constants JSON Data** - Structured constants block:
+   - All DIFFICULTY_CONSTANTS
+   - DIFFICULTY_MODIFIER_CAPS with min/max
+   - Score multipliers (0.50× Simple → 2.00× Impossible)
+   - Difficulty name mappings
+
+4. **AI Starting Tech Bonuses JSON** - New section:
+   - Bonus techs by difficulty (0 → 4)
+   - Starting tier adjustments
+   - Tech cost multipliers
+   - Bonus tech field selection algorithm
+
+**Files Updated:**
+- `design/game-mechanics/difficulty.md` (now ~1200 lines with all JSON blocks)
+
+**Verification:** Pending resubmission
+

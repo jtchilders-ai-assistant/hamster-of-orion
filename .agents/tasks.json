@@ -203,10 +203,12 @@
       "id": "spec-023",
       "title": "Difficulty Level Modifiers",
       "description": "Document exact modifiers for each difficulty: AI bonuses, player handicaps, starting conditions, event frequency. Update design/game-mechanics/difficulty.md with JSON data",
-      "status": "done",
+      "status": "pending_verification",
       "priority": 23,
       "output_file": "design/game-mechanics/difficulty.md",
-      "completed": "2026-03-22"
+      "completed": "2026-03-22",
+      "retry": 1,
+      "revision_notes": "Added custom difficulty parameters schema (30 parameters with min/max/default), monster stats JSON, constants JSON, AI starting tech bonuses JSON"
     },
     {
       "id": "spec-024",
