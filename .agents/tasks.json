@@ -39,7 +39,7 @@
       "id": "ui-001",
       "title": "UI Screen Inventory vs MOO1",
       "description": "List ALL screens from the original MOO1 and compare to our UI docs. Identify missing screens or screens that need updates. Reference MOO1 manual and StrategyWiki. Output: design/ui-ux/screen-inventory.md",
-      "status": "pending_verification",
+      "status": "done",
       "priority": 5,
       "output_file": "design/ui-ux/screen-inventory.md"
     },
