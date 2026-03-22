@@ -672,3 +672,43 @@ PASS - The gap analysis now provides an accurate assessment of the project's sta
 - Total Score: 95/100
 
 **Recommendation:** PASS - Fully implementation-ready wireframe specification. This is an exceptional document that provides everything needed to implement the Research Tree screen. The wireframe properly captures MOO1's research mechanics while providing modern UI enhancements for usability and accessibility. Minor tech naming verification is cosmetic and does not block implementation.
+
+---
+
+### ui-006: Ship Design UI - ASCII Wireframe
+**File:** design/ui-ux/wireframes/ship-design.md  
+**Verified:** 2026-03-22T18:59:00Z  
+**Result:** ✅ PASSED (Score: 92/100)
+
+**Summary:** Excellent Ship Design UI wireframe specification with 12 detailed ASCII wireframes covering all required elements. Includes: default design list view (6 slots), hull selection (6 classes), main ship design editor with component dropdowns (Engine, Weapons, Computer, ECM, Shields, Armor, Specials), weapon selection with categories (Beams, Missiles, Torpedoes, Bombs), weapon count selector, special systems selection, error state (over budget), scrap confirmation dialog, auto-design options, copy from existing design, design saved confirmation, and miniaturization tooltip.
+
+**Requirements Coverage:**
+- ✅ Detailed ASCII wireframe matching MOO1 style
+- ✅ Hull selection display (6 classes with stats, locked indicators)
+- ✅ Component slots interface (7 component types with dropdowns)
+- ✅ Weapon assignment system (4 slots, categorized selection, count selector)
+- ✅ Stats display (space usage, cost, HP, offense/defense/mobility ratings)
+- ✅ Save/load designs functionality (save confirmation, copy from, auto-design)
+
+**Bonus Features:**
+- JSON data schema for ship designs
+- Complete keyboard shortcuts table (20+ shortcuts)
+- Mouse interaction specifications
+- State transition diagram
+- Validation rules
+- Responsive behavior notes
+- Accessibility features (ARIA labels, keyboard nav, color blind support)
+- Pet-themed naming conventions
+- Data display formulas (cost, space, HP, miniaturization)
+
+**Issues Found (4 minor):**
+1. Hull class names expanded from MOO1's 4 sizes to 6 named classes - consistent with ship-classes.md design decision
+2. Hull unlock requirements (Construction 24/36) may not match ship-classes.md RP values
+3. Miniaturization 50% cap should be verified against other specs
+4. Titan class (7th hull) not shown - may be intentional exclusion
+
+**Verification Details:**
+- Completeness: 95/100 | Accuracy: 88/100 | Implementation Readiness: 93/100 | Integration: 92/100
+- Total Score: 92/100
+
+**Recommendation:** PASS - Fully implementation-ready wireframe specification. All requirements met with extensive bonus features. Minor cross-document consistency issues do not block implementation.

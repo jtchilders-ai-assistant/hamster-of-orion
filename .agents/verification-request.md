@@ -1,19 +1,24 @@
 # Verification Request
 
-**Task ID:** ui-005
-**Task Title:** Research Tree UI - ASCII Wireframe
-**Output File:** design/ui-ux/wireframes/research-tree.md
+**Task ID**: ui-006
+**Task Title**: Ship Design UI - ASCII Wireframe
+**Output File**: design/ui-ux/wireframes/ship-design.md
 
-## Verification Criteria
-1. File exists and has substantial content
-2. Contains ASCII wireframe representations
-3. Covers all 6 tech fields (Weapons, Propulsion, Construction, Computers, Force Fields, Planetology)
-4. Shows allocation sliders and research mechanics
-5. Matches MOO1 style and gameplay patterns
-6. Includes tech details panel
-7. Well-structured with clear sections
+## Requirements to Verify
+- Detailed ASCII wireframe for Ship Design screen matching MOO1
+- Hull selection display
+- Component slots interface
+- Weapon assignment system
+- Stats display
+- Save/load designs functionality
 
-## Expected Content
-- Multiple screen state wireframes
-- Keyboard/mouse interaction specs
-- MOO1-faithful mechanics documentation
+## Worker Claims
+- 12 ASCII wireframes created
+- 6 hull classes with stats
+- Component dropdowns (Engine, Shield, Armor, Computer, ECM)
+- Weapon selection with categories
+- Special systems selection
+- Error states and confirmations
+- Keyboard shortcuts and mouse interactions
+- JSON data schema
+- Accessibility features

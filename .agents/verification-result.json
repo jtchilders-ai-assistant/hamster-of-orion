@@ -1,23 +1,37 @@
 {
-  "task_id": "ui-005",
-  "verified_at": "2026-03-22T13:51:00-05:00",
+  "task_id": "ui-006",
+  "verified_at": "2026-03-22T18:59:00Z",
   "passed": true,
-  "score": 95,
+  "score": 92,
   "issues": [
     {
       "severity": "minor",
       "category": "accuracy",
-      "description": "Some tech names in examples (e.g., 'Battle Comp III', 'Scatter Pack V') should be verified against MOO1 exact naming conventions",
-      "location": "design/ui-ux/wireframes/research-tree.md - Tech examples throughout",
-      "suggestion": "Cross-reference with StrategyWiki tech lists to confirm exact tech names used in MOO1"
+      "description": "Hull class names differ from MOO1 originals. MOO1 uses 4 hull sizes (Small, Medium, Large, Huge), while the wireframe shows 6 named classes (Scout, Fighter, Destroyer, Cruiser, Battlecruiser, Dreadnought). However, this is consistent with ship-classes.md which defines 7 classes for Hamster of Orion as a deliberate design choice.",
+      "location": "design/ui-ux/wireframes/ship-design.md - Hull Selection section",
+      "suggestion": "No change needed - this is an intentional deviation from MOO1 documented in ship-classes.md. Consider adding a note in the wireframe referencing this design decision."
+    },
+    {
+      "severity": "minor",
+      "category": "accuracy",
+      "description": "Hull unlock requirements inconsistent with ship-classes.md. Wireframe states Battlecruiser requires 'Battle Station (Construction 24)' and Dreadnought requires 'Star Fortress (Construction 36)', but ship-classes.md specifies 6,000 RP and 18,000 RP respectively without specific Construction tech levels.",
+      "location": "design/ui-ux/wireframes/ship-design.md - Hull Selection section",
+      "suggestion": "Reconcile tech requirements between wireframe and ship-classes.md to ensure consistency."
+    },
+    {
+      "severity": "minor",
+      "category": "accuracy",
+      "description": "Miniaturization cap stated as 50% in wireframe tooltip but spec should verify this matches other game mechanics documents.",
+      "location": "design/ui-ux/wireframes/ship-design.md - Miniaturization Info Tooltip section",
+      "suggestion": "Cross-reference with research-formulas.md or components-complete.md to confirm miniaturization cap value."
     },
     {
       "severity": "minor",
       "category": "integration",
-      "description": "References to related documents (research-formulas.md, TECH_OVERVIEW.md) may not exist yet",
-      "location": "design/ui-ux/wireframes/research-tree.md - Related Documents section",
-      "suggestion": "Ensure referenced documents are created or mark as future work"
+      "description": "Titan class (7th hull in ship-classes.md) not shown in wireframe hull selection. This may be intentional if Titans are end-game only.",
+      "location": "design/ui-ux/wireframes/ship-design.md - Hull Selection section",
+      "suggestion": "Either add Titan as a 7th locked hull class or document that Titans are excluded from standard ship design UI."
     }
   ],
-  "summary": "Excellent, comprehensive Research Tree UI wireframe that exceeds requirements. Contains 7+ detailed ASCII wireframes covering all screen states, comprehensive interaction specifications (keyboard/mouse), all 6 tech fields with visual styling, allocation slider mechanics faithful to MOO1, detailed tech panels, responsive layouts, accessibility features, and JSON data structures. The document is implementation-ready with clear sections for developers. Minor issues are only about verifying exact MOO1 tech naming and ensuring referenced docs exist."
+  "summary": "Excellent Ship Design UI wireframe specification that meets all requirements. The document provides 12 detailed ASCII wireframes covering: default design list view, hull selection, main ship design editor, weapon selection dropdown, weapon count selection, special systems selection, error state (over budget), scrap confirmation dialog, auto-design options, copy from existing design, design saved confirmation, and miniaturization tooltip. All required elements are present: hull selection (6 classes with stats), component slots (Engine, Weapons, Computer, ECM, Shields, Armor, Specials), weapon assignment system with categories (Beams, Missiles, Torpedoes, Bombs), stats display (space usage, cost, HP, offense/defense/mobility ratings), and save/load functionality. Additional features include keyboard shortcuts (20+ documented), mouse interactions, JSON data schema, state transitions diagram, validation rules, responsive behavior notes, accessibility features (ARIA labels, keyboard navigation), and pet-themed flavor text. The specification is implementation-ready and follows established wireframe format from other UI specs. Minor issues relate to cross-document consistency with ship-classes.md tech requirements rather than MOO1 accuracy, as the project has intentionally expanded hull classes beyond MOO1's original 4 sizes."
 }
