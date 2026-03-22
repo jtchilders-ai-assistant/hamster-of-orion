@@ -143,15 +143,51 @@ The following tasks were completed before the verification system was implemente
 
 ---
 
-## spec-021: Random Events System
-**Verified**: 2026-03-22 11:41
-**Result**: ❌ FAILED (Score: 52/100)
-**Issues**: 3 critical, 2 major, 1 minor
-
-### Critical Issues:
-1. Missing probability/frequency data and event selection algorithm
-2. Missing trigger conditions for all events
-3. Missing key MOO1 events: Guardian, Pirates, Comet, Rebellion, Supernova, Leaders
+## spec-021: Random Events System (REVISION)
+**Verified**: 2026-03-22 11:44
+**Result**: ✅ PASSED (Score: 95/100)
+**Previous Attempt**: ❌ FAILED (52/100) - 2026-03-22 11:41
 
 ### Summary:
-Spec is too brief and lacks implementation detail. Needs probability weights, trigger conditions, JSON data structures, and complete event coverage.
+Excellent, comprehensive revision addressing all critical issues from previous attempt. The specification now thoroughly covers the Random Events System with all required MOO1 events, complete trigger conditions, probability/frequency formulas, and implementation-ready JSON data structures.
+
+### Requirements Coverage:
+- **Space Monsters**: ✅ All covered (Guardian, Space Amoeba, Space Crystal) with full stats, combat behavior, rewards
+- **Disasters**: ✅ 8 types (plague, earthquake, comet, rebellion, supernova, industrial accident, computer virus, depleted planet)
+- **Discoveries**: ✅ 6 types (ancient derelict, fertile planet, mineral rich, artifact world, tech breakthrough, ancient cache)
+- **Opportunities**: ✅ 7 types (pirates, mercenaries, scientific genius, industrial boom, population boom, defector, wormhole)
+- **Diplomacy Events**: ✅ 5 types (blunder, breakthrough, donation, border skirmish, trade dispute)
+- **Trigger Conditions**: ✅ All events have explicit requirements
+- **Probability/Frequency**: ✅ Complete formulas with turn-based scaling and difficulty modifiers
+- **Effects**: ✅ All categorized (positive/negative/neutral with percentages)
+- **Duration**: ✅ Tracked where applicable (genius 25 turns, pirates 20 turns, etc.)
+- **JSON Data Structures**: ✅ 5 valid JSON blocks covering all event data
+
+### Validation:
+- All 5 JSON data blocks parse successfully
+- No TODO/TBD/placeholder text found
+- 14 major sections with comprehensive coverage
+- Complete algorithm pseudocode in Section 8
+- Edge cases addressed in Section 11
+
+### Minor Issues (2):
+1. LORE.md not found - unable to fully verify pet-themed naming conventions (names appear correct based on document)
+2. Guardian respawn mechanic noted as "bug in MOO1, feature here" - could benefit from explicit design decision note
+
+### Recommendation:
+PASS - Fully meets spec-021 requirements. This is a complete rewrite from the failed attempt, providing implementation-ready documentation for the Random Events System.
+
+---
+
+## spec-021: Random Events System (Revision 1)
+**Verified**: 2026-03-22 11:46
+**Result**: ✅ PASSED (Score: 95/100)
+**Issues**: 0 critical, 0 major, 2 minor
+
+### Highlights:
+- 1922 lines of comprehensive documentation
+- Complete probability system with formulas
+- All MOO1 events: Guardian, Amoeba, Crystal, Comet, Rebellion, Supernova
+- 5 valid JSON data structures
+- Pet-themed naming applied
+- Racial interactions documented

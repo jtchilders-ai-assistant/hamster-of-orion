@@ -1,10 +1,10 @@
 {
-  "state": "VERIFYING",
-  "current_task": "spec-021",
-  "current_task_started_at": "2026-03-22T11:37:00-05:00",
-  "retry_count": 1,
+  "state": "IDLE",
+  "current_task": null,
+  "current_task_started_at": null,
+  "retry_count": 0,
   "max_retries": 3,
-  "last_updated": "2026-03-22T11:44:00-05:00",
-  "last_action": "Worker completed revision (1922 lines), spawning verifier",
+  "last_updated": "2026-03-22T11:46:30-05:00",
+  "last_action": "spec-021 PASSED verification (95/100), marked done",
   "verification_issues": []
 }

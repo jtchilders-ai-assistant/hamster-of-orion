@@ -185,7 +185,7 @@
       "id": "spec-021",
       "title": "Random Events System",
       "description": "Document all random events: trigger conditions, probability, effects, duration. Include space monsters, discoveries, disasters, opportunities. Update design/game-mechanics/random-events.md",
-      "status": "pending_verification",
+      "status": "done",
       "priority": 21,
       "output_file": "design/game-mechanics/random-events.md"
     },
