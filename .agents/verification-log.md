@@ -817,3 +817,71 @@ PASS - The gap analysis now provides an accurate assessment of the project's sta
 - Total Score: 92/100
 
 **Recommendation:** PASS - Fully implementation-ready wireframe specification. This is an exceptional document providing comprehensive tactical combat UI documentation with 10+ wireframe screens. Minor issues are non-critical enhancements. The document properly captures MOO1's tactical combat philosophy while providing modern UI improvements for hex-based movement, accessibility, and responsive design.
+
+---
+
+### ui-009: High Council UI - ASCII Wireframe
+**File:** design/ui-ux/wireframes/high-council.md  
+**Verified:** 2026-03-22T14:25:00-05:00  
+**Result:** ✅ PASSED (Score: 92/100)
+
+**Summary:** Excellent High Council UI wireframe specification that comprehensively documents all Council voting screens and interactions. The document provides 15+ detailed ASCII wireframes covering the complete Council flow: Opening Ceremony, Candidate Nomination, AI Voting Announcements, Player Voting (both as candidate and non-candidate), Vote Tally/Final Results (with and without winner), Victory Announcement (player wins), Victory Confirmation Dialog, Opponent Wins Decision, Final War Declaration, Pre-Council Lobbying, Bribe Offer Dialog, Bribe Response, Candidate Speeches (both candidates), and Declined Victory consequences.
+
+**Requirements Coverage:**
+- ✅ Detailed ASCII wireframes for High Council screen matching MOO1 behavior
+- ✅ Opening ceremony with all races displayed and vote weights
+- ✅ Candidate nomination screen showing two candidates with stats
+- ✅ AI voting phase with animated announcements and vote progress bars
+- ✅ Player voting interface (vote for candidate 1, candidate 2, or abstain)
+- ✅ Vote tally with detailed breakdown by race
+- ✅ Victory/defeat screens with player choices (accept/decline/defy)
+- ✅ Final War consequences when player defies council decision
+
+**MOO1 Faithfulness Verified:**
+- ✅ Council triggers at 50% colonization
+- ✅ Reconvenes every 25 turns
+- ✅ Two-thirds (67%) majority required for victory
+- ✅ Two candidates selected by highest population
+- ✅ Abstentions reduce effective total
+- ✅ Candidates automatically vote for themselves
+- ✅ Player can defy council decision (triggers Final War)
+- ✅ Accept/Decline options for own victory
+
+**Bonus Features (Exceeding Requirements):**
+- Pre-Council Lobbying screen with projected vote outcomes
+- Bribery interface with effectiveness calculations
+- Candidate speech screens with personality-appropriate dialogue
+- Vote speech templates in JSON format
+- Detailed state transition diagram
+- Complete keyboard navigation (1/2/3 for vote, A/D for accept/decline)
+- Animation specifications (2-3 seconds per AI vote, typewriter text, confetti)
+- UI element specifications (vote progress bars, delegate portraits, candidate banners)
+- Comprehensive JSON data structures (council session state, speech templates, candidate speech templates)
+- Edge cases (player at war with both candidates, all races abstain, tie scenarios)
+- Accessibility features (screen reader support, color blind considerations, visual impairment support)
+- Version history tracking
+
+**Pet-Themed Naming (LORE.md Compliant):**
+- ✅ All 10 races represented (Hamsters, Guinea Pigs, Rats, Mice, Budgies, Chameleons, Ants, Ferrets, Rabbits, Hermit Crabs)
+- ✅ Leader names: "Emperor Flufficus the Bold", "High Researcher Whiskerstein"
+- ✅ Game title: "Hamster of Orion"
+- ✅ Reference to "Cosmic Wheel of Orion" from LORE.md
+
+**Integration with council.md Verified:**
+- ✅ Vote weight formula matches (population-based percentages)
+- ✅ Victory threshold matches (67% / two-thirds)
+- ✅ Council formation trigger matches (50% colonization)
+- ✅ Meeting interval matches (25 turns)
+- ✅ Abstention mechanics match (removed from effective total)
+- ✅ Final War consequences match (all races declare war)
+
+**Issues Found (3 minor):**
+1. **Completeness**: Most screens lack the F-key header bar (F2-F7) shown in galaxy-map.md wireframe for consistency
+2. **Accuracy**: Minor ASCII alignment issue in "Declined Own Victory" screen near "Relation Changes" section (extra blank line within box)
+3. **Integration**: Reference paths inconsistent (some use "design/diplomacy/council.md" others omit leading path)
+
+**Verification Details:**
+- Completeness: 95/100 | Accuracy: 90/100 | Implementation Readiness: 93/100 | Integration: 90/100
+- Total Score: 92/100
+
+**Recommendation:** PASS - Fully implementation-ready wireframe specification. This is an exceptional document providing comprehensive High Council UI documentation with 15+ wireframe screens covering all voting scenarios. Minor issues are cosmetic formatting inconsistencies that do not affect implementation. The wireframe properly captures MOO1's council voting mechanics while providing modern UI enhancements for animation, accessibility, and detailed player feedback.

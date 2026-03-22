@@ -1,37 +1,30 @@
 {
-  "task_id": "ui-008",
-  "verified_at": "2026-03-22T14:16:45-05:00",
+  "task_id": "ui-009",
+  "verified_at": "2026-03-22T14:25:00-05:00",
   "passed": true,
   "score": 92,
   "issues": [
     {
       "severity": "minor",
       "category": "completeness",
-      "description": "Missing explicit ground invasion wireframe screen layout. Document mentions ground invasion as a button option in bombardment phase but doesn't show dedicated wireframe for that flow.",
-      "location": "design/ui-ux/wireframes/tactical-combat.md - Planetary Bombardment Phase section",
-      "suggestion": "Consider adding a separate wireframe for Ground Invasion dialog showing troop transport selection, ground combat strength comparison, and invasion success probability."
+      "description": "Missing explicit keyboard shortcut section for accessibility (F-key mappings) in header like other wireframes",
+      "location": "design/ui-ux/wireframes/high-council.md - Screen Layout headers",
+      "suggestion": "Add consistent F-key header bar to all Council screens showing the global navigation shortcuts"
     },
     {
       "severity": "minor",
-      "category": "completeness",
-      "description": "Auto-resolve battle screen not wireframed. While auto-resolve is mentioned as an option, no wireframe shows the quick summary screen for auto-resolved battles.",
-      "location": "design/ui-ux/wireframes/tactical-combat.md - Pre-Battle Screen section",
-      "suggestion": "Add a simplified auto-resolve result screen wireframe showing the quick battle outcome without tactical detail."
-    },
-    {
-      "severity": "minor",
-      "category": "accuracy",
-      "description": "The document states grid size is 16×10 hexes as 'standard MOO1 size'. MOO1's actual tactical grid was approximately 10×10 cells with a square grid, not hexagonal. This is an intentional enhancement but the phrasing implies MOO1 fidelity.",
-      "location": "design/ui-ux/wireframes/tactical-combat.md - Core Concepts section",
-      "suggestion": "Clarify in the text that the hex grid is an enhancement over MOO1's original square-based combat grid, making the design decision explicit rather than implying MOO1 accuracy."
+      "category": "implementation",
+      "description": "One wireframe has minor alignment issue with box characters in 'Declined Own Victory' section",
+      "location": "design/ui-ux/wireframes/high-council.md - Screen Layout: Declined Own Victory (line ~890)",
+      "suggestion": "Review ASCII box alignment near 'Relation Changes' section where extra blank line appears"
     },
     {
       "severity": "minor",
       "category": "integration",
-      "description": "Reference to 'combat-mechanics.md' and 'combat-algorithm.md' in Related Documents section - these files should be verified to exist or be queued for creation.",
-      "location": "design/ui-ux/wireframes/tactical-combat.md - Related Documents section",
-      "suggestion": "Ensure referenced spec files exist or add them to the backlog."
+      "description": "Reference to design/diplomacy/council.md is correct but file path inconsistently formatted (missing leading slash in some references)",
+      "location": "design/ui-ux/wireframes/high-council.md - References section",
+      "suggestion": "Standardize file path references to use consistent format"
     }
   ],
-  "summary": "Excellent tactical combat UI wireframe specification. The document is comprehensive, covering 10+ detailed ASCII wireframe screens including: pre-battle, main combat arena, movement phase, firing phase, attack resolution, missile tracking, retreat attempt, planetary bombardment, victory, and defeat screens. Strong attention to MOO1 combat philosophy with appropriate modern enhancements. Includes thorough interactive elements specification, command buttons, keyboard shortcuts, tooltips, animation specs, accessibility features, and performance targets. The pet-themed naming (Hamsters, Guinea Pigs, ship names like 'Sunflower', 'Whiskers', 'Pellet') properly follows LORE.md conventions. Combat mechanics display (stacks, initiative, weapons, shields) align well with MOO1 concepts. Minor issues are non-critical enhancements rather than blocking problems. Document is implementation-ready."
+  "summary": "Excellent wireframe specification for the High Council UI. The document comprehensively covers all major Council scenarios including: opening ceremony, candidate nomination, AI voting animations, player voting (both as candidate and non-candidate), vote tallies, victory/defeat screens, defiance mechanics (Final War), pre-council lobbying, and bribery dialogs. The wireframes are detailed ASCII layouts matching the established format from other UI specs. The document correctly implements MOO1 mechanics (50% colonization trigger, 25-turn intervals, 2/3 majority requirement, candidate selection by population, abstention rules). Pet-themed lore is properly integrated with race names (Hamsters, Guinea Pigs, Rats, etc.). JSON data structures are valid and well-defined. Edge cases are thoroughly documented. State transitions are clearly diagrammed. Minor issues found are cosmetic/formatting only."
 }
