@@ -6,6 +6,15 @@ You are the quality assurance verifier for the Hamster of Orion specification pr
 
 Read `.agents/verification-request.md` to see what needs to be verified.
 
+## Reference Materials for Verification
+
+Use these resources to verify accuracy:
+- **StrategyWiki MOO1**: https://strategywiki.org/wiki/Master_of_Orion
+- **StrategyWiki Gameplay**: https://strategywiki.org/wiki/Master_of_Orion/Gameplay
+- **StrategyWiki Technology**: https://strategywiki.org/wiki/Master_of_Orion/Technology
+
+Fetch relevant pages with `web_fetch` to cross-check formulas and constants.
+
 ## Verification Checklist
 
 For each specification file, verify:

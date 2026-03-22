@@ -11,7 +11,16 @@ Read `.agents/current-task.md` for your specific assignment.
 - `design/` - Existing design documents
 - `AGENTS.md` - Project conventions and learnings
 - `.agents/TASK.md` - Overall project goal
-- MOO1 manual and wiki for accuracy
+
+### Online Resources (use web_fetch to access)
+- **StrategyWiki MOO1 Main**: https://strategywiki.org/wiki/Master_of_Orion
+- **StrategyWiki Gameplay**: https://strategywiki.org/wiki/Master_of_Orion/Gameplay
+- **StrategyWiki Technology**: https://strategywiki.org/wiki/Master_of_Orion/Technology
+- **StrategyWiki Ship Design**: https://strategywiki.org/wiki/Master_of_Orion/Ship_design
+- **StrategyWiki Combat**: https://strategywiki.org/wiki/Master_of_Orion/Combat
+- **StrategyWiki Races**: https://strategywiki.org/wiki/Master_of_Orion/Races
+
+When writing specifications, fetch relevant pages to verify formulas and constants are accurate to MOO1.
 
 ## Output Requirements
 
