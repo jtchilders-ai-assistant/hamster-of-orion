@@ -1,34 +1,207 @@
 {
-  "project": "my-project",
+  "project": "hamster-of-orion-specification",
   "created": "2026-03-21",
+  "description": "Complete game design specification for Hamster of Orion",
   "tasks": [
     {
-      "id": "task-001",
-      "title": "Project setup",
-      "description": "Initialize the project structure and dependencies",
+      "id": "spec-001",
+      "title": "Factory & Production Formulas",
+      "description": "Document exact formulas for: factory output (BC/turn), factory construction cost, factory maintenance, production efficiency by population, racial modifiers. Create design/economy/factory-formulas.md",
       "status": "pending",
-      "priority": 1
+      "priority": 1,
+      "output_file": "design/economy/factory-formulas.md"
     },
     {
-      "id": "task-002", 
-      "title": "Core implementation",
-      "description": "Implement the main functionality",
+      "id": "spec-002", 
+      "title": "Population Growth Mathematics",
+      "description": "Document exact formulas for: base growth rate, growth modifiers (planet type, tech, morale), maximum population by planet size, racial growth bonuses. Create design/economy/population-growth.md",
       "status": "pending",
-      "priority": 2
+      "priority": 2,
+      "output_file": "design/economy/population-growth.md"
     },
     {
-      "id": "task-003",
-      "title": "Tests",
-      "description": "Write tests for all functionality",
-      "status": "pending", 
-      "priority": 3
+      "id": "spec-003",
+      "title": "Research Point Calculation",
+      "description": "Document exact formulas for: RP per scientist, research building bonuses, tech cost scaling, miniaturization formula, racial research modifiers. Update design/technology/research-formulas.md",
+      "status": "pending",
+      "priority": 3,
+      "output_file": "design/technology/research-formulas.md"
     },
     {
-      "id": "task-004",
-      "title": "Documentation",
-      "description": "Add README and code documentation",
+      "id": "spec-004",
+      "title": "Planetary Slider Mathematics",
+      "description": "Document exact formulas for: how each slider percentage converts to output, slider interaction effects, waste/pollution calculation, reserve fund mechanics. Update design/planets/slider-mathematics.md",
       "status": "pending",
-      "priority": 4
+      "priority": 4,
+      "output_file": "design/planets/slider-mathematics.md"
+    },
+    {
+      "id": "spec-005",
+      "title": "Ship Maintenance & Fleet Costs",
+      "description": "Document exact formulas for: ship maintenance cost by class, fleet upkeep, scrapping returns, refit costs. Create design/economy/ship-costs.md",
+      "status": "pending",
+      "priority": 5,
+      "output_file": "design/economy/ship-costs.md"
+    },
+    {
+      "id": "spec-006",
+      "title": "Complete Weapons Table",
+      "description": "Create complete weapon stats table: all beam weapons, missiles, bombs, special weapons with damage, range, space, cost, tech level. Update design/ships/weapons-complete.md with JSON data",
+      "status": "pending",
+      "priority": 6,
+      "output_file": "design/ships/weapons-complete.md"
+    },
+    {
+      "id": "spec-007",
+      "title": "Complete Ship Components Table", 
+      "description": "Create complete component stats: engines, computers, ECM, shields, armor, specials with all stats and costs. Update design/ships/components-complete.md with JSON data",
+      "status": "pending",
+      "priority": 7,
+      "output_file": "design/ships/components-complete.md"
+    },
+    {
+      "id": "spec-008",
+      "title": "Combat Damage Resolution Algorithm",
+      "description": "Document complete combat algorithm: initiative order, movement resolution, firing sequence, damage application (shields→armor→hull), critical hits, retreat mechanics. Update design/ships/combat-algorithm.md",
+      "status": "pending",
+      "priority": 8,
+      "output_file": "design/ships/combat-algorithm.md"
+    },
+    {
+      "id": "spec-009",
+      "title": "Complete Tech Tree - Weapons Field",
+      "description": "Document all weapons technologies: tech name, tier, cost, effect, prerequisites. Include all beam weapons, missiles, bombs, specials. Update design/technology/weapons.md with JSON data",
+      "status": "pending",
+      "priority": 9,
+      "output_file": "design/technology/weapons.md"
+    },
+    {
+      "id": "spec-010",
+      "title": "Complete Tech Tree - Propulsion Field",
+      "description": "Document all propulsion technologies: engines, fuel cells, speed bonuses, maneuverability. Include tier, cost, effect for each. Update design/technology/propulsion.md with JSON data",
+      "status": "pending",
+      "priority": 10,
+      "output_file": "design/technology/propulsion.md"
+    },
+    {
+      "id": "spec-011",
+      "title": "Complete Tech Tree - Construction Field",
+      "description": "Document all construction technologies: armor types, factory bonuses, ship size increases. Include tier, cost, effect for each. Update design/technology/construction.md with JSON data",
+      "status": "pending",
+      "priority": 11,
+      "output_file": "design/technology/construction.md"
+    },
+    {
+      "id": "spec-012",
+      "title": "Complete Tech Tree - Computers Field",
+      "description": "Document all computer technologies: battle computers, ECM, scanners, spy tech. Include tier, cost, effect for each. Update design/technology/computers.md with JSON data",
+      "status": "pending",
+      "priority": 12,
+      "output_file": "design/technology/computers.md"
+    },
+    {
+      "id": "spec-013",
+      "title": "Complete Tech Tree - Force Fields Field",
+      "description": "Document all force field technologies: shields, planetary shields, repulsors, stasis. Include tier, cost, effect for each. Update design/technology/force-fields.md with JSON data",
+      "status": "pending",
+      "priority": 13,
+      "output_file": "design/technology/force-fields.md"
+    },
+    {
+      "id": "spec-014",
+      "title": "Complete Tech Tree - Planetology Field",
+      "description": "Document all planetology technologies: terraforming, colonization, pollution control, bio weapons. Include tier, cost, effect for each. Update design/technology/planetology.md with JSON data",
+      "status": "pending",
+      "priority": 14,
+      "output_file": "design/technology/planetology.md"
+    },
+    {
+      "id": "spec-015",
+      "title": "Diplomacy Relationship Mathematics",
+      "description": "Document exact formulas for: relationship value changes, treaty effects on relations, war weariness, racial diplomacy modifiers. Create design/diplomacy/relationship-formulas.md",
+      "status": "pending",
+      "priority": 15,
+      "output_file": "design/diplomacy/relationship-formulas.md"
+    },
+    {
+      "id": "spec-016",
+      "title": "Council Voting Algorithm",
+      "description": "Document exact algorithm for: vote allocation by population, voting behavior by relationship, victory threshold, abstention rules. Update design/diplomacy/council.md",
+      "status": "pending",
+      "priority": 16,
+      "output_file": "design/diplomacy/council.md"
+    },
+    {
+      "id": "spec-017",
+      "title": "Espionage Success Formulas",
+      "description": "Document exact formulas for: spy success rate, sabotage effects, tech theft probability, spy death chance, counter-espionage. Update design/diplomacy/espionage.md",
+      "status": "pending",
+      "priority": 17,
+      "output_file": "design/diplomacy/espionage.md"
+    },
+    {
+      "id": "spec-018",
+      "title": "AI Decision Scoring Functions",
+      "description": "Document AI algorithms for: threat assessment scoring, expansion priority, research selection, fleet deployment, diplomatic stance. Update design/technical/ai-implementation.md",
+      "status": "pending",
+      "priority": 18,
+      "output_file": "design/technical/ai-implementation.md"
+    },
+    {
+      "id": "spec-019",
+      "title": "Galaxy Generation Algorithm",
+      "description": "Document exact algorithm for: star placement, cluster formation, planet assignment, resource distribution, home world placement. Update design/galaxy/generation-algorithm.md",
+      "status": "pending",
+      "priority": 19,
+      "output_file": "design/galaxy/generation-algorithm.md"
+    },
+    {
+      "id": "spec-020",
+      "title": "Planet Generation Tables",
+      "description": "Document exact tables for: planet type probability by star type, size distribution, mineral richness, special features. Create design/planets/generation-tables.md with JSON data",
+      "status": "pending",
+      "priority": 20,
+      "output_file": "design/planets/generation-tables.md"
+    },
+    {
+      "id": "spec-021",
+      "title": "Random Events System",
+      "description": "Document all random events: trigger conditions, probability, effects, duration. Include space monsters, discoveries, disasters, opportunities. Update design/game-mechanics/random-events.md",
+      "status": "pending",
+      "priority": 21,
+      "output_file": "design/game-mechanics/random-events.md"
+    },
+    {
+      "id": "spec-022",
+      "title": "Victory Condition Checks",
+      "description": "Document exact algorithms for: domination check (population threshold), council victory, conquest victory, Orion guardian defeat, transcendence detection. Update design/game-mechanics/victory-conditions.md",
+      "status": "pending",
+      "priority": 22,
+      "output_file": "design/game-mechanics/victory-conditions.md"
+    },
+    {
+      "id": "spec-023",
+      "title": "Difficulty Level Modifiers",
+      "description": "Document exact modifiers for each difficulty: AI bonuses, player handicaps, starting conditions, event frequency. Update design/game-mechanics/difficulty.md with JSON data",
+      "status": "pending",
+      "priority": 23,
+      "output_file": "design/game-mechanics/difficulty.md"
+    },
+    {
+      "id": "spec-024",
+      "title": "Complete Race Statistics",
+      "description": "Compile complete racial stats for all 10 races: all bonuses, penalties, special abilities as exact numbers. Create design/species/race-stats-complete.md with JSON data",
+      "status": "pending",
+      "priority": 24,
+      "output_file": "design/species/race-stats-complete.md"
+    },
+    {
+      "id": "spec-025",
+      "title": "JSON Data Schemas",
+      "description": "Create TypeScript/JSON schemas for all game data: races, technologies, weapons, ships, planets, events. Create design/technical/data-schemas.md",
+      "status": "pending",
+      "priority": 25,
+      "output_file": "design/technical/data-schemas.md"
     }
   ]
 }
