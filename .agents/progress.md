@@ -1189,3 +1189,99 @@ Proceeding to next task...
 **Task**: Planet Generation Tables
 **Output**: design/planets/generation-tables.md
 **Action**: Spawning worker agent
+
+---
+
+### 2026-03-22 11:31 - spec-020: Planet Generation Tables ✅
+**Completed:** `design/planets/generation-tables.md`
+
+**Summary:**
+Created comprehensive planet generation tables specification including:
+
+**1. Star Color Types:**
+- 6 star colors with frequency weights (Yellow 25% → Purple 8%)
+- Habitability and mineral tier ratings per star
+- Complete JSON schema with descriptions
+
+**2. Environment Types:**
+- 14 environments organized by category (Hostile, Standard, Legendary)
+- Hostile environments (6): Radiated → Barren, require tech, 0.5× growth
+- Standard environments (7): Minimal → Terran, no tech required, 1.0× growth
+- Legendary (Gaia): 2.0× growth, terraformed only
+- Population capacity modifiers (0.30× to 1.00×)
+- Tech requirements for each hostile type
+
+**3. Planet Type Probability by Star Color:**
+- Complete 14×6 probability matrix (all values sum to 100)
+- Cumulative probability ranges for roll implementation
+- Selection algorithm pseudocode
+- Quality summary (Yellow 50% habitable, Purple 2% habitable)
+
+**4. Planet Size Distribution:**
+- 5 sizes (Tiny → Huge) with probability weights
+- Base population ranges per size (10-20 → 100-150)
+- Size-independent of star color
+- Cumulative ranges and selection algorithm
+
+**5. Mineral Richness Distribution:**
+- 5 richness levels with production modifiers (0.33× → 3.00×)
+- Probability tables by star color
+- Purple stars: 25% Ultra Rich, 35% Rich (best minerals)
+- Yellow stars: Balanced distribution around Normal
+- Average modifier calculation per star type
+- Cumulative ranges and selection algorithm
+
+**6. Special Features:**
+- Orion: 1 per galaxy, center, 4× research, Guardian, forced Dead/Huge/Ultra Rich
+- Artifacts: 2-6 by galaxy size, middle ring, 2× research
+- Homeworld: Player count, edge placement, forced Terran/Large+/Normal
+- Placement algorithm for Artifacts worlds
+
+**7. Nebula Effects:**
+- 40% resource upgrade chance for nebula planets
+- Upgrade path (Ultra Poor → Poor → Normal → Rich → Ultra Rich)
+- Bonus application algorithm
+
+**8. Complete Planet Generation Algorithm:**
+- 5-step generation process pseudocode
+- Max population calculation formula
+- Full worked example (Yellow star in nebula)
+
+**9. Statistical Distribution Summary:**
+- Expected counts for 48-star medium galaxy
+- Environment, size, mineral, and special feature breakdowns
+- Planet quality scoring formula (0-100 scale)
+- Quality examples from Exceptional (95) to Terrible (5)
+
+**10. Edge Cases:**
+- No valid environment rolls (allowed - tech requirement)
+- Forced overrides for special systems
+- Gaia never spawns naturally
+- Hermit Crab special colonization rules
+
+**11. Implementation Checklist:**
+- 9 implementation tasks documented
+
+**JSON Data Schemas:**
+- star_colors (6 entries)
+- environment_types (14 entries with modifiers)
+- environment_probability_by_star (6×14 matrix)
+- environment_cumulative_ranges (6 star types)
+- size_distribution (5 sizes)
+- size_cumulative_ranges (5 sizes)
+- mineral_richness_levels (5 levels)
+- mineral_richness_by_star (6×5 matrix)
+- mineral_cumulative_ranges (6 star types)
+- special_features (3 types)
+- nebula_effects (upgrade table)
+- planet_quality_formula (scoring weights)
+
+**Files Created:**
+- `design/planets/generation-tables.md` (28KB, ~750 lines)
+
+**Notes:**
+- Cross-references design/galaxy/generation-algorithm.md
+- All tables consistent with existing planet-types.md and planet-sizes.md
+- Complete JSON schemas ready for implementation
+- Strategic insights documented (Purple stars = minerals, Yellow = habitability)
+- MOO1-faithful design throughout
