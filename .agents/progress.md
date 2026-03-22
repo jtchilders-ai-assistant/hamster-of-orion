@@ -776,3 +776,84 @@ Created comprehensive Research Tree (F4) wireframe specification with detailed A
 - **State Transition**: VERIFYING → IDLE
 - **Minor Notes**: Tech names should be verified against MOO1, some referenced docs TBD
 - **Next**: Starting ui-006 (Ship Design UI)
+
+## [2026-03-22 13:53] Orchestrator Check
+- **State**: WORKING
+- **Task**: ui-006 (Ship Design UI - ASCII Wireframe)
+- **Status**: Worker still active (runtime: ~1 minute)
+- **Action**: Waiting for worker to complete output file
+
+## [2026-03-22 13:52] Worker Completed ui-006 ✅
+
+**Task:** ui-006 - Ship Design UI - ASCII Wireframe
+**Output:** design/ui-ux/wireframes/ship-design.md (76KB, ~2000 lines)
+**Status:** pending_verification
+
+### Summary:
+Created comprehensive Ship Design (F6) wireframe specification with detailed ASCII art:
+
+**Main Wireframes Created:**
+1. Default View - Design List (6 slots showing existing designs and empty slots)
+2. Hull Selection Screen (6 hull classes: Scout through Dreadnought)
+3. Ship Design Editor - Main Interface (full component editing)
+4. Weapon Selection Dropdown (categorized by type)
+5. Weapon Count Selection Modal (slider and direct input)
+6. Special Systems Selection Modal (categorized list)
+7. Design Over Budget Error State (space exceeded warning)
+8. Scrap Design Confirmation Dialog (with affected ships list)
+9. Auto-Design Options Dialog (focus and tech preferences)
+10. Copy From Design Dialog (existing design selection)
+11. Design Saved Confirmation Dialog (summary display)
+12. Miniaturization Info Tooltip (space reduction explanation)
+
+**Component Dropdowns Specified:**
+- Engine dropdown (Retro through Hyper-X)
+- Shield dropdown (None through Class XV)
+- Armor dropdown (Titanium through Neutronium)
+- Computer dropdown (None through BC XI)
+- ECM dropdown (None through Jammer X)
+
+**Key Features Documented:**
+
+**Core Mechanics (MOO1-Faithful):**
+- 6 active design slots limit
+- Space budget system (hull space - components)
+- Miniaturization (5% per tech level, 50% max)
+- Required engine component
+- Max 4 weapon types per ship
+- Ship cost = base + components × armor modifier
+
+**Design Editor Components:**
+- Engine selection (required)
+- 4 weapon slots with count selector
+- Battle Computer selection
+- ECM Jammer selection
+- Shield selection
+- Armor selection (cost modifier, not space)
+- Special systems (unlimited slots)
+
+**Interactive Elements:**
+- All component dropdowns with stats display
+- Weapon count slider/input
+- Space usage bar (color-coded)
+- Real-time cost calculation
+- Validation errors for over-budget
+
+**Additional Specifications:**
+- 15+ keyboard shortcuts (F6, 1-6, N, E, S, etc.)
+- Mouse interactions table (click, right-click, hover, drag)
+- Component interaction workflows
+- Validation rules (space, required, conflicts)
+- State transition diagram
+- Data display formulas (cost, space, HP, miniaturization)
+- JSON data schema for ship designs
+- Responsive behavior (wide, standard, narrow)
+- Accessibility features
+- Error states documentation
+- Pet-themed default ship names by race
+
+**References Used:**
+- design/ships/ship-classes.md
+- design/ships/components-complete.md
+- design/ships/weapons-complete.md
+- Existing wireframe styling from galaxy-map.md, planet-management.md
