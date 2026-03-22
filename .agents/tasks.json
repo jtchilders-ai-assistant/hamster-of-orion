@@ -212,7 +212,7 @@
       "id": "spec-024",
       "title": "Complete Race Statistics",
       "description": "Compile complete racial stats for all 10 races: all bonuses, penalties, special abilities as exact numbers. Create design/species/race-stats-complete.md with JSON data",
-      "status": "pending",
+      "status": "in_progress",
       "priority": 24,
       "output_file": "design/species/race-stats-complete.md"
     },

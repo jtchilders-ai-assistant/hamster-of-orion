@@ -1,50 +1,28 @@
-# Current Task: spec-023 (REVISION REQUIRED)
+# Current Task: spec-024
 
 ## Task Details
-- **ID**: spec-023
-- **Title**: Difficulty Level Modifiers
-- **Output File**: design/game-mechanics/difficulty.md
-- **Retry**: 1 of 3
+- **ID**: spec-024
+- **Title**: Complete Race Statistics
+- **Output File**: design/species/race-stats-complete.md
+- **Priority**: 24
 
-## Original Description
-Document exact modifiers for each difficulty: AI bonuses, player handicaps, starting conditions, event frequency. Update design/game-mechanics/difficulty.md with JSON data
+## Description
+Compile complete racial stats for all 10 races: all bonuses, penalties, special abilities as exact numbers. Create design/species/race-stats-complete.md with JSON data
 
-## REVISION REQUIRED - Previous Verification Failed
+## Requirements
+1. **All 10 Races**: Hamsters, Ants, Mice, Rats, Rabbits, Hermit Crabs, Guinea Pigs, Ferrets, Budgies, Chameleons
+2. **Complete Stats for Each**:
+   - Production bonuses/penalties (exact percentages)
+   - Research bonuses/penalties
+   - Population growth modifiers
+   - Combat bonuses (ship and ground)
+   - Diplomacy modifiers
+   - Special abilities with exact mechanics
+   - Starting technologies
+   - Homeworld preferences
+3. **JSON Data**: Must include structured JSON with all numeric values
+4. **Cross-Reference**: Align with LORE.md naming and design/species/*.md existing docs
 
-### Critical Issue (must fix):
-**The task explicitly requires JSON data but the document contains none.**
-
-### Required Additions:
-
-1. **Add JSON block for difficulty modifiers**:
-```json
-{
-  "difficulty_levels": {
-    "easy": {
-      "player_production_multiplier": 1.25,
-      "player_research_multiplier": 1.25,
-      "player_combat_modifier": 0.10,
-      "ai_production_multiplier": 1.0,
-      "ai_research_multiplier": 1.0,
-      ...
-    },
-    "normal": { ... },
-    "hard": { ... },
-    "impossible": { ... }
-  }
-}
-```
-
-2. **Add event frequency modifiers** - How difficulty affects random event chances
-
-3. **Add starting conditions as structured data** - Exact counts for starting techs, money, ships
-
-4. **Add custom difficulty schema** - Parameter ranges with min/max/default values
-
-### Keep
-- The existing prose descriptions are good for context
-- The race difficulty recommendations are helpful
-- Achievement section is nice flavor
-
-### Goal
-Transform this from a player guide into an implementation-ready specification with exact numeric data in JSON format.
+## Reference Files
+- LORE.md - Race names and themes
+- design/species/*.md - Individual race docs if they exist

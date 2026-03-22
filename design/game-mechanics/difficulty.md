@@ -127,6 +127,54 @@ Player_Tech_Cost = 500 × 1.00 = 500 RP
 | Hard | Optimal counter-tech, racial synergy |
 | Impossible | Perfect counter-tech, knows player's research |
 
+### AI Starting Tech Bonuses
+
+```json
+{
+  "ai_starting_tech_bonuses": {
+    "simple": {
+      "bonus_techs": 0,
+      "starting_tier": 1,
+      "tech_cost_mult": 1.50,
+      "research_speed_mult": 0.67
+    },
+    "easy": {
+      "bonus_techs": 0,
+      "starting_tier": 1,
+      "tech_cost_mult": 1.25,
+      "research_speed_mult": 0.80
+    },
+    "average": {
+      "bonus_techs": 0,
+      "starting_tier": 1,
+      "tech_cost_mult": 1.00,
+      "research_speed_mult": 1.00
+    },
+    "hard": {
+      "bonus_techs": 2,
+      "starting_tier": 1,
+      "tech_cost_mult": 0.75,
+      "research_speed_mult": 1.33,
+      "bonus_tech_fields": ["racial_preference", "random"]
+    },
+    "impossible": {
+      "bonus_techs": 4,
+      "starting_tier": 2,
+      "tech_cost_mult": 0.50,
+      "research_speed_mult": 2.00,
+      "bonus_tech_fields": ["racial_preference", "racial_preference", "weapons", "random"]
+    }
+  }
+}
+```
+
+**Bonus Tech Selection Algorithm:**
+1. On Hard/Impossible, AI receives bonus starting techs
+2. "racial_preference" picks random tech from the race's preferred field
+3. "random" picks any tier-appropriate tech
+4. "weapons" guarantees early weapon upgrade
+5. Techs are tier-1 on Hard, tier-1 or tier-2 on Impossible
+
 ---
 
 ## Combat Modifiers
