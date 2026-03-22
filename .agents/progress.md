@@ -972,3 +972,98 @@ Created comprehensive espionage system specification including:
 ### 2026-03-22 11:22:09 - Orchestrator
 - **Issue**: Previous verifier had workspace resolution issue
 - **Action**: Re-spawned verifier with explicit absolute paths
+
+---
+
+### 2026-03-22 11:21 - spec-018: AI Decision Scoring Functions ✅
+**Completed:** `design/technical/ai-implementation.md`
+
+**Summary:**
+Complete rewrite of AI implementation specification with implementation-ready scoring functions:
+
+**1. Threat Assessment Scoring:**
+- 5-component formula: Military (40%) + Economic (25%) + Tech (15%) + Proximity (10%) + Hostility (10%)
+- Fleet Power calculation: HP × Armor + Weapons × 2 + Shields + Speed
+- Ship HP and Armor multiplier tables
+- Racial threat perception modifiers (Guinea Pigs 0.70× → Rabbits 1.30×)
+- Threat level classification (Negligible → Critical)
+- Worked examples with full calculations
+
+**2. Expansion Priority Scoring:**
+- Base value by planet size (Tiny 20 → Huge 100)
+- Environment modifiers (-40 Radiated → +60 Gaia)
+- Resource modifiers (-30 Ultra Poor → +50 Ultra Rich)
+- Special planet bonuses (Artifacts +40, Homeworld +60)
+- Distance penalty (-3 per parsec)
+- Strategic bonuses (border +15, blocks enemy +10, etc.)
+- Competition modifier (-10 per rival empire)
+- Racial expansion weights (Rabbits 1.40× → Hermit Crabs 0.80×)
+
+**3. Research Selection Algorithm:**
+- Base value = Tech_Tier × 10
+- Strategic alignment bonuses by strategy type
+- Racial research preferences (complete 10-race × 6-field matrix)
+- Cost efficiency calculation (penalty if >20 turns)
+- Synergy bonuses (unlocks +15 each, ship class +20, terraform +25)
+- Urgency modifiers (counters enemy +30, obsolete -20)
+- Complete worked example (Rats: Fusion Beam vs Scanner)
+
+**4. Fleet Deployment Decisions:**
+- Fleet role classification algorithm (recon, patrol, defense, strike, invasion)
+- Target score formula: Objective + Success + Strategic + Distance + Risk
+- Objective values (Defend Homeworld 200, Attack Colony 40+production)
+- Success probability based on fleet power ratios
+- Fleet composition recommendations (JSON table with min/max per role)
+- Combat engagement decision formula
+- Retreat decision algorithm
+
+**5. Diplomatic Stance Calculations:**
+- Stance score formula: Relationship + Power + Strategic + Trust + Personality + History
+- Score-to-stance mapping (< -60 Hostile → > +60 Allied)
+- Power assessment by ratio (inverted for aggressive races)
+- Strategic value factors (+30 buffer, -30 expansion target)
+- Trust factor with racial modifiers (Hamsters 1.3×, Chameleons 0.7×)
+- Complete personality stance modifiers (JSON, all 10 races)
+- History modifier with decay factor (0.98^turns)
+- War declaration decision algorithm with personality thresholds
+- Treaty proposal and response algorithms
+
+**6. Difficulty Level Modifiers:**
+- 5 difficulty levels (Simple → Impossible)
+- Production, research, combat modifiers
+- Decision randomness (±30 Simple → ±0 Impossible)
+- Information advantages (fog of war, perfect information)
+
+**7. Constants Summary:**
+- 28 constants across all 5 domains
+- All values, descriptions, and usage documented
+
+**8. Complete AI Turn Algorithm:**
+- Full pseudocode for execute_ai_turn()
+- 8-step decision process
+- Integrates all scoring functions
+
+**9. Edge Cases:**
+- No valid expansion targets
+- Surrounded by hostile empires
+- Technology gap too large
+- Economic collapse
+- Diplomatic isolation
+
+**Data Tables (JSON):**
+- racial_research_preferences (10 races × 6 fields)
+- fleet_compositions (5 roles with ship class requirements)
+- personality_stance_modifiers (10 races with 4 attributes)
+- difficulty_modifiers (5 levels with 6 attributes)
+
+**Files Updated:**
+- `design/technical/ai-implementation.md` (36KB, ~1000 lines, complete rewrite)
+
+**Notes:**
+- Replaces previous conceptual AI document with implementation-ready formulas
+- All calculations use integer math with floor() rounding
+- Integrates with relationship-formulas.md, combat-algorithm.md, factory-formulas.md
+- Every formula includes worked examples
+- Racial modifiers consistent with other specifications
+- Ready for direct implementation
+
