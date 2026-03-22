@@ -1,10 +1,10 @@
 {
-  "state": "IDLE",
-  "current_task": null,
-  "current_task_started_at": null,
+  "state": "WORKING",
+  "current_task": "spec-014",
+  "current_task_started_at": "2026-03-22T10:52:00-05:00",
   "retry_count": 0,
   "max_retries": 3,
   "last_updated": "2026-03-22T10:52:00-05:00",
-  "last_action": "spec-013 verified and marked done",
+  "last_action": "assigned spec-014 to worker",
   "verification_issues": []
 }
