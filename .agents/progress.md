@@ -1092,3 +1092,75 @@ Created comprehensive Tactical Combat wireframe specification with detailed ASCI
 - **Verification**: PASSED (92/100)
 - **Minor Issues**: Ground invasion wireframe, auto-resolve screen, hex grid clarification, doc references
 - **Action**: Marked done, proceeding to next task
+
+### 2026-03-22 14:18 - Orchestrator Check
+- **State**: WORKING
+- **Task**: ui-009 (High Council UI - ASCII Wireframe)
+- **Worker Status**: Active, running for ~1 minute
+- **Action**: Worker still in progress, no action needed
+
+## 2026-03-22 14:18 - Worker Completed ui-009 ✅
+
+**Task:** ui-009 - High Council UI - ASCII Wireframe
+**Output:** design/ui-ux/wireframes/high-council.md (82KB, ~2000 lines)
+**Status:** pending_verification
+
+### Summary:
+Created comprehensive High Council wireframe specification with detailed ASCII art for all voting phases:
+
+**Main Wireframes Created:**
+1. Council Chamber - Opening Ceremony (all delegates, Cosmic Wheel hologram)
+2. Candidate Nomination (two largest population empires)
+3. Voting Phase - AI Votes Being Cast (animated announcements)
+4. Player Voting Turn (Not a Candidate) - 3 options with strategic notes
+5. Player Voting Turn (IS a Candidate) - automatic self-vote
+6. Vote Tally - Final Results (No Winner) - detailed breakdown
+7. Victory Announcement - Player Wins
+8. Victory Confirmation Dialog - Accept/Decline
+9. Opponent Wins - Accept/Defy decision
+10. Final War Declaration (defiance consequences)
+11. Pre-Council Lobbying (5 turns before, bribe/threaten interface)
+12. Bribe Offer Dialog (BC + Technology selection, effectiveness preview)
+13. Bribe Response (acceptance/rejection with outcome)
+14. AI Speech During Voting (candidate speeches)
+15. Second Candidate Speech
+16. Declined Own Victory (penalty consequences)
+
+**Voting Mechanics Documented (MOO1-Faithful):**
+- Two-thirds (67%) majority required
+- Votes weighted by population percentage
+- Two candidates = top two population empires
+- Abstention removes votes from effective total
+- Council forms at 50% planets colonized
+- Reconvenes every 25 turns
+
+**Key Features:**
+- Vote progress bars with threshold markers
+- Delegate portraits with vote weight display
+- Candidate banners with empire statistics
+- Animated vote announcement scroll
+- Strategic voting notes for player decisions
+- Bribery effectiveness calculator
+- Post-vote consequence displays
+
+**Post-Vote Options:**
+- Accept victory → Diplomatic Victory (game ends)
+- Decline victory → -30 relations, 50-turn cooldown
+- Accept opponent → Game Over
+- Defy opponent → Final War (galaxy united against player)
+
+**Additional Specifications:**
+- Keyboard navigation (1/2/3 for votes, A/D for accept/defy)
+- Animation timing (vote announcements, victory effects)
+- State transition diagram (full voting flow)
+- Data structures (council session state, vote speech templates)
+- Edge cases (two-race galaxy, candidate eliminated, war with both)
+- Accessibility features (screen reader, color blind mode)
+- References to design/diplomacy/council.md for algorithms
+
+**References Used:**
+- design/diplomacy/council.md (voting algorithms)
+- design/LORE.md (pet-themed naming)
+- MOO1 High Council screen
+- LP Archive MOO1 Playthrough
+- StrategyWiki Victory Conditions

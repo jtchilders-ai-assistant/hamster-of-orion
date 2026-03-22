@@ -1,27 +1,19 @@
-# Current Task: ui-008
+# Current Task: ui-009
 
-## Title
-Tactical Combat UI - ASCII Wireframe
+## High Council UI - ASCII Wireframe
+
+**Priority**: 13
+**Output File**: design/ui-ux/wireframes/high-council.md
 
 ## Description
-Create detailed ASCII wireframe for Combat screen matching MOO1. Include: hex/grid display, ship stacks, weapon firing, movement, retreat. Show turn phases.
-
-## Output File
-design/ui-ux/wireframes/tactical-combat.md
+Create detailed ASCII wireframe for Galactic Council screen matching MOO1. Include: voting display, candidate banners, vote tallies, speech/response.
 
 ## Requirements
-- Match MOO1 tactical combat look and feel
-- Show hex/grid-based combat arena
-- Include ship stack representations with count indicators
-- Weapon firing UI with targeting
-- Movement phase with range indicators
-- Retreat mechanics
-- Turn phase display (Move → Fire → Resolve)
-- Ship selection and orders
-- Combat resolution feedback
-- Victory/defeat screens
-
-## Reference
-- Study existing wireframes in design/ui-ux/wireframes/ for format
-- Reference design/combat/ specs for mechanics
-- Reference ship-classes.md for ship types
+- Match MOO1 Galactic Council mechanics and feel
+- Show council chamber layout with all empire delegates
+- Voting interface with candidate selection
+- Vote tallies display (votes based on population)
+- Speech/response dialog for diplomatic interactions
+- Victory conditions display (elected galactic emperor)
+- Abstain and defiance options
+- Pet-themed naming per LORE.md

@@ -103,7 +103,7 @@
       "id": "ui-009",
       "title": "High Council UI - ASCII Wireframe",
       "description": "Create detailed ASCII wireframe for Galactic Council screen matching MOO1. Include: voting display, candidate banners, vote tallies, speech/response. Output: design/ui-ux/wireframes/high-council.md",
-      "status": "pending",
+      "status": "pending_verification",
       "priority": 13,
       "output_file": "design/ui-ux/wireframes/high-council.md"
     },
