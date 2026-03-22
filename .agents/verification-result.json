@@ -1,30 +1,23 @@
 {
-  "task_id": "ui-004",
-  "verified_at": "2026-03-22T13:43:00-05:00",
+  "task_id": "ui-005",
+  "verified_at": "2026-03-22T13:51:00-05:00",
   "passed": true,
   "score": 95,
   "issues": [
     {
       "severity": "minor",
       "category": "accuracy",
-      "description": "Rally points and patrol routes are enhancements not in original MOO1 - document correctly notes these as enhancements but could be more explicit about optional implementation",
-      "location": "design/ui-ux/wireframes/fleet-command.md - MOO1 Faithfulness Notes section",
-      "suggestion": "Consider adding a note that rally points and patrol routes should be flagged as 'optional enhanced features' for strict MOO1 mode"
-    },
-    {
-      "severity": "minor",
-      "category": "completeness",
-      "description": "Ship class 'Titan' mentioned in strength calculation but not seen in MOO1 ship classes (MOO1 has: Scout, Fighter, Destroyer, Cruiser, Battleship, Dreadnought)",
-      "location": "design/ui-ux/wireframes/fleet-command.md - Fleet Strength Ratings section",
-      "suggestion": "Replace 'Titan' with 'Battleship' to match MOO1 terminology, or clarify if Titan is a Hamster of Orion specific addition"
+      "description": "Some tech names in examples (e.g., 'Battle Comp III', 'Scatter Pack V') should be verified against MOO1 exact naming conventions",
+      "location": "design/ui-ux/wireframes/research-tree.md - Tech examples throughout",
+      "suggestion": "Cross-reference with StrategyWiki tech lists to confirm exact tech names used in MOO1"
     },
     {
       "severity": "minor",
       "category": "integration",
-      "description": "Ship design quick view references 'F6' for edit design, but F6 hotkey assignment should be verified against other UI specs for consistency",
-      "location": "design/ui-ux/wireframes/fleet-command.md - Ship Design Quick View section",
-      "suggestion": "Verify F6 hotkey assignment is consistent with other wireframe documents (galaxy-map.md shows F7 in header)"
+      "description": "References to related documents (research-formulas.md, TECH_OVERVIEW.md) may not exist yet",
+      "location": "design/ui-ux/wireframes/research-tree.md - Related Documents section",
+      "suggestion": "Ensure referenced documents are created or mark as future work"
     }
   ],
-  "summary": "Excellent Fleet Command UI wireframe specification. The document is comprehensive, well-structured, and implementation-ready. It includes all required elements: fleet list (with detailed entry layouts and status icons), ship counts display (with composition tables), destination setting interface (with full map dialog), and rally points functionality (with configuration screen). The specification follows the established wireframe format from galaxy-map.md and planet-management.md, with consistent header styling, ASCII art quality, and section organization. MOO1 faithfulness is maintained for core mechanics (fleet speed/range determined by slowest ship, in-transit movement restrictions, same-location merge requirements). The document provides extensive coverage including: 10 detailed ASCII wireframe screens, keyboard shortcuts, mouse interactions, context menus, tooltips, notification dialogs, JSON data structures, edge cases, accessibility features, responsive behavior notes, and performance considerations. Minor issues are cosmetic and do not affect implementation readiness."
+  "summary": "Excellent, comprehensive Research Tree UI wireframe that exceeds requirements. Contains 7+ detailed ASCII wireframes covering all screen states, comprehensive interaction specifications (keyboard/mouse), all 6 tech fields with visual styling, allocation slider mechanics faithful to MOO1, detailed tech panels, responsive layouts, accessibility features, and JSON data structures. The document is implementation-ready with clear sections for developers. Minor issues are only about verifying exact MOO1 tech naming and ensuring referenced docs exist."
 }

@@ -764,3 +764,15 @@ Created comprehensive Research Tree (F4) wireframe specification with detailed A
 - design/technology/TECH_OVERVIEW.md
 - design/ui-ux/wireframes/planet-management.md (slider reference)
 - MOO1 (1993) Technology Research Screen
+
+### 2026-03-22 13:50 - Worker Completed ui-005
+- **Task**: Research Tree UI - ASCII Wireframe
+- **Output**: design/ui-ux/wireframes/research-tree.md (101KB, 1185 lines)
+- **State Transition**: WORKING → PENDING_VERIFICATION
+- **Action**: Spawning verifier sub-agent
+
+### 2026-03-22 13:52 - Task ui-005 COMPLETE ✅
+- **Verification**: PASSED (95/100)
+- **State Transition**: VERIFYING → IDLE
+- **Minor Notes**: Tech names should be verified against MOO1, some referenced docs TBD
+- **Next**: Starting ui-006 (Ship Design UI)

@@ -71,7 +71,7 @@
       "id": "ui-005",
       "title": "Research Tree UI - ASCII Wireframe",
       "description": "Create detailed ASCII wireframe for Research screen matching MOO1. Show all 6 tech fields, current research, allocation sliders, tech details panel. Output: design/ui-ux/wireframes/research-tree.md",
-      "status": "pending_verification",
+      "status": "done",
       "priority": 9,
       "output_file": "design/ui-ux/wireframes/research-tree.md"
     },
