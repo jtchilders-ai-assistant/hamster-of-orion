@@ -93,3 +93,20 @@ The following tasks were completed before the verification system was implemente
 **Recommendation:** PASS - Minor documentation clarifications do not impact implementation. Fully meets spec-017 requirements for spy success rate, sabotage effects, tech theft probability, spy death chance, and counter-espionage formulas.
 
 ---
+
+### spec-018: AI Decision Scoring Functions
+**File:** design/technical/ai-implementation.md  
+**Verified:** 2026-03-22T16:22:23Z  
+**Result:** ✅ PASSED (Score: 92/100)
+
+**Summary:** Excellent specification document covering all five core AI decision domains: Threat Assessment, Expansion Priority, Research Selection, Fleet Deployment, and Diplomatic Stance. All required sections present (Overview, Formulas, Constants, Algorithms, Data Tables, Edge Cases). Mathematical formulas use integer arithmetic with explicit floor() operations, faithful to MOO1 mechanics. All JSON data blocks (racial_research_preferences, fleet_compositions, personality_stance_modifiers, difficulty_modifiers) are valid and parseable. Properly uses pet-themed race naming from LORE.md. Includes complete Turn Algorithm pseudocode in Section 8. Edge cases comprehensively address scenarios like no expansion targets, tech gaps, economic collapse, and diplomatic isolation.
+
+**Issues Found (4 minor):**
+1. Hull HP values for ship classes don't have explicit mapping to ship-classes.md - clarify these are derived combat values
+2. Chameleons described as "Paranoid spies" for threat perception vs "confident infiltrators" in ai-personalities.md - minor tone inconsistency
+3. Related Documents section uses inconsistent paths (should use relative paths from technical/ directory)
+4. Random factor (±5) in research selection doesn't specify distribution or RNG seeding for replay determinism
+
+**Recommendation:** PASS - Ready for implementation. Minor documentation issues don't impact code viability. Comprehensive coverage of AI decision-making with worked examples demonstrating formula application.
+
+---

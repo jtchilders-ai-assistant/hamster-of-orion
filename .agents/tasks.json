@@ -159,7 +159,7 @@
       "id": "spec-018",
       "title": "AI Decision Scoring Functions",
       "description": "Document AI algorithms for: threat assessment scoring, expansion priority, research selection, fleet deployment, diplomatic stance. Update design/technical/ai-implementation.md",
-      "status": "pending_verification",
+      "status": "done",
       "priority": 18,
       "output_file": "design/technical/ai-implementation.md",
       "completed": "2026-03-22"

@@ -1,23 +1,37 @@
 {
-  "task_id": "spec-017",
-  "verified_at": "2026-03-22T11:17:00-05:00",
+  "task_id": "spec-018",
+  "verified_at": "2026-03-22T16:22:23Z",
   "passed": true,
-  "score": 95,
+  "score": 92,
   "issues": [
     {
       "severity": "minor",
+      "category": "accuracy",
+      "description": "Ship class 'Battle Cruiser' uses 120 Hull HP in ai-implementation.md but ship-classes.md shows 1000 space. The Hull HP values don't have a direct mapping in ship-classes.md - they appear to be custom for AI calculations. Should clarify relationship.",
+      "location": "design/technical/ai-implementation.md, Section 1.3 Hull HP by Class",
+      "suggestion": "Add a note clarifying that Hull HP values are derived combat values, distinct from ship space allocation."
+    },
+    {
+      "severity": "minor",
+      "category": "integration",
+      "description": "The Racial Threat Perception Modifiers section lists 10 races correctly matching LORE.md, but Chameleons are listed as 'Paranoid spies' with 1.10 modifier while ai-personalities.md describes them as confident infiltrators. Minor tone inconsistency.",
+      "location": "design/technical/ai-implementation.md, Section 1.8",
+      "suggestion": "Consider aligning threat perception description with ai-personalities.md characterization."
+    },
+    {
+      "severity": "minor",
       "category": "completeness",
-      "description": "SpyEffectiveness formula includes TargetSecurity but doesn't explicitly show RacialDefenseBonus as a separate term in some examples",
-      "location": "design/diplomacy/espionage.md Section 1.2",
-      "suggestion": "Consider clarifying that RacialDefenseBonus is applied via the defender's detection chance, not spy effectiveness"
+      "description": "The Related Documents section references files with inconsistent paths - some use relative paths like 'ai-personalities.md' while the actual file is at 'design/diplomacy/ai-personalities.md'.",
+      "location": "design/technical/ai-implementation.md, Section 10",
+      "suggestion": "Update Related Documents section with consistent relative paths from the technical/ directory."
     },
     {
       "severity": "minor",
       "category": "implementation",
-      "description": "Rebellion morale modifier table stops at 20% morale but formula allows any value below 70%",
-      "location": "design/diplomacy/espionage.md Section 6.5",
-      "suggestion": "Add a note that morale below 20% continues formula extrapolation or caps at +25"
+      "description": "Random factor in research selection algorithm (±5) doesn't specify the random distribution or seed handling for deterministic replay.",
+      "location": "design/technical/ai-implementation.md, Section 3.9",
+      "suggestion": "Specify uniform distribution and note that game replays should use seeded RNG."
     }
   ],
-  "summary": "Excellent, comprehensive specification covering all required espionage formulas. The document includes: (1) spy success rate formula with racial/tech/security modifiers, (2) sabotage effects with destruction percentages for factories and missile bases, (3) tech theft probability with tier-based modifiers, (4) spy death chance formula with mission risk levels, and (5) counter-espionage mechanics including detection, spy hunts, and double agents. All JSON data tables are valid and implementation-ready. The pseudocode algorithm in Section 11 provides a complete mission resolution flow. Minor issues are cosmetic and do not impact implementation. Fully meets spec-017 requirements."
+  "summary": "Excellent specification document. All required sections present (Overview, Formulas, Constants, Algorithms, Data Tables, Edge Cases). Five core AI decision domains comprehensively covered with mathematical formulas using integer arithmetic faithful to MOO1. JSON data is valid and parseable. Racial modifiers correctly use pet-themed naming from LORE.md (Hamsters, Guinea Pigs, Budgies, etc.). Constants are well-organized and reasonable. Worked examples demonstrate formula application clearly. Minor issues relate to cross-document path consistency and small integration details. Ready for implementation."
 }
