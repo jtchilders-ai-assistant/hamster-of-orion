@@ -135,7 +135,7 @@
       "id": "fix-001",
       "title": "Address Gap Analysis Findings",
       "description": "Based on gap-analysis-manual.md and gap-analysis-wiki.md, create or update specification documents to fill identified gaps. Mark each gap as resolved. Output: design/review/gaps-resolved.md",
-      "status": "pending",
+      "status": "done",
       "priority": 17,
       "output_file": "design/review/gaps-resolved.md"
     },

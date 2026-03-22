@@ -190,12 +190,12 @@ If Research_Progress[field] >= Actual_Tech_Cost:
 
 ## Miniaturization
 
-### 9. Miniaturization Formula
+### 9. Miniaturization Formula (MOO1 Faithful)
 
 As you advance in a technology field, older technologies become smaller and cheaper:
 
 ```
-Size_Reduction = (Current_Tier - Tech_Tier) × Miniaturization_Rate
+Size_Reduction = min((Current_Tier - Tech_Tier) × Miniaturization_Rate, Maximum_Reduction)
 Miniaturized_Size = Base_Size × (1 - Size_Reduction)
 Miniaturized_Cost = Base_Cost × (1 - Size_Reduction)
 ```
@@ -204,8 +204,11 @@ Where:
 - `Current_Tier` = Your highest researched tier in that field
 - `Tech_Tier` = The tier of the component being miniaturized
 - `Miniaturization_Rate` = 0.05 (5% per tier)
+- `Maximum_Reduction` = 0.50 (50% cap, matching MOO1)
 
-**Minimum Size:** Components cannot shrink below 20% of their original size (0.2× minimum).
+**Minimum Size:** Components cannot shrink below 50% of their original size (0.5× minimum).
+
+**Note:** MOO1 capped miniaturization at 50% reduction. This design choice is preserved for balance.
 
 #### Miniaturization Example
 
@@ -341,7 +344,8 @@ Special abilities:
   "research_system": {
     "base_rp_per_scientist": 1.0,
     "miniaturization_rate": 0.05,
-    "miniaturization_minimum": 0.20,
+    "miniaturization_maximum": 0.50,
+    "miniaturization_minimum": 0.50,
     "tech_choices_base": 2,
     "tech_choices_rats": 3
   },
@@ -551,15 +555,15 @@ function get_miniaturized_stats(component, empire):
     tier_difference = current_tier - component_tier
     reduction = tier_difference * 0.05  # 5% per tier
     
-    # Apply minimum
-    reduction = min(reduction, 0.80)  # Cannot reduce more than 80%
+    # Apply maximum (MOO1 caps at 50%)
+    reduction = min(reduction, 0.50)  # Cannot reduce more than 50%
     
     miniaturized_size = component.base_size * (1 - reduction)
     miniaturized_cost = component.base_cost * (1 - reduction)
     
     return {
-        size: max(miniaturized_size, component.base_size * 0.20),
-        cost: max(miniaturized_cost, component.base_cost * 0.20)
+        size: max(miniaturized_size, component.base_size * 0.50),
+        cost: max(miniaturized_cost, component.base_cost * 0.50)
     }
 ```
 

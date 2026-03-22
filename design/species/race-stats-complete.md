@@ -382,11 +382,13 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
         {
           "id": "cybernetic_workers",
           "name": "Cybernetic Workers",
-          "description": "Population produces more with less (effective +2 production per pop)",
+          "description": "Start with Robotic Controls III (+2 levels from base), population operates at enhanced efficiency",
           "effect": {
-            "type": "production_per_pop",
-            "value": 2
-          }
+            "type": "starting_robotic_controls_bonus",
+            "value": 2,
+            "production_per_pop_bonus": 2
+          },
+          "moo1_note": "Matches Meklars +2 Robotic Controls starting bonus"
         },
         {
           "id": "robotic_labor",
@@ -996,12 +998,13 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
         {
           "id": "deadly_accuracy",
           "name": "Deadly Accuracy",
-          "description": "All weapons deal +25% damage and have +15% hit chance",
+          "description": "All weapons have +4 Attack Level (accuracy) and deal +15% damage on hit",
           "effect": {
-            "type": "weapon_damage_bonus",
-            "value": 25,
-            "hit_bonus": 15
-          }
+            "type": "weapon_attack_bonus",
+            "attack_level_bonus": 4,
+            "damage_bonus_percent": 15
+          },
+          "moo1_note": "Matches Mrrshan +4 Attack Level bonus"
         },
         {
           "id": "first_strike",
@@ -1112,12 +1115,14 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
         {
           "id": "superior_pilots",
           "name": "Superior Pilots",
-          "description": "All ships gain +3 combat initiative and +20% evasion",
+          "description": "All ships gain +3 combat initiative, +3 defense level, and +20% evasion",
           "effect": {
-            "type": "ship_initiative",
-            "value": 3,
+            "type": "ship_combat_bonus",
+            "initiative_bonus": 3,
+            "defense_level_bonus": 3,
             "evasion_bonus": 20
-          }
+          },
+          "moo1_note": "Matches Alkari +3 Defense AND +3 Initiative bonuses"
         },
         {
           "id": "three_dimensional_tactics",

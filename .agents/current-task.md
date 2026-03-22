@@ -1,21 +1,26 @@
-# Current Task: ui-012
+# Current Task: fix-001
 
 ## Title
-UI State Transitions
+Address Gap Analysis Findings
 
 ## Description
-Document all screen transitions and modal behaviors matching MOO1. Include: screen flow diagram, popup triggers, confirmation dialogs, turn flow.
+Based on gap-analysis-manual.md and gap-analysis-wiki.md, create or update specification documents to fill identified gaps. Mark each gap as resolved.
 
 ## Output File
-design/ui-ux/state-transitions.md
+design/review/gaps-resolved.md
 
 ## Priority
-16
+17
 
 ## Requirements
-- Document all screen-to-screen transitions
-- Define modal/popup trigger conditions
-- Specify confirmation dialog requirements
-- Map the turn flow state machine
-- Match MOO1 screen flow patterns
-- Include transition animations and timing
+1. Read design/review/gap-analysis-manual.md for gaps identified from the MOO1 manual
+2. Read design/review/gap-analysis-wiki.md for gaps identified from wiki research
+3. For each gap:
+   - Either update an existing spec document to address the gap
+   - Or create new spec content as needed
+   - Document what was done to resolve each gap
+4. Create design/review/gaps-resolved.md that:
+   - Lists each gap from both analysis documents
+   - Shows the resolution (what spec was updated/created, where)
+   - Marks each as RESOLVED or DEFERRED (with reason)
+5. Ensure all critical gaps are addressed before marking task complete

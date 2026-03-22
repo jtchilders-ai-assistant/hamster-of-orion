@@ -914,6 +914,238 @@ function resolve_bombardment(ship, bomb, planet):
 
 ---
 
+## Section 25: Auto-Combat AI Targeting Priorities
+
+When the player chooses "Auto-Resolve" or AI controls ships, the following algorithms determine behavior.
+
+### 25.1 Target Priority Algorithm
+
+```pseudocode
+function select_target(ship, combat):
+    enemies = get_enemy_ships(ship.side, combat)
+    
+    # Score each potential target
+    scores = []
+    for enemy in enemies:
+        score = calculate_target_priority(ship, enemy, combat)
+        scores.append({target: enemy, score: score})
+    
+    # Sort by score descending
+    scores.sort(key=score, descending=True)
+    
+    # Return highest priority target
+    return scores[0].target if scores else None
+
+function calculate_target_priority(ship, target, combat):
+    score = 0
+    
+    # Priority 1: Bombers (highest threat to planets)
+    if target.has_bombs:
+        score += 1000
+    
+    # Priority 2: Troop transports (invasion threat)
+    if target.has_troops:
+        score += 800
+    
+    # Priority 3: Capital ships with heavy weapons
+    if target.size_class >= 4:  # Large or bigger
+        score += 500
+    
+    # Priority 4: Ships that can kill us this turn
+    if can_destroy_us(target, ship):
+        score += 400
+    
+    # Priority 5: Damaged ships (finish them off)
+    damage_percent = 1 - (target.current_hp / target.max_hp)
+    score += damage_percent * 300
+    
+    # Priority 6: Range bonus (prefer closer targets)
+    distance = hex_distance(ship.position, target.position)
+    score -= distance * 10  # Penalize distant targets
+    
+    # Priority 7: Kill probability (prefer easy kills)
+    kill_chance = estimate_kill_chance(ship, target)
+    score += kill_chance * 200
+    
+    return score
+```
+
+### 25.2 Weapon Selection Logic
+
+```pseudocode
+function select_weapon(ship, target, combat):
+    best_weapon = None
+    best_dps = 0
+    
+    for weapon in ship.weapons:
+        if weapon.cooldown > 0:
+            continue
+        if weapon.ammo_remaining <= 0:
+            continue
+        
+        # Calculate expected damage per second
+        hit_chance = calculate_hit_chance(ship, weapon, target)
+        avg_damage = (weapon.damage_min + weapon.damage_max) / 2
+        expected_damage = hit_chance * avg_damage
+        
+        # Apply shield consideration
+        if target.shields_current > 0:
+            # Prefer shield-bypassing weapons
+            if weapon.ignores_shields:
+                expected_damage *= 1.5
+            else:
+                expected_damage -= min(target.shield_class, expected_damage)
+        
+        # Consider ammo conservation
+        if weapon.is_missile and ship.missile_count < 3:
+            expected_damage *= 0.7  # Prefer saving missiles
+        
+        if expected_damage > best_dps:
+            best_dps = expected_damage
+            best_weapon = weapon
+    
+    return best_weapon
+```
+
+### 25.3 Movement AI
+
+```pseudocode
+function ai_choose_movement(ship, target, combat):
+    optimal_range = get_optimal_weapon_range(ship)
+    current_range = hex_distance(ship.position, target.position)
+    
+    # Bombers: Rush planet
+    if ship.has_bombs and combat.has_planet:
+        return move_toward(ship, combat.planet_position)
+    
+    # Short-range ships: Close distance
+    if optimal_range <= 3 and current_range > optimal_range:
+        return move_toward(ship, target.position)
+    
+    # Long-range ships: Maintain distance
+    if optimal_range >= 6 and current_range < optimal_range:
+        return move_away(ship, target.position)
+    
+    # Damaged ships: Seek escape route
+    if ship.current_hp < ship.max_hp * 0.25:
+        return move_toward_retreat_edge(ship, combat)
+    
+    # Default: Approach to optimal range
+    return move_to_optimal_range(ship, target.position, optimal_range)
+```
+
+### 25.4 Retreat Decision Algorithm
+
+```pseudocode
+function ai_should_retreat(ship, combat):
+    # Calculate force ratios
+    our_strength = calculate_fleet_strength(ship.side, combat)
+    enemy_strength = calculate_fleet_strength(get_enemy_side(ship.side), combat)
+    ratio = our_strength / max(enemy_strength, 1)
+    
+    # Racial tendencies
+    retreat_threshold = get_racial_retreat_threshold(ship.race)
+    
+    # Guinea Pigs: Almost never retreat (threshold 0.1)
+    # Hermit Crabs: Retreat quickly (threshold 0.5)
+    # Others: Standard (threshold 0.3)
+    
+    if ratio < retreat_threshold:
+        return true
+    
+    # Individual ship survival
+    if ship.current_hp < ship.max_hp * 0.15:
+        return true
+    
+    return false
+
+function get_racial_retreat_threshold(race):
+    thresholds = {
+        "guinea_pigs": 0.10,
+        "budgies": 0.25,
+        "ferrets": 0.20,
+        "hermit_crabs": 0.50,
+        "hamsters": 0.30,
+        "default": 0.30
+    }
+    return thresholds.get(race, thresholds["default"])
+```
+
+### 25.5 Focus Fire Coordination
+
+```pseudocode
+function coordinate_focus_fire(fleet_side, combat):
+    # All AI ships focus on single target when possible
+    primary_target = None
+    
+    for ship in get_fleet_ships(fleet_side, combat):
+        if ship.current_target:
+            if primary_target == None:
+                primary_target = ship.current_target
+            elif ship.current_target.current_hp < primary_target.current_hp:
+                # Switch to almost-dead target
+                primary_target = ship.current_target
+    
+    # Assign all ships to primary target if valid
+    if primary_target and primary_target.current_hp > 0:
+        for ship in get_fleet_ships(fleet_side, combat):
+            if can_hit(ship, primary_target, combat):
+                ship.current_target = primary_target
+    
+    return primary_target
+```
+
+### 25.6 Auto-Resolve Quick Combat
+
+For players who skip tactical combat entirely:
+
+```pseudocode
+function auto_resolve_combat(attacker_fleet, defender_fleet, location):
+    # Calculate force strengths
+    attacker_strength = 0
+    for ship in attacker_fleet:
+        attacker_strength += calculate_ship_combat_power(ship)
+    
+    defender_strength = 0
+    for ship in defender_fleet:
+        defender_strength += calculate_ship_combat_power(ship)
+    
+    # Add planetary defenses to defender
+    if location.has_missile_bases:
+        defender_strength += location.missile_bases * 50
+    
+    # Determine winner
+    total = attacker_strength + defender_strength
+    attacker_roll = random() * attacker_strength
+    defender_roll = random() * defender_strength
+    
+    if attacker_roll > defender_roll:
+        winner = "attacker"
+        casualty_rate = defender_strength / total
+    else:
+        winner = "defender"
+        casualty_rate = attacker_strength / total
+    
+    # Apply casualties (higher variance than manual combat)
+    attacker_losses = apply_casualties(attacker_fleet, casualty_rate * 1.2)
+    defender_losses = apply_casualties(defender_fleet, casualty_rate * 0.8)
+    
+    return {
+        winner: winner,
+        attacker_losses: attacker_losses,
+        defender_losses: defender_losses
+    }
+
+function calculate_ship_combat_power(ship):
+    power = ship.max_hp
+    power += ship.shield_class * 10
+    power += sum(weapon.avg_damage for weapon in ship.weapons) * 5
+    power *= 1 + (ship.experience_level * 0.1)
+    return power
+```
+
+---
+
 ## Summary: Complete Combat Flow
 
 ```pseudocode

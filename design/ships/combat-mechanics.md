@@ -69,28 +69,37 @@ Combat triggers when:
 
 ## Targeting & Accuracy
 
-### Base Hit Chance
-**Formula**: 70% - (Range Penalty) + (Computer Bonus) - (ECM Penalty) + (Size Modifier)
+### Base Hit Chance (MOO1 Differential Formula)
+**Formula**: 50% + (Attack_Level - Defense_Level) × 5%
 
-**Range Penalties**:
-- Point Blank (1 hex): +10%
-- Close (2-4 hexes): +0%
-- Medium (5-8 hexes): -10%
-- Long (9-15 hexes): -20%
-- Very Long (16+ hexes): -30%
+Where:
+- **Attack_Level** = Battle_Computer_Mark + Racial_Attack_Bonus
+- **Defense_Level** = ECM_Jammer_Level + Ship_Maneuver_Class + Range_Penalty
 
-**Computer Bonus**: Battle Computer Mark adds +accuracy
-**ECM Penalty**: Enemy ECM reduces your accuracy
-**Size Modifier**: Larger targets easier to hit (+10% per size class)
+**Minimum**: 5% (always some chance to hit)
+**Maximum**: 95% (always some chance to miss)
+
+**Range Penalties (added to Defense)**:
+- Point Blank (1 hex): -2 Defense (bonus to attacker)
+- Close (2-4 hexes): +0 Defense
+- Medium (5-8 hexes): +1 Defense
+- Long (9-15 hexes): +2 Defense
+- Very Long (16+ hexes): +4 Defense
+
+**Size Modifier**: Larger targets easier to hit (+1 Attack per size class above Scout)
+
+**Racial Bonuses**:
+- Ferrets: +4 Attack Level (Mrrshan equivalent)
+- Budgies: +3 Defense Level (Alkari equivalent)
 
 **Example**:
-- Ion Cannon at long range vs destroyer with ECM III
-- Base: 70%
-- Range: -20% (long)
-- Computer Mark V: +35%
-- ECM III: -20%
-- Size (destroyer): +0%
-- **Final: 65% hit chance**
+- Ion Cannon at long range vs Destroyer with ECM III
+- Attacker: Battle Computer Mark V (+5), Size target (+1) = Attack 6
+- Defender: ECM III (+3), Maneuver 2 (+2), Long Range (+2) = Defense 7
+- Hit Chance: 50% + (6 - 7) × 5% = 50% - 5% = 45%
+
+See `combat-algorithm.md` Section 9 for the full pseudocode implementation.
+See `force-fields.md` for shield absorption values.
 
 ---
 
@@ -251,6 +260,73 @@ Budgies: -20% ground combat (terrible)
 - Ferrets: Alpha strike biggest threat first
 - Hermit Crabs: Tank damage, outlast
 - Rabbits: Swarm with numbers
+
+---
+
+## Missile Bases (Planetary Defense)
+
+Missile bases are ground-based defense installations that participate in orbital combat.
+
+### Base Statistics
+
+| Component | Value | Notes |
+|-----------|-------|-------|
+| Base Cost | 150 BC | Plus component costs |
+| Volleys per Round | 3 | Fire 3 times per combat round |
+| Auto-Upgrade | Yes | Uses best available tech |
+
+### Component Assignment
+
+Missile bases automatically use the best available technology:
+- **Shield**: Best researched Deflector Shield class
+- **Battle Computer**: Best researched BC Mark
+- **ECM Jammer**: Best researched Jammer Mark
+- **Missiles**: Best researched missile type
+
+### Combat Behavior
+
+**Targeting Priority** (highest to lowest):
+1. Bombers (ships with bombs equipped)
+2. Troop transports
+3. Largest enemy ships
+4. Closest enemy ships
+
+**Attack Resolution**:
+- Each base fires 3 missile volleys per combat round
+- Missiles use standard hit formula with base's Battle Computer
+- Enemy point defense can intercept missiles
+- Missiles that hit deal standard missile damage
+
+### Base Cost Formula
+
+```
+Total_Base_Cost = 150 + Shield_Cost + Computer_Cost + ECM_Cost + (Missile_Cost × 3)
+```
+
+Where component costs are based on the best available technology at time of construction.
+
+### Planetary Shield Interaction
+
+- Missile bases benefit from Planetary Shields
+- Planetary Shield absorbs X damage per bomb hit (Class V = 5, Class X = 10, etc.)
+- Shields stack with base armor
+
+### Edge Cases
+
+- Bases cannot retreat
+- Bases are destroyed when planet is captured
+- Bases continue firing even if all ships retreat
+- Multiple bases fire independently (no coordination bonus)
+
+---
+
+## Related Documents
+
+- `combat-algorithm.md` - Full combat resolution pseudocode
+- `../technology/force-fields.md` - Shield absorption values
+- `components-complete.md` - All ship components
+- `weapons-complete.md` - All weapon statistics
+- `ship-design.md` - Ship design rules
 
 ---
 
