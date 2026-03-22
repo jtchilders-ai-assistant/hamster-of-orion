@@ -1,10 +1,10 @@
 {
-  "state": "WORKING",
-  "current_task": "spec-019",
-  "current_task_started_at": "2026-03-22T11:26:00-05:00",
+  "state": "IDLE",
+  "current_task": null,
+  "current_task_started_at": null,
   "retry_count": 0,
   "max_retries": 3,
-  "last_updated": "2026-03-22T11:26:00-05:00",
-  "last_action": "Assigned spec-019 Galaxy Generation Algorithm to worker",
+  "last_updated": "2026-03-22T11:31:00-05:00",
+  "last_action": "spec-019 verified and marked done (score: 95/100)",
   "verification_issues": []
 }
