@@ -1,16 +1,10 @@
 {
-  "state": "WORKING",
+  "state": "VERIFYING",
   "current_task": "spec-021",
   "current_task_started_at": "2026-03-22T11:37:00-05:00",
   "retry_count": 1,
   "max_retries": 3,
-  "last_updated": "2026-03-22T11:41:45-05:00",
-  "last_action": "Verification FAILED (52/100) - returning to worker with issues",
-  "verification_issues": [
-    "Missing probability/frequency data and event selection algorithm",
-    "Missing trigger conditions for all events",
-    "Missing key MOO1 events: Guardian, Pirates, Comet, Rebellion, Supernova, Leaders",
-    "No JSON data structures provided",
-    "Missing duration information for lasting effects"
-  ]
+  "last_updated": "2026-03-22T11:44:00-05:00",
+  "last_action": "Worker completed revision (1922 lines), spawning verifier",
+  "verification_issues": []
 }
