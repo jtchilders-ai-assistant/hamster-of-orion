@@ -1,10 +1,10 @@
 {
-  "state": "WORKING",
+  "state": "PENDING_VERIFICATION",
   "current_task": "spec-024",
   "current_task_started_at": "2026-03-22T11:54:30-05:00",
   "retry_count": 0,
   "max_retries": 3,
-  "last_updated": "2026-03-22T11:54:30-05:00",
-  "last_action": "Starting spec-024 (Complete Race Statistics)",
+  "last_updated": "2026-03-22T11:58:00-05:00",
+  "last_action": "Worker completed spec-024, ready for verification",
   "verification_issues": []
 }
