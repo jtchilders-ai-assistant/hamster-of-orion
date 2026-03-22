@@ -1,10 +1,10 @@
 {
-  "state": "IDLE",
-  "current_task": null,
-  "current_task_started_at": null,
+  "state": "WORKING",
+  "current_task": "spec-018",
+  "current_task_started_at": "2026-03-22T11:17:45-05:00",
   "retry_count": 0,
   "max_retries": 3,
-  "last_updated": "2026-03-22T11:17:30-05:00",
-  "last_action": "spec-017 verified and completed (score 95/100)",
+  "last_updated": "2026-03-22T11:17:45-05:00",
+  "last_action": "Spawning worker for spec-018",
   "verification_issues": []
 }

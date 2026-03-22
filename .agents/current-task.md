@@ -1,18 +1,20 @@
-# Current Task: spec-017
+# Current Task: spec-018
 
 ## Title
-Espionage Success Formulas
+AI Decision Scoring Functions
 
 ## Description
-Document exact formulas for: spy success rate, sabotage effects, tech theft probability, spy death chance, counter-espionage. Update design/diplomacy/espionage.md
+Document AI algorithms for: threat assessment scoring, expansion priority, research selection, fleet deployment, diplomatic stance. Update design/technical/ai-implementation.md
 
 ## Output File
-design/diplomacy/espionage.md
+design/technical/ai-implementation.md
 
 ## Requirements
-- All formulas must be implementation-ready with exact numbers
-- Include worked examples demonstrating calculations
-- Must be MOO1-faithful (adapted for pet theme)
-- Include JSON data blocks for constants/tables
-- Cover edge cases
-- Reference related specs (relationship-formulas.md, races, etc.)
+- Threat assessment scoring algorithm
+- Expansion priority scoring
+- Research selection algorithm
+- Fleet deployment decisions
+- Diplomatic stance calculations
+- All formulas must be implementation-ready with exact constants
+- Include worked examples
+- JSON data tables where appropriate
