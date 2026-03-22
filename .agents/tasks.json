@@ -7,7 +7,7 @@
       "id": "review-001",
       "title": "Comprehensive Gap Analysis vs MOO1 Manual",
       "description": "Compare ALL design documents against the original MOO1 manual PDF. Identify any missing mechanics, systems, or details. Create a gap report listing: 1) Missing systems entirely, 2) Incomplete specifications, 3) Deviations from MOO1 (intentional vs unintentional). Output: design/review/gap-analysis-manual.md",
-      "status": "pending",
+      "status": "pending_verification",
       "priority": 1,
       "output_file": "design/review/gap-analysis-manual.md"
     },
