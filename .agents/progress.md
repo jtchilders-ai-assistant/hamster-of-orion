@@ -694,3 +694,73 @@ Created comprehensive Fleet Command (F3) wireframe specification with detailed A
 - **Output**: design/ui-ux/wireframes/research-tree.md
 - **State**: WORKING
 - **Action**: Spawning worker agent
+
+### 2026-03-22 13:48 - Orchestrator Check
+- **State**: WORKING
+- **Current Task**: ui-005 (Research Tree UI - ASCII Wireframe)
+- **Status**: Worker sub-agent still running (4 min elapsed, worker-ui-005)
+- **Action**: No state change needed, worker still processing
+- **Next Check**: Will verify output file exists on next cycle
+
+## [2026-03-22 13:52] Worker Completed ui-005 ✅
+
+**Task:** ui-005 - Research Tree UI - ASCII Wireframe
+**Output:** design/ui-ux/wireframes/research-tree.md (70KB, ~1800 lines)
+**Status:** pending_verification
+
+### Summary:
+Created comprehensive Research Tree (F4) wireframe specification with detailed ASCII art:
+
+**Main Wireframes Created:**
+1. Default View - Research Overview (all 6 fields with allocation sliders)
+2. Field Selected State - Detailed tech info panel (Weapons example)
+3. Technology Choice Dialog - 2-3 tech selection cards
+4. Full Tech Tree View - Visual progression with tier markers
+5. Research Complete Notification - Achievement popup with miniaturization info
+6. Research Report Screen - Empire-wide research statistics
+
+**The Six Technology Fields:**
+- ⚔️ Weapons (Red) - Beam, missile, bomb systems
+- 🚀 Propulsion (Orange) - Engines, speed, range
+- 🔧 Construction (Yellow) - Armor, factories, building
+- 💻 Computers (Blue) - Targeting, ECM, espionage
+- 🛡️ Force Fields (Purple) - Shields, barriers, defense
+- 🌿 Planetology (Green) - Terraforming, ecology, growth
+
+**Allocation Slider Mechanics (MOO1-Faithful):**
+- Six sliders sum to exactly 100%
+- Lock/unlock functionality
+- Proportional rebalancing when one slider adjusted
+- Progress bars showing current tech completion
+- ETA calculations with formula documentation
+
+**Technology Details Panel:**
+- Current research display with stats
+- Tech tier and category information
+- Research cost and progress
+- Miniaturization status for researched techs
+- Change research / View tech tree actions
+
+**Special UI States Documented:**
+- No research selected (warning)
+- All techs researched (field complete)
+- Research stalled (0% allocation)
+- Research treaty bonus display
+
+**Additional Specifications:**
+- Keyboard shortcuts (1-6 for fields, L for lock, C for change, etc.)
+- Mouse interactions (drag sliders, context menus)
+- Tooltips (field, progress bar, lock button)
+- Animation specifications
+- Color specifications by field
+- Responsive layouts (Desktop, Medium, Mobile)
+- Accessibility features (ARIA labels, screen reader support)
+- JSON data structures (research state, technology definition)
+- Edge cases (all locked, insufficient unlock, no research)
+- MOO1 faithfulness notes
+
+**References Used:**
+- design/technology/research-formulas.md
+- design/technology/TECH_OVERVIEW.md
+- design/ui-ux/wireframes/planet-management.md (slider reference)
+- MOO1 (1993) Technology Research Screen
