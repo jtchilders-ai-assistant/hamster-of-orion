@@ -585,3 +585,55 @@ Created complete Force Fields technology tree specification including:
 - State: WORKING → PENDING_VERIFICATION
 - Task spec-014 output file detected (79 lines)
 - Spawning verifier...
+
+---
+
+### 2026-03-22 10:53 - spec-014: Complete Tech Tree - Planetology Field ✅
+**Completed:** `design/technology/planetology.md`
+
+**Summary:**
+Created complete Planetology technology tree specification including:
+- **12 Technology Tiers** (Free → 40,000+ RP)
+- **28 Core Technologies + 10 Future Techs:**
+  - 9 Terraforming levels (+10 to +120 max population)
+  - 6 Environmental Colonization (Barren → Radiated)
+  - 5 Ecological Restoration (2 to 20 waste/BC)
+  - 2 Soil Enrichment (+25% → +50% base size, Gaia conversion)
+  - 3 Biological Weapons (Death Spores → Bio Terminator)
+  - 2 Bio-Defense Antidotes (1M → 2M casualty reduction)
+  - 2 Cloning Technologies (10 BC → 5 BC per million)
+  - 1 Atmospheric Terraforming (hostile → standard, 200 BC)
+- **Terraforming Progression:**
+  - +10 (60 RP) → +120 (40,000 RP)
+  - Cost per million decreases: 5 BC → 2 BC
+- **Colonization Progression:**
+  - Barren (140 RP) → Radiated (5,180 RP)
+  - All 6 hostile environment types covered
+- **Soil Enrichment:**
+  - Basic: +25% size, +50% growth, 150 BC
+  - Advanced: +50% size, Gaia conversion (2x growth), 300 BC
+- **Biological Weapons:**
+  - Death Spores (1M/attack), Doom Virus (2M), Bio Terminator (3M)
+  - Space: 150-250, Cost: 100-300 BC
+  - Diplomatic penalty: -100 with ALL races
+- **Ecological Restoration:**
+  - 2 waste/BC (free) → 20 waste/BC (18,490 RP)
+  - Complements Construction's waste reduction
+- **Racial Bonuses:**
+  - Rabbits: +100% population growth
+  - Ants: +50% factory production
+  - Hermit Crabs: Can colonize any planet without tech
+- All formulas documented with worked examples
+- Complete JSON data schema (38 technologies)
+- Environment type table with growth modifiers
+
+**Files Created:**
+- `design/technology/planetology.md` (44KB, 1,200+ lines)
+
+**Notes:**
+- Sixth and final technology field specification ✓
+- All 6 tech fields now fully documented
+- Integrates with planet-types.md and construction.md
+- Bio weapons carry severe diplomatic consequences
+- Maximum population cap is 300 per planet
+- Starting tech: Ecological Restoration (free)
