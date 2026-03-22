@@ -1,29 +1,23 @@
-# Current Task: ui-002
+# Current Task: ui-003
 
 ## Title
-Main Galaxy Map UI - ASCII Wireframe
+Planet Management UI - ASCII Wireframe
 
 ## Description
-Create detailed ASCII wireframe for Galaxy Map matching MOO1 behavior. Include: star display, fleet indicators, selection mechanics, info panels, all buttons. Show multiple states (nothing selected, star selected, fleet selected).
+Create detailed ASCII wireframe for Planet Management screen matching MOO1. Include: production sliders, population display, building queue, ship construction. Show slider interactions.
 
 ## Output File
-design/ui-ux/wireframes/galaxy-map.md
+design/ui-ux/wireframes/planet-management.md
 
 ## Priority
-6
+7
 
 ## Requirements
-- Reference MOO1 Strategy Guide and StrategyWiki for accurate screen layout
-- Create ASCII wireframes showing the full screen layout
-- Include multiple states:
-  1. Default view (nothing selected)
-  2. Star selected state
-  3. Fleet selected state
-- Document all interactive elements:
-  - Star display and types
-  - Fleet indicators and movement
-  - Selection mechanics
-  - Info panels (star info, fleet info)
-  - All buttons and controls
-- Follow LORE.md pet-themed naming conventions
-- Reference existing docs: main-screens.md, UI_OVERVIEW.md, screen-inventory.md
+- ASCII wireframe showing Planet Management screen layout
+- Production sliders (SHIP, DEF, IND, ECO, TECH) with visual representation
+- Population display with breakdown
+- Building queue interface
+- Ship construction panel
+- Slider interaction states
+- Match MOO1 aesthetic and functionality
+- Include responsive behavior notes

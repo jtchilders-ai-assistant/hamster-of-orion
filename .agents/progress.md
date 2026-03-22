@@ -511,3 +511,61 @@ Created comprehensive Galaxy Map wireframe specification with detailed ASCII art
   - Rally point visual representation not documented
   - Transport ships UI not shown in fleet info
 - **State**: VERIFYING → IDLE
+
+---
+**[2026-03-22 13:28:00]** ORCHESTRATOR: State IDLE → WORKING. Assigned task ui-003 (Planet Management UI - ASCII Wireframe) to worker.
+
+### 2026-03-22 13:30 - Worker Completed ui-003 ✅
+
+**Task:** ui-003 - Planet Management UI - ASCII Wireframe
+**Output:** design/ui-ux/wireframes/planet-management.md (43.6KB, ~1300 lines)
+**Status:** pending_verification
+
+### Summary:
+Created comprehensive Planet Management wireframe specification with detailed ASCII art:
+
+**Main Wireframes Created:**
+1. Full View - Single Planet Layout (complete screen)
+2. Production Sliders - Detailed component breakdown
+3. All 5 slider states: Default, Locked, Hover, Active Drag, Warning, Maxed
+4. Ship Selection Modal
+5. Building Queue Panel with card states
+6. Transfer Population Modal
+7. Planet List View
+
+**Five Production Sliders (MOO1-Faithful):**
+- 🚀 SHIP - Ship construction with progress tracking
+- 🛡️ DEF - Defense/Missile bases
+- 🏭 IND - Industry/Factory building
+- 🌿 ECO - Ecology/Terraforming with multiple modes
+- 🔬 TECH - Research points output
+
+**Slider Mechanics Documented:**
+- Lock/unlock functionality
+- Auto-balancing algorithm (pseudocode)
+- Shift+Drag fine-tune mode
+- Double-click quick set
+- Right-click context menus
+- Warning states for pollution, etc.
+
+**Additional Panels:**
+- Population breakdown (workers/scientists/growth)
+- Factory details (built/operating/idle/output)
+- Defense display (bases/shields/troops)
+- Ecology status (waste/cleanup/terraform)
+- Ship construction with queue
+- Building cards (built/available/locked/in-progress)
+- Planet special indicators (Rich/Poor/Ultra-Rich/Artifacts)
+
+**Responsive Layouts:**
+- Desktop (1920×1080) - Full two-column
+- Laptop (1366×768) - Compact with collapsibles  
+- Tablet (1024×768) - Touch optimized, vertical sliders
+- Mobile (375×667) - Simplified single column
+
+**Technical Specs:**
+- Keyboard shortcuts (1-5 for sliders, L for lock, etc.)
+- Animation specifications (slider adjustment, progress bars)
+- Color specifications (normal/warning/error/success)
+- Accessibility features (ARIA labels, keyboard nav)
+- JSON data structure for planet state
