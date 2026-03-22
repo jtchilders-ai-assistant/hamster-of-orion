@@ -150,7 +150,7 @@
       "id": "spec-017",
       "title": "Espionage Success Formulas",
       "description": "Document exact formulas for: spy success rate, sabotage effects, tech theft probability, spy death chance, counter-espionage. Update design/diplomacy/espionage.md",
-      "status": "pending",
+      "status": "in_progress",
       "priority": 17,
       "output_file": "design/diplomacy/espionage.md"
     },

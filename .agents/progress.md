@@ -853,3 +853,8 @@ Created comprehensive Council voting algorithm specification including:
   - AI voting behavior with multi-factor scoring
   - All 5 JSON data blocks parse successfully
   - 12 edge cases thoroughly addressed
+
+### 2026-03-22 11:12 AM - Starting spec-017
+- **Task**: Espionage Success Formulas
+- **Output**: design/diplomacy/espionage.md
+- **Worker**: Spawned

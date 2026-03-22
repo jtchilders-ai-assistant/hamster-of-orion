@@ -1,27 +1,18 @@
-# Current Task: spec-016
+# Current Task: spec-017
 
 ## Title
-Council Voting Algorithm
+Espionage Success Formulas
 
 ## Description
-Document exact algorithm for: vote allocation by population, voting behavior by relationship, victory threshold, abstention rules. Update design/diplomacy/council.md
+Document exact formulas for: spy success rate, sabotage effects, tech theft probability, spy death chance, counter-espionage. Update design/diplomacy/espionage.md
 
 ## Output File
-design/diplomacy/council.md
+design/diplomacy/espionage.md
 
 ## Requirements
-1. Complete mathematical formulas (no placeholders)
-2. MOO1-faithful mechanics adapted to Hamster of Orion theme
-3. Implementation-ready with pseudocode
-4. JSON data tables for all constants
-5. Edge cases documented
-6. Use pet-themed race names per LORE.md
-
-## Key Topics to Cover
-- Vote allocation formula (population-based)
-- Voting behavior based on diplomatic relationships
-- Victory threshold calculation
-- Abstention rules and conditions
-- Council election timing and frequency
-- Veto mechanics (if applicable)
-- Council dissolution conditions
+- All formulas must be implementation-ready with exact numbers
+- Include worked examples demonstrating calculations
+- Must be MOO1-faithful (adapted for pet theme)
+- Include JSON data blocks for constants/tables
+- Cover edge cases
+- Reference related specs (relationship-formulas.md, races, etc.)
