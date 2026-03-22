@@ -1,10 +1,10 @@
 {
-  "state": "WORKING",
+  "state": "PENDING_VERIFICATION",
   "current_task": "spec-016",
   "current_task_started_at": "2026-03-22T11:07:00-05:00",
   "retry_count": 0,
   "max_retries": 3,
-  "last_updated": "2026-03-22T11:07:00-05:00",
-  "last_action": "Spawning worker for spec-016 (Council Voting Algorithm)",
+  "last_updated": "2026-03-22T11:10:30-05:00",
+  "last_action": "Worker completed spec-016, output verified to exist (30KB), spawning verifier",
   "verification_issues": []
 }

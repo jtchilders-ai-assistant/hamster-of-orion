@@ -828,3 +828,10 @@ Created comprehensive Council voting algorithm specification including:
 - All 10 races have documented voting modifiers
 - MOO1-faithful 2/3 majority threshold
 - Ready for implementation with complete formulas and JSON schemas
+
+## 2026-03-22 11:10 - Worker Completed spec-016
+- **Task**: Council Voting Algorithm
+- **Output**: design/diplomacy/council.md (30.3 KB, 1151 lines)
+- **Content**: Vote allocation formulas, voting behavior algorithm, victory thresholds, abstention rules
+- **State**: PENDING_VERIFICATION → VERIFYING
+- **Action**: Spawning verifier sub-agent
