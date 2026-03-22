@@ -1,10 +1,10 @@
 {
-  "state": "WORKING",
+  "state": "VERIFYING",
   "current_task": "spec-021",
   "current_task_started_at": "2026-03-22T11:37:00-05:00",
   "retry_count": 0,
   "max_retries": 3,
-  "last_updated": "2026-03-22T11:37:00-05:00",
-  "last_action": "Started spec-021 (Random Events System)",
+  "last_updated": "2026-03-22T11:41:00-05:00",
+  "last_action": "Spawned verifier for spec-021",
   "verification_issues": []
 }
