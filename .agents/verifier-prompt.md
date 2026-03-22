@@ -8,10 +8,17 @@ Read `.agents/verification-request.md` to see what needs to be verified.
 
 ## Reference Materials for Verification
 
-Use these resources to verify accuracy:
-- **StrategyWiki MOO1**: https://strategywiki.org/wiki/Master_of_Orion
-- **StrategyWiki Gameplay**: https://strategywiki.org/wiki/Master_of_Orion/Gameplay
+**See `.agents/moo1-references.md` for the complete list.**
+
+Key verification resources:
+- **StrategyWiki Table of Contents**: https://strategywiki.org/wiki/Master_of_Orion/Table_of_Contents
 - **StrategyWiki Technology**: https://strategywiki.org/wiki/Master_of_Orion/Technology
+- **StrategyWiki Combat**: https://strategywiki.org/wiki/Master_of_Orion/Combat
+- **StrategyWiki Races**: https://strategywiki.org/wiki/Master_of_Orion/Races
+- **StrategyWiki Diplomacy**: https://strategywiki.org/wiki/Master_of_Orion/Diplomacy
+- **Official Strategy Guide (Archive.org)**: https://archive.org/stream/MasterOfOrionStrategyGuide/MasterOfOrionStrategyGuide_opt_djvu.txt
+
+⚠️ **WARNING**: Avoid MOO2 pages (URLs contain `Master_of_Orion_II`) - different mechanics!
 
 Fetch relevant pages with `web_fetch` to cross-check formulas and constants.
 

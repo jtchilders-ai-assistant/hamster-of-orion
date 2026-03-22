@@ -13,12 +13,26 @@ Read `.agents/current-task.md` for your specific assignment.
 - `.agents/TASK.md` - Overall project goal
 
 ### Online Resources (use web_fetch to access)
-- **StrategyWiki MOO1 Main**: https://strategywiki.org/wiki/Master_of_Orion
+
+**See `.agents/moo1-references.md` for the complete list.**
+
+Key resources:
+- **StrategyWiki Table of Contents**: https://strategywiki.org/wiki/Master_of_Orion/Table_of_Contents
 - **StrategyWiki Gameplay**: https://strategywiki.org/wiki/Master_of_Orion/Gameplay
 - **StrategyWiki Technology**: https://strategywiki.org/wiki/Master_of_Orion/Technology
 - **StrategyWiki Ship Design**: https://strategywiki.org/wiki/Master_of_Orion/Ship_design
 - **StrategyWiki Combat**: https://strategywiki.org/wiki/Master_of_Orion/Combat
 - **StrategyWiki Races**: https://strategywiki.org/wiki/Master_of_Orion/Races
+- **StrategyWiki Planets**: https://strategywiki.org/wiki/Master_of_Orion/Planets
+- **StrategyWiki Diplomacy**: https://strategywiki.org/wiki/Master_of_Orion/Diplomacy
+- **StrategyWiki Tips & Tricks**: https://strategywiki.org/wiki/Master_of_Orion/Tips_and_Tricks
+- **StrategyWiki Game Roadmap**: https://strategywiki.org/wiki/Master_of_Orion/Game_roadmap
+- **StrategyWiki How to Begin**: https://strategywiki.org/wiki/Master_of_Orion/How_to_begin
+- **StrategyWiki Walkthrough**: https://strategywiki.org/wiki/Master_of_Orion/Walkthrough
+- **Official Strategy Guide (Archive.org)**: https://archive.org/stream/MasterOfOrionStrategyGuide/MasterOfOrionStrategyGuide_opt_djvu.txt
+- **Fandom Wiki**: https://masteroforion.fandom.com/wiki/Master_of_Orion
+
+⚠️ **WARNING**: Avoid MOO2 pages (URLs contain `Master_of_Orion_II`) - different mechanics!
 
 When writing specifications, fetch relevant pages to verify formulas and constants are accurate to MOO1.
 
