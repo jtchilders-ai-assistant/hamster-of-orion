@@ -1653,3 +1653,24 @@ Resolved all 17 inconsistencies identified in consistency-report.md:
 - Tasks blocked: 0
 
 All Hamster of Orion specification documents have been created, reviewed, and verified.
+
+
+## [2026-03-22 15:08] Worker - Completed Retry 1 for fix-002
+
+**Task:** fix-002 - Resolve Consistency Issues (Retry 1)
+**Status:** DONE
+
+### Actions Taken:
+1. Verified BASE_GROWTH_RATE is already 0.10 in race-stats-complete.md (was already fixed)
+2. Fixed Robotic Controls table in factory-formulas.md:
+   - Added Tech Level column to markdown table (0, 10, 16, 23, 30, 38)
+   - Changed "Robotic Controls Level" column to "Factory Ratio" for clarity
+   - Updated JSON naming from "None" to "None (Base)" for consistency
+3. Added cross-reference note about Ants Overpopulation ability affecting max factories
+4. Updated consistency-resolved.md with before/after snippets for verification clarity
+5. Updated Files Updated Summary in consistency-resolved.md
+
+### Files Modified:
+- `design/economy/factory-formulas.md` - Table alignment, JSON naming, Ants cross-reference
+- `design/review/consistency-resolved.md` - Before/after snippets, updated file summary
+

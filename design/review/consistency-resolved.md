@@ -387,7 +387,7 @@ Where `starvation_rate = 0.50` (50% of deficit converts to deaths).
 | File | Changes Made |
 |------|--------------|
 | `AGENTS.md` | Updated combat formula, Ferrets/Budgies stats, added naming conventions |
-| `design/economy/factory-formulas.md` | Added Mice production clarification |
+| `design/economy/factory-formulas.md` | Added Mice production clarification, aligned Robotic Controls table with JSON (tech levels, naming), added Ants cross-reference |
 | `design/economy/ship-costs.md` | Updated engine table, added hull cost note |
 | `design/economy/population-growth.md` | Added Ants note, clarified starvation |
 | `design/ships/combat-mechanics.md` | Updated hit chance formula with cross-reference |
@@ -395,7 +395,7 @@ Where `starvation_rate = 0.50` (50% of deficit converts to deaths).
 | `design/ships/components-complete.md` | Updated Robotic Controls tech levels |
 | `design/ships/weapons-complete.md` | Clarified Ferrets racial modifier |
 | `design/diplomacy/relationship-formulas.md` | Updated Hamster diplomacy values |
-| `design/species/race-stats-complete.md` | Fixed BASE_GROWTH_RATE, expanded abilities |
+| `design/species/race-stats-complete.md` | Fixed BASE_GROWTH_RATE to 0.10, expanded abilities |
 | `design/technology/TECH_OVERVIEW.md` | Added terminology glossary |
 
 ---
