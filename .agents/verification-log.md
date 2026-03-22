@@ -78,3 +78,18 @@ The following tasks were completed before the verification system was implemente
 **Recommendation:** PASS - Minor formula/documentation inconsistencies do not impact implementation viability. The specification provides clear, complete algorithms that can be directly translated to code.
 
 ---
+
+### spec-017: Espionage Success Formulas
+**File:** design/diplomacy/espionage.md  
+**Verified:** 2026-03-22T11:17:00-05:00  
+**Result:** ✅ PASSED (Score: 95/100)
+
+**Summary:** Excellent, comprehensive specification covering all required espionage formulas. The document thoroughly documents: (1) spy success rate formula with racial/tech/security modifiers, (2) sabotage effects with destruction percentages for factories and missile bases, (3) tech theft probability with tier-based modifiers, (4) spy death chance formula with mission risk levels, and (5) counter-espionage mechanics including detection, spy hunts, and double agents. All 5 JSON data tables are valid and implementation-ready. The pseudocode algorithm in Section 11 provides a complete mission resolution flow. Properly integrates with relationship-formulas.md for diplomatic penalties. Uses LORE.md-compliant pet-themed naming with Chameleons as espionage masters (+60% bonus).
+
+**Issues Found (2 minor):**
+1. SpyEffectiveness formula includes TargetSecurity but doesn't explicitly show RacialDefenseBonus as a separate term - could clarify that RacialDefenseBonus applies via detection chance
+2. Rebellion morale modifier table stops at 20% morale; should clarify if formula extrapolates or caps at +25 for lower morale values
+
+**Recommendation:** PASS - Minor documentation clarifications do not impact implementation. Fully meets spec-017 requirements for spy success rate, sabotage effects, tech theft probability, spy death chance, and counter-espionage formulas.
+
+---

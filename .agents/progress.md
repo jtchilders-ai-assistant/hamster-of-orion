@@ -943,3 +943,15 @@ Created comprehensive espionage system specification including:
 - State: WORKING → PENDING_VERIFICATION
 - Task spec-017 (Espionage Success Formulas) output file verified (1210 lines)
 - Spawning verifier agent
+
+## 2026-03-22 11:17:01 - Orchestrator
+- Verifier reported files not found, but files DO exist:
+  - .agents/verifier-prompt.md (1874 bytes)
+  - design/diplomacy/espionage.md (31481 bytes)
+- Re-spawning verifier with explicit working directory
+
+## 2026-03-22 11:18:07 - Orchestrator
+- ✅ spec-017 (Espionage Success Formulas) VERIFIED - Score: 95/100
+- State: VERIFYING → IDLE
+- Task marked as done
+- Next task: spec-018 (AI Decision Scoring Functions)

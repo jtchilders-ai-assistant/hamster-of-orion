@@ -1,37 +1,23 @@
 {
-  "task_id": "spec-016",
-  "verified_at": "2026-03-22T11:11:45-05:00",
+  "task_id": "spec-017",
+  "verified_at": "2026-03-22T11:17:00-05:00",
   "passed": true,
   "score": 95,
   "issues": [
     {
       "severity": "minor",
-      "category": "accuracy",
-      "description": "Victory threshold inconsistency: Section 3.1 states 'floor(Total_Votes × 2/3) + 1' while Section 3.2 uses 'ceil(Effective_Votes_Cast × (2/3))'. These formulas can produce different results. MOO1 uses a strict 2/3 majority check.",
-      "location": "design/diplomacy/council.md - Sections 3.1 vs 3.2",
-      "suggestion": "Standardize to a single formula: ceil(Effective_Total × 0.6667) throughout, which correctly implements 2/3 majority requirement."
-    },
-    {
-      "severity": "minor",
       "category": "completeness",
-      "description": "The Hamster 'universal diplomat' bonus is implemented in two different ways: Section 4.5 shows +5 in the Racial Affinity Matrix as a wildcard entry, while Section 4.7 shows HAMSTER_COUNCIL_BONUS = 5 applied separately. This could lead to double-counting (+10 instead of +5).",
-      "location": "design/diplomacy/council.md - Sections 4.5 and 4.7",
-      "suggestion": "Clarify that the Racial Affinity Matrix entry for 'hamsters' IS the council bonus, or remove one application point to avoid double-counting."
-    },
-    {
-      "severity": "minor",
-      "category": "integration",
-      "description": "Council spec references 'relationship-formulas.md' for reputation calculation, but the Reputation_Factor formula (Section 4.6) uses REPUTATION_WEIGHT = 0.15 while relationship-formulas.md uses a 0-400 scale calculation. These should align more clearly.",
-      "location": "design/diplomacy/council.md - Section 4.6",
-      "suggestion": "Add explicit note that Candidate_Reputation = (Honor + Peace + Fairness + Mercy) / 4 produces a value from -100 to +100, which when multiplied by 0.15 yields -15 to +15 range as documented."
+      "description": "SpyEffectiveness formula includes TargetSecurity but doesn't explicitly show RacialDefenseBonus as a separate term in some examples",
+      "location": "design/diplomacy/espionage.md Section 1.2",
+      "suggestion": "Consider clarifying that RacialDefenseBonus is applied via the defender's detection chance, not spy effectiveness"
     },
     {
       "severity": "minor",
       "category": "implementation",
-      "description": "The worked example in Section 11.1 shows 'Hamster Bonus: +5' being added to vote scores, but the Racial Affinity already shows Hamsters receiving +5 from all voters. The calculation appears to apply both, totaling +10.",
-      "location": "design/diplomacy/council.md - Section 11.1",
-      "suggestion": "Update worked example to show only one +5 bonus application, consistent with the fix suggested for the double-counting issue."
+      "description": "Rebellion morale modifier table stops at 20% morale but formula allows any value below 70%",
+      "location": "design/diplomacy/espionage.md Section 6.5",
+      "suggestion": "Add a note that morale below 20% continues formula extrapolation or caps at +25"
     }
   ],
-  "summary": "The Council Voting Algorithm specification is comprehensive, well-structured, and implementation-ready. It covers all required sections including detailed formulas, constants, algorithms, data tables, edge cases, and worked examples. The specification faithfully adapts MOO1 mechanics with pet-themed races (Hamsters, Guinea Pigs, etc.) per LORE.md conventions. All 5 JSON data blocks parse correctly. Integration with relationship-formulas.md is solid with consistent race IDs and modifier values. Minor issues identified relate to formula consistency for victory threshold and potential double-counting of Hamster diplomat bonus. These are non-critical and can be addressed during implementation or a future documentation pass. Overall: EXCELLENT specification ready for implementation."
+  "summary": "Excellent, comprehensive specification covering all required espionage formulas. The document includes: (1) spy success rate formula with racial/tech/security modifiers, (2) sabotage effects with destruction percentages for factories and missile bases, (3) tech theft probability with tier-based modifiers, (4) spy death chance formula with mission risk levels, and (5) counter-espionage mechanics including detection, spy hunts, and double agents. All JSON data tables are valid and implementation-ready. The pseudocode algorithm in Section 11 provides a complete mission resolution flow. Minor issues are cosmetic and do not impact implementation. Fully meets spec-017 requirements."
 }
