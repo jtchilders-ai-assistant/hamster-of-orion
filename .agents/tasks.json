@@ -43,9 +43,10 @@
       "id": "spec-005",
       "title": "Ship Maintenance & Fleet Costs",
       "description": "Document exact formulas for: ship maintenance cost by class, fleet upkeep, scrapping returns, refit costs. Create design/economy/ship-costs.md",
-      "status": "pending",
+      "status": "done",
       "priority": 5,
-      "output_file": "design/economy/ship-costs.md"
+      "output_file": "design/economy/ship-costs.md",
+      "completed": "2026-03-21"
     },
     {
       "id": "spec-006",

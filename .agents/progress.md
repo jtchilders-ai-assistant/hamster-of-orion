@@ -142,3 +142,43 @@ Created comprehensive planetary slider system specification including:
 - Integrates with factory-formulas.md and research-formulas.md
 
 ---
+
+### 2026-03-21 22:35 - spec-005: Ship Maintenance & Fleet Costs ✅
+**Completed:** `design/economy/ship-costs.md`
+
+**Summary:**
+Created comprehensive ship economics specification including:
+- Ship construction cost formula (hull + components)
+- Hull base costs by class (Scout 25 BC → Titan 1000 BC)
+- Component costs (engines, weapons, shields, specials)
+- Miniaturization cost reduction (5% per tier, 80% max)
+- Maintenance formula: Ship_Cost × 0.02 per turn
+- Minimum maintenance: 1 BC per ship
+- Racial maintenance modifiers (Ants -25%, Ferrets +15%)
+- Technology maintenance reductions
+- Fleet total maintenance calculation
+- Scrap value formulas (25% base, 35% at shipyard)
+- Emergency scrapping (10% value, bankruptcy handling)
+- Auto-scrap algorithm for bankruptcy
+- Refit cost formula: 50% of cost difference
+- Refit time calculation
+- Sustainable fleet size planning (40% income guideline)
+- Fleet-to-income ratio health indicators
+- Defensive installation costs (missile bases, stations)
+- Transport costs and capacities
+- Complete JSON data schemas
+- Pseudocode for maintenance and refit calculations
+- Worked examples (fleet maintenance, Ants advantage, scrapping, refit)
+- Edge cases (captured ships, ships in transit, Ancient ships)
+- Difficulty modifiers for maintenance
+
+**Files Created:**
+- `design/economy/ship-costs.md` (17KB, 480+ lines)
+
+**Notes:**
+- Ants save 25% on fleet maintenance (major economic advantage)
+- Bankruptcy triggers random ship scrapping at 10% value
+- Refitting is much cheaper than building new ships
+- Completes the core economy specification suite
+
+---
