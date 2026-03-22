@@ -119,7 +119,7 @@
       "id": "ui-011",
       "title": "UI Interaction Specification",
       "description": "Document all UI interactions matching MOO1: click behaviors, keyboard shortcuts, slider mechanics, list navigation, context menus. Create interaction spec. Output: design/ui-ux/interaction-spec.md",
-      "status": "pending_verification",
+      "status": "done",
       "priority": 15,
       "output_file": "design/ui-ux/interaction-spec.md"
     },
