@@ -1,25 +1,25 @@
-# Current Task: spec-022
+# Current Task: spec-023
 
 ## Title
-Victory Condition Checks
+Difficulty Level Modifiers
 
 ## Description
-Document exact algorithms for: domination check (population threshold), council victory, conquest victory, Orion guardian defeat, transcendence detection. Update design/game-mechanics/victory-conditions.md
+Document exact modifiers for each difficulty: AI bonuses, player handicaps, starting conditions, event frequency. Update design/game-mechanics/difficulty.md with JSON data
 
 ## Output File
-design/game-mechanics/victory-conditions.md
+design/game-mechanics/difficulty.md
 
 ## Priority
-22
+23
 
 ## Requirements
-- Exact algorithm for each victory type
-- Population thresholds for domination victory
-- Council voting mechanics (who votes, vote weights, timing)
-- Conquest victory conditions (all enemies eliminated)
-- Orion Guardian defeat special victory
-- Transcendence victory (if applicable to MOO1)
-- Turn-by-turn checking logic
-- Edge cases (ties, simultaneous victories)
-- JSON data structures for victory configuration
-- Pet-themed flavor where appropriate per LORE.md
+- All difficulty levels (Simple, Easy, Average, Hard, Impossible)
+- AI bonuses per difficulty (production, research, credits, etc.)
+- Player handicaps per difficulty
+- Starting conditions (ships, money, tech)
+- Event frequency modifiers
+- Combat bonuses/penalties
+- Diplomacy modifiers
+- JSON data structures with all constants
+- Clear tables showing progression across difficulties
+- MOO1 accurate values where applicable

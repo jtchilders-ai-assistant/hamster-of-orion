@@ -1,10 +1,10 @@
 {
-  "state": "IDLE",
-  "current_task": null,
-  "current_task_started_at": null,
+  "state": "WORKING",
+  "current_task": "spec-023",
+  "current_task_started_at": "2026-03-22T11:48:30-05:00",
   "retry_count": 0,
   "max_retries": 3,
-  "last_updated": "2026-03-22T11:48:00-05:00",
-  "last_action": "spec-022 PASSED verification (82/100), marked done",
+  "last_updated": "2026-03-22T11:48:30-05:00",
+  "last_action": "Started spec-023 (Difficulty Level Modifiers)",
   "verification_issues": []
 }
