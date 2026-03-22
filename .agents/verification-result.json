@@ -1,61 +1,11 @@
 {
-  "task_id": "ui-001",
-  "verified_at": "2026-03-22T18:18:00Z",
+  "task_id": "ui-002",
   "passed": true,
-  "score": 88,
+  "score": 93,
   "issues": [
-    {
-      "severity": "minor",
-      "category": "accuracy",
-      "description": "Document claims tactical-combat-ui.md is missing but file exists with 589 lines of detailed content",
-      "location": "screen-inventory.md Section 3.1 and Section 10",
-      "suggestion": "Update status from 'Missing' to 'Documented' for tactical-combat-ui.md and remove from gap list"
-    },
-    {
-      "severity": "minor",
-      "category": "accuracy",
-      "description": "MOO1 opponent count stated as 1-5, but actual MOO1 supported variable opponents based on galaxy size",
-      "location": "screen-inventory.md Section 1.2 Galaxy Setup Screen",
-      "suggestion": "Verify exact opponent limits per galaxy size from MOO1 manual: Small=1-2, Medium=1-3, Large=1-4, Huge=1-5"
-    },
-    {
-      "severity": "minor",
-      "category": "completeness",
-      "description": "Document references MOO1 Strategy Guide but doesn't cite page numbers for verification",
-      "location": "screen-inventory.md Overview section",
-      "suggestion": "Add page number citations from Prima Official Strategy Guide (1994) for key claims"
-    },
-    {
-      "severity": "minor",
-      "category": "integration",
-      "description": "Summary says 0 wireframes but wireframes directory exists (though currently empty)",
-      "location": "screen-inventory.md Summary table",
-      "suggestion": "Clarify that wireframes directory structure is created, pending wireframe content"
-    },
-    {
-      "severity": "minor",
-      "category": "accuracy",
-      "description": "MOO1 did have difficulty levels but names may differ from 'Simple/Easy/Normal/Hard/Impossible'",
-      "location": "screen-inventory.md Section 1.2",
-      "suggestion": "Verify exact MOO1 difficulty names from manual: Simple, Easy, Average, Hard, Impossible"
-    }
+    "Nebula display not shown in wireframes",
+    "Rally point visual representation not documented",
+    "Transport ships UI not shown in fleet info"
   ],
-  "summary": "The screen-inventory.md document is a comprehensive and well-organized comparison of MOO1 screens vs Hamster of Orion UI documentation. It correctly identifies 34 MOO1 screens and provides detailed feature-by-feature comparison tables. The document accurately reflects existing UI documentation (main-screens.md, information-displays.md, UI_OVERVIEW.md) and provides actionable gap analysis. Minor issues include incorrectly listing tactical-combat-ui.md as missing when it exists with substantial content. The pet-themed naming conventions from LORE.md are properly referenced. MOO1 mechanics appear accurately represented based on the Official Strategy Guide (Prima 1994). Overall, this is a solid reference document that will guide wireframe creation effectively.",
-  "verification_details": {
-    "documents_reviewed": [
-      "design/ui-ux/screen-inventory.md",
-      "design/ui-ux/main-screens.md",
-      "design/ui-ux/UI_OVERVIEW.md",
-      "design/ui-ux/information-displays.md",
-      "design/ui-ux/tactical-combat-ui.md",
-      "design/LORE.md"
-    ],
-    "moo1_references_checked": [
-      "Archive.org Master of Orion Strategy Guide (Prima 1994) - Table of Contents verified"
-    ],
-    "completeness_score": 90,
-    "accuracy_score": 85,
-    "implementation_readiness_score": 88,
-    "integration_score": 90
-  }
+  "verified_at": "2026-03-22T13:25:00-05:00"
 }
