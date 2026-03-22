@@ -79,9 +79,10 @@
       "id": "spec-009",
       "title": "Complete Tech Tree - Weapons Field",
       "description": "Document all weapons technologies: tech name, tier, cost, effect, prerequisites. Include all beam weapons, missiles, bombs, specials. Update design/technology/weapons.md with JSON data",
-      "status": "pending",
+      "status": "done",
       "priority": 9,
-      "output_file": "design/technology/weapons.md"
+      "output_file": "design/technology/weapons.md",
+      "completed": "2026-03-22"
     },
     {
       "id": "spec-010",

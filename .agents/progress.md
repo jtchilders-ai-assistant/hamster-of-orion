@@ -329,3 +329,47 @@ Created comprehensive combat system algorithm specification including:
 - Completes the combat system specification
 
 ---
+
+### 2026-03-22 07:28 - spec-009: Complete Tech Tree - Weapons Field ✅
+**Completed:** `design/technology/weapons.md`
+
+**Summary:**
+Created complete Weapons technology tree specification including:
+- **18 Technology Tiers** (50 RP to 100,000 RP)
+- **51 Total Technologies:**
+  - 22 Beam weapons (Laser → Stellar Converter)
+  - 11 Missiles (Nuclear → Scatter Pack X)
+  - 4 Torpedoes (Anti-Matter → Plasma)
+  - 5 Bombs (Nuclear → Neutronium)
+  - 3 Biological weapons (Death Spores → Bio Terminator)
+  - 6 Ground weapons (Hand Lasers → Mauler Pistol)
+- **Tier Structure:**
+  - Tier 1-3: Early game (50-150 RP)
+  - Tier 4-6: Early-mid (250-800 RP)
+  - Tier 7-9: Mid game (1,500-4,000 RP)
+  - Tier 10-12: Mid-late (6,000-10,000 RP)
+  - Tier 13-15: Late (14,000-24,000 RP)
+  - Tier 16-18: End game (30,000-100,000 RP)
+- **Technology Selection:**
+  - 2-3 random choices per tier
+  - Rats always see 3 choices
+  - Pool sizes per tier documented
+- **Racial Bonuses:**
+  - Ferrets: +25% weapon damage
+  - Guinea Pigs: +50% ground combat
+- **Category Summaries:**
+  - Light/Medium/Heavy/Ultimate beams
+  - Basic/Advanced/Elite missiles
+- Strategic recommendations per game phase
+- Complete JSON data schema
+
+**Files Created:**
+- `design/technology/weapons.md` (25KB, 680+ lines)
+
+**Notes:**
+- First of six technology field specifications
+- Links to weapons-complete.md for detailed stats
+- Random selection system creates game variety
+- Starting techs: Laser + Nuclear Missile
+
+---
