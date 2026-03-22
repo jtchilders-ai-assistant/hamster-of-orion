@@ -885,3 +885,72 @@ PASS - The gap analysis now provides an accurate assessment of the project's sta
 - Total Score: 92/100
 
 **Recommendation:** PASS - Fully implementation-ready wireframe specification. This is an exceptional document providing comprehensive High Council UI documentation with 15+ wireframe screens covering all voting scenarios. Minor issues are cosmetic formatting inconsistencies that do not affect implementation. The wireframe properly captures MOO1's council voting mechanics while providing modern UI enhancements for animation, accessibility, and detailed player feedback.
+
+---
+
+### ui-010: Reports & Statistics UI - ASCII Wireframe
+**File:** design/ui-ux/wireframes/reports.md  
+**Verified:** 2026-03-22T14:36:00-05:00  
+**Result:** ✅ PASSED (Score: 93/100)
+
+**Summary:** Excellent, comprehensive Reports & Statistics UI wireframe specification. Includes 10 detailed ASCII wireframes covering: Rankings tab, multiple Graph types (Population, Production, Technology, Military history), Empire Summary, Tech Status comparison, Military Intel, Pie Chart, Bar Chart, Victory Progress Tracker, and detailed Empire Breakdown popup. All MOO1-required features present: empire comparison, historical graphs, military rankings, tech levels by field, and production statistics.
+
+**Checklist (ui-010 Requirements):**
+- ✅ Detailed ASCII wireframe for Reports screen matching MOO1
+- ✅ Empire comparison (Rankings tab with sortable columns, power bars)
+- ✅ Graphs (Line graphs for Population, Production, Technology, Military, Colonies)
+- ✅ Military rankings (Military Intel tab with fleet composition, threat levels)
+- ✅ Tech levels (Tech Status tab with 6-field comparison matrix)
+- ✅ Production stats (Empire Summary tab, Bar Chart view)
+
+**Screens Documented (10 wireframes):**
+1. Main Reports Hub with Rankings table
+2. Graphs Tab - Population History (line graph)
+3. Graphs Tab - Production History (line graph)
+4. Graphs Tab - Technology Progress (line graph)
+5. Graphs Tab - Military Strength (line graph)
+6. Empire Summary Tab (economic overview, colony breakdown)
+7. Tech Status Tab (6-field comparison matrix, gap analysis)
+8. Military Intel Tab (fleet composition, threat assessment)
+9. Pie Chart - Population Distribution
+10. Bar Chart - Production Comparison
+11. Victory Progress Tracker
+12. Empire Breakdown Popup
+
+**Implementation-Ready Features:**
+- ✅ JSON data schemas for Empire Statistics and Victory Progress objects
+- ✅ Power ranking formula documentation
+- ✅ Intelligence accuracy mechanics (spy-dependent)
+- ✅ Tab navigation with hotkeys (1-5)
+- ✅ Graph interactions (hover, pan, zoom, legend toggle)
+- ✅ Complete keyboard shortcuts (F7, arrows, P/L/B for chart types)
+- ✅ Color coding with hex values for all empire colors and status indicators
+- ✅ Responsive behavior (Desktop/Laptop/Tablet breakpoints)
+- ✅ Animation specifications with timings
+- ✅ Accessibility features (screen reader, color blind, keyboard nav)
+- ✅ Tooltip specifications with examples
+
+**MOO1 Faithfulness:**
+- ✅ Report screen concept matches MOO1's "Graphs" screen
+- ✅ Historical trends over turns (Population, Production, Tech, Military)
+- ✅ Empire ranking comparisons
+- ✅ Tech level comparison by 6 fields (Computers, Construction, Force Fields, Planetology, Propulsion, Weapons)
+- ✅ F7 hotkey matches MOO1 convention
+
+**LORE.md Compliance:**
+- ✅ All 10 pet-themed races represented
+- ✅ Proper race emoji usage (🐹 Hamsters, 🐀 Rats, 🐹 Guinea Pigs, etc.)
+- ✅ Leader names: "Grand Poobah Whiskers III", "Emperor Flufficus the Bold"
+- ✅ Game title: "HAMSTER OF ORION"
+
+**Issues Found (4 minor):**
+1. ASCII wireframe rendering artifact on line 176 - extra whitespace in Empire Summary factory row
+2. "Survival Victory" naming differs from MOO1's "Conquest/Elimination" terminology
+3. "Transcendence Victory" is a new addition not present in MOO1 - intentional enhancement not documented as such
+4. Victory thresholds should cross-reference victory-conditions.md for authoritative values
+
+**Verification Details:**
+- Completeness: 95/100 | Accuracy: 90/100 | Implementation Readiness: 95/100 | Integration: 92/100
+- Total Score: 93/100
+
+**Recommendation:** PASS - Fully implementation-ready wireframe specification. The 10+ wireframe screens comprehensively document the Reports & Statistics UI with excellent attention to detail. Minor issues are cosmetic or documentation-related and do not affect implementation viability. The specification provides everything needed to implement the complete Reports screen including data structures, interactions, animations, and accessibility.
