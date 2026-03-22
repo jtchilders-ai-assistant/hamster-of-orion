@@ -105,3 +105,40 @@ Created comprehensive research and technology system specification including:
 - Research buildings are cumulative (not replacement)
 
 ---
+
+### 2026-03-21 22:32 - spec-004: Planetary Slider Mathematics ✅
+**Completed:** `design/planets/slider-mathematics.md`
+
+**Summary:**
+Created comprehensive planetary slider system specification including:
+- Five-slider system overview (SHIP, DEF, IND, ECO, TECH)
+- Total production allocation formula
+- SHIP slider: BC to shipyard, rush production (2× cost)
+- DEF slider: Missile bases (150 BC each, max 50), planetary shields (4 tiers)
+- IND slider: Factory construction with overflow to reserve
+- ECO slider: Priority order (cleanup → terraform → growth boost)
+- TECH slider: Population-to-scientists conversion (not BC allocation)
+- Pollution cleanup mechanics (mandatory, deficit causes penalties)
+- Terraforming spending (5 BC per +1 max pop)
+- Population growth boost (20 BC per +1 pop instant)
+- Worker/scientist split affecting factory operation
+- Empire Reserve fund mechanics (global BC pool)
+- Reserve sources and distribution
+- Lock slider functionality
+- Governor AI auto-adjustment rules
+- Complete JSON data schemas
+- Comprehensive pseudocode for turn processing
+- Worked examples (balanced, pollution crisis, overflow, rush)
+- Edge cases (zero production, 100% TECH, locked sliders)
+- UI display formulas for turns-to-complete
+
+**Files Created:**
+- `design/planets/slider-mathematics.md` (19KB, 520+ lines)
+
+**Notes:**
+- ECO slider has mandatory cleanup requirement (critical mechanic)
+- TECH slider is unique - converts population, not production
+- All overflow goes to Empire Reserve (global pool)
+- Integrates with factory-formulas.md and research-formulas.md
+
+---
