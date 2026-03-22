@@ -79,7 +79,7 @@
       "id": "ui-006",
       "title": "Ship Design UI - ASCII Wireframe",
       "description": "Create detailed ASCII wireframe for Ship Design screen matching MOO1. Include: hull selection, component slots, weapon assignment, stats display, save/load designs. Output: design/ui-ux/wireframes/ship-design.md",
-      "status": "pending",
+      "status": "in_progress",
       "priority": 10,
       "output_file": "design/ui-ux/wireframes/ship-design.md"
     },
