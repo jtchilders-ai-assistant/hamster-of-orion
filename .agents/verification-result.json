@@ -1,37 +1,57 @@
 {
-  "task_id": "ui-006",
-  "verified_at": "2026-03-22T18:59:00Z",
+  "task_id": "ui-007",
+  "verified_at": "2026-03-22T19:08:00Z",
   "passed": true,
   "score": 92,
   "issues": [
     {
       "severity": "minor",
       "category": "accuracy",
-      "description": "Hull class names differ from MOO1 originals. MOO1 uses 4 hull sizes (Small, Medium, Large, Huge), while the wireframe shows 6 named classes (Scout, Fighter, Destroyer, Cruiser, Battlecruiser, Dreadnought). However, this is consistent with ship-classes.md which defines 7 classes for Hamster of Orion as a deliberate design choice.",
-      "location": "design/ui-ux/wireframes/ship-design.md - Hull Selection section",
-      "suggestion": "No change needed - this is an intentional deviation from MOO1 documented in ship-classes.md. Consider adding a note in the wireframe referencing this design decision."
+      "description": "Trade agreement treaty hierarchy may not exactly match MOO1. In the wireframe, Alliance requires Trade Agreement as prerequisite. Need to verify if MOO1 had this strict prerequisite chain or if Alliance could be proposed independently with high enough relations.",
+      "location": "design/ui-ux/wireframes/diplomacy.md - Treaty Types table",
+      "suggestion": "Verify against MOO1 official strategy guide. This may be correct but could not be confirmed from available sources."
     },
     {
       "severity": "minor",
-      "category": "accuracy",
-      "description": "Hull unlock requirements inconsistent with ship-classes.md. Wireframe states Battlecruiser requires 'Battle Station (Construction 24)' and Dreadnought requires 'Star Fortress (Construction 36)', but ship-classes.md specifies 6,000 RP and 18,000 RP respectively without specific Construction tech levels.",
-      "location": "design/ui-ux/wireframes/ship-design.md - Hull Selection section",
-      "suggestion": "Reconcile tech requirements between wireframe and ship-classes.md to ensure consistency."
-    },
-    {
-      "severity": "minor",
-      "category": "accuracy",
-      "description": "Miniaturization cap stated as 50% in wireframe tooltip but spec should verify this matches other game mechanics documents.",
-      "location": "design/ui-ux/wireframes/ship-design.md - Miniaturization Info Tooltip section",
-      "suggestion": "Cross-reference with research-formulas.md or components-complete.md to confirm miniaturization cap value."
+      "category": "completeness",
+      "description": "Galactic Council screen is mentioned in the diplomatic actions bar but not wireframed in this document. May be intentionally separate.",
+      "location": "design/ui-ux/wireframes/diplomacy.md - Main Diplomacy Hub",
+      "suggestion": "Add a note clarifying that Galactic Council has its own wireframe, or add a basic wireframe for Council voting."
     },
     {
       "severity": "minor",
       "category": "integration",
-      "description": "Titan class (7th hull in ship-classes.md) not shown in wireframe hull selection. This may be intentional if Titans are end-game only.",
-      "location": "design/ui-ux/wireframes/ship-design.md - Hull Selection section",
-      "suggestion": "Either add Titan as a 7th locked hull class or document that Titans are excluded from standard ship design UI."
+      "description": "The 'Frame Enemy' special action in Security screen references a cost of 150 BC but the espionage.md specification should be cross-referenced to ensure consistency.",
+      "location": "design/ui-ux/wireframes/diplomacy.md - Counter-Espionage / Security screen",
+      "suggestion": "Cross-reference with design/diplomacy/espionage.md to verify framing costs are consistent."
     }
   ],
-  "summary": "Excellent Ship Design UI wireframe specification that meets all requirements. The document provides 12 detailed ASCII wireframes covering: default design list view, hull selection, main ship design editor, weapon selection dropdown, weapon count selection, special systems selection, error state (over budget), scrap confirmation dialog, auto-design options, copy from existing design, design saved confirmation, and miniaturization tooltip. All required elements are present: hull selection (6 classes with stats), component slots (Engine, Weapons, Computer, ECM, Shields, Armor, Specials), weapon assignment system with categories (Beams, Missiles, Torpedoes, Bombs), stats display (space usage, cost, HP, offense/defense/mobility ratings), and save/load functionality. Additional features include keyboard shortcuts (20+ documented), mouse interactions, JSON data schema, state transitions diagram, validation rules, responsive behavior notes, accessibility features (ARIA labels, keyboard navigation), and pet-themed flavor text. The specification is implementation-ready and follows established wireframe format from other UI specs. Minor issues relate to cross-document consistency with ship-classes.md tech requirements rather than MOO1 accuracy, as the project has intentionally expanded hull classes beyond MOO1's original 4 sizes."
+  "checklist": {
+    "completeness": {
+      "passed": true,
+      "notes": "All required sections present: Overview, multiple screen wireframes, state definitions, data schemas, edge cases, accessibility. No TODO/TBD placeholders found."
+    },
+    "accuracy_moo1_faithful": {
+      "passed": true,
+      "notes": "Matches MOO1 mechanics: Non-Aggression Pact, Trade Agreement, Alliance treaties. Includes personality types (Pacifist, Honorable, Erratic, Aggressive, Ruthless, Xenophobic) and objectives (Militarist, Technologist, Ecologist, etc.) matching MOO1. Spy missions (Espionage, Sabotage, Hide) align with MOO1. War declaration, peace negotiations, and relation modifiers are consistent with Wikipedia MOO1 description."
+    },
+    "implementation_ready": {
+      "passed": true,
+      "notes": "JSON data schemas provided for Race Diplomatic State, Diplomatic Events, Treaty Definitions, and Spy Missions. All schemas are valid and parseable. Variable names consistent throughout document."
+    },
+    "integration": {
+      "passed": true,
+      "notes": "Follows established wireframe patterns from galaxy-map.md (same header, footer, layout structure). Pet-themed naming used (Hamsters, Guinea Pigs, Ferrets, etc.). References to espionage.md and relationship-formulas.md are valid paths."
+    }
+  },
+  "strengths": [
+    "Comprehensive coverage: 15+ unique screen wireframes covering all diplomacy scenarios",
+    "Excellent MOO1 fidelity: Personality types, objectives, treaty mechanics all match original",
+    "Strong implementation support: Complete JSON schemas for all data structures",
+    "Good edge case coverage: Handles race elimination, final war, broken treaties, audience refusal",
+    "Proper accessibility considerations: Screen reader, color blind mode, keyboard navigation",
+    "Consistent with project wireframe standards (matches galaxy-map.md structure)",
+    "Pet-themed lore properly integrated (Hamster Consortium, Guinea Pig Hegemony, etc.)"
+  ],
+  "summary": "The Diplomacy UI wireframe is comprehensive, well-structured, and faithfully represents MOO1 diplomacy mechanics. It includes detailed ASCII wireframes for all major diplomatic interactions (audience, treaties, trade, war declaration, espionage, AI contact), proper data schemas for implementation, and thoughtful edge case handling. The document follows established project patterns and integrates the pet-themed lore appropriately. Minor issues are cosmetic and do not affect implementation readiness. PASSED with score 92/100."
 }

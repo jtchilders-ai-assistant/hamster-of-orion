@@ -87,7 +87,7 @@
       "id": "ui-007",
       "title": "Diplomacy UI - ASCII Wireframe",
       "description": "Create detailed ASCII wireframe for Diplomacy screen matching MOO1. Include: race relations, treaty options, audience request, trade agreements. Show different diplomatic states. Output: design/ui-ux/wireframes/diplomacy.md",
-      "status": "pending_verification",
+      "status": "done",
       "priority": 11,
       "output_file": "design/ui-ux/wireframes/diplomacy.md"
     },
