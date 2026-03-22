@@ -1057,3 +1057,34 @@ PASS - The gap analysis now provides an accurate assessment of the project's sta
 **Recommendation:** PASS - Fully implementation-ready specification. This is an exceptional document providing comprehensive UI state transition documentation with complete flow diagrams, state machines, and implementation details. Minor issues are documentation clarifications that do not affect implementation viability.
 
 ---
+
+---
+
+### fix-001: Address Gap Analysis Findings
+**File:** design/review/gaps-resolved.md  
+**Verified:** 2026-03-22T14:58:00-05:00  
+**Result:** ✅ PASSED (Score: 88/100)
+
+**Summary:** The gap resolution work for task fix-001 is complete and well-documented. All 18 gaps identified in gap-analysis-manual.md and gap-analysis-wiki.md have been addressed. The gaps-resolved.md document provides excellent traceability from original gaps to resolutions with clear rationale for each decision.
+
+**Verified Changes:**
+1. ✅ **combat-algorithm.md** - Section 25 "Auto-Combat AI Targeting Priorities" added with complete pseudocode for target priority, weapon selection, movement AI, retreat decisions, and focus fire coordination
+2. ✅ **combat-mechanics.md** - Hit formula updated to MOO1 differential formula (50% + (Attack - Defense) × 5%), missile base mechanics section added with 3 volleys/round and auto-upgrade behavior
+3. ✅ **research-formulas.md** - Miniaturization cap correctly set to 50% (matching MOO1), documented in Section 9
+4. ✅ **race-stats-complete.md** - Budgies have +3 Initiative AND +3 Defense in Superior Pilots ability (with moo1_note), Mice have +2 starting Robotic Controls in Cybernetic Workers ability (with moo1_note), Ferrets have +4 Attack Level in Deadly Accuracy ability (with moo1_note and reduced damage bonus to +15%)
+5. ✅ **force-fields.md** - Shield absorption values verified present (Class I-XV absorbing 1-15 damage per hit)
+
+**Gap Coverage:**
+- Manual Analysis Gaps (M-001 through M-006): All 6 resolved (4 documented, 2 deferred with rationale)
+- Wiki Analysis High Priority (W-001 through W-004): All 4 resolved with spec updates
+- Wiki Analysis Medium Priority (W-005 through W-008): All 4 resolved with race stat updates
+- Wiki Analysis Low Priority (W-009 through W-012): All 4 documented as intentional design decisions
+
+**Issues Found (3 minor):**
+1. **Integration**: Hit formula descriptions have slight structural differences between combat-mechanics.md (range penalties as "added to Defense") and combat-algorithm.md Section 9-10 (range as separate subtraction). Should harmonize terminology.
+2. **Completeness**: Cross-reference from combat-mechanics.md to force-fields.md is present but brief. Shield absorption values could be more prominently linked.
+3. **Documentation**: Chameleon spy bonus deviation (60% vs 80%) documented in gaps-resolved.md but race-stats-complete.md doesn't have explicit moo1_note field for this like Ferrets/Mice/Budgies do.
+
+**Recommendation:** PASS - All critical gap resolutions verified. Work is implementation-ready. Minor consistency issues noted but none are blocking.
+
+---

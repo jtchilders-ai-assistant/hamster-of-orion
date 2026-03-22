@@ -1,37 +1,30 @@
 {
-  "task_id": "ui-012",
-  "verified_at": "2026-03-22T14:51:30-05:00",
+  "task_id": "fix-001",
+  "verified_at": "2026-03-22T14:58:00-05:00",
   "passed": true,
-  "score": 94,
+  "score": 88,
   "issues": [
     {
       "severity": "minor",
-      "category": "accuracy",
-      "description": "MOO1 had a simpler turn structure; the 9-phase turn processing (Section 3.2) is a modern enhancement. Should note this is expanded from MOO1's basic Movement→Combat→Production→Research flow.",
-      "location": "Section 3.2 Turn Processing Phases",
-      "suggestion": "Add a note clarifying that Phases 5-8 (Random Events, AI Turns, Diplomacy, Council Check) are sequenced for clarity but may have occurred atomically in MOO1."
-    },
-    {
-      "severity": "minor",
       "category": "integration",
-      "description": "Reference to 'interaction-spec.md' path may need verification - document refers to it without full path.",
-      "location": "Header - Related Docs section",
-      "suggestion": "Specify full relative path: ../interaction-spec.md or design/ui-ux/interaction-spec.md"
+      "description": "Hit formula description in combat-mechanics.md and combat-algorithm.md have slight structural differences. combat-mechanics.md describes range penalties as 'added to Defense' while combat-algorithm.md Section 9-10 implements them as separate subtractive modifiers.",
+      "location": "design/ships/combat-mechanics.md (Targeting & Accuracy section) vs design/ships/combat-algorithm.md (Section 9-10)",
+      "suggestion": "Harmonize the formula descriptions so both documents use identical terminology for range penalty application."
     },
     {
       "severity": "minor",
       "category": "completeness",
-      "description": "Victory condition 'TRANSCENDENCE' is listed as a HoO addition with 'Hidden conditions met' - this is not from MOO1. Should clarify this is intentional creative addition.",
-      "location": "Section 8.3 Victory/Defeat Conditions",
-      "suggestion": "Add note: '(HoO-specific: Not in original MOO1)' for Transcendence victory type."
+      "description": "Cross-reference from combat-mechanics.md to force-fields.md was noted as added in gaps-resolved.md, but the actual reference is a brief 'See force-fields.md' line. The shield absorption values table could be duplicated or more prominently linked.",
+      "location": "design/ships/combat-mechanics.md (Shields section)",
+      "suggestion": "Add explicit shield absorption values inline or add a more prominent cross-reference with specific section pointer."
     },
     {
       "severity": "minor",
-      "category": "accuracy",
-      "description": "Council reconvene condition states '25 turns since last' but council.md specifies Council reconvenes every 25 turns AND when 50% population reached.",
-      "location": "Section 3.2 COUNCIL_CHECK condition",
-      "suggestion": "Verify exact council trigger rules against design/diplomacy/council.md and ensure consistency."
+      "category": "completeness",
+      "description": "The Chameleon spy bonus documented as 'intentional balance decision at 60%' in gaps-resolved.md is reasonable, but race-stats-complete.md doesn't have an explicit 'moo1_note' field for this deviation like it does for Ferrets and Mice.",
+      "location": "design/species/race-stats-complete.md (Chameleons section)",
+      "suggestion": "Add 'moo1_note' field to Chameleons master_spies ability documenting the intentional deviation from Darlok's +80%."
     }
   ],
-  "summary": "Excellent UI State Transitions specification with 1818 lines comprehensively documenting all screen transitions, modal behaviors, popup triggers, confirmation dialogs, and turn flow state machines. All 20 JSON data blocks validate correctly. The document includes: master screen flow diagram with ASCII art navigation matrix, 6 core screen states with transitions, complete 9-phase turn flow state machine, modal hierarchy with 6 modal types and queue system, 10 transition types with durations/easing, detailed confirmation dialog specifications for 8 destructive actions, notification system with 4 priority levels and batching, game lifecycle states, tactical combat state machine with 12 states, loading/save states, error recovery, and comprehensive edge case handling. Pet-themed naming (Hamsters, Guinea Pigs, Sunflower, Whiskers, New Hamsterton) is used correctly per LORE.md. Matches and extends interaction-spec.md keyboard shortcuts (F1-F8, Enter, Escape). Faithfully captures MOO1 turn-based flow while adding modern web enhancements (reduced motion support, auto-save, error recovery). All required sections present with no placeholder text."
+  "summary": "The gap resolution work for task fix-001 is complete and well-documented. All 18 identified gaps have been addressed. Key verifications: (1) combat-algorithm.md now includes Section 25 with comprehensive Auto-Combat AI Targeting Priorities; (2) combat-mechanics.md has the MOO1-faithful differential hit formula and detailed missile base mechanics; (3) research-formulas.md correctly caps miniaturization at 50% matching MOO1; (4) race-stats-complete.md has been updated with Budgies +3 Initiative, Mice +2 starting Robotic Controls, and Ferrets +4 Attack Level. The gaps-resolved.md document provides excellent traceability from original gaps to resolutions. Three minor consistency issues noted but none are blocking. Work is ready for implementation."
 }
