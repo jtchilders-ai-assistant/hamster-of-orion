@@ -1,0 +1,34 @@
+{
+  "project": "my-project",
+  "created": "2026-03-21",
+  "tasks": [
+    {
+      "id": "task-001",
+      "title": "Project setup",
+      "description": "Initialize the project structure and dependencies",
+      "status": "pending",
+      "priority": 1
+    },
+    {
+      "id": "task-002", 
+      "title": "Core implementation",
+      "description": "Implement the main functionality",
+      "status": "pending",
+      "priority": 2
+    },
+    {
+      "id": "task-003",
+      "title": "Tests",
+      "description": "Write tests for all functionality",
+      "status": "pending", 
+      "priority": 3
+    },
+    {
+      "id": "task-004",
+      "title": "Documentation",
+      "description": "Add README and code documentation",
+      "status": "pending",
+      "priority": 4
+    }
+  ]
+}
