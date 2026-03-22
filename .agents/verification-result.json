@@ -1,30 +1,37 @@
 {
-  "task_id": "ui-011",
-  "verified_at": "2026-03-22T14:43:00-05:00",
+  "task_id": "ui-012",
+  "verified_at": "2026-03-22T14:51:30-05:00",
   "passed": true,
-  "score": 95,
+  "score": 94,
   "issues": [
     {
       "severity": "minor",
       "category": "accuracy",
-      "description": "Original MOO1 used different function key mappings (e.g., F3 for previous planet per historical sources), but the document uses a modernized F1-F8 navigation scheme that is internally consistent and matches the project's UI_OVERVIEW.md convention",
-      "location": "design/ui-ux/interaction-spec.md, Section 2.1-2.9",
-      "suggestion": "This is acceptable as the project deliberately modernizes MOO1 conventions while maintaining spirit. Document could note this is a modernization."
-    },
-    {
-      "severity": "minor",
-      "category": "completeness",
-      "description": "The spy allocation sliders section mentions espionage mechanics but spy gameplay may not be fully specified elsewhere in the project",
-      "location": "design/ui-ux/interaction-spec.md, Section 3.3",
-      "suggestion": "Ensure spy mechanics are documented in a separate specification document if espionage is a planned feature"
+      "description": "MOO1 had a simpler turn structure; the 9-phase turn processing (Section 3.2) is a modern enhancement. Should note this is expanded from MOO1's basic Movement→Combat→Production→Research flow.",
+      "location": "Section 3.2 Turn Processing Phases",
+      "suggestion": "Add a note clarifying that Phases 5-8 (Random Events, AI Turns, Diplomacy, Council Check) are sequenced for clarity but may have occurred atomically in MOO1."
     },
     {
       "severity": "minor",
       "category": "integration",
-      "description": "References to 'pet-themed' naming in UI_OVERVIEW.md could be reflected more explicitly in interaction examples (e.g., fleet names use 'Whiskers', 'Sunflower' which is good, but no hamster-specific theming in main examples)",
-      "location": "design/ui-ux/interaction-spec.md, various sections",
-      "suggestion": "Examples already use pet-themed names well. Minor enhancement would be more hamster-themed examples in modal dialogs"
+      "description": "Reference to 'interaction-spec.md' path may need verification - document refers to it without full path.",
+      "location": "Header - Related Docs section",
+      "suggestion": "Specify full relative path: ../interaction-spec.md or design/ui-ux/interaction-spec.md"
+    },
+    {
+      "severity": "minor",
+      "category": "completeness",
+      "description": "Victory condition 'TRANSCENDENCE' is listed as a HoO addition with 'Hidden conditions met' - this is not from MOO1. Should clarify this is intentional creative addition.",
+      "location": "Section 8.3 Victory/Defeat Conditions",
+      "suggestion": "Add note: '(HoO-specific: Not in original MOO1)' for Transcendence victory type."
+    },
+    {
+      "severity": "minor",
+      "category": "accuracy",
+      "description": "Council reconvene condition states '25 turns since last' but council.md specifies Council reconvenes every 25 turns AND when 50% population reached.",
+      "location": "Section 3.2 COUNCIL_CHECK condition",
+      "suggestion": "Verify exact council trigger rules against design/diplomacy/council.md and ensure consistency."
     }
   ],
-  "summary": "Excellent, comprehensive UI interaction specification. The document covers 15 major interaction categories including click behaviors, keyboard shortcuts, slider mechanics, list navigation, context menus, drag-and-drop, focus states, modals, touch controls, animations, accessibility, and error handling. All 4 JSON data blocks are valid and parseable. No placeholder text (TODO/TBD) found. Hotkey mappings are internally consistent with UI_OVERVIEW.md. The document successfully adapts MOO1 interaction patterns for modern web while adding tablet touch support and full accessibility features. Implementation-ready with detailed timing constants, animation specs, and ARIA attributes. Strong attention to edge cases and error handling."
+  "summary": "Excellent UI State Transitions specification with 1818 lines comprehensively documenting all screen transitions, modal behaviors, popup triggers, confirmation dialogs, and turn flow state machines. All 20 JSON data blocks validate correctly. The document includes: master screen flow diagram with ASCII art navigation matrix, 6 core screen states with transitions, complete 9-phase turn flow state machine, modal hierarchy with 6 modal types and queue system, 10 transition types with durations/easing, detailed confirmation dialog specifications for 8 destructive actions, notification system with 4 priority levels and batching, game lifecycle states, tactical combat state machine with 12 states, loading/save states, error recovery, and comprehensive edge case handling. Pet-themed naming (Hamsters, Guinea Pigs, Sunflower, Whiskers, New Hamsterton) is used correctly per LORE.md. Matches and extends interaction-spec.md keyboard shortcuts (F1-F8, Enter, Escape). Faithfully captures MOO1 turn-based flow while adding modern web enhancements (reduced motion support, auto-save, error recovery). All required sections present with no placeholder text."
 }

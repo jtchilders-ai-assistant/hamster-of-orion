@@ -127,7 +127,7 @@
       "id": "ui-012",
       "title": "UI State Transitions",
       "description": "Document all screen transitions and modal behaviors matching MOO1. Include: screen flow diagram, popup triggers, confirmation dialogs, turn flow. Output: design/ui-ux/state-transitions.md",
-      "status": "pending_verification",
+      "status": "done",
       "priority": 16,
       "output_file": "design/ui-ux/state-transitions.md"
     },
