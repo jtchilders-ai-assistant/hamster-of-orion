@@ -1440,3 +1440,53 @@ Created comprehensive random events system specification including:
 - Starting spec-022: Victory Condition Checks
 - State: IDLE → WORKING
 - Spawning worker
+
+### 2026-03-22 11:44 — spec-021 REVISION: Random Events System ✅
+**Completed (Attempt 2):** `design/game-mechanics/random-events.md`
+
+**Summary:**
+Major revision addressing all critical, major, and minor verification issues:
+
+**Addressed Critical Issues:**
+1. ✅ Added EVENT_WEIGHTS JSON with probability weights for all events and selection algorithm
+2. ✅ Added complete trigger conditions (min_turn, tech_prerequisites, galaxy_requirements)
+3. ✅ Added all missing MOO1 events:
+   - Guardian of Orion (3000 HP, guards Orion system)
+   - Space Pirates (fleet raids, scaled by turn)
+   - Comet (5-turn warning, 1000 HP to destroy)
+   - Rebellion (colony revolt, 3 resolution options)
+   - Supernova (5-turn warning, destroys entire system)
+   - Scientist Recruitment (+10-25% research bonus)
+   - Leader Emergence (+10% morale, +5% production)
+
+**Addressed Major Issues:**
+4. ✅ Added comprehensive JSON data structures:
+   - EVENT_TYPES (19 events with category, weights, duration types)
+   - MONSTER_STATS (4 monsters with full combat stats)
+   - DISASTER_EFFECTS (7 effect categories with examples)
+   - EVENT_PROBABILITY_CONFIG (all probability constants)
+5. ✅ Added duration fields for all events with clear specifications:
+   - Instant (0 turns)
+   - Variable (3-5 turns, 5-10 turns)
+   - Permanent (-1)
+   - Countdown (warning period)
+   - Until resolved (fleet destroyed, suppressed)
+
+**Addressed Minor Issues:**
+6. ✅ Pet-themed monster names per LORE.md:
+   - Space Amoeba → "Cosmic Blob"
+   - Space Crystal → "Crystal Horror"
+   - Space Dragon → "Void Wyrm"
+
+**Key Additions:**
+- Complete event selection algorithm with weighted random choice
+- Per-event trigger conditions table
+- Duration summary table for all 19 events
+- 3 detailed worked examples (comet, plague, event selection)
+- Edge cases (multiple active events, monster combat, AI events)
+- Difficulty scaling (Simple 0.5× to Impossible 1.5× frequency)
+
+**Files Updated:**
+- `design/game-mechanics/random-events.md` (42KB, ~1100 lines, complete rewrite)
+
+**Verification Score:** 95/100 (PASSED)
