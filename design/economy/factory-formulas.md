@@ -22,14 +22,14 @@ The number of factories a planet can operate is limited by population and Roboti
 Max_Operable_Factories = Population × Robotic_Controls_Level
 ```
 
-| Technology | Robotic Controls Level | Factories per Colonist |
-|------------|------------------------|------------------------|
-| None (Base) | 2 | 2:1 |
-| Robotic Controls II | 3 | 3:1 |
-| Robotic Controls III | 4 | 4:1 |
-| Robotic Controls IV | 5 | 5:1 |
-| Robotic Controls V | 6 | 6:1 |
-| Robotic Controls VI | 7 | 7:1 |
+| Technology | Tech Level | Factory Ratio |
+|------------|------------|---------------|
+| None (Base) | 0 | 2:1 |
+| Robotic Controls II | 10 | 3:1 |
+| Robotic Controls III | 16 | 4:1 |
+| Robotic Controls IV | 23 | 5:1 |
+| Robotic Controls V | 30 | 6:1 |
+| Robotic Controls VI | 38 | 7:1 |
 
 **Example:** A planet with 50 population and Robotic Controls IV can operate up to 50 × 5 = 250 factories.
 
@@ -153,6 +153,10 @@ Where `Max_Population` is determined by planet size and terraforming.
 
 With Terraforming, max population can increase significantly (see Population Growth spec).
 
+**Racial Abilities:** Some races have abilities that affect maximum factories:
+- **Ants (Overpopulation):** +25% max population capacity, which also increases max factories
+- See `species/race-stats-complete.md` for full racial ability details
+
 ---
 
 ## Pollution / Industrial Waste
@@ -246,7 +250,7 @@ Effective_Operating_Factories = min(Factories_Built, Workers_For_Production × R
   },
   
   "robotic_controls": [
-    { "tech_level": 0, "name": "None", "factory_ratio": 2 },
+    { "tech_level": 0, "name": "None (Base)", "factory_ratio": 2 },
     { "tech_level": 10, "name": "Robotic Controls II", "factory_ratio": 3 },
     { "tech_level": 16, "name": "Robotic Controls III", "factory_ratio": 4 },
     { "tech_level": 23, "name": "Robotic Controls IV", "factory_ratio": 5 },

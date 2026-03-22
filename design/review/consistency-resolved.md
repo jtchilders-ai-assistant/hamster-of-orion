@@ -203,17 +203,33 @@ The +3 Defense in AGENTS.md was a simplification; canonical is +50% = +5 effecti
 
 **Canonical Robotic Controls:**
 
-| Technology | Tech Level | Factories per Pop |
-|------------|------------|-------------------|
-| RC II (Base) | 1 | 2:1 |
-| RC III | 10 | 3:1 |
-| RC IV | 16 | 4:1 |
-| RC V | 23 | 5:1 |
-| RC VI | 30 | 6:1 |
-| RC VII | 38 | 7:1 |
+| Technology | Tech Level | Factory Ratio |
+|------------|------------|---------------|
+| None (Base) | 0 | 2:1 |
+| Robotic Controls II | 10 | 3:1 |
+| Robotic Controls III | 16 | 4:1 |
+| Robotic Controls IV | 23 | 5:1 |
+| Robotic Controls V | 30 | 6:1 |
+| Robotic Controls VI | 38 | 7:1 |
+
+**Before/After (factory-formulas.md Section 1):**
+
+*Before:*
+```
+| Technology | Robotic Controls Level | Factories per Colonist |
+| None (Base) | 2 | 2:1 |
+```
+
+*After:*
+```
+| Technology | Tech Level | Factory Ratio |
+| None (Base) | 0 | 2:1 |
+```
 
 **Files Updated:**
-- `design/ships/components-complete.md` - Updated Robotic Controls table
+- `design/economy/factory-formulas.md` - Updated markdown table to include tech levels and aligned naming with JSON
+- `design/economy/factory-formulas.md` - Updated JSON to use "None (Base)" name for consistency
+- `design/economy/factory-formulas.md` - Added cross-reference note about Ants Overpopulation ability
 
 ---
 
@@ -222,6 +238,18 @@ The +3 Defense in AGENTS.md was a simplification; canonical is +50% = +5 effecti
 **Issue:** `population-growth.md` showed 0.10 (10%), `race-stats-complete.md` constants showed 0.02 (2%).
 
 **Resolution:** 0.10 (10% per turn) is correct for MOO1-style gameplay. The 0.02 in `race-stats-complete.md` was an error.
+
+**Before/After (race-stats-complete.md Constants section):**
+
+*Before:*
+```
+| `BASE_GROWTH_RATE` | 0.02 | Base 2% population growth per turn |
+```
+
+*After:*
+```
+| `BASE_GROWTH_RATE` | 0.10 | Base 10% population growth per turn (MOO1 standard) |
+```
 
 **Files Updated:**
 - `design/species/race-stats-complete.md` - Updated BASE_GROWTH_RATE constant to 0.10
