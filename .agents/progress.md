@@ -364,3 +364,50 @@ Comprehensive consistency review of 30+ specification documents. Identified and 
 - **Phase**: Phase 2 UI Gap Analysis
 - **Action**: Spawning worker agent
 
+## 2026-03-22 13:18 - Worker Completed ui-001 ✅
+
+**Task:** ui-001 - UI Screen Inventory vs MOO1
+**Output:** design/ui-ux/screen-inventory.md (27KB, ~600 lines)
+**Status:** pending_verification
+
+### Summary:
+Created comprehensive UI screen inventory comparing ALL MOO1 screens against HoO documentation:
+
+**MOO1 Screens Identified:** 34
+**HoO Screens Documented:** 26 (76%)
+**Wireframes Created:** 0 (0%)
+**Critical Gaps:** 7
+**Important Gaps:** 7
+
+### Key Findings by Category:
+| Category | MOO1 | HoO | Status |
+|----------|------|-----|--------|
+| Pre-Game | 6 | 4 | ⚠️ Partial |
+| Core Gameplay | 8 | 8 | ⚠️ Need Wireframes |
+| Combat | 3 | 1 | ⚠️ Missing Details |
+| Information | 5 | 5 | ✅ Good |
+| Diplomacy | 4 | 3 | ⚠️ Missing |
+| Victory/Defeat | 4 | 2 | ⚠️ Incomplete |
+| System | 4 | 3 | ⚠️ Partial |
+
+### Critical Gaps Identified:
+1. Tactical Combat UI - No detailed specification
+2. Ground Combat UI - Not documented
+3. Pre-Combat Screen - Not documented
+4. Spy Network UI - Not documented
+5. Tech Trade UI - Not documented
+6. Population Transfer UI - Not documented
+7. Random Event Screens - Not documented
+
+### New Documentation Recommended:
+- `tactical-combat-ui.md` (highest priority)
+- `ground-combat-ui.md`
+- `espionage-ui.md`
+- `save-load-ui.md`
+- `random-events-ui.md`
+
+### Reference Sources Used:
+- MOO1 Official Strategy Guide (Prima, 1994) via Archive.org
+- Existing HoO design documents in design/ui-ux/
+- AGENTS.md project conventions
+
