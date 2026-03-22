@@ -106,7 +106,8 @@
       "id": "spec-012",
       "title": "Complete Tech Tree - Computers Field",
       "description": "Document all computer technologies: battle computers, ECM, scanners, spy tech. Include tier, cost, effect for each. Update design/technology/computers.md with JSON data",
-      "status": "pending",
+      "status": "done",
+      "completed": "2026-03-22",
       "priority": 12,
       "output_file": "design/technology/computers.md"
     },

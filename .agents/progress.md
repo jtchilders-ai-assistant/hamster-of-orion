@@ -464,3 +464,46 @@ Created complete Construction technology tree specification including:
 - Starting techs: Titanium Armor + Standard Construction
 
 ---
+
+### 2026-03-22 07:37 - spec-012: Complete Tech Tree - Computers Field ✅
+**Completed:** `design/technology/computers.md`
+
+**Summary:**
+Created complete Computers technology tree specification including:
+- **14+ Technology Tiers** (50 RP to 50,000 RP)
+- **38 Total Technologies:**
+  - 11 Battle Computers (Mark I-XI, +1 to +11 Attack Rating)
+  - 10 ECM Jammers (Mark I-X, +1 to +10 Missile Defense)
+  - 6 Robotic Controls (2:1 → 7:1 factories per pop)
+  - 5 Scanners (colony detect 5→15, ship detect 1→5)
+  - 4 Special Systems (Battle Scanner, Hypercomm, Oracle, Tech Nullifier)
+- **Battle Computer Progression:**
+  - Mark I (+1) at Tech 1 → Mark XI (+11) at Tech 50
+  - Each +1 Attack Rating ≈ +5% hit chance
+- **ECM Jammer Progression:**
+  - Mark I (+1) at Tech 3 → Mark X (+10) at Tech 48
+  - Each +1 Missile Defense ≈ -5% enemy missile accuracy
+- **Robotic Controls:**
+  - RC II (2:1) → RC VII (7:1) = +250% factory capacity
+- **Special Systems:**
+  - Battle Scanner: +3 Initiative, +1 Targeting
+  - Hyperspace Comm: Reroute fleets in transit
+  - Oracle Interface: All weapons armor-piercing
+  - Tech Nullifier: Target -2 to -5 attack rating
+- **Racial Bonuses:**
+  - Budgies: +3 Initiative
+  - Chameleons: +60% Espionage
+  - Rats: +50% Research
+- Computer vs Computer arms race dynamics
+- Complete JSON data schema
+
+**Files Created:**
+- `design/technology/computers.md` (25KB, 680+ lines)
+
+**Notes:**
+- Fourth of six technology field specifications
+- Robotic Controls critical for economic multiplication
+- Battle Computers vs ECM creates arms race
+- Starting techs: BC Mark I + RC II
+
+---
