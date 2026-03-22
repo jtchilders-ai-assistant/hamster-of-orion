@@ -1,62 +1,28 @@
-# Current Task: review-002
+# Current Task: review-003
 
-## Gap Analysis vs StrategyWiki
+## Title
+Cross-Reference Verification Report
 
-**ID:** review-002
-**Priority:** 2
-**Output File:** design/review/gap-analysis-wiki.md
+## Description
+Create a verification matrix showing which MOO1 systems are covered by which design documents. Identify orphan systems (not documented) and duplicate coverage.
 
-### Description
+## Output File
+design/review/coverage-matrix.md
 
-Fetch all StrategyWiki MOO1 pages and compare against our specifications. Focus on: 
-- Formulas accuracy
-- Tech tree completeness
-- Combat mechanics
-- Race abilities
+## Priority
+3
 
-Identify any discrepancies between StrategyWiki's documentation and our Hamster of Orion specifications.
+## Requirements
+1. List ALL MOO1 game systems (from manual, StrategyWiki, gameplay)
+2. Map each system to the HoO design documents that cover it
+3. Create a coverage matrix (system × document)
+4. Identify:
+   - **Orphan systems**: MOO1 features with NO coverage
+   - **Duplicate coverage**: Same system documented in multiple places
+   - **Partial coverage**: Systems only partially documented
+5. Provide recommendations for filling gaps
 
-### Key StrategyWiki Pages to Review
-
-1. https://strategywiki.org/wiki/Master_of_Orion
-2. https://strategywiki.org/wiki/Master_of_Orion/Races
-3. https://strategywiki.org/wiki/Master_of_Orion/Technology
-4. https://strategywiki.org/wiki/Master_of_Orion/Combat
-5. https://strategywiki.org/wiki/Master_of_Orion/Planets
-6. https://strategywiki.org/wiki/Master_of_Orion/Ships
-7. https://strategywiki.org/wiki/Master_of_Orion/Diplomacy
-8. Any other relevant subpages
-
-### Expected Output Format
-
-```markdown
-# Gap Analysis: StrategyWiki vs Hamster of Orion Specifications
-
-## Executive Summary
-[Brief overview of findings]
-
-## Methodology
-[How comparison was performed]
-
-## Findings by Category
-
-### Tech Tree / Technology
-[Discrepancies found]
-
-### Combat Mechanics  
-[Discrepancies found]
-
-### Race Abilities
-[Discrepancies found]
-
-### Formulas
-[Accuracy comparison]
-
-## Priority Gaps
-[Items needing attention]
-
-## Conclusion
-```
-
-### Working Directory
-/Users/jchilders/projects/orion-game
+## Reference
+- Use the gap analysis documents (review-001, review-002) as input
+- Reference MOO1 manual and wiki for complete system list
+- Cross-reference against all files in design/ directory
