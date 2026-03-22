@@ -1,24 +1,15 @@
 # Verification Request
 
-**Task ID**: ui-006
-**Task Title**: Ship Design UI - ASCII Wireframe
-**Output File**: design/ui-ux/wireframes/ship-design.md
+## Task
+- **ID**: ui-007
+- **Title**: Diplomacy UI - ASCII Wireframe
+- **Output File**: design/ui-ux/wireframes/diplomacy.md
 
 ## Requirements to Verify
-- Detailed ASCII wireframe for Ship Design screen matching MOO1
-- Hull selection display
-- Component slots interface
-- Weapon assignment system
-- Stats display
-- Save/load designs functionality
+1. Detailed ASCII wireframe for Diplomacy screen matching MOO1
+2. Include: race relations, treaty options, audience request, trade agreements
+3. Show different diplomatic states
+4. Proper formatting and completeness
 
-## Worker Claims
-- 12 ASCII wireframes created
-- 6 hull classes with stats
-- Component dropdowns (Engine, Shield, Armor, Computer, ECM)
-- Weapon selection with categories
-- Special systems selection
-- Error states and confirmations
-- Keyboard shortcuts and mouse interactions
-- JSON data schema
-- Accessibility features
+## Reference
+Check against MOO1 diplomacy mechanics and existing wireframe patterns in the project.
