@@ -424,3 +424,27 @@ PASS - The gap analysis now provides an accurate assessment of the project's sta
 3. Some documents in Appendix B file listing don't have line counts while others do
 
 **Recommendation:** PASS - Minor cosmetic discrepancies in line counts and document totals don't affect the matrix's accuracy or utility. The coverage matrix successfully achieves its purpose: providing a comprehensive mapping of MOO1 systems to HoO documentation with clear gap identification.
+
+---
+
+### review-004: Consistency Check Across All Specs
+**File:** design/review/consistency-report.md  
+**Verified:** 2026-03-22T13:15:00-05:00  
+**Result:** ✅ PASSED (Score: 88/100)
+
+**Summary:** Comprehensive consistency report that accurately identifies real inconsistencies across the specification documents. The document is well-organized with clear severity classifications (Critical, Major, Minor, Documentation) and actionable resolution recommendations. Key findings verified as accurate: hit chance formula discrepancy between combat-mechanics.md (70% base) and combat-algorithm.md (50% base); base growth rate conflict (0.10 vs 0.02) between population-growth.md and race-stats-complete.md; engine cost/space values differ between ship-costs.md and components-complete.md.
+
+**Verified Findings:**
+- CRIT-002 Hit Chance Formula: Confirmed - combat-mechanics.md uses "70% - Range Penalty + Computer - ECM + Size", combat-algorithm.md uses "50 + Computer×5 - ECM×5 - Range + Size", AGENTS.md uses simplified "50 + Computer - ECM + Size - Range"
+- MAJ-005 Base Growth Rate: Confirmed - population-growth.md states 0.10 (10%), race-stats-complete.md states 0.02 (2%)
+- MAJ-002 Ferrets Bonus: Confirmed - multiple interpretations of attack (+30%) vs damage (+25%) vs attack rating (+4)
+- DOC-001 Missing References: Confirmed - slider-mathematics.md referenced but exists at design/planets/slider-mathematics.md (path issue)
+
+**Issues Found (5 minor):**
+1. CRIT-001 is labeled "Critical" but analysis confirms values ARE consistent - should be relabeled as documentation clarity issue
+2. CRIT-003 Ship Hull Costs correctly identifies distinction is hull vs total cost (not actual inconsistency) - appropriately resolved
+3. MIN-001 Variable naming recommendations are sound and should be added to AGENTS.md conventions
+4. Canonical Source Documents table is excellent addition for future maintenance
+5. Verification checklist provides good template for ongoing QA
+
+**Recommendation:** PASS - The consistency report accurately identifies genuine inconsistencies that need resolution. The severity classifications are mostly appropriate (with minor suggestion to downgrade CRIT-001). The document provides clear canonical source recommendations and a verification checklist for future updates. Ready to serve as action item list for spec harmonization.
