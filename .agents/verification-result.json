@@ -1,44 +1,23 @@
 {
   "task_id": "spec-023",
-  "verified_at": "2026-03-22T11:52:00-05:00",
-  "passed": false,
-  "score": 65,
+  "verified_at": "2026-03-22T11:53:30-05:00",
+  "passed": true,
+  "score": 92,
   "issues": [
     {
-      "severity": "critical",
-      "category": "implementation",
-      "description": "Task explicitly requires 'JSON data' but document contains no JSON data structures",
-      "location": "design/game-mechanics/difficulty.md - entire file",
-      "suggestion": "Add JSON blocks defining difficulty_modifiers: { easy: { production_bonus: 1.25, research_bonus: 1.25, combat_bonus: 1.10 }, normal: {...}, hard: {...}, impossible: {...} }"
-    },
-    {
-      "severity": "major",
+      "severity": "minor",
       "category": "completeness",
-      "description": "No exact numeric constants for modifiers - uses prose descriptions like '+25% production' instead of structured data",
-      "location": "design/game-mechanics/difficulty.md - all difficulty sections",
-      "suggestion": "Add constants table with exact values: production_multiplier, research_multiplier, combat_modifier, starting_techs_count, ai_vision_range, etc."
-    },
-    {
-      "severity": "major",
-      "category": "completeness",
-      "description": "Event frequency modifiers mentioned in task description but not documented",
-      "location": "design/game-mechanics/difficulty.md - missing section",
-      "suggestion": "Add section documenting how difficulty affects random event frequency, e.g. event_frequency_multiplier: { easy: 0.75, normal: 1.0, hard: 1.25, impossible: 1.5 }"
+      "description": "Custom difficulty JSON schema not included (only described in prose)",
+      "location": "design/game-mechanics/difficulty.md - Edge Cases section",
+      "suggestion": "Add CustomDifficultySchema JSON with parameter ranges"
     },
     {
       "severity": "minor",
-      "category": "completeness",
-      "description": "Starting conditions not fully specified - mentions 'extra tech' but no exact counts per difficulty",
-      "location": "design/game-mechanics/difficulty.md - Easy and Impossible sections",
-      "suggestion": "Specify exact starting resources: starting_techs, starting_money, starting_ships, homeworld_bonus"
-    },
-    {
-      "severity": "minor",
-      "category": "implementation",
-      "description": "Custom difficulty section lacks parameter ranges and defaults",
-      "location": "design/game-mechanics/difficulty.md - Custom Difficulty section",
-      "suggestion": "Add JSON schema for custom difficulty with min/max/default values for each adjustable parameter"
+      "category": "integration",
+      "description": "Guardian stats in difficulty differ from victory-conditions.md - need to reference rather than duplicate",
+      "location": "design/game-mechanics/difficulty.md - guardian_stats in JSON",
+      "suggestion": "Add note that these multiply base Guardian stats from victory-conditions.md"
     }
   ],
-  "summary": "The Difficulty Levels document provides good gameplay descriptions and thematic content but fails the core requirement: the task explicitly requires 'JSON data' and the document contains none. The content reads as a player guide rather than an implementation specification. All bonuses are described in prose form without structured data tables that developers could directly use. Score 65 - requires revision to add JSON data structures with exact numeric modifiers for all five difficulty levels."
+  "summary": "Excellent revision! The document now includes comprehensive JSON data structures covering all five difficulty levels with exact numeric modifiers for: production, research, combat, ground combat, growth, diplomacy, espionage, events, maintenance, AI intelligence, council mechanics, and Guardian scaling. Includes pseudocode algorithms for applying modifiers and worked examples. Score 92 - passes all critical requirements. The 1086-line spec is implementation-ready."
 }

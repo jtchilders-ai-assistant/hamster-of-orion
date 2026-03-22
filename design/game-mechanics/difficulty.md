@@ -972,6 +972,433 @@ Custom difficulty allows individual modifier adjustment:
 - Score multiplier calculated from average of all modifiers
 - Achievements disabled if any modifier easier than Average
 
+#### Custom Difficulty Parameters Schema
+
+```json
+{
+  "custom_difficulty_parameters": [
+    {
+      "id": "player_production",
+      "name": "Player Production",
+      "category": "economy",
+      "type": "multiplier",
+      "min": 0.50,
+      "max": 2.00,
+      "default": 1.00,
+      "step": 0.05,
+      "description": "Multiplier applied to all player production output"
+    },
+    {
+      "id": "ai_production",
+      "name": "AI Production",
+      "category": "economy",
+      "type": "multiplier",
+      "min": 0.50,
+      "max": 2.00,
+      "default": 1.00,
+      "step": 0.05,
+      "description": "Multiplier applied to all AI production output"
+    },
+    {
+      "id": "player_research_cost",
+      "name": "Player Research Cost",
+      "category": "research",
+      "type": "multiplier",
+      "min": 0.50,
+      "max": 2.00,
+      "default": 1.00,
+      "step": 0.05,
+      "description": "Multiplier on player technology costs"
+    },
+    {
+      "id": "ai_research_cost",
+      "name": "AI Research Cost",
+      "category": "research",
+      "type": "multiplier",
+      "min": 0.50,
+      "max": 2.00,
+      "default": 1.00,
+      "step": 0.05,
+      "description": "Multiplier on AI technology costs"
+    },
+    {
+      "id": "player_combat_attack",
+      "name": "Player Attack Bonus",
+      "category": "combat",
+      "type": "additive_percentage",
+      "min": -0.20,
+      "max": 0.20,
+      "default": 0.00,
+      "step": 0.05,
+      "description": "Additive bonus/penalty to player hit chance"
+    },
+    {
+      "id": "player_combat_defense",
+      "name": "Player Defense Bonus",
+      "category": "combat",
+      "type": "additive_percentage",
+      "min": -0.20,
+      "max": 0.20,
+      "default": 0.00,
+      "step": 0.05,
+      "description": "Additive bonus/penalty to player evasion"
+    },
+    {
+      "id": "ai_combat_attack",
+      "name": "AI Attack Bonus",
+      "category": "combat",
+      "type": "additive_percentage",
+      "min": -0.20,
+      "max": 0.20,
+      "default": 0.00,
+      "step": 0.05,
+      "description": "Additive bonus/penalty to AI hit chance"
+    },
+    {
+      "id": "ai_combat_defense",
+      "name": "AI Defense Bonus",
+      "category": "combat",
+      "type": "additive_percentage",
+      "min": -0.20,
+      "max": 0.20,
+      "default": 0.00,
+      "step": 0.05,
+      "description": "Additive bonus/penalty to AI evasion"
+    },
+    {
+      "id": "player_ground_combat",
+      "name": "Player Ground Combat",
+      "category": "combat",
+      "type": "additive_percentage",
+      "min": -0.25,
+      "max": 0.25,
+      "default": 0.00,
+      "step": 0.05,
+      "description": "Additive bonus/penalty to player ground combat"
+    },
+    {
+      "id": "ai_ground_combat",
+      "name": "AI Ground Combat",
+      "category": "combat",
+      "type": "additive_percentage",
+      "min": -0.25,
+      "max": 0.25,
+      "default": 0.00,
+      "step": 0.05,
+      "description": "Additive bonus/penalty to AI ground combat"
+    },
+    {
+      "id": "player_growth",
+      "name": "Player Growth Rate",
+      "category": "economy",
+      "type": "multiplier",
+      "min": 0.50,
+      "max": 1.50,
+      "default": 1.00,
+      "step": 0.05,
+      "description": "Multiplier on player population growth"
+    },
+    {
+      "id": "ai_growth",
+      "name": "AI Growth Rate",
+      "category": "economy",
+      "type": "multiplier",
+      "min": 0.50,
+      "max": 1.50,
+      "default": 1.00,
+      "step": 0.05,
+      "description": "Multiplier on AI population growth"
+    },
+    {
+      "id": "player_maintenance",
+      "name": "Player Ship Maintenance",
+      "category": "economy",
+      "type": "multiplier",
+      "min": 0.50,
+      "max": 2.00,
+      "default": 1.00,
+      "step": 0.05,
+      "description": "Multiplier on player fleet upkeep costs"
+    },
+    {
+      "id": "ai_maintenance",
+      "name": "AI Ship Maintenance",
+      "category": "economy",
+      "type": "multiplier",
+      "min": 0.50,
+      "max": 2.00,
+      "default": 1.00,
+      "step": 0.05,
+      "description": "Multiplier on AI fleet upkeep costs"
+    },
+    {
+      "id": "player_spy_success",
+      "name": "Player Spy Success",
+      "category": "espionage",
+      "type": "additive_percentage",
+      "min": -0.30,
+      "max": 0.30,
+      "default": 0.00,
+      "step": 0.05,
+      "description": "Additive bonus/penalty to player spy mission success"
+    },
+    {
+      "id": "ai_spy_success",
+      "name": "AI Spy Success",
+      "category": "espionage",
+      "type": "additive_percentage",
+      "min": -0.30,
+      "max": 0.30,
+      "default": 0.00,
+      "step": 0.05,
+      "description": "Additive bonus/penalty to AI spy mission success"
+    },
+    {
+      "id": "player_spy_cost",
+      "name": "Player Spy Cost",
+      "category": "espionage",
+      "type": "multiplier",
+      "min": 0.50,
+      "max": 2.00,
+      "default": 1.00,
+      "step": 0.05,
+      "description": "Multiplier on player spy training costs"
+    },
+    {
+      "id": "event_frequency",
+      "name": "Event Frequency",
+      "category": "events",
+      "type": "multiplier",
+      "min": 0.25,
+      "max": 2.00,
+      "default": 1.00,
+      "step": 0.05,
+      "description": "Multiplier on random event occurrence rate"
+    },
+    {
+      "id": "negative_event_bias",
+      "name": "Negative Event Bias",
+      "category": "events",
+      "type": "additive_percentage",
+      "min": -0.50,
+      "max": 0.50,
+      "default": 0.00,
+      "step": 0.05,
+      "description": "Shifts event balance toward negative (positive value) or positive (negative value)"
+    },
+    {
+      "id": "monster_strength",
+      "name": "Monster Strength",
+      "category": "events",
+      "type": "multiplier",
+      "min": 0.50,
+      "max": 2.00,
+      "default": 1.00,
+      "step": 0.10,
+      "description": "Multiplier on space monster HP and damage"
+    },
+    {
+      "id": "coalition_probability",
+      "name": "AI Coalition Chance",
+      "category": "diplomacy",
+      "type": "percentage",
+      "min": 0.00,
+      "max": 1.00,
+      "default": 0.25,
+      "step": 0.05,
+      "description": "Probability that AI empires will form anti-player coalition"
+    },
+    {
+      "id": "ai_war_threshold",
+      "name": "AI War Eagerness",
+      "category": "diplomacy",
+      "type": "additive_integer",
+      "min": -50,
+      "max": 50,
+      "default": 0,
+      "step": 5,
+      "description": "Modifier to AI war declaration threshold (negative = more eager)"
+    },
+    {
+      "id": "ai_forgiveness",
+      "name": "AI Forgiveness",
+      "category": "diplomacy",
+      "type": "multiplier",
+      "min": 0.25,
+      "max": 2.00,
+      "default": 1.00,
+      "step": 0.05,
+      "description": "Multiplier on AI relation recovery speed"
+    },
+    {
+      "id": "council_threshold",
+      "name": "Council Formation",
+      "category": "diplomacy",
+      "type": "percentage",
+      "min": 0.30,
+      "max": 0.70,
+      "default": 0.50,
+      "step": 0.05,
+      "description": "Galaxy colonization percentage to trigger council"
+    },
+    {
+      "id": "bribe_effectiveness",
+      "name": "Bribe Effectiveness",
+      "category": "diplomacy",
+      "type": "multiplier",
+      "min": 0.25,
+      "max": 2.00,
+      "default": 1.00,
+      "step": 0.05,
+      "description": "Multiplier on council vote bribe effectiveness"
+    },
+    {
+      "id": "ai_decision_noise",
+      "name": "AI Decision Quality",
+      "category": "ai",
+      "type": "noise_integer",
+      "min": 0,
+      "max": 50,
+      "default": 10,
+      "step": 5,
+      "description": "Random noise added to AI decisions (0 = perfect, higher = worse)"
+    },
+    {
+      "id": "ai_information_level",
+      "name": "AI Information Access",
+      "category": "ai",
+      "type": "enum",
+      "options": ["fog_of_war", "limited", "normal", "extended", "omniscient"],
+      "default": "normal",
+      "description": "How much information AI has about player activities"
+    },
+    {
+      "id": "starting_population",
+      "name": "Starting Population",
+      "category": "starting",
+      "type": "integer",
+      "min": 30,
+      "max": 60,
+      "default": 40,
+      "step": 5,
+      "description": "Player homeworld starting population"
+    },
+    {
+      "id": "starting_factories",
+      "name": "Starting Factories",
+      "category": "starting",
+      "type": "integer",
+      "min": 20,
+      "max": 50,
+      "default": 30,
+      "step": 5,
+      "description": "Player homeworld starting factory count"
+    },
+    {
+      "id": "starting_scouts",
+      "name": "Starting Scouts",
+      "category": "starting",
+      "type": "integer",
+      "min": 0,
+      "max": 5,
+      "default": 1,
+      "step": 1,
+      "description": "Number of scout ships player starts with"
+    },
+    {
+      "id": "starting_fighters",
+      "name": "Starting Fighters",
+      "category": "starting",
+      "type": "integer",
+      "min": 0,
+      "max": 3,
+      "default": 0,
+      "step": 1,
+      "description": "Number of fighter ships player starts with"
+    },
+    {
+      "id": "starting_reserve",
+      "name": "Starting Reserve BC",
+      "category": "starting",
+      "type": "integer",
+      "min": 0,
+      "max": 200,
+      "default": 0,
+      "step": 25,
+      "description": "Player starting treasury in BC"
+    },
+    {
+      "id": "guardian_hp_multiplier",
+      "name": "Guardian HP",
+      "category": "guardian",
+      "type": "multiplier",
+      "min": 0.50,
+      "max": 1.50,
+      "default": 1.00,
+      "step": 0.10,
+      "description": "Multiplier on Guardian of Orion base HP (32000)"
+    },
+    {
+      "id": "guardian_armor_multiplier",
+      "name": "Guardian Armor",
+      "category": "guardian",
+      "type": "multiplier",
+      "min": 2.0,
+      "max": 8.0,
+      "default": 4.0,
+      "step": 0.5,
+      "description": "Guardian damage reduction multiplier"
+    }
+  ]
+}
+```
+
+#### Custom Difficulty Score Calculation
+
+```pseudocode
+function calculate_custom_difficulty_score(settings):
+    # Weight each parameter by its impact
+    weights = {
+        "player_production": 1.0,
+        "ai_production": 1.0,
+        "player_research_cost": 0.8,
+        "ai_research_cost": 0.8,
+        "player_combat_attack": 0.6,
+        "player_combat_defense": 0.6,
+        "ai_combat_attack": 0.6,
+        "ai_combat_defense": 0.6,
+        "player_growth": 0.5,
+        "ai_growth": 0.5,
+        "event_frequency": 0.3,
+        "monster_strength": 0.3,
+        "coalition_probability": 0.4,
+        "ai_decision_noise": 0.5
+    }
+    
+    # Calculate deviation from Average (index 2)
+    total_weighted_deviation = 0
+    total_weight = 0
+    
+    for param in settings:
+        if param.id in weights:
+            # Normalize deviation: 0 = Average, -1 = Simple, +1 = Impossible
+            deviation = calculate_deviation(param.value, param.default, param.min, param.max)
+            total_weighted_deviation += deviation * weights[param.id]
+            total_weight += weights[param.id]
+    
+    # Map to difficulty index (0-4)
+    average_deviation = total_weighted_deviation / total_weight
+    difficulty_score = 2 + (average_deviation * 2)  # Center on Average (2)
+    
+    return clamp(difficulty_score, 0, 4)
+
+function get_score_multiplier(difficulty_score):
+    # Score multiplier for leaderboards
+    # Simple = 0.5x, Easy = 0.75x, Average = 1.0x, Hard = 1.5x, Impossible = 2.0x
+    multipliers = [0.50, 0.75, 1.00, 1.50, 2.00]
+    return interpolate(multipliers, difficulty_score)
+```
+
 ### Multiplayer Difficulty
 
 In multiplayer games:
