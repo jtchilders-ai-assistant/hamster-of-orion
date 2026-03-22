@@ -1290,3 +1290,89 @@ Created comprehensive Reports & Statistics (F7) wireframe specification with det
 - State: IDLE → WORKING
 - Assigned task ui-011: UI Interaction Specification
 - Spawning worker agent
+
+## [2026-03-22 14:38] Orchestrator Check
+- **State**: WORKING
+- **Task**: ui-011 (UI Interaction Specification)
+- **Status**: Worker sub-agent running (1m elapsed, typically ~6m)
+- **Action**: No action needed, worker in progress
+
+
+## 2026-03-22 14:48 - Worker Completed ui-011 ✅
+
+**Task:** ui-011 - UI Interaction Specification
+**Output:** design/ui-ux/interaction-spec.md (48KB, ~1550 lines)
+**Status:** pending_verification
+
+### Summary:
+Created comprehensive UI Interaction specification documenting all user interface interactions matching MOO1 behavior with modern web enhancements:
+
+**15 Major Sections:**
+1. **Click Behaviors** - Single, double, right-click for all screens
+2. **Keyboard Shortcuts** - Global and screen-specific (90+ shortcuts)
+3. **Slider Mechanics** - Production allocation, research, spy sliders
+4. **List Navigation** - Single/multi-select, sorting, type-ahead search
+5. **Context Menus** - Right-click menus for all elements
+6. **Drag and Drop** - Fleet transfers, queue reordering
+7. **Focus and Hover States** - Keyboard focus, tooltips, disabled states
+8. **Modal Interaction Patterns** - Dialogs, confirmations, inputs
+9. **Touch Controls (Tablet)** - Gesture mapping, touch targets
+10. **Animation Specifications** - Timing, easing, reduced motion
+11. **Accessibility Patterns** - ARIA, screen reader, high contrast
+12. **Error Handling** - Validation, recovery, messages
+13. **JSON Data Tables** - Key bindings, animation config, touch config
+14. **Edge Cases** - Rapid input, boundaries, conflicts
+15. **Implementation Notes** - Priorities, state management, performance
+
+**Key Deliverables:**
+
+**Click Behaviors:**
+- Complete tables for each screen (Galaxy Map, Planet Management, Fleet Command, Research, Ship Design, Diplomacy, Combat)
+- Left-click, double-click, right-click actions documented
+- Context menu specifications with shortcuts
+
+**Keyboard Shortcuts (90+ keys):**
+- Global (F1-F8, Enter, Escape, Ctrl+S/L, Tab)
+- Galaxy Map (zoom, pan, selection cycling)
+- Planet Management (slider focus, lock, adjust)
+- Fleet Command (move, split, patrol)
+- Research (field select, lock, tech selection)
+- Ship Design (hull, components, save)
+- Diplomacy (contact, treaty, war)
+- Tactical Combat (next ship, weapons, fire, retreat)
+
+**Slider Mechanics:**
+- Visual structure and interaction methods
+- Auto-balance algorithm (pseudocode)
+- Lock behavior rules
+- Linked sliders (spy allocation)
+- Visual feedback specifications
+
+**Context Menus:**
+- 8 detailed menu specifications with submenus
+- Keyboard navigation within menus
+- Submenu hover behavior (200ms delay)
+
+**Modal Patterns:**
+- 4 modal types (confirmation, info, input, selection)
+- Turn confirmation modal
+- Stacked modals behavior
+- Focus trap and return focus specs
+
+**Touch/Tablet:**
+- Gesture mapping table (tap, long-press, pinch, swipe)
+- Minimum touch target sizes (44px)
+- Touch-specific feedback (haptic, ripple)
+
+**Accessibility:**
+- ARIA attributes by element type
+- Screen reader announcements
+- High contrast mode adjustments
+- Keyboard focus order
+
+**JSON Configuration Tables:**
+- keyBindings (global + per-screen)
+- animations (durations, easing, reduced motion)
+- touch (thresholds, targets, gestures)
+- accessibility (focus, timing, navigation)
+
