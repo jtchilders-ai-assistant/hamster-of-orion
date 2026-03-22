@@ -859,6 +859,86 @@ Created comprehensive Council voting algorithm specification including:
 - **Output**: design/diplomacy/espionage.md
 - **Worker**: Spawned
 
+---
+
+### 2026-03-22 11:12 - spec-017: Espionage Success Formulas ✅
+**Completed:** `design/diplomacy/espionage.md`
+
+**Summary:**
+Created comprehensive espionage system specification including:
+- **Spy Network Fundamentals:**
+  - Spy cost (50 BC base, difficulty modified)
+  - Deployment time (5 turns to operational)
+  - Spy effectiveness formula: Base + Racial + Tech - Security
+- **Racial Espionage Modifiers:**
+  - Offensive: Chameleons +60, Ferrets +10, Ants -100 (cannot spy)
+  - Defensive: Ants immune, Chameleons +30 detection
+  - All 10 races documented with execution tendencies
+- **Technology Effects:**
+  - Computer tech advantage formula (±2 per tech level, capped ±20)
+  - Scanner detection bonuses (+5% to +25%)
+  - Espionage tech level derived from Computer field
+- **Security System:**
+  - 11 Security levels (0-10)
+  - Cost formula: quadratic scaling (50 BC → 2,750 BC)
+  - Detection chance: 10% base + 10% per level + racial + scanner
+- **7 Mission Types with Full Formulas:**
+  - Reconnaissance (80% base, free, passive)
+  - Technology Theft (30% base, 100 BC, tech tier modifiers)
+  - Sabotage Factories (40% base, 100 BC, 10-30% destruction)
+  - Sabotage Missile Bases (35% base, 150 BC, 15-30% destruction)
+  - Incite Rebellion (25% base, 200 BC, morale requirements)
+  - Frame Another Race (50% base, 150 BC, detection escalation)
+  - Assassination (10% base, 300 BC, extreme risk)
+- **Spy Death Mechanics:**
+  - Death chance formula per mission type
+  - Caught penalty (+30% death chance)
+  - Execution likelihood by race (Ants 100% → Chameleons 10%)
+- **Counter-Espionage Operations:**
+  - Active counter-intelligence (+10% per spy assigned)
+  - Spy hunt mode (200 BC, 50%+ success)
+  - Double agents (turning, loyalty tracking, defection)
+- **Diplomatic Consequences:**
+  - Caught spy penalties (-10 to -100 relations)
+  - Cumulative hostility tracking (threshold: 100)
+  - Honor reputation track effects
+- **Special Operations (Chameleon-specific):**
+  - Sleeper agents (150 BC plant, +30% bonus on activation)
+  - False flag operations (200 BC, third-party framing)
+  - Technology sabotage (250 BC, delay research 15-30%)
+- **Complete Algorithm:**
+  - ResolveMission pseudocode with all steps
+  - Detection and death chance calculations
+  - Cumulative hostility updates
+- **4 Complete JSON Data Schemas:**
+  - espionage_missions (7 missions with all stats)
+  - racial_espionage_stats (10 races)
+  - security_levels (11 levels)
+  - tech_theft_modifiers (5 tier ranges)
+- **3 Detailed Worked Examples:**
+  - Chameleon tech theft vs Rats
+  - Guinea Pig assassination attempt vs Hamsters
+  - Cumulative hostility tracking over 20 turns
+- **Edge Cases:**
+  - No valid targets (no tech to steal, high morale)
+  - Ants immunity
+  - War state effects (+20% sabotage, +20% detection)
+  - Alliance espionage blocking
+  - Chameleon vs Chameleon dynamics
+  - Integer math conventions
+
+**Files Created:**
+- `design/diplomacy/espionage.md` (31KB, ~850 lines, complete rewrite)
+
+**Notes:**
+- Chameleons are truly dominant (+60% success, +30% detection, special abilities)
+- Ants cannot conduct espionage (hive-mind) but are immune to it
+- Integrates with relationship-formulas.md for caught spy penalties
+- Integrates with computers.md for tech level advantages
+- All formulas clamped (5% min, 95% max success)
+- MOO1-faithful with integer math throughout
+- Ready for implementation with complete JSON schemas
+
 ## 2026-03-22 11:16:17 - Orchestrator
 - State: WORKING → PENDING_VERIFICATION
 - Task spec-017 (Espionage Success Formulas) output file verified (1210 lines)
