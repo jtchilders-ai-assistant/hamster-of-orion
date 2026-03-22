@@ -1403,3 +1403,71 @@ Created comprehensive UI Interaction specification documenting all user interfac
 - **Task**: UI State Transitions
 - **Output**: design/ui-ux/state-transitions.md
 - **Action**: Spawning worker subagent
+
+## 2026-03-22 14:52 - Worker Completed ui-012 ✅
+
+**Task:** ui-012 - UI State Transitions
+**Output:** design/ui-ux/state-transitions.md (66KB, ~1850 lines)
+**Status:** pending_verification
+
+### Summary:
+Created comprehensive UI State Transitions specification documenting all screen flows, modal behaviors, and turn state machine:
+
+**15 Major Sections:**
+1. **Master Screen Flow Diagram** - ASCII diagram showing all screens and navigation paths
+2. **Screen State Machine** - LOADING, IDLE, PROCESSING, MODAL_OPEN, ERROR states
+3. **Turn Flow State Machine** - Complete turn cycle with 10 processing phases
+4. **Modal and Popup System** - Modal hierarchy, types, trigger conditions, queue system
+5. **Screen Transition Specifications** - 10 transition types with timing
+6. **Confirmation Dialog Requirements** - All destructive actions requiring confirmation
+7. **Notification and Alert System** - Priority levels, batching, display layout
+8. **Game Phase Transitions** - Game lifecycle, new game flow, victory/defeat
+9. **Combat State Machine** - Complete tactical combat flow with 15+ states
+10. **Loading and Save States** - Auto-save, load flow, progress tracking
+11. **Error and Recovery States** - Error types, recovery state machine
+12. **JSON Data Structures** - Screen, turn, modal, notification, combat state objects
+13. **Animation and Timing** - Transition timing table, animation sequences
+14. **Edge Cases** - Concurrent events, rapid state changes, interruption handling
+
+**Key Deliverables:**
+
+**Screen Flow:**
+- Complete navigation matrix (F1-F8, Esc, Enter)
+- Screen-specific states (Galaxy Map, Planet, Combat)
+- Navigation history with state preservation
+
+**Turn Flow:**
+- 10 turn processing phases (Movement→Combat→Production→Research→Events→AI→Diplomacy→Council→Cleanup)
+- Turn confirmation dialog specification
+- Notification queue processing
+
+**Modal System:**
+- 6 modal types (BLOCKING, CONFIRMATION, INFORMATION, SELECTION, INPUT, NOTIFICATION)
+- Z-index layer hierarchy (100-1000)
+- Modal trigger conditions table (17 triggers)
+- Queue priority order
+
+**Combat States:**
+- 15+ combat states (PRE_COMBAT through COMBAT_RESULT)
+- State transition table
+- Round/initiative flow
+
+**JSON Data:**
+- screenState object
+- turnState object
+- modalState object
+- notificationQueue object
+- combatState object
+
+**References Used:**
+- MOO1 (1993) screen flow patterns
+- design/ui-ux/interaction-spec.md
+- design/ui-ux/main-screens.md
+- design/ui-ux/UI_OVERVIEW.md
+- design/LORE.md
+
+## 2026-03-22 14:48 - Orchestrator Check
+- **State**: WORKING
+- **Task**: ui-012 (UI State Transitions)
+- **Status**: Worker sub-agent active (running for ~3 minutes)
+- **Action**: No action needed - worker still processing
