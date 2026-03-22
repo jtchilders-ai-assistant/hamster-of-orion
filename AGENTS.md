@@ -24,13 +24,13 @@ This file contains patterns, conventions, and learnings for AI agents working on
 
 | Race | MOO1 Equivalent | Key Trait |
 |------|-----------------|-----------|
-| Budgies | Alkari | +3 Ship Defense, Pilot bonus |
+| Budgies | Alkari | +50% Ship Defense (+5 effective), +3 Initiative, +20% Evasion |
 | Guinea Pigs | Bulrathi | +25 Ground Combat |
 | Chameleons | Darloks | +60% Spy bonus |
 | Hamsters | Humans | Diplomatic, Balanced |
 | Ants | Klackons | +2 Production |
 | Mice | Meklar | +2 Production (Cybernetic) |
-| Ferrets | Mrrshan | +4 Ship Attack |
+| Ferrets | Mrrshan | +4 Attack Level, +15% Weapon Damage (Deadly Accuracy) |
 | Rats | Psilons | +50% Research |
 | Rabbits | Sakkra | +2 Population Growth |
 | Hermit Crabs | Silicoid | Ignore planet hostility |
@@ -90,8 +90,34 @@ Worked examples showing calculations
 - Miniaturization: 5% size reduction per tech level above
 
 ### Combat Formula (General)
-- Hit Chance = 50 + Computer - ECM + Size Modifier - Range Penalty
-- Damage = Weapon Damage × (1 - Shield Absorption)
+**Canonical formula** (see `design/ships/combat-algorithm.md` Section 9):
+```
+hit_chance = 50 + (battle_computer_rating × 5) - (target_defense × 5) + size_modifier - range_penalty + experience_modifier
+
+Where:
+  target_defense = ecm_rating + maneuver_rating
+  size_modifier = (target_size_class - 1) × 5  # Scout = class 1
+  range_penalty = {point_blank: -10, close: 0, medium: +5, long: +10, very_long: +20}
+  experience_modifier = {rookie: -5, regular: 0, veteran: +5, elite: +10}
+```
+- Damage = Weapon Damage - Shield Absorption (shields absorb up to class value per hit)
+
+## Variable Naming Conventions
+
+**Formula Variables:** Use `snake_case` for all variables
+**Formula Names:** Use `Title_Case` for formula definitions
+
+| Concept | Standard Name |
+|---------|---------------|
+| Production modifier | `production_modifier` |
+| Hit chance | `hit_chance` |
+| Ship HP | `ship_hp` |
+| Factory ratio | `robotic_controls_level` |
+| Attack rating | `attack_rating` |
+| Defense rating | `defense_rating` |
+| Experience modifier | `experience_modifier` |
+
+**JSON Keys:** Always use `snake_case` (e.g., `tech_level`, `attack_rating`)
 
 ## Gotchas & Learnings
 
@@ -100,8 +126,12 @@ Worked examples showing calculations
 - MOO1 uses integer math - document rounding rules
 - Factory count is per-planet, not global
 - Research points pool empire-wide
-- Shield absorption is percentage-based
+- Shield absorption is per-hit (shields absorb up to class value, not percentage)
 - Missiles can be shot down by point defense
+- Ferrets have BOTH +4 attack level AND +15% damage (two separate bonuses)
+- Budgies have +50% defense (+5 effective) AND +3 initiative AND +20% evasion (three bonuses)
+- Mice have stacking production bonuses: +25% base, +2 per pop, +50% factory efficiency
+- Hamsters have +30% diplomacy stat AND 2× positive action multiplier (separate)
 
 ## File Structure
 

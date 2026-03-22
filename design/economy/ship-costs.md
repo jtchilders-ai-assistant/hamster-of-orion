@@ -36,7 +36,7 @@ Ship_Cost = Hull_Cost + Engine_Cost + Σ(Weapon_Costs) + Σ(Defense_Costs) + Σ(
 | Dreadnought | 1,500 | 500 BC |
 | Titan | 2,500 | 1,000 BC |
 
-**Note:** Hull cost is a base minimum before components are added.
+**Note:** Hull cost is the **base cost before adding engines, weapons, and other components**. Typical fully-equipped ships cost 2-20× the hull cost depending on technology level. See `ships/ship-classes.md` for typical total ship costs.
 
 ---
 

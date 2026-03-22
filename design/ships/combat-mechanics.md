@@ -70,36 +70,42 @@ Combat triggers when:
 ## Targeting & Accuracy
 
 ### Base Hit Chance (MOO1 Differential Formula)
-**Formula**: 50% + (Attack_Level - Defense_Level) × 5%
+
+**Canonical Formula** (see `combat-algorithm.md` Section 9-10):
+
+```
+hit_chance = 50 + (battle_computer_rating × 5) - (target_defense × 5) + size_modifier - range_penalty + experience_modifier
+```
 
 Where:
-- **Attack_Level** = Battle_Computer_Mark + Racial_Attack_Bonus
-- **Defense_Level** = ECM_Jammer_Level + Ship_Maneuver_Class + Range_Penalty
+- **battle_computer_rating** = Battle Computer Mark (I=1, II=2, etc.)
+- **target_defense** = ecm_rating + maneuver_rating
+- **size_modifier** = (target_size_class - 1) × 5 (Scout = class 1, Fighter = 2, etc.)
+- **range_penalty** = {point_blank: -10, close: 0, medium: +5, long: +10, very_long: +20}
+- **experience_modifier** = {rookie: -5, regular: 0, veteran: +5, elite: +10}
 
 **Minimum**: 5% (always some chance to hit)
 **Maximum**: 95% (always some chance to miss)
 
-**Range Penalties (added to Defense)**:
-- Point Blank (1 hex): -2 Defense (bonus to attacker)
-- Close (2-4 hexes): +0 Defense
-- Medium (5-8 hexes): +1 Defense
-- Long (9-15 hexes): +2 Defense
-- Very Long (16+ hexes): +4 Defense
+**Range Brackets**:
+- Point Blank (1 hex): -10% penalty (bonus to attacker)
+- Close (2-4 hexes): +0%
+- Medium (5-8 hexes): +5% penalty
+- Long (9-15 hexes): +10% penalty
+- Very Long (16+ hexes): +20% penalty
 
-**Size Modifier**: Larger targets easier to hit (+1 Attack per size class above Scout)
-
-**Racial Bonuses**:
-- Ferrets: +4 Attack Level (Mrrshan equivalent)
-- Budgies: +3 Defense Level (Alkari equivalent)
+**Racial Combat Bonuses**:
+- Ferrets: +4 Attack Level AND +15% weapon damage (Deadly Accuracy ability)
+- Budgies: +5 Defense Level (+50%), +3 Initiative, +20% Evasion (Superior Pilots)
 
 **Example**:
 - Ion Cannon at long range vs Destroyer with ECM III
-- Attacker: Battle Computer Mark V (+5), Size target (+1) = Attack 6
-- Defender: ECM III (+3), Maneuver 2 (+2), Long Range (+2) = Defense 7
-- Hit Chance: 50% + (6 - 7) × 5% = 50% - 5% = 45%
+- Attacker: Battle Computer Mark V (+5 × 5% = +25%), Size target (Destroyer = 3, so +2 × 5% = +10%)
+- Defender: ECM III (3 × 5% = 15%), Maneuver 2 (2 × 5% = 10%), Long Range (+10%)
+- Hit Chance: 50% + 25% + 10% - 15% - 10% - 10% = 50%
 
 See `combat-algorithm.md` Section 9 for the full pseudocode implementation.
-See `force-fields.md` for shield absorption values.
+See `components-complete.md` for shield absorption values.
 
 ---
 
