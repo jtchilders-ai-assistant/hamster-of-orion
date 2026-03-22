@@ -125,3 +125,18 @@ The following tasks were completed before the verification system was implemente
 **Recommendation:** PASS - Fully meets spec-019 requirements for galaxy generation. Minor issues do not impact implementation viability. Excellent documentation with JSON schemas, pseudocode algorithms, and worked examples ready for direct translation to code.
 
 ---
+
+### spec-020: Planet Generation Tables
+**File:** design/planets/generation-tables.md  
+**Verified:** 2026-03-22T11:36:00-05:00  
+**Result:** ✅ PASSED (Score: 88/100)
+
+**Summary:** Comprehensive and implementation-ready specification for planet generation tables. All 13 JSON blocks are valid and parseable. Probability tables correctly sum to 100% for all categories (star colors, environments per star, sizes, mineral richness). Cumulative ranges are mathematically accurate and cover the full 1-100 range for all star types. The spec is fully consistent with galaxy/generation-algorithm.md - star color weights, environment probability tables, mineral richness tables, size distributions, and environment modifiers all match exactly. Pet-themed naming (Hermit Crab special case in Section 10.4) aligns with LORE.md races. Excellent coverage of edge cases including forced overrides (Orion, Homeworlds), Gaia terraforming-only rule, and Hermit Crab environmental immunity. Complete generation algorithm with worked example. Implementation checklist provided.
+
+**Issues Found (2 minor):**
+1. Section 5.5 Mineral Richness Summary: Average Modifier calculations are incorrect. Calculated values: yellow=1.14 (not 1.05), green=1.11 (not 0.99), red=0.98 (not 0.87), blue=1.44 (not 1.31), white=1.31 (not 1.13), purple=1.79 (not 1.63)
+2. Section 3.4 Probability Summary: Blue star Colonizable=41%/Hostile=59% (documented as 46%/54%); White star Colonizable=33%/Hostile=67% (documented as 35%/65%)
+
+**Recommendation:** PASS - Minor accuracy issues in summary tables do not affect the core implementation data (JSON tables, cumulative ranges, algorithms). These are documentation inconsistencies in human-readable summaries, not the machine-readable implementation data.
+
+---

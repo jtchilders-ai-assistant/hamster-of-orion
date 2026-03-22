@@ -1,23 +1,23 @@
 {
-  "task_id": "spec-019",
-  "verified_at": "2026-03-22T11:30:00-05:00",
+  "task_id": "spec-020",
+  "verified_at": "2026-03-22T11:36:00-05:00",
   "passed": true,
-  "score": 95,
+  "score": 88,
   "issues": [
     {
       "severity": "minor",
       "category": "accuracy",
-      "description": "Duplicate star name 'Thuban' in the star_names array",
-      "location": "design/galaxy/generation-algorithm.md, Section 2.5 Star Naming",
-      "suggestion": "Remove the duplicate 'Thuban' entry from the star_names array"
+      "description": "Average Modifier calculations in Section 5.5 Mineral Richness Summary table are incorrect. All six star colors show lower values than the actual weighted averages.",
+      "location": "design/planets/generation-tables.md, Section 5.5",
+      "suggestion": "Recalculate: yellow=1.14 (not 1.05), green=1.11 (not 0.99), red=0.98 (not 0.87), blue=1.44 (not 1.31), white=1.31 (not 1.13), purple=1.79 (not 1.63)"
     },
     {
       "severity": "minor",
-      "category": "integration",
-      "description": "References to space-regions.md should be verified to ensure region names match",
-      "location": "design/galaxy/generation-algorithm.md, Section 3.3 and 14.1",
-      "suggestion": "Verify that 'omega_sector', 'wild_pellet_fields', 'safe_zones', 'dark_sectors' match definitions in space-regions.md"
+      "category": "accuracy",
+      "description": "Section 3.4 Probability Summary table shows incorrect Colonizable/Hostile percentages for Blue and White stars.",
+      "location": "design/planets/generation-tables.md, Section 3.4",
+      "suggestion": "Blue should be Colonizable=41% Hostile=59% (not 46%/54%). White should be Colonizable=33% Hostile=67% (not 35%/65%)."
     }
   ],
-  "summary": "Excellent specification that comprehensively covers the galaxy generation algorithm. All required sections present with detailed pseudocode, formulas, constants, and JSON schemas. Faithful to MOO1 mechanics (one planet per star, star color effects, Orion/Artifacts systems). Implementation-ready with clear algorithms, edge case handling, and worked examples. Only minor issues: a duplicate star name and need to cross-verify region naming with space-regions.md. Score: 95/100 - PASSED."
+  "summary": "Planet Generation Tables specification is comprehensive, well-structured, and implementation-ready. All 13 JSON blocks are valid and parseable. Probability tables correctly sum to 100%. Cumulative ranges are accurate and cover the full 1-100 range. The spec is fully consistent with galaxy/generation-algorithm.md (star colors, environment tables, mineral richness, size distribution all match). Pet-themed naming (Hermit Crab special case) aligns with LORE.md. Two minor accuracy issues found in summary tables that don't affect the core implementation data. The specification exceeds requirements with excellent coverage of edge cases, algorithms, and worked examples."
 }

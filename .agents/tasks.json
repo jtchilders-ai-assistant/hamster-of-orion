@@ -176,7 +176,7 @@
       "id": "spec-020",
       "title": "Planet Generation Tables",
       "description": "Document exact tables for: planet type probability by star type, size distribution, mineral richness, special features. Create design/planets/generation-tables.md with JSON data",
-      "status": "pending_verification",
+      "status": "done",
       "priority": 20,
       "output_file": "design/planets/generation-tables.md",
       "completed": "2026-03-22"
