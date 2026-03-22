@@ -1,23 +1,44 @@
 {
-  "task_id": "spec-021",
-  "verified_at": "2026-03-22T11:46:00-05:00",
+  "task_id": "spec-022",
+  "verified_at": "2026-03-22T11:47:00-05:00",
   "passed": true,
-  "score": 95,
+  "score": 82,
   "issues": [
     {
       "severity": "minor",
-      "category": "integration",
-      "description": "LORE.md file not found for cross-reference validation",
-      "location": "N/A",
-      "suggestion": "Ensure LORE.md exists in expected location for future specs"
+      "category": "implementation",
+      "description": "No JSON data tables for victory constants (thresholds, timings, Guardian stats)",
+      "location": "design/game-mechanics/victory-conditions.md - throughout",
+      "suggestion": "Add a JSON block defining victory_thresholds: { domination_population_percent: 66.7, council_vote_percent: 66.7, council_first_turn: 50, council_interval: 25 }, guardian_stats: { hp, damage, regen_rate }, etc."
     },
     {
       "severity": "minor",
       "category": "completeness",
-      "description": "Guardian respawn mechanic preservation could use explicit design decision documentation",
-      "location": "design/game-mechanics/random-events.md, Section 2.3",
-      "suggestion": "Add design rationale for keeping MOO1 bug as feature"
+      "description": "Victory check algorithms not formally specified - document describes conditions but not the per-turn check logic",
+      "location": "design/game-mechanics/victory-conditions.md - all victory sections",
+      "suggestion": "Add an 'Algorithm' section describing when and how victory conditions are evaluated each turn (e.g., 'Check at end of turn phase, iterate through conditions in priority order')"
+    },
+    {
+      "severity": "minor",
+      "category": "implementation",
+      "description": "Diplomatic Victory vote calculation formula incomplete - mentions 'votes = population %' but lacks full formula including relationship modifiers, fear factor, bribes",
+      "location": "design/game-mechanics/victory-conditions.md - Section 3: Diplomatic Victory",
+      "suggestion": "Add explicit formula: vote_weight = base_population_percent + relationship_modifier + fear_modifier + bribe_modifier, with constants for each factor"
+    },
+    {
+      "severity": "minor",
+      "category": "completeness",
+      "description": "Guardian combat requirements listed but stats not fully defined for implementation",
+      "location": "design/game-mechanics/victory-conditions.md - Section 2: The Guardian",
+      "suggestion": "Add concrete stats: HP value, damage values for each weapon, exact armor/shield values, regeneration formula"
+    },
+    {
+      "severity": "minor",
+      "category": "accuracy",
+      "description": "Transcendence Victory is not in MOO1 - this is a creative addition",
+      "location": "design/game-mechanics/victory-conditions.md - Section 5: Transcendence Victory",
+      "suggestion": "No fix needed - this is documented as a 'hidden' victory and aligns with LORE.md. Consider adding a note that this is a Hamster of Orion original feature."
     }
   ],
-  "summary": "Comprehensive Random Events specification covering all MOO1 event types. Complete probability system with formulas, difficulty modifiers, and cooldowns. All space monsters (Guardian, Amoeba, Crystal) fully documented with combat stats. Disasters, discoveries, and opportunities all have trigger conditions, effects, and durations. Five valid JSON data structures included. Pet-themed naming applied. Excellent revision that addresses all previous issues."
+  "summary": "Victory Conditions specification is well-written with clear descriptions of all five victory paths, good thematic content matching LORE.md, and solid integration with other game mechanics. The document excels at conveying gameplay intent and strategy guidance. However, it reads more as a game design document than an implementation-ready specification - it lacks formal algorithms, JSON data structures, and precise formulas that developers would need. The core victory mechanics (population thresholds, council voting, elimination checks) are accurate to MOO1. Passing with score 82 - the document provides sufficient detail for implementation but would benefit from adding structured data tables and explicit check algorithms in a future pass."
 }
