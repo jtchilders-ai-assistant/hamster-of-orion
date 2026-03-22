@@ -994,3 +994,89 @@ Created comprehensive Diplomacy (F5) wireframe specification with detailed ASCII
   - Galactic Council reference should note separate wireframe
   - Espionage costs should be cross-referenced
 - State: IDLE → Ready for next task
+
+## 2026-03-22 14:09 - Starting Task ui-008
+- Task: Tactical Combat UI - ASCII Wireframe
+- Output: design/ui-ux/wireframes/tactical-combat.md
+- Action: Spawning worker agent
+
+## 2026-03-22 14:13 - Orchestrator Check
+- **State**: WORKING
+- **Task**: ui-008 (Tactical Combat UI - ASCII Wireframe)
+- **Status**: Worker sub-agent still running (4m runtime)
+- **Action**: No intervention needed - worker in progress
+
+## 2026-03-22 14:25 - Worker Completed ui-008 ✅
+
+**Task:** ui-008 - Tactical Combat UI - ASCII Wireframe
+**Output:** design/ui-ux/wireframes/tactical-combat.md (71KB, ~1900 lines)
+**Status:** pending_verification
+
+### Summary:
+Created comprehensive Tactical Combat wireframe specification with detailed ASCII art covering all combat phases:
+
+**Main Wireframes Created:**
+1. Pre-Battle Screen (Combat Initiation) - Fleet comparison, planet defenses, battle options
+2. Main Combat Arena (Standard View) - 16×10 hex grid with initiative order, ship stacks
+3. Movement Phase (Stack Selected for Movement) - Range highlights, valid hexes
+4. Firing Phase (Weapon Selection & Targeting) - Weapon list, target selection, hit chances
+5. Attack Resolution (Damage Display) - Hit animation, damage breakdown, kills
+6. Missile Attack (In-Flight Display) - Missiles tracking, point defense
+7. Retreat Attempt - Stack selection, escape chances
+8. Planetary Bombardment Phase - Target options, ethical choices
+9. Victory Screen - Casualties, experience, salvage, reputation
+10. Defeat Screen - Losses, strategic impact, recommendations
+
+**Combat Systems Documented (MOO1-Faithful):**
+
+**Ship Stack Display:**
+- [Y] = Your ships (Green), [E] = Enemy ships (Red)
+- Stack count indicators, selected/acting markers
+- Cloaked and retreating states
+
+**Turn Phases:**
+- Initiative (speed-based order)
+- Movement (hex-by-hex with range circle)
+- Firing (weapon selection, target selection, hit rolls)
+- Missiles (travel, point defense interception)
+- Resolution (damage application, destruction)
+- Retreat (escape chance formula)
+
+**Combat Grid:**
+- 16×10 hex grid (standard MOO1 size)
+- Your ships start left, enemies right
+- Planet position in center if present
+- Shield zones, asteroid cover, debris
+
+**Weapon System:**
+- Beam weapons (instant hit)
+- Missiles (travel time, can be intercepted)
+- Bombs (planetary bombardment only)
+- Point defense (automatic intercept)
+
+**Bombardment Options:**
+- Military targets (-10 relations)
+- Industrial targets (-25 relations)
+- Terror bombing (-50 relations, war crime)
+- Biological weapons (-100 all races, atrocity)
+
+**Additional Specifications:**
+- Command buttons with hotkeys (M=Move, F=Fire, R=Retreat, etc.)
+- Combat log display (scrollable, timestamped)
+- Ship stack tooltips (full stats, weapons, experience)
+- Weapon tooltips (damage, range, accuracy modifiers)
+- Target tooltips (hit chance, expected damage/kills)
+- Animation specifications (beam fire, missile travel, explosions)
+- Combat options menu (animation speed, automation, display)
+- Responsive behavior (desktop, laptop, tablet)
+- Accessibility features (color blind, keyboard-only, ARIA labels)
+- Performance targets (60fps, <100ms turn resolution)
+- JSON data structure for combat state
+
+**References Used:**
+- design/ships/combat-mechanics.md
+- design/ships/combat-algorithm.md
+- design/ui-ux/tactical-combat-ui.md (previous draft)
+- design/ships/ship-classes.md
+- design/LORE.md (pet-themed naming)
+- MOO1 (1993) tactical combat screen

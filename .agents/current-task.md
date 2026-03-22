@@ -1,30 +1,27 @@
-# Current Task: ui-007
+# Current Task: ui-008
 
 ## Title
-Diplomacy UI - ASCII Wireframe
+Tactical Combat UI - ASCII Wireframe
 
 ## Description
-Create detailed ASCII wireframe for Diplomacy screen matching MOO1. Include: race relations, treaty options, audience request, trade agreements. Show different diplomatic states.
+Create detailed ASCII wireframe for Combat screen matching MOO1. Include: hex/grid display, ship stacks, weapon firing, movement, retreat. Show turn phases.
 
 ## Output File
-design/ui-ux/wireframes/diplomacy.md
+design/ui-ux/wireframes/tactical-combat.md
 
 ## Requirements
-1. Race relations display - show all known empires with relationship status
-2. Treaty options - NAP, Alliance, Trade Agreement, etc.
-3. Audience request interface - how to request diplomatic audience
-4. Trade agreement mechanics - technology and BC trade
-5. Different diplomatic states - peace, war, allied, hostile, etc.
-6. MOO1-accurate diplomatic mechanics
+- Match MOO1 tactical combat look and feel
+- Show hex/grid-based combat arena
+- Include ship stack representations with count indicators
+- Weapon firing UI with targeting
+- Movement phase with range indicators
+- Retreat mechanics
+- Turn phase display (Move → Fire → Resolve)
+- Ship selection and orders
+- Combat resolution feedback
+- Victory/defeat screens
 
-## Reference Materials
-- Look at existing wireframes in design/ui-ux/wireframes/ for format
-- Check design/mechanics/ for any diplomacy-related specs
-- Reference MOO1 diplomacy system behavior
-
-## Success Criteria
-- Detailed ASCII wireframes for all diplomacy screens/states
-- Keyboard and mouse interaction specs
-- All treaty types covered
-- Diplomatic state transitions documented
-- JSON data schema for implementation
+## Reference
+- Study existing wireframes in design/ui-ux/wireframes/ for format
+- Reference design/combat/ specs for mechanics
+- Reference ship-classes.md for ship types
