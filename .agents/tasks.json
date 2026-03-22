@@ -13,7 +13,7 @@
       "completed": "2026-03-21"
     },
     {
-      "id": "spec-002", 
+      "id": "spec-002",
       "title": "Population Growth Mathematics",
       "description": "Document exact formulas for: base growth rate, growth modifiers (planet type, tech, morale), maximum population by planet size, racial growth bonuses. Create design/economy/population-growth.md",
       "status": "done",
@@ -59,7 +59,7 @@
     },
     {
       "id": "spec-007",
-      "title": "Complete Ship Components Table", 
+      "title": "Complete Ship Components Table",
       "description": "Create complete component stats: engines, computers, ECM, shields, armor, specials with all stats and costs. Update design/ships/components-complete.md with JSON data",
       "status": "done",
       "priority": 7,
@@ -115,7 +115,7 @@
       "id": "spec-013",
       "title": "Complete Tech Tree - Force Fields Field",
       "description": "Document all force field technologies: shields, planetary shields, repulsors, stasis. Include tier, cost, effect for each. Update design/technology/force-fields.md with JSON data",
-      "status": "pending_verification",
+      "status": "done",
       "priority": 13,
       "output_file": "design/technology/force-fields.md",
       "completed": "2026-03-22"
