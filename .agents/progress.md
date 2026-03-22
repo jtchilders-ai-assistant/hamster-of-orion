@@ -1311,6 +1311,102 @@ Created comprehensive planet generation tables specification including:
 - **State**: IDLE → WORKING
 - **Action**: Spawning worker agent
 
+---
+
+### 2026-03-22 11:38 - spec-021: Random Events System ✅
+**Completed:** `design/game-mechanics/random-events.md`
+
+**Summary:**
+Created comprehensive random events system specification including:
+
+**1. Event System Fundamentals:**
+- Base event probability: 3% + 0.07% per turn (max 10%)
+- Difficulty modifiers (0.5× Simple → 1.5× Impossible)
+- Bad event bias by difficulty (-25% Simple → +20% Impossible)
+- Cooldown system: 5 turns between events, 50 turns between same event
+- Target selection weighted by population, homeworld protected
+
+**2. Space Monsters (3 types):**
+- **Space Amoeba** ("Cosmic Cheek-Pouch"): 1000 HP, 100 HP/turn regen, speed 1
+  - Kills 10% population + 5 factories/turn at colony
+  - Reward: +15 relations all, Advanced Damage Control tech
+  - Counter: High sustained DPS (must exceed 100 dmg/round)
+- **Space Crystal** ("Crystal Cage"): 800 HP, Class X shields, 50% beam reflect
+  - Kills 15% pop + 10 factories + 1 base/turn
+  - Reward: +20 relations all, Hard Shields tech
+  - Counter: Missiles/torpedoes only (beams reflected)
+- **Guardian of Orion**: 32,000 HP, Neutronium armor (128k effective), full stats
+  - Not a random event but documented for completeness
+  - Reward: Orion colony + 4 techs + Death Ray
+
+**3. Disasters (8 types):**
+- **Plague**: 10-40% population loss, mitigated by antidotes, Hermit Crabs immune
+- **Earthquake**: 10-35% factory loss, 5-20% base loss, construction tech helps
+- **Comet Strike**: 5-turn warning, 500 HP can be shot down, environmental degradation
+- **Industrial Accident**: 20-50 factories lost + pollution
+- **Rebellion**: 4 outcomes (suppress/ongoing/independence/defection)
+- **Computer Virus**: 25% research loss in one field
+- **Super Nova**: 10-turn warning, total system destruction (evacuation only)
+- **Depleted Planet**: Rich/Ultra Rich drops one resource level
+
+**4. Discoveries (6 types):**
+- **Ancient Derelict**: BC salvage, tech, ship, or treasure
+- **Fertile Planet**: Environment upgrade or +10 max pop
+- **Mineral Rich Planet**: Resource level +1 (up to Rich)
+- **Artifact World**: Planet gains Artifacts special (2× research)
+- **Technology Breakthrough**: 50-100% research completion
+- **Ancient Cache**: 200-500 BC
+
+**5. Diplomatic Incidents (5 types):**
+- **Diplomatic Blunder**: -10 to -30 relations
+- **Diplomatic Breakthrough**: +10 to +25 relations, treaty offer
+- **Generous Donation**: BC gift + relations boost
+- **Border Skirmish**: Combat incident, possible war trigger
+- **Trade Dispute**: Resolution with BC/relation effects
+
+**6. Opportunities (7 types):**
+- **Pirate Raiders**: Raidable base, fleet combat reward
+- **Mercenary Offer**: Purchase ships (150% maintenance)
+- **Scientific Genius**: +25% research in one field for 25 turns
+- **Industrial Boom**: 10-30 free factories
+- **Population Boom**: 5-15 million instant population
+- **Defector Arrival**: Scientist/General/Spy/Noble with bonuses
+- **Wormhole Discovery**: Permanent instant travel (once per game)
+
+**7. Complete JSON Data Schemas:**
+- All 3 space monsters with full stats
+- All 8 disasters with severity tables
+- All 6 discoveries with outcome tables
+- All 5 diplomatic incidents
+- All 7 opportunities
+- Event category weights
+- 30+ event constants
+
+**8. Event Processing Algorithm:**
+- Complete pseudocode for turn processing
+- Target selection algorithms
+- GNN announcement templates
+- Racial event interactions (5 races with special rules)
+
+**9. Edge Cases:**
+- No valid targets handling
+- Empire elimination during event
+- Multiple monsters (blocked)
+- Comet destruction timing
+- Rebellion during war
+
+**Files Updated:**
+- `design/game-mechanics/random-events.md` (54KB, ~1450 lines, complete rewrite)
+
+**Notes:**
+- MOO1-faithful mechanics for event frequency and monster stats
+- Pet-themed flavor text maintains "dignified ridiculousness"
+- All probability tables complete with cumulative ranges
+- Integrates with combat, diplomacy, and tech specifications
+- Strategic considerations documented for monster combat
+- GNN announcement system fully specified
+- Ready for implementation with complete JSON schemas
+
 ### 2026-03-22 11:41 — Orchestrator
 - State: WORKING → PENDING_VERIFICATION
 - Task spec-021 output file exists (101 lines)
