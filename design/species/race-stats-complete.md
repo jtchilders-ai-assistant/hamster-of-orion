@@ -93,7 +93,7 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
 |----------|-------|-------------|
 | `BASE_PRODUCTION_PER_POP` | 1.0 | Base production per population unit |
 | `BASE_RESEARCH_PER_SCIENTIST` | 1.0 | Base RP per scientist |
-| `BASE_GROWTH_RATE` | 0.02 | Base 2% population growth per turn |
+| `BASE_GROWTH_RATE` | 0.10 | Base 10% population growth per turn (MOO1 standard) |
 | `BASE_ESPIONAGE_SUCCESS` | 0.30 | Base 30% spy success rate |
 | `GROUND_COMBAT_BASE` | 3 | Base ground combat strength |
 | `SHIP_COMBAT_BASE_ATTACK` | 1 | Base ship attack bonus |

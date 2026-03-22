@@ -262,7 +262,7 @@ Each race has inherent diplomatic abilities that modify relationship calculation
 
 | Race | Diplomacy Modifier | Effect |
 |------|-------------------|--------|
-| Hamsters | +60% | 2× effect on positive diplomatic actions |
+| Hamsters | +30% (1.30) | Base diplomacy modifier. **Additionally:** Universal Diplomat ability grants 2× multiplier on positive diplomatic action effects (separate from base modifier). |
 | Chameleons | +20% | Skilled manipulators |
 | Rabbits | +5% | Non-threatening demeanor |
 | Mice | +0% | Neutral |
@@ -648,7 +648,7 @@ function UpdateRelationships(race_a, race_b):
   "racial_diplomacy_stats": [
     {
       "id": "hamsters",
-      "diplomacy_modifier": 1.60,
+      "diplomacy_modifier": 1.30,
       "positive_action_multiplier": 2.0,
       "trade_bonus": 1.25,
       "treaty_bonus": 5,

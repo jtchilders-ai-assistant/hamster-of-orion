@@ -66,6 +66,18 @@ Terraforming, environmental colonization, and population management
 
 **Key for**: Growth races (Rabbits, Ants, Rats)
 
+## Terminology Glossary
+
+| Term | Definition |
+|------|------------|
+| **Tech Level** | Numbered position (1-50) indicating research progression within a field |
+| **Tier** | Research cost bracket (1-18) that determines base RP cost |
+| **Research Cost** | Actual Research Points (RP) required to complete a technology (50 to 100,000+) |
+| **Field** | One of the six technology categories (Weapons, Propulsion, Construction, Computers, Force Fields, Planetology) |
+| **Miniaturization** | Cost/space reduction for components as your tech level exceeds component's tech level |
+
+**Example:** Fusion Beam is Tech Level 20 in Weapons field, Tier 6, Research Cost ~2,000 RP.
+
 ## Tech Level Structure
 
 Each field has roughly **8-10 tiers** of technology:

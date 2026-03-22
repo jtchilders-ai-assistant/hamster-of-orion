@@ -302,12 +302,14 @@ Planetary production enhancement (not ship component).
 
 | Technology | Tech Level | Factories/Pop |
 |------------|------------|---------------|
-| Robotic Controls II | 1 | 2:1 |
+| Robotic Controls II (Base) | 1 | 2:1 |
 | Robotic Controls III | 10 | 3:1 |
-| Robotic Controls IV | 20 | 4:1 |
-| Robotic Controls V | 30 | 5:1 |
-| Robotic Controls VI | 40 | 6:1 |
-| Robotic Controls VII | 50 | 7:1 |
+| Robotic Controls IV | 16 | 4:1 |
+| Robotic Controls V | 23 | 5:1 |
+| Robotic Controls VI | 30 | 6:1 |
+| Robotic Controls VII | 38 | 7:1 |
+
+**Note:** Tech levels align with `economy/factory-formulas.md` (canonical source for Robotic Controls).
 
 ---
 

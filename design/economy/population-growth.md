@@ -134,7 +134,7 @@ Hostile environments also reduce effective maximum population:
 | Race | Growth Modifier | Notes |
 |------|-----------------|-------|
 | Rabbits | 2.00 (+100%) | Exponential breeders |
-| Ants | 1.25 (+25%) | Rapid reproduction |
+| Ants | 1.25 (+25%) | Rapid reproduction. **Note:** Ants also receive +25% max population capacity from their Overpopulation ability (separate bonus, applied to max_population calculation). |
 | Guinea Pigs | 1.00 (baseline) | Controlled growth |
 | Hamsters | 1.00 (baseline) | Balanced |
 | Rats | 1.00 (baseline) | Focus on research |

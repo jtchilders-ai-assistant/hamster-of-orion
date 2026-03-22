@@ -315,7 +315,7 @@ function apply_damage(target, damage, weapon):
 
 ### 12. Shield Mechanics
 
-Shields absorb a fixed amount of damage **per hit**:
+Shields absorb damage **up to their class rating per hit**. Damage exceeding the shield class passes through to armor/hull:
 
 ```
 Damage_After_Shields = max(0, Weapon_Damage - Shield_Class)

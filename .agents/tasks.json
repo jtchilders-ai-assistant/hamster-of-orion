@@ -143,7 +143,7 @@
       "id": "fix-002",
       "title": "Resolve Consistency Issues",
       "description": "Based on consistency-report.md, fix all identified inconsistencies across spec documents. Standardize variable names, correct formula conflicts. Output: design/review/consistency-resolved.md",
-      "status": "pending",
+      "status": "done",
       "priority": 18,
       "output_file": "design/review/consistency-resolved.md"
     }

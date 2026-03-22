@@ -46,15 +46,20 @@ Each component added to a ship increases its cost:
 
 #### Engine Costs
 
+**Canonical values** (see `ships/components-complete.md`):
+
 | Engine Type | Tech Level | Base Cost | Space |
 |-------------|------------|-----------|-------|
-| Retro Engine | 1 | 10 BC | 20 |
-| Nuclear Engine | 4 | 18 BC | 18 |
-| Fusion Engine | 10 | 30 BC | 16 |
-| Ion Engine | 16 | 48 BC | 14 |
-| Antimatter Engine | 22 | 75 BC | 12 |
-| Interphased Engine | 30 | 110 BC | 11 |
-| Hyperdrive | 40 | 160 BC | 10 |
+| Retro Engine | 1 | 10 BC | 25 |
+| Nuclear Engine | 5 | 18 BC | 22 |
+| Sub-Light Drive | 8 | 25 BC | 20 |
+| Fusion Drive | 12 | 35 BC | 18 |
+| Impulse Drive | 16 | 45 BC | 17 |
+| Ion Drive | 20 | 55 BC | 15 |
+| Antimatter Drive | 26 | 70 BC | 14 |
+| Interphased Drive | 34 | 90 BC | 12 |
+| Hyperdrive | 42 | 120 BC | 11 |
+| Hyper-X Drive | 48 | 150 BC | 10 |
 
 #### Weapon Costs (Examples)
 

@@ -192,10 +192,12 @@ Personal weapons provide bonuses to all ground combat.
 
 | Race | Modifier | Effect |
 |------|----------|--------|
-| Ferrets | +25% damage | All weapons deal 1.25× damage |
+| Ferrets | +4 Attack Level, +15% Damage | Deadly Accuracy ability: +4 to attack rating AND 1.15× weapon damage multiplier. These stack! |
 | Guinea Pigs | +0% ship, +50% ground | Ground weapons are devastating |
-| Budgies | +0% damage | But +3 defense (harder to hit) |
+| Budgies | +0% damage | But +50% defense (+5 effective), +3 initiative, +20% evasion (Superior Pilots) |
 | All others | 0% | No weapon modifier |
+
+**Note:** Ferrets' +30% ship combat bonus in `race-stats-complete.md` translates to the +4 attack level bonus shown here. The +15% damage is from the separate Deadly Accuracy special ability. Both always apply.
 
 ---
 

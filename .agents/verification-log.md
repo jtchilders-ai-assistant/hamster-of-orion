@@ -1088,3 +1088,40 @@ PASS - The gap analysis now provides an accurate assessment of the project's sta
 **Recommendation:** PASS - All critical gap resolutions verified. Work is implementation-ready. Minor consistency issues noted but none are blocking.
 
 ---
+
+### fix-002: Resolve Consistency Issues
+**File:** design/review/consistency-resolved.md  
+**Verified:** 2026-03-22T15:04:32-05:00  
+**Result:** ❌ FAILED (Score: 72/100)
+
+**Summary:** The consistency resolution report is well-structured and addresses all 17 issues identified in the original consistency-report.md. The document provides clear resolutions with canonical source recommendations and a verification checklist. However, verification revealed that at least one critical change was documented but NOT actually applied to the source file, and there are remaining inconsistencies in the Robotic Controls naming conventions.
+
+**Issues Verified as Actually Fixed:**
+- ✅ CRIT-002: Hit chance formula standardized in AGENTS.md to reference combat-algorithm.md Section 9
+- ✅ MAJ-006: Shield absorption language clarified in combat-algorithm.md Section 12
+- ✅ MAJ-002/MAJ-003: Ferrets and Budgies stats clarified with moo1_note fields in race-stats-complete.md
+- ✅ population-growth.md correctly shows Base_Growth_Rate = 0.10 (10%)
+
+**Critical Issue Found:**
+- ❌ **MAJ-005 BASE_GROWTH_RATE**: The resolution claims race-stats-complete.md was updated to change BASE_GROWTH_RATE from 0.02 to 0.10. However, verification shows race-stats-complete.md STILL contains `"BASE_GROWTH_RATE": 0.02` in the Constants section. This is an unimplemented fix creating an ongoing inconsistency with population-growth.md which correctly uses 0.10.
+
+**Major Issue Found:**
+- ⚠️ **Robotic Controls naming**: factory-formulas.md has inconsistent naming between markdown table and JSON. The table shows "None (Base) = 2:1" then "Robotic Controls II = 3:1", but in MOO1 the base is 2:1 and RC III gives 3:1. The naming convention creates confusion about whether RC II gives ratio 2 or 3.
+
+**Minor Issues:**
+- The resolution report claims files were updated but provides no before/after diffs, making verification difficult
+- Some cross-reference notes mentioned in resolutions were not found in the source files
+
+**Verification Details:**
+- Completeness: 85/100 (well-documented resolutions)
+- Accuracy: 60/100 (critical change not implemented)  
+- Implementation Readiness: 70/100 (source files not fully updated)
+- Integration: 75/100 (some cross-references missing)
+- Total Score: 72/100
+
+**Recommendation:** FAIL - The resolution documentation is good, but the actual file changes were not fully implemented. Before passing:
+1. Update race-stats-complete.md Constants section: change BASE_GROWTH_RATE from 0.02 to 0.10
+2. Clarify Robotic Controls naming in factory-formulas.md to match MOO1 conventions
+3. Verify all other claimed updates were actually written to source files
+
+---
