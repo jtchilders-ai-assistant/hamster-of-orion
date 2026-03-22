@@ -1,10 +1,10 @@
 {
-  "state": "IDLE",
-  "current_task": null,
-  "current_task_started_at": "2026-03-22T11:54:30-05:00",
+  "state": "WORKING",
+  "current_task": "spec-025",
+  "current_task_started_at": "2026-03-22T12:00:30-05:00",
   "retry_count": 0,
   "max_retries": 3,
-  "last_updated": "2026-03-22T12:00:00-05:00",
-  "last_action": "spec-024 verified and marked done",
+  "last_updated": "2026-03-22T12:00:30-05:00",
+  "last_action": "Starting spec-025 (JSON Data Schemas)",
   "verification_issues": []
 }

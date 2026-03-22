@@ -1892,3 +1892,9 @@ All 10 races with full statistics:
 
 ---
 
+
+### 2026-03-22 12:00 - Starting spec-025
+**Task:** JSON Data Schemas  
+**Output:** design/technical/data-schemas.md  
+**Status:** Worker spawning...
+
