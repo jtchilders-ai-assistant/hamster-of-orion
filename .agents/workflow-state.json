@@ -1,10 +1,10 @@
 {
-  "state": "WORKING",
+  "state": "VERIFYING",
   "current_task": "spec-023",
   "current_task_started_at": "2026-03-22T11:48:30-05:00",
   "retry_count": 0,
   "max_retries": 3,
-  "last_updated": "2026-03-22T11:48:30-05:00",
-  "last_action": "Started spec-023 (Difficulty Level Modifiers)",
+  "last_updated": "2026-03-22T11:51:30-05:00",
+  "last_action": "Spawning verifier for spec-023",
   "verification_issues": []
 }
