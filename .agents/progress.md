@@ -512,3 +512,48 @@ Created complete Computers technology tree specification including:
 - State: IDLE → WORKING
 - Task: spec-013 (Complete Tech Tree - Force Fields Field)
 - Action: Assigning to Worker agent
+
+---
+
+### 2026-03-22 10:47 - spec-013: Complete Tech Tree - Force Fields Field ✅
+**Completed:** `design/technology/force-fields.md`
+
+**Summary:**
+Created complete Force Fields technology tree specification including:
+- **14 Technology Tiers** (50 RP to 50,000 RP)
+- **25 Total Technologies:**
+  - 15 Deflector Shields (Class I-XV, absorbs 1-15 damage per hit)
+  - 4 Planetary Shields (Class V, X, XV, XX for bombardment protection)
+  - 3 Personal Shields (+10, +20, +30 ground combat)
+  - 5 Tactical Fields (Repulsor, Lightning, Cloaking, Zyro, Stasis)
+  - 1 Ultimate Weapon (Black Hole Generator)
+- **Deflector Shield Progression:**
+  - Class I (absorbs 1) at Tech 1 → Class XV (absorbs 15) at Tech 50
+  - Space: 8 + (Class - 1) × 2
+  - Cost: 12 BC → 220 BC
+- **Planetary Shield Progression:**
+  - Class V (500 BC) → Class XX (4,000 BC)
+  - Absorbs 5/10/15/20 bombardment damage
+  - Protects missile bases from orbital attacks
+- **Tactical Field Systems:**
+  - Repulsor Beam (Tech 16): Push ships 2 hexes, prevents bombardment
+  - Lightning Shield (Tech 25): 50% missile damage reflection
+  - Cloaking Device (Tech 27): +5 Defense, invisible until firing
+  - Zyro Shield (Tech 31): 75% missile destruction chance
+  - Stasis Field (Tech 37): Disable target 1 turn
+  - Black Hole Generator (Tech 43): 25-100% stack destruction
+- **Racial Bonuses:**
+  - Hermit Crabs: +25% shield absorption (multiplicative)
+- Shield vs weapon dynamics (arms race)
+- Shield-bypassing weapons documented
+- Complete JSON data schema with all components
+
+**Files Created:**
+- `design/technology/force-fields.md` (34KB, 900+ lines)
+
+**Notes:**
+- Fifth of six technology field specifications
+- Shields create arms race with weapon damage
+- Zyro Shield + ECM makes missiles nearly useless
+- Black Hole Generator is powerful but Dreadnought+ only
+- Starting tech: Class I Deflector Shield
