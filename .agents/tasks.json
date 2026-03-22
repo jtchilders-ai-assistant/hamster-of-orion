@@ -31,7 +31,7 @@
       "id": "review-004",
       "title": "Consistency Check Across All Specs",
       "description": "Review all specification files for internal consistency: same variable names, matching formulas, no contradictions. Create list of inconsistencies to fix. Output: design/review/consistency-report.md",
-      "status": "pending",
+      "status": "in_progress",
       "priority": 4,
       "output_file": "design/review/consistency-report.md"
     },

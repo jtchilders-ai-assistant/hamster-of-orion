@@ -1,28 +1,21 @@
-# Current Task: review-003
+# Current Task: review-004
 
 ## Title
-Cross-Reference Verification Report
+Consistency Check Across All Specs
 
 ## Description
-Create a verification matrix showing which MOO1 systems are covered by which design documents. Identify orphan systems (not documented) and duplicate coverage.
+Review all specification files for internal consistency: same variable names, matching formulas, no contradictions. Create list of inconsistencies to fix.
 
 ## Output File
-design/review/coverage-matrix.md
+design/review/consistency-report.md
 
 ## Priority
-3
+4
 
 ## Requirements
-1. List ALL MOO1 game systems (from manual, StrategyWiki, gameplay)
-2. Map each system to the HoO design documents that cover it
-3. Create a coverage matrix (system × document)
-4. Identify:
-   - **Orphan systems**: MOO1 features with NO coverage
-   - **Duplicate coverage**: Same system documented in multiple places
-   - **Partial coverage**: Systems only partially documented
-5. Provide recommendations for filling gaps
-
-## Reference
-- Use the gap analysis documents (review-001, review-002) as input
-- Reference MOO1 manual and wiki for complete system list
-- Cross-reference against all files in design/ directory
+- Check all specification files in design/ directory
+- Verify consistent variable/constant names across documents
+- Verify formulas don't contradict each other
+- Check for duplicate or conflicting definitions
+- Identify any inconsistencies between related systems
+- Produce actionable list of issues to fix
