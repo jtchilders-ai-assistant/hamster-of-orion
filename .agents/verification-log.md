@@ -579,3 +579,44 @@ PASS - The gap analysis now provides an accurate assessment of the project's sta
 - Total Score: 95/100
 
 **Recommendation:** PASS - Fully implementation-ready wireframe specification. This is an exceptional document that provides everything needed to implement the Planet Management screen. Minor accuracy issues with factory cost and abbreviations can be easily corrected. The wireframe properly captures MOO1's colony management mechanics while providing modern UI enhancements for responsive design and accessibility.
+
+---
+
+### ui-004: Fleet Command UI - ASCII Wireframe
+**File:** design/ui-ux/wireframes/fleet-command.md  
+**Verified:** 2026-03-22T13:43:00-05:00  
+**Result:** ✅ PASSED (Score: 95/100)
+
+**Summary:** Excellent Fleet Command UI wireframe specification. The document is comprehensive, well-structured, and implementation-ready. It includes all required elements: fleet list (with detailed entry layouts and status icons), ship counts display (with composition tables), destination setting interface (with full map dialog), and rally points functionality (with configuration screen). The specification follows the established wireframe format from galaxy-map.md and planet-management.md, with consistent header styling, ASCII art quality, and section organization. MOO1 faithfulness is maintained for core mechanics (fleet speed/range determined by slowest ship, in-transit movement restrictions, same-location merge requirements). The document provides extensive coverage including: 10 detailed ASCII wireframe screens, keyboard shortcuts, mouse interactions, context menus, tooltips, notification dialogs, JSON data structures, edge cases, accessibility features, responsive behavior notes, and performance considerations.
+
+**Requirements Coverage:**
+- ✅ Detailed ASCII wireframe for Fleet screen matching MOO1 style
+- ✅ Fleet list with status icons, strength ratings, and sorting options
+- ✅ Ship counts display with composition tables and design names
+- ✅ Destination setting interface with map selection and range indicators
+- ✅ Rally points functionality with configuration and ship type filters
+- ✅ Follows established wireframe format from other UI specs
+- ✅ Comprehensive and implementation-ready
+
+**Wireframe Screens Included (10):**
+1. Default View (Fleet List) - empty selection state with empire summary
+2. Fleet Selected State - details panel with ship composition
+3. Fleet In Transit State - journey progress with ETA
+4. Set Destination Dialog - map with range circle
+5. Split Fleet Dialog - ship transfer interface
+6. Rally Point Configuration - auto-rally settings
+7. Ship Design Quick View - detailed ship stats
+8. Merge Fleets Dialog - selection and preview
+9. Patrol Route Configuration - waypoint map
+10. Fleet Report Screen - empire-wide statistics
+
+**Issues Found (3 minor):**
+1. **Accuracy**: Ship class "Titan" mentioned in strength calculation but not in MOO1 ship classes (MOO1 has Scout, Fighter, Destroyer, Cruiser, Battleship, Dreadnought) - clarify if Titan is a HoO addition or replace with "Battleship"
+2. **Accuracy**: Rally points and patrol routes are enhancements not in original MOO1 - correctly noted in MOO1 Faithfulness section but could be more explicit about optional implementation for strict MOO1 mode
+3. **Integration**: Ship design quick view references F6 for edit design - verify F6 hotkey assignment consistency across all wireframe documents
+
+**Verification Details:**
+- Completeness: 98/100 | Accuracy: 92/100 | Implementation Readiness: 95/100 | Integration: 95/100
+- Total Score: 95/100
+
+**Recommendation:** PASS - Fully implementation-ready wireframe specification. This is an exceptional document providing comprehensive Fleet Command UI documentation. Minor issues are cosmetic and do not affect implementation readiness. The document maintains MOO1 faithfulness for core mechanics while providing modern enhancements for fleet management automation.
