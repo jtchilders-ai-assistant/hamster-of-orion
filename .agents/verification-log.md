@@ -140,3 +140,18 @@ The following tasks were completed before the verification system was implemente
 **Recommendation:** PASS - Minor accuracy issues in summary tables do not affect the core implementation data (JSON tables, cumulative ranges, algorithms). These are documentation inconsistencies in human-readable summaries, not the machine-readable implementation data.
 
 ---
+
+---
+
+## spec-021: Random Events System
+**Verified**: 2026-03-22 11:41
+**Result**: ❌ FAILED (Score: 52/100)
+**Issues**: 3 critical, 2 major, 1 minor
+
+### Critical Issues:
+1. Missing probability/frequency data and event selection algorithm
+2. Missing trigger conditions for all events
+3. Missing key MOO1 events: Guardian, Pirates, Comet, Rebellion, Supernova, Leaders
+
+### Summary:
+Spec is too brief and lacks implementation detail. Needs probability weights, trigger conditions, JSON data structures, and complete event coverage.

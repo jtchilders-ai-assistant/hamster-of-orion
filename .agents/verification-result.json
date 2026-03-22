@@ -1,23 +1,51 @@
 {
-  "task_id": "spec-020",
-  "verified_at": "2026-03-22T11:36:00-05:00",
-  "passed": true,
-  "score": 88,
+  "task_id": "spec-021",
+  "verified_at": "2026-03-22T11:41:30-05:00",
+  "passed": false,
+  "score": 52,
   "issues": [
     {
-      "severity": "minor",
-      "category": "accuracy",
-      "description": "Average Modifier calculations in Section 5.5 Mineral Richness Summary table are incorrect. All six star colors show lower values than the actual weighted averages.",
-      "location": "design/planets/generation-tables.md, Section 5.5",
-      "suggestion": "Recalculate: yellow=1.14 (not 1.05), green=1.11 (not 0.99), red=0.98 (not 0.87), blue=1.44 (not 1.31), white=1.31 (not 1.13), purple=1.79 (not 1.63)"
+      "severity": "critical",
+      "category": "completeness",
+      "description": "Missing probability/frequency data for events. Spec says '10% chance per turn' but doesn't specify individual event weights or selection algorithm.",
+      "location": "design/game-mechanics/random-events.md, Overview section",
+      "suggestion": "Add EVENT_WEIGHTS JSON table with probability for each event type. Include selection algorithm."
+    },
+    {
+      "severity": "critical",
+      "category": "completeness",
+      "description": "Missing trigger conditions. Requirements specify documenting when each event can trigger but spec only lists effects.",
+      "location": "design/game-mechanics/random-events.md, all sections",
+      "suggestion": "Add 'Trigger Conditions' field to each event specifying turn requirements, tech prerequisites, galaxy state requirements."
+    },
+    {
+      "severity": "critical",
+      "category": "completeness",
+      "description": "Missing key MOO1 events: Guardian of Orion, Space Pirates, Comet, Rebellion, Supernova, Leaders/Scientists.",
+      "location": "design/game-mechanics/random-events.md",
+      "suggestion": "Add Guardian of Orion (Orion system), Space Pirates (random raids), Comet (destroys planet), Rebellion (colony revolt), Supernova (star death), Leader recruitment events."
+    },
+    {
+      "severity": "major",
+      "category": "implementation",
+      "description": "No JSON data structures provided despite requirements specifying them.",
+      "location": "design/game-mechanics/random-events.md",
+      "suggestion": "Add JSON blocks for EVENT_TYPES, EVENT_WEIGHTS, MONSTER_STATS, DISASTER_EFFECTS constants."
+    },
+    {
+      "severity": "major",
+      "category": "completeness",
+      "description": "Missing duration information for events that have lasting effects.",
+      "location": "design/game-mechanics/random-events.md",
+      "suggestion": "Specify duration in turns for ongoing effects like plague, trade disputes, etc."
     },
     {
       "severity": "minor",
       "category": "accuracy",
-      "description": "Section 3.4 Probability Summary table shows incorrect Colonizable/Hostile percentages for Blue and White stars.",
-      "location": "design/planets/generation-tables.md, Section 3.4",
-      "suggestion": "Blue should be Colonizable=41% Hostile=59% (not 46%/54%). White should be Colonizable=33% Hostile=67% (not 35%/65%)."
+      "description": "Space monsters are generic - need pet-themed names per LORE.md conventions.",
+      "location": "design/game-mechanics/random-events.md, Space Monsters section",
+      "suggestion": "Rename to pet-themed: 'Space Hamster Swarm', 'Crystal Goldfish', 'Cosmic Parrot' etc."
     }
   ],
-  "summary": "Planet Generation Tables specification is comprehensive, well-structured, and implementation-ready. All 13 JSON blocks are valid and parseable. Probability tables correctly sum to 100%. Cumulative ranges are accurate and cover the full 1-100 range. The spec is fully consistent with galaxy/generation-algorithm.md (star colors, environment tables, mineral richness, size distribution all match). Pet-themed naming (Hermit Crab special case) aligns with LORE.md. Two minor accuracy issues found in summary tables that don't affect the core implementation data. The specification exceeds requirements with excellent coverage of edge cases, algorithms, and worked examples."
+  "summary": "Random Events specification is incomplete and not implementation-ready. Missing critical requirements: probability weights, trigger conditions, key MOO1 events (Guardian, Comet, Rebellion), JSON data structures, and duration fields. Content is too brief and lacks the algorithmic detail needed for implementation. Needs substantial expansion to meet spec-021 requirements."
 }
