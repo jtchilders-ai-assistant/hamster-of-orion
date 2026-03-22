@@ -182,3 +182,41 @@ Created comprehensive ship economics specification including:
 - Completes the core economy specification suite
 
 ---
+
+### 2026-03-21 22:37 - spec-006: Complete Weapons Table ✅
+**Completed:** `design/ships/weapons-complete.md`
+
+**Summary:**
+Created comprehensive weapons database specification including:
+- **22 Beam Weapons** (Laser → Stellar Converter)
+  - Full stats: damage, range, space, cost, tech level
+  - Special effects (multi-attack, armor-piercing, always-hits, etc.)
+- **11 Missiles** (Nuclear → Scatter Pack X)
+  - Fixed damage, speed, rack sizes, MIRV mechanics
+- **4 Torpedoes** (Anti-Matter → Plasma)
+  - Cannot be intercepted, fire every 2 turns
+- **5 Bombs** (Nuclear → Neutronium)
+  - Planetary bombardment damage
+- **3 Biological Weapons** (Death Spores → Bio Terminator)
+  - Population damage, permanent max pop reduction
+  - Diplomatic penalties documented
+- **5 Special Weapons** (Ion Stream → Black Hole Generator)
+  - Unique effects (disable engines, area damage, instant kill)
+- **6 Ground Weapons** (Hand Lasers → Mauler Pistol)
+  - Ground combat bonuses
+- Racial weapon modifiers (Ferrets +25% damage, Guinea Pigs +50% ground)
+- Weapon mounting rules by ship class
+- Heavy weapon restrictions
+- 20+ special effect definitions
+- Complete JSON data schema with all weapons
+
+**Files Created:**
+- `design/ships/weapons-complete.md` (22KB, 600+ lines)
+
+**Notes:**
+- MOO1-faithful weapon stats with comprehensive coverage
+- Heavy weapons have mounting limits on smaller ships
+- Biological weapons have severe diplomatic consequences
+- All weapons ready for implementation with JSON schema
+
+---

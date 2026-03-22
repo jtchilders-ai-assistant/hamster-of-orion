@@ -52,9 +52,10 @@
       "id": "spec-006",
       "title": "Complete Weapons Table",
       "description": "Create complete weapon stats table: all beam weapons, missiles, bombs, special weapons with damage, range, space, cost, tech level. Update design/ships/weapons-complete.md with JSON data",
-      "status": "pending",
+      "status": "done",
       "priority": 6,
-      "output_file": "design/ships/weapons-complete.md"
+      "output_file": "design/ships/weapons-complete.md",
+      "completed": "2026-03-21"
     },
     {
       "id": "spec-007",
