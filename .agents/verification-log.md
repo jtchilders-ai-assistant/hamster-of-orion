@@ -232,3 +232,20 @@ PASS - Provides sufficient detail for implementation. Would benefit from adding 
 - Accurate MOO1 mechanics (2/3 population threshold, council voting)
 - Good thematic alignment with LORE.md
 - Minor gaps: JSON structures and explicit algorithms could be added later
+
+---
+
+### spec-024: Complete Race Statistics
+**File:** design/species/race-stats-complete.md  
+**Verified:** 2026-03-22T11:59:45-05:00  
+**Result:** ✅ PASSED (Score: 92/100)
+
+**Summary:** Excellent specification covering all 10 races with complete statistical data. All required sections present (Overview, Formulas, Constants, Algorithm, Data Tables, Edge Cases). JSON data validates correctly with 10 races. Racial bonuses match existing individual race documentation (hamsters.md, ants.md, etc.). MOO1 equivalencies are correct and faithfully adapted. Comprehensive coverage includes: production/research/food/growth/combat/espionage/diplomacy bonuses, 4-6 special abilities per race, starting technologies, homeworld specs, unique content (buildings/ships/tech), AI behavior parameters, and leader names. Edge cases well addressed (Hermit Crabs food, Ants espionage immunity, bonus stacking). Examples demonstrate formulas correctly.
+
+**Issues Found (4 minor):**
+1. Ants espionage: '0*' in summary but '0' in JSON; should add explicit 'can_conduct_espionage': false
+2. Ship prefix ambiguity: Budgies 'FAS' vs Ferrets 'FHS' - consider 'BAS' for clarity
+3. LORE.md not found at expected location - cannot verify naming conventions
+4. Starting technologies use display names, not tech IDs matching other tech specs
+
+**Recommendation:** PASS - Fully implementation-ready. Minor issues are cosmetic and don't affect implementation viability. All races have complete stats, special abilities, and AI parameters.

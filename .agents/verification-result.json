@@ -1,16 +1,37 @@
 {
-  "task_id": "spec-022",
-  "verified_at": "2026-03-22T11:54:15-05:00",
+  "task_id": "spec-024",
+  "verified_at": "2026-03-22T11:59:45-05:00",
   "passed": true,
-  "score": 95,
+  "score": 92,
   "issues": [
     {
       "severity": "minor",
+      "category": "accuracy",
+      "description": "Ants espionage bonus shown as '0*' in summary table but '0' in JSON; footnote explains immunity but JSON lacks explicit spy_operations: false flag",
+      "location": "design/species/race-stats-complete.md - Stat Summary Table / Ants JSON",
+      "suggestion": "Add explicit 'can_conduct_espionage': false field to Ants JSON data"
+    },
+    {
+      "severity": "minor",
+      "category": "completeness",
+      "description": "Ship prefix for Budgies is 'FAS' (Flight Avian Ship?) which could be confused with Ferrets 'FHS' - consider more distinct naming",
+      "location": "design/species/race-stats-complete.md - Budgies section",
+      "suggestion": "Consider 'BAS' (Budgie Avian Ship) for clearer distinction"
+    },
+    {
+      "severity": "minor",
       "category": "integration",
-      "description": "Council voting references council.md - ensure cross-reference consistency",
-      "location": "design/game-mechanics/victory-conditions.md - Section 4",
-      "suggestion": "Verify vote calculation matches council.md specification"
+      "description": "LORE.md file not found in expected location for cross-referencing - cannot verify naming conventions match",
+      "location": "Project root",
+      "suggestion": "Verify LORE.md exists or update reference in task description"
+    },
+    {
+      "severity": "minor",
+      "category": "implementation",
+      "description": "Starting technologies reference tech names but don't include tech IDs for direct lookup in tech tree specs",
+      "location": "design/species/race-stats-complete.md - starting_technologies arrays",
+      "suggestion": "Add tech_id field or use consistent snake_case IDs matching other tech specs"
     }
   ],
-  "summary": "Outstanding specification with 1395 lines. Complete victory check algorithms in priority order: Survival, Discovery (with full Guardian stats: 3000 HP, 12 Attack, 10 Defense, Class XV Shields, 4 weapon systems), Domination (integer math: empire_pop × 3 >= galaxy_pop × 2), Diplomatic (council mechanics), Transcendence (6-component scoring with 500-point threshold). Includes 13 edge cases, 3 worked examples, and complete JSON schemas."
+  "summary": "Excellent specification covering all 10 races with complete statistical data. All required sections present (Overview, Formulas, Constants, Algorithm, Data Tables, Edge Cases). JSON data validates correctly with 10 races. Racial bonuses match existing individual race documentation (hamsters.md, ants.md, etc.). MOO1 equivalencies are correct and faithfully adapted. Comprehensive coverage includes: production/research/food/growth/combat/espionage/diplomacy bonuses, 4-6 special abilities per race, starting technologies, homeworld specs, unique content (buildings/ships/tech), AI behavior parameters, and leader names. Edge cases well addressed (Hermit Crabs food, Ants espionage immunity, bonus stacking). Examples demonstrate formulas correctly. Minor issues are cosmetic and don't affect implementation readiness."
 }
