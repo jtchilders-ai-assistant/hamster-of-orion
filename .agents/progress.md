@@ -437,3 +437,9 @@ Created comprehensive UI screen inventory comparing ALL MOO1 screens against HoO
   - Wireframes directory status needs clarification
   - Difficulty names should be verified
 - **State**: → IDLE (ready for next task)
+
+## 2026-03-22 13:19 - Starting Task ui-002
+- **Task**: Main Galaxy Map UI - ASCII Wireframe
+- **Output**: design/ui-ux/wireframes/galaxy-map.md
+- **State**: WORKING
+- **Action**: Spawning worker subagent

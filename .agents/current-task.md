@@ -1,27 +1,29 @@
-# Current Task: ui-001
+# Current Task: ui-002
 
 ## Title
-UI Screen Inventory vs MOO1
+Main Galaxy Map UI - ASCII Wireframe
 
 ## Description
-List ALL screens from the original MOO1 and compare to our UI docs. Identify missing screens or screens that need updates. Reference MOO1 manual and StrategyWiki.
+Create detailed ASCII wireframe for Galaxy Map matching MOO1 behavior. Include: star display, fleet indicators, selection mechanics, info panels, all buttons. Show multiple states (nothing selected, star selected, fleet selected).
 
 ## Output File
-design/ui-ux/screen-inventory.md
+design/ui-ux/wireframes/galaxy-map.md
 
 ## Priority
-5
+6
 
 ## Requirements
-1. Create comprehensive inventory of ALL MOO1 screens/interfaces
-2. Compare against existing HoO UI documentation
-3. Identify gaps - screens not yet documented
-4. Identify updates needed - screens that exist but need more detail
-5. Use MOO1 manual and StrategyWiki as references
-6. Organize by game flow/category
-
-## Success Criteria
-- Complete list of MOO1 screens
-- Clear mapping to HoO documentation status
-- Gap analysis with actionable items
-- Reference sources cited
+- Reference MOO1 Strategy Guide and StrategyWiki for accurate screen layout
+- Create ASCII wireframes showing the full screen layout
+- Include multiple states:
+  1. Default view (nothing selected)
+  2. Star selected state
+  3. Fleet selected state
+- Document all interactive elements:
+  - Star display and types
+  - Fleet indicators and movement
+  - Selection mechanics
+  - Info panels (star info, fleet info)
+  - All buttons and controls
+- Follow LORE.md pet-themed naming conventions
+- Reference existing docs: main-screens.md, UI_OVERVIEW.md, screen-inventory.md
