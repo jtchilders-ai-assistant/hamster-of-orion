@@ -1,37 +1,51 @@
 {
-  "task_id": "review-001",
-  "verified_at": "2026-03-22T12:53:00-05:00",
+  "task_id": "review-002",
+  "verified_at": "2026-03-22T18:03:30Z",
   "passed": true,
   "score": 88,
   "issues": [
     {
       "severity": "minor",
       "category": "accuracy",
-      "description": "File count discrepancy: claims 68 files, actual count is 71 files",
-      "location": "design/review/gap-analysis-manual.md - Methodology section",
-      "suggestion": "Update 'Total Design Documents: 68 files' to '71 files'"
-    },
-    {
-      "severity": "minor",
-      "category": "accuracy",
-      "description": "Total line count discrepancy: claims ~35,000 lines, actual is ~38,874 lines",
-      "location": "design/review/gap-analysis-manual.md - File Inventory Summary",
-      "suggestion": "Update to '~39,000+ lines' for accuracy"
-    },
-    {
-      "severity": "minor",
-      "category": "accuracy",
-      "description": "Category line count discrepancies: Game Mechanics (5,446 claimed vs 5,036 actual), Ships (3,621 vs 3,305), Diplomacy (3,245 vs 4,185), Planets (3,078 vs 2,337), Species (1,645 vs 2,858)",
-      "location": "design/review/gap-analysis-manual.md - Files by Category table",
-      "suggestion": "Re-run wc -l on each category directory and update the table"
+      "description": "Gap analysis correctly notes StrategyWiki access was blocked (Cloudflare), but should have relied more heavily on the Archive.org Strategy Guide which was accessible. The document does reference it but some comparisons lack direct page/table citations.",
+      "location": "gap-analysis-wiki.md, Section 9 (Appendix)",
+      "suggestion": "Add specific table numbers from the Official Strategy Guide (e.g., 'Table 7-3 for hit calculations', 'Table 8-11 for ground combat') to strengthen source citations."
     },
     {
       "severity": "minor",
       "category": "completeness",
-      "description": "Miniaturization rate stated as '50% per tech level' in MOO1 but '5% per tier' in Hamster of Orion - this appears to be an intentional deviation but not listed in Intentional Design Deviations section",
-      "location": "design/review/gap-analysis-manual.md - Appendix: Key Numerical References",
-      "suggestion": "Clarify if this is intentional or a typo (5% vs 50%)"
+      "description": "The gap analysis correctly identifies Ferrets have +25% damage vs MOO1 Mrrshans +4 Attack, but the actual HoO spec (race-stats-complete.md) shows Ferrets have +30% ship combat bonus AND +25% weapon damage from special ability. This nuance not fully captured.",
+      "location": "gap-analysis-wiki.md, Section 1.2 (Ferrets vs Mrrshans)",
+      "suggestion": "Update to reflect that Ferrets actually have both +30% ship combat AND deadly accuracy (+25% damage, +15% hit chance) - the comparison should note this is MORE generous than MOO1's +4 Attack."
+    },
+    {
+      "severity": "minor",
+      "category": "accuracy",
+      "description": "Combat hit formula comparison states HoO uses base 70% but combat-mechanics.md shows the formula correctly. The comparison is valid but could be clearer that MOO1's 50% base with differential system vs HoO's 70% base with additive penalties are different design philosophies, both reasonable.",
+      "location": "gap-analysis-wiki.md, Section 3.1 (Hit Probability)",
+      "suggestion": "Acknowledge this as an intentional design choice rather than a discrepancy requiring correction."
+    },
+    {
+      "severity": "minor",
+      "category": "completeness",
+      "description": "The Mice vs Meklars comparison correctly notes different implementation, but misses that race-stats-complete.md gives Mice 'Automated Production' (+50% factory efficiency) and 'Robotic Labor' (no hostile environment penalty) which collectively approximate Meklar bonuses differently.",
+      "location": "gap-analysis-wiki.md, Section 1.2 (Mice vs Meklars)",
+      "suggestion": "Add note that Mice special abilities (Automated Production, Robotic Labor) achieve similar net effect through different mechanics."
+    },
+    {
+      "severity": "minor",
+      "category": "accuracy",
+      "description": "Diplomacy relationship scale comparison shows 10 vs 5 states, but this accurately reflects the HoO simplification. The relationship-formulas.md document is comprehensive and well-specified.",
+      "location": "gap-analysis-wiki.md, Section 6 (Diplomacy Comparison)",
+      "suggestion": "None needed - correctly identified and properly marked as intentional simplification."
+    },
+    {
+      "severity": "minor",
+      "category": "completeness",
+      "description": "The gap analysis identifies missing shield absorption values, but force-fields.md or defense-systems.md in the ships folder likely contains this. Should have verified existence before listing as missing.",
+      "location": "gap-analysis-wiki.md, Section 3.3 (Shield Absorption)",
+      "suggestion": "Cross-reference with design/ships/defense-systems.md to verify if shield absorption values exist there before marking as missing."
     }
   ],
-  "summary": "The revised gap analysis (Version 2.0) successfully addresses all critical issues from the previous failed verification. All five false gap claims have been corrected: random-events.md (1628 lines), components-complete.md (583 lines), weapons-complete.md (900 lines), victory-conditions.md (1395 lines), and slider-mathematics.md (737 lines) are now correctly acknowledged as existing comprehensive specifications. The methodology section now documents proper file inventory using find commands. Coverage percentages are reasonable (93% overall). Remaining gaps are genuine and appropriately marked as low-priority polish items. The document now accurately represents the project's production-ready status. Minor line count discrepancies do not impact the document's core value as an accurate gap analysis."
+  "summary": "The gap analysis document (review-002) is thorough, well-structured, and provides actionable comparison between MOO1 mechanics and Hamster of Orion specifications. The 655-line document covers all major systems (races, tech, combat, economy, diplomacy) with clear categorization of discrepancies as matches, intentional enhancements, or gaps requiring attention. The executive summary is accurate, the comparison tables are useful, and priority recommendations are reasonable. Minor issues include some incomplete cross-referencing with existing HoO specs (e.g., Ferrets have more bonuses than noted, shield values may exist in other files), and citations could be strengthened with specific Strategy Guide table numbers. The document correctly acknowledges StrategyWiki access issues and appropriately uses Archive.org as primary reference. Overall, this is a high-quality gap analysis suitable for guiding specification refinement. Score: 88/100 - PASS."
 }

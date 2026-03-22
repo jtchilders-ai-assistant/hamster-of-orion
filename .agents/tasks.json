@@ -15,7 +15,7 @@
       "id": "review-002",
       "title": "Gap Analysis vs StrategyWiki",
       "description": "Fetch all StrategyWiki MOO1 pages and compare against our specifications. Focus on: formulas accuracy, tech tree completeness, combat mechanics, race abilities. Identify any discrepancies. Output: design/review/gap-analysis-wiki.md",
-      "status": "pending",
+      "status": "done",
       "priority": 2,
       "output_file": "design/review/gap-analysis-wiki.md"
     },

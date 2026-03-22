@@ -379,3 +379,23 @@ The revised gap analysis (Version 2.0) successfully addresses all critical issue
 
 ### Recommendation:
 PASS - The gap analysis now provides an accurate assessment of the project's status. Minor line count discrepancies are cosmetic and do not affect the document's utility. The core purpose (identifying genuine gaps vs existing specs) is now achieved correctly.
+
+---
+
+## review-002: Gap Analysis vs StrategyWiki
+**Verified:** 2026-03-22T18:03:30Z  
+**Result:** ✅ PASS (88/100)
+
+**Summary:** The gap analysis document is thorough, well-structured, and provides actionable comparison between MOO1 mechanics and Hamster of Orion specifications. Covers all major systems (races, tech, combat, economy, diplomacy) with clear categorization. Minor issues with cross-referencing existing specs and citation specificity. Correctly acknowledges source access limitations and uses Archive.org Strategy Guide as primary reference.
+
+**Minor Issues (6):**
+- Source citations could include specific Strategy Guide table numbers
+- Ferrets comparison incomplete (has both +30% ship combat AND +25%/+15% from special ability)
+- Combat formula difference should be noted as intentional design choice
+- Mice vs Meklars comparison could note special abilities approximate similar effect
+- Shield absorption values should be verified against defense-systems.md
+- Diplomacy simplification correctly identified
+
+**Action Items:**
+- Consider adding Strategy Guide table references for stronger documentation
+- Verify shield values exist in design/ships/defense-systems.md before creating new spec
