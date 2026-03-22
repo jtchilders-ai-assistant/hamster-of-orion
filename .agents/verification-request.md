@@ -1,17 +1,23 @@
 # Verification Request
 
-## Task ID: ui-003
-## Task Title: Planet Management UI - ASCII Wireframe
-## Output File: design/ui-ux/wireframes/planet-management.md
+## Task
+- **ID**: ui-004
+- **Title**: Fleet Command UI - ASCII Wireframe
+- **Output File**: design/ui-ux/wireframes/fleet-command.md
 
-## Description
-Create detailed ASCII wireframe for Planet Management screen matching MOO1. Include: production sliders, population display, building queue, ship construction. Show slider interactions.
+## Requirements to Verify
+1. Detailed ASCII wireframe for Fleet screen matching MOO1 style
+2. Must include: fleet list, ship counts, destination setting, rally points
+3. Should follow established wireframe format from other UI specs
+4. Must be comprehensive and implementation-ready
 
-## Verification Focus
-1. Complete ASCII wireframe with all required elements
-2. Production sliders (SHIP, DEF, IND, ECO, TECH) properly represented
-3. Population display and worker allocation visible
-4. Building queue and ship construction status shown
-5. Slider interaction states documented
-6. MOO1 faithful design (not MOO2)
-7. Keyboard/mouse interaction notes included
+## Verification Checklist
+- [ ] File exists and has substantial content
+- [ ] ASCII wireframes are properly formatted and readable
+- [ ] Covers fleet list view
+- [ ] Covers ship counts display
+- [ ] Covers destination setting interface
+- [ ] Covers rally points functionality
+- [ ] Matches MOO1 faithful design principles
+- [ ] Includes keyboard shortcuts and interactions
+- [ ] Technical specifications are complete
