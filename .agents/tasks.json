@@ -124,7 +124,7 @@
       "id": "spec-014",
       "title": "Complete Tech Tree - Planetology Field",
       "description": "Document all planetology technologies: terraforming, colonization, pollution control, bio weapons. Include tier, cost, effect for each. Update design/technology/planetology.md with JSON data",
-      "status": "pending_verification",
+      "status": "done",
       "priority": 14,
       "output_file": "design/technology/planetology.md",
       "completed": "2026-03-22"
