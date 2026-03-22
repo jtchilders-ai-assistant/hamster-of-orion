@@ -1623,3 +1623,96 @@ Created comprehensive victory conditions algorithm specification including:
 - Action: Retry 1/3 - returning to WORKING state
 - Spawning worker to revise with specific feedback
 
+
+---
+
+### 2026-03-22 11:49 - spec-023: Difficulty Level Modifiers ✅ (Revision)
+**Completed:** `design/game-mechanics/difficulty.md`
+
+**Summary:**
+Complete rewrite of difficulty system specification with comprehensive modifiers:
+
+**1. Starting Conditions:**
+- Player starting state by difficulty (Population 40-50, Factories 30-40, Ships 1-3)
+- Starting production calculations with worked examples
+- AI always uses Average starting conditions
+
+**2. Production Modifiers:**
+- Player: 1.25× (Simple) → 0.75× (Impossible)
+- AI: 0.75× (Simple) → 1.50× (Impossible)
+- Net ratio ranges from 0.60:1 to 2.00:1
+
+**3. Research Modifiers:**
+- Player cost unchanged across difficulties
+- AI cost: 1.50× (Simple) → 0.50× (Impossible)
+- AI effectively researches 2× faster on Impossible
+
+**4. Combat Modifiers:**
+- Ship combat: ±10% attack/defense by difficulty
+- Ground combat: ±15% by difficulty
+- Full formulas with worked examples
+
+**5. Population Growth:**
+- Player growth: 1.25× (Simple) → 0.75× (Impossible)
+- AI growth: 0.75× (Simple) → 1.25× (Impossible)
+
+**6. Diplomatic Modifiers:**
+- AI forgiveness multipliers (0.5× to 1.5×)
+- Treaty duration modifiers
+- War declaration thresholds (-30 to +30)
+- Coalition probability (0% Simple → 75% Impossible)
+
+**7. Espionage Modifiers:**
+- Success/detection ±20% by difficulty
+- Spy cost multipliers (0.75× to 1.25×)
+
+**8. Event Frequency:**
+- Event frequency 0.5× to 1.5×
+- Negative event bias -25% to +25%
+- Monster strength 0.75× to 1.50×
+- Full monster stats table by difficulty
+
+**9. Guardian of Orion Scaling:**
+- HP: 16,000 (Simple) → 48,000 (Impossible)
+- Armor: 2.0× → 6.0× multiplier
+- Effective HP: 32,000 → 288,000
+- Shields: Class X → Class XX
+
+**10. AI Intelligence Scaling:**
+- Decision noise: ±30 (Simple) → ±0 (Impossible)
+- Information access: Fog of War → Omniscient
+- Planning horizon: 5 turns → Infinite
+
+**11. Council Voting:**
+- Formation threshold: 60% → 40% colonized
+- AI vote loyalty modifiers
+- Bribe effectiveness 1.5× to 0.5×
+
+**Complete JSON Data Schema:**
+- All 5 difficulty levels with full modifier objects
+- Starting conditions, production, research, combat, ground combat
+- Growth, diplomacy, espionage, events, maintenance
+- AI intelligence, council, Guardian stats
+- 20+ constants per difficulty level
+
+**Algorithms:**
+- apply_difficulty_modifiers() - main application function
+- get_event_modifier() - event system integration
+- get_guardian_stats() - Guardian scaling
+- check_coalition_formation() - anti-player alliance logic
+
+**Additional Content:**
+- Race difficulty recommendations (beginner to expert)
+- Achievement system by difficulty
+- 3 detailed worked examples
+- Edge cases (mid-game change, custom difficulty, multiplayer)
+- Cross-references to all related documents
+
+**Files Updated:**
+- `design/game-mechanics/difficulty.md` (31KB, ~900 lines, complete rewrite)
+
+**Notes:**
+- MOO1-faithful starting conditions (40 pop, 30 factories on Impossible)
+- Consistent with existing modifier tables in other specs
+- JSON schema ready for direct implementation
+- Addresses all critical issues from first verification attempt
