@@ -1,0 +1,232 @@
+Master of Orion — StrategyWiki | Strategy guide and game reference wiki
+Stage 3
+Master of Orion
+Namespaces
+PageDiscussion
+English
+Views
+ReadEditEdit sourceView history
+More
+From StrategyWiki, the video game walkthrough and strategy guide wiki
+Jump to navigation
+Jump to search
+Expand
+Master of Orion
+Table of Contents
+Gameplay
+WalkthroughTable of Contents
+Gameplay
+Controls
+Backstory
+Victory conditions
+Colony Types
+Walkthrough
+Interstellar combat
+Tactical initiative and movement
+Attack range
+Attack roll
+Damage
+Shields
+Planetary attacks and defenses
+Miscellaneous factors
+Managing your economy
+How to begin
+Star systems
+System habitability
+System resources
+Planets to colonize
+Growing your population
+Increasing your production
+Technologies
+Technology tree
+Computers
+Construction
+Force Fields
+Planetology
+Propulsion
+Weapons
+Game stages
+Key techs
+Techs always available
+Tech trading
+Comparative tree
+Races
+Best races
+Average races
+Worst races
+Racial personalities
+Diplomacy and intelligence
+Diplomacy
+Spying
+Planning and winning wars
+Preparing yourself for war
+Warship design
+Killing the Guardian
+General battle tactics
+Winning defensive battles
+Winning with beam weapons
+Winning with missiles
+Winning with invasion
+Invade and Capture Techs
+Managing newly conquered colonies
+Interplanetary reserve
+Game roadmap
+Tips and Tricks
+Solving Problems
+Tips and Tricks
+Obscure Interface Features
+Useful Hotkeys
+This is the first game in the Master of Orion series. For other games in the series see the Master of Orion category.Box artwork for Master of Orion.Master of OrionDeveloper(s)SimtexPublisher(s)MicroProse SoftwareYear released1993System(s)DOS, Mac OS, Windows, macOS, LinuxFollowed byMaster of Orion II: Battle at AntaresSeriesMaster of OrionGenre(s)Turn-based strategyPlayers1+ModesSingle player, MultiplayerLinks
+Master of Orion (MOO1) is the first in the Master of Orion series. It was developed by Simtex; Steve Barcia and Ken Burd designed it. The game was designed to use MS-DOS and was published by MicroProse in 1993. Most reviews by critics and players were very favorable.
+The game begins with a single colonized homeworld, a colony ship, and two scout ships that can be used to explore nearby stars. As the game progresses, new worlds are discovered, other races encountered, worlds colonized and wars fought. Despite their different backgrounds and homeworlds, all races possess legends of the Orions, a master race that once controlled the galaxy, and their protected homeworld containing powerful secrets and technology. The homeworld is found in the Orion star system and is defended by a powerful robotic starship, the Guardian.
+Copy Protection[edit | edit source]
+This game is copy protected, requiring the player to look up content found in one of the manuals. This copy protection appears after a random number of turns, and will drop the player to the main menu if failed.
+There are reports of said protection appearing in the Steam version. If it appears, it accepts any answer instead of the correct one, even though the reference card is found in the main directory.
+Table of Contentsedit
+Gameplay
+Controls
+Backstory
+Victory conditions
+Colony Types
+Walkthrough
+Interstellar combat
+Tactical initiative and movement
+Attack range
+Attack roll
+Damage
+Shields
+Planetary attacks and defenses
+Miscellaneous factors
+Managing your economy
+How to begin
+Star systems
+System habitability
+System resources
+Planets to colonize
+Growing your population
+Increasing your production
+Technologies
+Technology tree
+Computers
+Construction
+Force Fields
+Planetology
+Propulsion
+Weapons
+Game stages
+Key techs
+Techs always available
+Tech trading
+Comparative tree
+Races
+Best races
+Average races
+Worst races
+Racial personalities
+Diplomacy and intelligence
+Diplomacy
+Spying
+Planning and winning wars
+Preparing yourself for war
+Warship design
+Killing the Guardian
+General battle tactics
+Winning defensive battles
+Winning with beam weapons
+Winning with missiles
+Winning with invasion
+Invade and Capture Techs
+Managing newly conquered colonies
+Interplanetary reserve
+Game roadmap
+Tips and Tricks
+Solving Problems
+Tips and Tricks
+Obscure Interface Features
+Useful Hotkeys
+view · editMaster of Orion series
+Master of Orion
+II: Battle at Antares
+III
+Conquer the Stars
+Retrieved from "https://strategywiki.org/w/index.php?title=Master_of_Orion&oldid=1071518"
+Categories: DOSMac OSWindowsMacOSLinuxGamesGuides at completion stage 31993Master of OrionSimtexMicroProse SoftwareTurn-based strategySingle playerMultiplayer
+This page was last edited on 20 May 2024, at 06:59.
+Content is available under Creative Commons Attribution-ShareAlike 4.0 unless otherwise noted.
+Privacy policy
+About StrategyWiki
+Disclaimers
+Mobile view
+Do Not Sell My Personal Information
+✖
+Navigation menu
+Personal tools
+Not logged inTalkContributionsCreate accountLog in
+Search
+Navigation
+Main pageGamesCommunityStaff loungeRecent changesUpload fileRandom pageHelpFacebookTwitterDiscord Chat
+Tools
+What links hereRelated changesSpecial pagesPrintable versionPermanent linkPage informationGuide pagesGuide imagesGuide files
+Table of Contents
+Master of OrionTable of Contents
+Gameplay
+Controls
+Backstory
+Victory conditions
+Colony Types
+Walkthrough
+Interstellar combat
+Tactical initiative and movement
+Attack range
+Attack roll
+Damage
+Shields
+Planetary attacks and defenses
+Miscellaneous factors
+Managing your economy
+How to begin
+Star systems
+System habitability
+System resources
+Planets to colonize
+Growing your population
+Increasing your production
+Technologies
+Technology tree
+Computers
+Construction
+Force Fields
+Planetology
+Propulsion
+Weapons
+Game stages
+Key techs
+Techs always available
+Tech trading
+Comparative tree
+Races
+Best races
+Average races
+Worst races
+Racial personalities
+Diplomacy and intelligence
+Diplomacy
+Spying
+Planning and winning wars
+Preparing yourself for war
+Warship design
+Killing the Guardian
+General battle tactics
+Winning defensive battles
+Winning with beam weapons
+Winning with missiles
+Winning with invasion
+Invade and Capture Techs
+Managing newly conquered colonies
+Interplanetary reserve
+Game roadmap
+Tips and Tricks
+Solving Problems
+Tips and Tricks
+Obscure Interface Features
+Useful Hotkeys

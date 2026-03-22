@@ -1,6 +1,18 @@
 # Master of Orion 1 Reference Sources
 
-This file lists authoritative sources for MOO1 mechanics. Agents should use `web_fetch` to access these when writing or verifying specifications.
+This file lists authoritative sources for MOO1 mechanics.
+
+## Local References (Check First!)
+
+| File | Description |
+|------|-------------|
+| `reference/README.md` | Index of local reference materials |
+| `reference/strategywiki-moo1.txt` | StrategyWiki main page with full Table of Contents |
+| `reference/index.html` | Original HTML from StrategyWiki |
+
+**Always check local files first before using web_fetch.**
+
+## Online Resources (use web_fetch when local is insufficient)
 
 ## Primary Sources
 
