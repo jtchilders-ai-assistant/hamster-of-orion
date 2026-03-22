@@ -1799,3 +1799,81 @@ Addressed verification failure by adding comprehensive JSON data structures:
 **Active Task:** spec-024 - Complete Race Statistics
 - Output: design/species/race-stats-complete.md (not yet created)
 
+---
+
+### 2026-03-22 11:54 - spec-024: Complete Race Statistics ✅
+**Completed:** `design/species/race-stats-complete.md`
+
+**Summary:**
+Created comprehensive race statistics specification compiling all 10 races:
+
+**1. Race-to-MOO1 Mapping:**
+- Complete mapping table (Hamsters=Humans, Ants=Klackons, etc.)
+- Primary trait summary for each race
+
+**2. Formulas:**
+- Racial modifier application (multiplicative)
+- Ground combat modifier
+- Ship combat modifier (attack/defense conversion)
+- Research modifier
+- Population growth modifier
+- Espionage modifier
+- Diplomacy modifier with relationship calculations
+
+**3. Complete Race Data (JSON):**
+All 10 races with full statistics:
+- **Hamsters**: Diplomatic (+30%), Trade Hub (+20% credits), Universal Diplomat
+- **Ants**: Production (+50%), Hive Mind (spy immune), Perfect Efficiency (no unrest)
+- **Mice**: Production (+25%), Research (+15%), Automated factories (150%)
+- **Rats**: Research (+50%), 50% tech cost reduction, 5% free tech chance
+- **Rabbits**: Growth (+100%), instant population transfer, 15% cheaper ships
+- **Hermit Crabs**: Universal colonization, no food requirement, +25% ground defense
+- **Guinea Pigs**: Ground Combat (+50%), Fearless, 2× troop effectiveness
+- **Ferrets**: Ship Combat (+30%), +25% weapon damage, First Strike
+- **Budgies**: Ship Combat (+50%), +20% evasion, +3 initiative, small ship bonus
+- **Chameleons**: Espionage (+60%), 50% cost reduction, false flags, sleeper agents
+
+**4. Per-Race Data Includes:**
+- All 8 bonuses (production, research, food, growth, ground, ship, espionage, diplomacy)
+- 4-6 special abilities with exact effects (JSON effect objects)
+- 4 starting technologies
+- Unique building, ship, and technology with stats
+- AI behavior parameters (9 values including aggression, expansion, reliability)
+- Leader names (male/female/coordinator variants)
+- Ship prefix
+- Homeworld specification (name, type, climate, size, special)
+
+**5. Stat Summary Table:**
+- Quick-reference 10×9 matrix of all racial bonuses
+- Primary advantage column
+
+**6. Edge Cases:**
+- Hermit Crabs and food (no consumption)
+- Ants and espionage (immune, cannot spy)
+- Stacking bonuses (multiplicative with tech)
+- Negative bonuses (minimum 10% of base)
+- Starting relationship calculation
+
+**7. Worked Examples:**
+- Ant production calculation (225 BC from 150 base)
+- Rat research calculation (17 turns for Tier 10 tech)
+- Guinea Pig ground combat (5 strength, 1.5× damage)
+- Budgie ship defense (6 defense, 20% evasion, -30% enemy missiles)
+
+**8. Implementation Notes:**
+- Load order requirements
+- Validation ranges
+- AI weighting interpretation
+- Localization considerations
+- Unique content integration
+
+**Files Created:**
+- `design/species/race-stats-complete.md` (43KB, ~1200 lines)
+
+**Notes:**
+- Cross-references all individual species/*.md files
+- Consistent with AGENTS.md race table
+- All JSON parseable and implementation-ready
+- Integrates with combat, economy, diplomacy specifications
+- Complete homeworld data for galaxy generation
+
