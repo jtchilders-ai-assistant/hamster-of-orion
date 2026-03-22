@@ -1,10 +1,10 @@
 {
-  "state": "VERIFYING",
-  "current_task": "spec-025",
-  "current_task_started_at": "2026-03-22T12:00:30-05:00",
+  "state": "IDLE",
+  "current_task": null,
+  "current_task_started_at": null,
   "retry_count": 0,
   "max_retries": 3,
-  "last_updated": "2026-03-22T12:05:15-05:00",
-  "last_action": "Spawned verifier for spec-025",
+  "last_updated": "2026-03-22T12:08:00-05:00",
+  "last_action": "All tasks completed! spec-025 verified and marked done.",
   "verification_issues": []
 }

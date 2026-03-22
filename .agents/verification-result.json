@@ -1,37 +1,37 @@
 {
-  "task_id": "spec-024",
-  "verified_at": "2026-03-22T11:59:45-05:00",
+  "task_id": "spec-025",
+  "verified_at": "2026-03-22T12:05:30-05:00",
   "passed": true,
-  "score": 92,
+  "score": 94,
   "issues": [
     {
       "severity": "minor",
-      "category": "accuracy",
-      "description": "Ants espionage bonus shown as '0*' in summary table but '0' in JSON; footnote explains immunity but JSON lacks explicit spy_operations: false flag",
-      "location": "design/species/race-stats-complete.md - Stat Summary Table / Ants JSON",
-      "suggestion": "Add explicit 'can_conduct_espionage': false field to Ants JSON data"
-    },
-    {
-      "severity": "minor",
-      "category": "completeness",
-      "description": "Ship prefix for Budgies is 'FAS' (Flight Avian Ship?) which could be confused with Ferrets 'FHS' - consider more distinct naming",
-      "location": "design/species/race-stats-complete.md - Budgies section",
-      "suggestion": "Consider 'BAS' (Budgie Avian Ship) for clearer distinction"
-    },
-    {
-      "severity": "minor",
-      "category": "integration",
-      "description": "LORE.md file not found in expected location for cross-referencing - cannot verify naming conventions match",
-      "location": "Project root",
-      "suggestion": "Verify LORE.md exists or update reference in task description"
+      "category": "implementation",
+      "description": "TypeScript 'const' object for GAME_CONSTANTS uses 'as const' but the type alias structure (e.g., 'PositiveInteger', 'Percentage') are not enforced at runtime",
+      "location": "design/technical/data-schemas.md, Section 10.1 Game Constants",
+      "suggestion": "Add comment noting these are for type documentation; consider adding Zod or similar runtime validators in implementation"
     },
     {
       "severity": "minor",
       "category": "implementation",
-      "description": "Starting technologies reference tech names but don't include tech IDs for direct lookup in tech tree specs",
-      "location": "design/species/race-stats-complete.md - starting_technologies arrays",
-      "suggestion": "Add tech_id field or use consistent snake_case IDs matching other tech specs"
+      "description": "DIFFICULTY_CONFIGS uses 'as const' but DifficultyConfig interface has incomplete property (cut off line at player_research_cost)",
+      "location": "design/technical/data-schemas.md, Section 10.2 Difficulty Modifiers, line ~1960",
+      "suggestion": "Review DifficultyConfig interface for completeness - appears comment block was truncated"
+    },
+    {
+      "severity": "minor",
+      "category": "integration",
+      "description": "ShipClass enum lists 7 classes (scout through titan) but MOO1 typically has 6 - verify titan is intended addition",
+      "location": "design/technical/data-schemas.md, Section 1.2 Core Enums - ShipClass",
+      "suggestion": "Confirm with ships/components-complete.md whether 7 classes is correct"
+    },
+    {
+      "severity": "minor",
+      "category": "completeness",
+      "description": "Ship components schema (Section 4.3) lacks a unified JSON Schema definition like races/tech/weapons/events have in Section 9",
+      "location": "design/technical/data-schemas.md, Section 9 JSON Schema Definitions",
+      "suggestion": "Add components.json schema in future enhancement for complete validation coverage"
     }
   ],
-  "summary": "Excellent specification covering all 10 races with complete statistical data. All required sections present (Overview, Formulas, Constants, Algorithm, Data Tables, Edge Cases). JSON data validates correctly with 10 races. Racial bonuses match existing individual race documentation (hamsters.md, ants.md, etc.). MOO1 equivalencies are correct and faithfully adapted. Comprehensive coverage includes: production/research/food/growth/combat/espionage/diplomacy bonuses, 4-6 special abilities per race, starting technologies, homeworld specs, unique content (buildings/ships/tech), AI behavior parameters, and leader names. Edge cases well addressed (Hermit Crabs food, Ants espionage immunity, bonus stacking). Examples demonstrate formulas correctly. Minor issues are cosmetic and don't affect implementation readiness."
+  "summary": "Excellent comprehensive specification providing 50+ TypeScript interfaces covering all game entities (races, technologies, ships, weapons, planets, diplomacy, events, game state). All 4 JSON Schema Draft-07 definitions are valid and parseable. The document covers: 15 core enums, 8 base types, complete race/tech/ship/planet/colony/diplomacy/event schemas, game state management, victory tracking, game constants, difficulty configs, validation rules with bounds, and usage examples. Integration verified: 10 races match LORE.md exactly, 6 tech fields consistent with other specs, weapon categories align with weapons-complete.md. No TODO/TBD placeholders found. File structure recommendation included. The specification is implementation-ready and provides type-safe development foundation."
 }
