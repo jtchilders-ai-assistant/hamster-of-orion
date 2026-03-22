@@ -1079,3 +1079,91 @@ Complete rewrite of AI implementation specification with implementation-ready sc
 - State: IDLE → WORKING
 - Starting task: spec-019 Galaxy Generation Algorithm
 - Spawning worker agent
+
+---
+
+### 2026-03-22 11:26 - spec-019: Galaxy Generation Algorithm ✅
+**Completed:** `design/galaxy/generation-algorithm.md`
+
+**Summary:**
+Created comprehensive galaxy generation algorithm specification including:
+
+**1. Galaxy Configuration:**
+- 4 galaxy sizes (Small 24 → Huge 108 stars)
+- Map dimensions, star distances, nebula/artifacts counts
+- Complete JSON configuration schema
+
+**2. Star Placement Algorithm:**
+- Clustered Poisson disk sampling
+- 70% cluster bias, 30% field stars
+- Minimum distance enforcement (35 parsecs)
+- Cluster generation with Gaussian distribution
+- Complete pseudocode for GenerateStarPositions
+
+**3. Star Properties:**
+- 6 star colors with weighted distribution (Yellow 25%, Purple 8%)
+- Star naming from 108-name classical pool
+- Region assignment (Safe Zones, Wild Pellet Fields, Dark Sectors, Omega Sector)
+
+**4. Planet Assignment:**
+- One planet per system (MOO1 faithful)
+- Environment probability tables by star color (14 environments × 6 colors)
+- Size distribution (Tiny 15% → Huge 10%)
+- Environment modifiers (growth, population, hostile flag)
+
+**5. Resource Distribution:**
+- 5 resource levels (Ultra Poor 0.33× → Ultra Rich 3×)
+- Resource probability tables by star color
+- Purple stars: 25% Ultra Rich (highest) + worst habitability
+- Blue stars: Good Rich chance + reasonable habitability
+- Nebula resource bonus (+40% upgrade chance)
+
+**6. Special System Placement:**
+- Orion: Galactic center, 4× research, Guardian protection
+- Artifacts: 2-6 per galaxy, 2× research, Wild Pellet Fields preferred
+- Complete placement algorithms with validation
+
+**7. Nebula Generation:**
+- 1-5 nebulae per galaxy (size dependent)
+- Radius 60-120 parsecs
+- Effects: Warp 1 speed, shields disabled
+- Minimum 2 stars per nebula
+
+**8. Homeworld Placement:**
+- Balanced distribution algorithm
+- Minimum distance scaling (160-320 by galaxy size)
+- Quality guarantee (Terran, Large/Huge)
+- Neighbor validation (2+ reachable stars)
+- Sector-based distribution fallback
+- Complete pseudocode with worked examples
+
+**9. Complete Generation Algorithm:**
+- 10-step generation process
+- Validation checks (star count, planets, spacing, connectivity)
+- Error handling and regeneration logic
+
+**10. Configuration Constants:**
+- 15 distance/probability/threshold constants
+- All values documented with descriptions
+
+**11. Edge Cases:**
+- Placement failures (reduce constraints, retry)
+- Homeworld clustering (sector-based distribution)
+- Isolated stars (move within range)
+- Regeneration limit (10 attempts)
+
+**12. JSON Data Schemas:**
+- Star schema (id, position, color, region, special, planet)
+- Planet schema (environment, size, resources, special)
+- Galaxy schema (stars, nebulae, clusters, homeworlds)
+
+**Files Created:**
+- `design/galaxy/generation-algorithm.md` (38KB, ~1100 lines)
+
+**Notes:**
+- Integrates with star-systems.md, planet-types.md, space-regions.md
+- All probability tables complete with values
+- Pseudocode implementable directly
+- Worked examples for small galaxy generation
+- Statistical distribution expectations documented
+- MOO1-faithful one-planet-per-system design
