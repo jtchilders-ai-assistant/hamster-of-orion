@@ -23,7 +23,7 @@
       "id": "review-003",
       "title": "Cross-Reference Verification Report",
       "description": "Create a verification matrix showing which MOO1 systems are covered by which design documents. Identify orphan systems (not documented) and duplicate coverage. Output: design/review/coverage-matrix.md",
-      "status": "pending",
+      "status": "pending_verification",
       "priority": 3,
       "output_file": "design/review/coverage-matrix.md"
     },
