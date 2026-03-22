@@ -297,6 +297,84 @@ Effective_Chance = 8% × 1.50 = 12%
 | Void Wyrm | HP | 1125 | 1350 | 1500 | 1875 | 2250 |
 | Void Wyrm | Damage | 75 | 90 | 100 | 125 | 150 |
 
+### Monster Stats JSON Data
+
+```json
+{
+  "space_monsters": {
+    "cosmic_blob": {
+      "id": "cosmic_blob",
+      "name": "Cosmic Blob",
+      "description": "Amorphous space creature with regenerative abilities",
+      "base_stats": {
+        "hp": 1000,
+        "regen_per_turn": 100,
+        "speed": 1,
+        "attack_rating": 0,
+        "defense_rating": 0,
+        "damage_min": 50,
+        "damage_max": 100,
+        "armor_class": 5
+      },
+      "difficulty_scaling": {
+        "simple": {"hp_mult": 0.75, "regen_mult": 0.75, "damage_mult": 0.75},
+        "easy": {"hp_mult": 0.90, "regen_mult": 0.90, "damage_mult": 0.90},
+        "average": {"hp_mult": 1.00, "regen_mult": 1.00, "damage_mult": 1.00},
+        "hard": {"hp_mult": 1.25, "regen_mult": 1.25, "damage_mult": 1.25},
+        "impossible": {"hp_mult": 1.50, "regen_mult": 1.50, "damage_mult": 1.50}
+      },
+      "abilities": ["regeneration", "immune_to_missiles"]
+    },
+    "crystal_horror": {
+      "id": "crystal_horror",
+      "name": "Crystal Horror",
+      "description": "Crystalline entity with powerful energy shields",
+      "base_stats": {
+        "hp": 800,
+        "regen_per_turn": 0,
+        "speed": 2,
+        "attack_rating": 3,
+        "defense_rating": 2,
+        "damage_min": 75,
+        "damage_max": 125,
+        "shield_class": 10
+      },
+      "difficulty_scaling": {
+        "simple": {"hp_mult": 0.75, "shield_class": 8, "damage_mult": 0.75},
+        "easy": {"hp_mult": 0.90, "shield_class": 9, "damage_mult": 0.90},
+        "average": {"hp_mult": 1.00, "shield_class": 10, "damage_mult": 1.00},
+        "hard": {"hp_mult": 1.25, "shield_class": 11, "damage_mult": 1.25},
+        "impossible": {"hp_mult": 1.50, "shield_class": 12, "damage_mult": 1.50}
+      },
+      "abilities": ["reflect_beam_weapons", "shield_regeneration"]
+    },
+    "void_wyrm": {
+      "id": "void_wyrm",
+      "name": "Void Wyrm",
+      "description": "Massive serpentine creature capable of devastating attacks",
+      "base_stats": {
+        "hp": 1500,
+        "regen_per_turn": 0,
+        "speed": 3,
+        "attack_rating": 5,
+        "defense_rating": 3,
+        "damage_min": 100,
+        "damage_max": 200,
+        "armor_class": 8
+      },
+      "difficulty_scaling": {
+        "simple": {"hp_mult": 0.75, "damage_mult": 0.75, "attack_rating": 3},
+        "easy": {"hp_mult": 0.90, "damage_mult": 0.90, "attack_rating": 4},
+        "average": {"hp_mult": 1.00, "damage_mult": 1.00, "attack_rating": 5},
+        "hard": {"hp_mult": 1.25, "damage_mult": 1.25, "attack_rating": 6},
+        "impossible": {"hp_mult": 1.50, "damage_mult": 1.50, "attack_rating": 7}
+      },
+      "abilities": ["multi_attack", "armor_piercing"]
+    }
+  }
+}
+```
+
 ---
 
 ## Guardian of Orion Modifiers
@@ -416,6 +494,49 @@ Impossible: 48,000 × 6.0 = 288,000 effective HP
 | Combat | -20% | +20% |
 | Growth | 0.50× | 1.50× |
 | Event Frequency | 0.25× | 2.00× |
+
+### Constants JSON Data
+
+```json
+{
+  "difficulty_constants": {
+    "DIFFICULTY_COUNT": 5,
+    "MIN_DIFFICULTY_INDEX": 0,
+    "MAX_DIFFICULTY_INDEX": 4,
+    "DEFAULT_DIFFICULTY": 2,
+    "COALITION_CHECK_INTERVAL": 25,
+    "COALITION_LEADER_THRESHOLD": 1.5,
+    "AI_GRACE_PERIOD_TURNS": 50,
+    "MIN_FACTORY_OUTPUT_PER_TURN": 1,
+    "TIER_1_TECH_TURN_LIMIT": 20
+  },
+  "difficulty_modifier_caps": {
+    "production": {"min": 0.50, "max": 2.00},
+    "research": {"min": 0.50, "max": 2.00},
+    "combat": {"min": -0.20, "max": 0.20},
+    "ground_combat": {"min": -0.25, "max": 0.25},
+    "growth": {"min": 0.50, "max": 1.50},
+    "event_frequency": {"min": 0.25, "max": 2.00},
+    "maintenance": {"min": 0.50, "max": 2.00},
+    "spy_success": {"min": -0.30, "max": 0.30},
+    "spy_cost": {"min": 0.50, "max": 2.00}
+  },
+  "score_multipliers": {
+    "simple": 0.50,
+    "easy": 0.75,
+    "average": 1.00,
+    "hard": 1.50,
+    "impossible": 2.00
+  },
+  "difficulty_names": {
+    "0": "Simple",
+    "1": "Easy",
+    "2": "Average",
+    "3": "Hard",
+    "4": "Impossible"
+  }
+}
+```
 
 ---
 

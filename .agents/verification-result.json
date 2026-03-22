@@ -1,23 +1,16 @@
 {
-  "task_id": "spec-023",
-  "verified_at": "2026-03-22T11:53:30-05:00",
+  "task_id": "spec-022",
+  "verified_at": "2026-03-22T11:54:15-05:00",
   "passed": true,
-  "score": 92,
+  "score": 95,
   "issues": [
     {
       "severity": "minor",
-      "category": "completeness",
-      "description": "Custom difficulty JSON schema not included (only described in prose)",
-      "location": "design/game-mechanics/difficulty.md - Edge Cases section",
-      "suggestion": "Add CustomDifficultySchema JSON with parameter ranges"
-    },
-    {
-      "severity": "minor",
       "category": "integration",
-      "description": "Guardian stats in difficulty differ from victory-conditions.md - need to reference rather than duplicate",
-      "location": "design/game-mechanics/difficulty.md - guardian_stats in JSON",
-      "suggestion": "Add note that these multiply base Guardian stats from victory-conditions.md"
+      "description": "Council voting references council.md - ensure cross-reference consistency",
+      "location": "design/game-mechanics/victory-conditions.md - Section 4",
+      "suggestion": "Verify vote calculation matches council.md specification"
     }
   ],
-  "summary": "Excellent revision! The document now includes comprehensive JSON data structures covering all five difficulty levels with exact numeric modifiers for: production, research, combat, ground combat, growth, diplomacy, espionage, events, maintenance, AI intelligence, council mechanics, and Guardian scaling. Includes pseudocode algorithms for applying modifiers and worked examples. Score 92 - passes all critical requirements. The 1086-line spec is implementation-ready."
+  "summary": "Outstanding specification with 1395 lines. Complete victory check algorithms in priority order: Survival, Discovery (with full Guardian stats: 3000 HP, 12 Attack, 10 Defense, Class XV Shields, 4 weapon systems), Domination (integer math: empire_pop × 3 >= galaxy_pop × 2), Diplomatic (council mechanics), Transcendence (6-component scoring with 500-point threshold). Includes 13 edge cases, 3 worked examples, and complete JSON schemas."
 }

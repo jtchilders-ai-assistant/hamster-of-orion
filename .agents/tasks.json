@@ -185,7 +185,7 @@
       "id": "spec-021",
       "title": "Random Events System",
       "description": "Document all random events: trigger conditions, probability, effects, duration. Include space monsters, discoveries, disasters, opportunities. Update design/game-mechanics/random-events.md",
-      "status": "pending_verification",
+      "status": "done",
       "priority": 21,
       "output_file": "design/game-mechanics/random-events.md",
       "completed": "2026-03-22"
@@ -194,7 +194,7 @@
       "id": "spec-022",
       "title": "Victory Condition Checks",
       "description": "Document exact algorithms for: domination check (population threshold), council victory, conquest victory, Orion guardian defeat, transcendence detection. Update design/game-mechanics/victory-conditions.md",
-      "status": "pending_verification",
+      "status": "done",
       "priority": 22,
       "output_file": "design/game-mechanics/victory-conditions.md",
       "completed": "2026-03-22"
