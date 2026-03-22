@@ -1080,3 +1080,15 @@ Created comprehensive Tactical Combat wireframe specification with detailed ASCI
 - design/ships/ship-classes.md
 - design/LORE.md (pet-themed naming)
 - MOO1 (1993) tactical combat screen
+
+## 2026-03-22 14:16 - Worker Completed ui-008
+- **Task**: Tactical Combat UI - ASCII Wireframe
+- **Output**: design/ui-ux/wireframes/tactical-combat.md (1030 lines)
+- **Contents**: Pre-battle, main arena, movement/firing phases, missile tracking, bombardment, victory/defeat screens
+- **Action**: Spawning verifier
+
+## 2026-03-22 14:17 - Task ui-008 COMPLETE ✓
+- **Task**: Tactical Combat UI - ASCII Wireframe
+- **Verification**: PASSED (92/100)
+- **Minor Issues**: Ground invasion wireframe, auto-resolve screen, hex grid clarification, doc references
+- **Action**: Marked done, proceeding to next task

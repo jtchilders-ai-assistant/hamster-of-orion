@@ -758,3 +758,62 @@ PASS - The gap analysis now provides an accurate assessment of the project's sta
 - Total Score: 92/100
 
 **Recommendation:** PASS - Fully implementation-ready wireframe specification. This is an exceptional document covering all diplomacy interactions with 15+ wireframe screens, comprehensive data schemas, and proper integration with pet-themed lore. Minor issues are cosmetic and do not block implementation.
+
+---
+
+### ui-008: Tactical Combat UI - ASCII Wireframe
+**File:** design/ui-ux/wireframes/tactical-combat.md  
+**Verified:** 2026-03-22T14:16:45-05:00  
+**Result:** ✅ PASSED (Score: 92/100)
+
+**Summary:** Excellent tactical combat UI wireframe specification. The document is comprehensive, covering 10+ detailed ASCII wireframe screens including: pre-battle screen (combat initiation), main combat arena, movement phase, firing phase (weapon selection & targeting), attack resolution (damage display), missile attack (in-flight tracking), retreat attempt, planetary bombardment, victory screen, and defeat screen. Strong attention to MOO1 combat philosophy with appropriate modern enhancements.
+
+**Requirements Coverage:**
+- ✅ Detailed ASCII wireframes for tactical combat matching MOO1 behavior
+- ✅ Pre-battle screen with force comparison and battle options (Tactical/Auto/Retreat)
+- ✅ Combat arena with 16×10 hexagonal grid (enhanced from MOO1's square grid)
+- ✅ Initiative order panel showing turn sequence by speed
+- ✅ Movement phase with hex range highlighting
+- ✅ Firing phase with weapon selection, target selection, and hit chance estimates
+- ✅ Attack resolution with damage breakdown (shots, hits, shields, kills)
+- ✅ Missile tracking with in-flight display and point defense
+- ✅ Retreat mechanics with escape chance calculations
+- ✅ Planetary bombardment options (military, industrial, terror, biological)
+- ✅ Victory/defeat screens with battle summary and strategic impact
+
+**MOO1 Faithfulness:**
+- ✅ Ship stacks move together as single units
+- ✅ Turn-based combat with speed-based initiative
+- ✅ Range affects weapon accuracy
+- ✅ Retreat based on speed comparison
+- ✅ Missile bases and planetary shields defend colonies
+- ✅ 50-round combat limit
+
+**Bonus Features (Exceeding Requirements):**
+- Complete interactive elements specification (ship stack display, hex grid elements, turn phases)
+- Command buttons with hotkey mappings (20+ shortcuts)
+- Combat log display with timestamps
+- Comprehensive tooltips (ship stats, weapons, targets)
+- Animation specifications with durations
+- Combat options menu (animation speed, automation, display settings)
+- Responsive behavior for desktop/laptop/tablet
+- Accessibility features (color blind mode, high contrast, screen reader, keyboard-only play)
+- Performance targets (60fps, 100 stacks, <50MB)
+- JSON data structure for combat state
+
+**Pet-Themed Naming (LORE.md Compliant):**
+- ✅ Race names: Hamsters, Guinea Pigs
+- ✅ Ship names: "Sunflower", "Whiskers", "Pellet", "Paw", "Grunt", "Fist"
+- ✅ Colony names: "New Pigton", "New Hamsterton"
+
+**Issues Found (4 minor):**
+1. Missing ground invasion wireframe - document mentions button but no dedicated screen
+2. Auto-resolve battle screen not wireframed despite being a pre-battle option
+3. Grid described as "16×10 MOO1 standard" but MOO1 used ~10×10 square grid - hex grid is an enhancement (should clarify this is intentional improvement)
+4. Related documents reference combat-mechanics.md and combat-algorithm.md - should verify these exist or queue for creation
+
+**Verification Details:**
+- Completeness: 93/100 | Accuracy: 90/100 | Implementation Readiness: 94/100 | Integration: 92/100
+- Total Score: 92/100
+
+**Recommendation:** PASS - Fully implementation-ready wireframe specification. This is an exceptional document providing comprehensive tactical combat UI documentation with 10+ wireframe screens. Minor issues are non-critical enhancements. The document properly captures MOO1's tactical combat philosophy while providing modern UI improvements for hex-based movement, accessibility, and responsive design.

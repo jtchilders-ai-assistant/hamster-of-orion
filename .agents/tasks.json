@@ -95,7 +95,7 @@
       "id": "ui-008",
       "title": "Tactical Combat UI - ASCII Wireframe",
       "description": "Create detailed ASCII wireframe for Combat screen matching MOO1. Include: hex/grid display, ship stacks, weapon firing, movement, retreat. Show turn phases. Output: design/ui-ux/wireframes/tactical-combat.md",
-      "status": "pending_verification",
+      "status": "done",
       "priority": 12,
       "output_file": "design/ui-ux/wireframes/tactical-combat.md"
     },
