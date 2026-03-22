@@ -1,59 +1,62 @@
-# Current Task: review-001 (RETRY 2/3)
+# Current Task: review-002
 
-## Task Details
-**ID:** review-001
-**Title:** Comprehensive Gap Analysis vs MOO1 Manual
-**Status:** NEEDS CORRECTION
-**Retry:** 2 of 3
+## Gap Analysis vs StrategyWiki
 
-## Description
-Compare ALL design documents against the original MOO1 manual PDF. Identify any missing mechanics, systems, or details. Create a gap report listing: 1) Missing systems entirely, 2) Incomplete specifications, 3) Deviations from MOO1 (intentional vs unintentional).
+**ID:** review-002
+**Priority:** 2
+**Output File:** design/review/gap-analysis-wiki.md
 
-## Output File
-design/review/gap-analysis-manual.md
+### Description
 
-## ⚠️ CRITICAL: VERIFICATION FEEDBACK FROM PREVIOUS ATTEMPT
+Fetch all StrategyWiki MOO1 pages and compare against our specifications. Focus on: 
+- Formulas accuracy
+- Tech tree completeness
+- Combat mechanics
+- Race abilities
 
-The previous gap analysis **FAILED VERIFICATION** with score 55/100.
+Identify any discrepancies between StrategyWiki's documentation and our Hamster of Orion specifications.
 
-### Critical Errors That MUST Be Fixed:
+### Key StrategyWiki Pages to Review
 
-1. **Random Events** - FALSELY claimed spec doesn't exist
-   - **ACTUAL:** A comprehensive 42KB specification exists at `design/game-mechanics/random-events.md`
-   - **CORRECTION:** Update coverage from 30% to 90%+, remove from gaps list
+1. https://strategywiki.org/wiki/Master_of_Orion
+2. https://strategywiki.org/wiki/Master_of_Orion/Races
+3. https://strategywiki.org/wiki/Master_of_Orion/Technology
+4. https://strategywiki.org/wiki/Master_of_Orion/Combat
+5. https://strategywiki.org/wiki/Master_of_Orion/Planets
+6. https://strategywiki.org/wiki/Master_of_Orion/Ships
+7. https://strategywiki.org/wiki/Master_of_Orion/Diplomacy
+8. Any other relevant subpages
 
-2. **Ship Components** - FALSELY listed as Critical Gap
-   - **ACTUAL:** `design/ships/components-complete.md` exists with engines, fuel cells, computers, ECM, shields, armor, scanners, special systems
-   - **CORRECTION:** Remove from Critical Gaps, update Ship Design coverage to 90%+
+### Expected Output Format
 
-3. **Weapons List** - FALSELY marked as missing
-   - **ACTUAL:** Both `design/ships/weapons-complete.md` AND `design/technology/weapons.md` exist with full stats
-   - **CORRECTION:** Remove from gaps, update technology coverage
+```markdown
+# Gap Analysis: StrategyWiki vs Hamster of Orion Specifications
 
-4. **Victory Conditions** - FALSELY marked as 60% coverage
-   - **ACTUAL:** 40KB comprehensive spec at `design/game-mechanics/victory-conditions.md`
-   - **CORRECTION:** Update to 95% coverage
+## Executive Summary
+[Brief overview of findings]
 
-5. **Slider System** - FALSELY listed as needing specification
-   - **ACTUAL:** `design/planets/slider-mathematics.md` exists with full 5-slider system documentation
-   - **CORRECTION:** Remove from Priority 2 gaps
+## Methodology
+[How comparison was performed]
 
-6. **Technology Fields** - NOT REFERENCED
-   - **ACTUAL:** Full tech tree specs exist: `design/technology/computers.md`, `construction.md`, `force-fields.md`, `planetology.md`, `propulsion.md`, `weapons.md`
-   - **CORRECTION:** Reference these and update technology coverage
+## Findings by Category
 
-### MANDATORY METHODOLOGY:
-Before claiming ANY gap exists, you MUST:
-```bash
-find design -name "*.md" -type f | sort
+### Tech Tree / Technology
+[Discrepancies found]
+
+### Combat Mechanics  
+[Discrepancies found]
+
+### Race Abilities
+[Discrepancies found]
+
+### Formulas
+[Accuracy comparison]
+
+## Priority Gaps
+[Items needing attention]
+
+## Conclusion
 ```
-And verify the claimed gap is NOT covered by an existing file.
 
-### Requirements for This Retry:
-1. Re-inventory ALL files in the design/ directory using `find`
-2. Cross-reference each MOO1 system against ACTUAL existing files
-3. Only list gaps that TRULY don't have specifications
-4. Update all coverage percentages accurately
-5. Focus on REAL gaps like: AI Governor automation, Fleet Movement details, UI/UX screens, Save/Load system
-
-The document structure was good. The CONTENT accuracy was the problem.
+### Working Directory
+/Users/jchilders/projects/orion-game
