@@ -1,23 +1,37 @@
 {
-  "task_id": "spec-014",
-  "verified_at": "2026-03-22T10:57:00-05:00",
+  "task_id": "spec-015",
+  "verified_at": "2026-03-22T11:05:42-05:00",
   "passed": true,
   "score": 92,
   "issues": [
     {
       "severity": "minor",
       "category": "accuracy",
-      "description": "Ants racial bonus listed as +50% Production in Overview but racial_modifiers JSON shows 0.50 production_bonus (same thing, but Overview earlier says +25% Growth which contradicts)",
-      "location": "design/technology/planetology.md, ## Overview section",
-      "suggestion": "Verify Ants bonus: Overview says '+50% Production' but earlier version mentioned '+25% Growth'. Ensure consistency."
+      "description": "Hamster trade bonus listed as +25% in relationship-formulas.md (Section 5.2) but treaties.md says +50%",
+      "location": "design/diplomacy/relationship-formulas.md, Section 5.2",
+      "suggestion": "Reconcile with treaties.md - verify which value is intended for MOO1 faithfulness (Human trade bonus)"
     },
     {
-      "severity": "minor", 
+      "severity": "minor",
       "category": "completeness",
-      "description": "Future Tech effects are listed as 'General improvements' without specific implementation details",
-      "location": "design/technology/planetology.md, ### Future Tech section",
-      "suggestion": "Consider specifying what 'general improvements' means for implementation (e.g., miniaturization bonus, research cost reduction, etc.)"
+      "description": "Example 2 in Section 2.3 shows Guinea Pigs catching Chameleon spy but uses Guinea Pig modifier (0.80) for the penalty calculation - should clarify whose modifier applies (victim vs perpetrator)",
+      "location": "design/diplomacy/relationship-formulas.md, Section 2.3 Example 2",
+      "suggestion": "Add clarification on which race's modifier is used for spy-caught penalties (likely victim's forgiveness modifier)"
+    },
+    {
+      "severity": "minor",
+      "category": "integration",
+      "description": "First Contact Modifiers table shows +20 for gift at first contact, but Section 2.2 Positive Actions shows gift_small at +10 (50-200 BC). Need to clarify if first contact gift uses different scale",
+      "location": "design/diplomacy/relationship-formulas.md, Section 1 vs Section 2.2",
+      "suggestion": "Clarify that first contact gift bonus is flat +20 regardless of value, or specify minimum gift value for first contact"
+    },
+    {
+      "severity": "minor",
+      "category": "accuracy",
+      "description": "Guinea Pigs vs Hamsters attitude shows -30 in relationship-formulas.md but treaties.md shows -20 for initial relations",
+      "location": "design/diplomacy/relationship-formulas.md, Section 5.3 vs treaties.md First Contact",
+      "suggestion": "Verify which value is correct; the -30 in relationship-formulas.md seems more aligned with Guinea Pig warrior contempt"
     }
   ],
-  "summary": "The Planetology technology tree specification is excellent and implementation-ready. It includes: comprehensive Overview with racial bonuses; complete 12-tier tech tree with 28 technologies plus 10 future tech levels; detailed statistics for all 8 technology categories (Terraforming, Colonization, Eco Restoration, Enrichment, Bio Weapons, Bio Defense, Cloning, Atmosphere); complete formulas for terraforming cost, pollution cleanup, bio weapon damage, and cloning; extensive JSON data schema with all technologies properly structured; thorough edge cases section; 4 worked examples; environment type reference table; and cross-references to related documents. The JSON is valid and parseable. Naming follows pet-themed conventions (Rabbits, Ants, Hermit Crabs). Minor issues: slight inconsistency in racial bonus description, and future tech lacks specific effects. Overall score 92/100 - PASSED."
+  "summary": "Excellent, comprehensive specification that thoroughly covers diplomacy relationship mathematics. All required sections are present (Overview, Formulas, Constants, Algorithm, Data Tables, Edge Cases). All 4 JSON data blocks parse successfully. Formulas are implementation-ready with clear pseudocode algorithm. Properly uses pet-themed naming (Hamsters, Guinea Pigs, etc.) consistent with LORE.md. Minor inconsistencies with treaties.md should be reconciled but do not block implementation. The spec correctly maps MOO1 Human diplomacy traits to Hamsters and provides complete racial modifiers for all 10 races."
 }

@@ -133,7 +133,7 @@
       "id": "spec-015",
       "title": "Diplomacy Relationship Mathematics",
       "description": "Document exact formulas for: relationship value changes, treaty effects on relations, war weariness, racial diplomacy modifiers. Create design/diplomacy/relationship-formulas.md",
-      "status": "pending_verification",
+      "status": "done",
       "priority": 15,
       "output_file": "design/diplomacy/relationship-formulas.md"
     },

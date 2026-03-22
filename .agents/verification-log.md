@@ -44,3 +44,20 @@ The following tasks were completed before the verification system was implemente
 **Recommendation:** Pass with minor corrections needed.
 
 ---
+
+### spec-015: Diplomacy Relationship Mathematics
+**File:** design/diplomacy/relationship-formulas.md  
+**Verified:** 2026-03-22T11:05:42-05:00  
+**Result:** ✅ PASSED (Score: 92/100)
+
+**Summary:** Excellent, comprehensive specification that thoroughly covers diplomacy relationship mathematics. All required sections present (Overview, Formulas, Constants, Algorithm, Data Tables, Edge Cases). All 4 JSON data blocks parse successfully. Formulas are implementation-ready with clear pseudocode algorithm. Properly uses pet-themed naming consistent with LORE.md. Correctly maps MOO1 Human diplomacy traits to Hamsters.
+
+**Issues Found (4 minor):**
+1. Hamster trade bonus inconsistency: +25% here vs +50% in treaties.md
+2. Spy-caught modifier application unclear (victim vs perpetrator modifier)
+3. First contact gift bonus (+20) vs standard gift scale needs clarification
+4. Guinea Pigs vs Hamsters attitude: -30 here vs -20 in treaties.md
+
+**Recommendation:** Pass - minor inconsistencies with treaties.md should be reconciled but do not block implementation.
+
+---
