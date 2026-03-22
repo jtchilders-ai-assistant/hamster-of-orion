@@ -649,3 +649,76 @@ Created complete Planetology technology tree specification including:
 - State: IDLE → WORKING
 - Assigned task spec-015: Diplomacy Relationship Mathematics
 - Spawning worker agent...
+
+---
+
+### 2026-03-22 11:01 - spec-015: Diplomacy Relationship Mathematics ✅
+**Completed:** `design/diplomacy/relationship-formulas.md`
+
+**Summary:**
+Created comprehensive diplomacy relationship mathematics specification including:
+- **Relationship Scale (-100 to +100):**
+  - 5 diplomatic states (War → Allied)
+  - Starting relationship formula with racial modifiers
+  - First contact modifiers (-30 to +20)
+- **Action-Based Relationship Changes:**
+  - 16 positive actions (+5 to +50 base change)
+  - 22 negative actions (-10 to -100 base change)
+  - Formula: floor(BaseChange × RacialMod × ReputationMod × DifficultyMod)
+  - Worked examples (Hamsters, Guinea Pigs)
+- **Treaty Effects on Relations:**
+  - 6 treaty types with maintenance bonuses (+0.10 to +0.30/turn)
+  - Treaty violation penalties (-20 to -100)
+  - Treaty duration bonuses (+5 per 25 turns, max +20)
+  - Treaty Breaker reputation (50 turn duration)
+- **War Weariness System:**
+  - Formula: BaseDuration + CasualtyFactor + EconomicStrain
+  - 6 weariness levels (Fresh → Desperate)
+  - Racial multipliers (Guinea Pigs 0.5× → Rabbits 1.5×)
+  - Recovery formula (2 + PeaceYears + VictoryBonus)
+- **Racial Diplomacy Modifiers:**
+  - All 10 races with diplomacy skill modifiers
+  - Hamster special abilities (2× positive, +25% trade, +5 treaty bonus)
+  - Racial attitude matrix (13 race-pair modifiers)
+  - Treaty acceptance thresholds by race
+- **Relationship Decay & Natural Drift:**
+  - Decay formula: 2% per turn toward baseline
+  - Decay rate modifiers (treaties, war, reputation)
+  - Border friction calculation (-5 per contested system, max -25)
+- **Reputation System:**
+  - 4 tracks (Honor, Peace, Fairness, Mercy)
+  - Reputation change events per track
+  - Global reputation modifier formula (0.5 to 1.5×)
+- **AI Diplomatic Behavior:**
+  - Acceptance formula for proposals
+  - Peace acceptance calculation with war weariness
+  - War declaration probability by race
+- **Complete JSON Data Schemas:**
+  - racial_diplomacy_stats (10 races)
+  - racial_attitudes (13 pairs)
+  - treaties (6 types)
+  - diplomatic_actions (38 actions)
+- **Turn Update Algorithm:**
+  - Pseudocode for relationship processing
+  - Order: Actions → Decay → Treaty Bonuses → Cap
+- **13 Constants Summary** with values and descriptions
+- **Edge Cases:**
+  - Relationship overflow/underflow
+  - Extinct races
+  - First turn contact
+  - Council effects
+  - Chameleon frame jobs
+  - Simultaneous actions
+- **2 Detailed Worked Examples:**
+  - Building alliance (Hamsters → Rats over 150 turns)
+  - War and recovery (Guinea Pigs → Hamsters)
+
+**Files Created:**
+- `design/diplomacy/relationship-formulas.md` (30KB, 950+ lines)
+
+**Notes:**
+- Based on MOO1 Human diplomatic bonuses (Hamsters = Humans)
+- Integer math with floor rounding throughout
+- Integrates with treaties.md, ai-personalities.md, and species docs
+- All 10 races have documented diplomatic stats
+- Comprehensive enough for full implementation
