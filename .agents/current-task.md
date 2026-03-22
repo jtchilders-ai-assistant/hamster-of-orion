@@ -1,21 +1,21 @@
-# Current Task: ui-011
+# Current Task: ui-012
 
 ## Title
-UI Interaction Specification
+UI State Transitions
 
 ## Description
-Document all UI interactions matching MOO1: click behaviors, keyboard shortcuts, slider mechanics, list navigation, context menus. Create interaction spec.
+Document all screen transitions and modal behaviors matching MOO1. Include: screen flow diagram, popup triggers, confirmation dialogs, turn flow.
 
 ## Output File
-design/ui-ux/interaction-spec.md
+design/ui-ux/state-transitions.md
+
+## Priority
+16
 
 ## Requirements
-- Document click behaviors (single, double, right-click)
-- Keyboard shortcuts (global and screen-specific)
-- Slider mechanics (production allocation, etc.)
-- List navigation (scrolling, selection, multi-select)
-- Context menus (right-click menus)
-- Drag and drop behaviors
-- Focus and hover states
-- Modal interaction patterns
-- Match MOO1 behavior where applicable
+- Document all screen-to-screen transitions
+- Define modal/popup trigger conditions
+- Specify confirmation dialog requirements
+- Map the turn flow state machine
+- Match MOO1 screen flow patterns
+- Include transition animations and timing
