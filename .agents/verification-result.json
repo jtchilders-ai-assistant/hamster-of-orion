@@ -1,44 +1,44 @@
 {
-  "task_id": "spec-022",
-  "verified_at": "2026-03-22T11:47:00-05:00",
-  "passed": true,
-  "score": 82,
+  "task_id": "spec-023",
+  "verified_at": "2026-03-22T11:52:00-05:00",
+  "passed": false,
+  "score": 65,
   "issues": [
     {
-      "severity": "minor",
+      "severity": "critical",
       "category": "implementation",
-      "description": "No JSON data tables for victory constants (thresholds, timings, Guardian stats)",
-      "location": "design/game-mechanics/victory-conditions.md - throughout",
-      "suggestion": "Add a JSON block defining victory_thresholds: { domination_population_percent: 66.7, council_vote_percent: 66.7, council_first_turn: 50, council_interval: 25 }, guardian_stats: { hp, damage, regen_rate }, etc."
+      "description": "Task explicitly requires 'JSON data' but document contains no JSON data structures",
+      "location": "design/game-mechanics/difficulty.md - entire file",
+      "suggestion": "Add JSON blocks defining difficulty_modifiers: { easy: { production_bonus: 1.25, research_bonus: 1.25, combat_bonus: 1.10 }, normal: {...}, hard: {...}, impossible: {...} }"
+    },
+    {
+      "severity": "major",
+      "category": "completeness",
+      "description": "No exact numeric constants for modifiers - uses prose descriptions like '+25% production' instead of structured data",
+      "location": "design/game-mechanics/difficulty.md - all difficulty sections",
+      "suggestion": "Add constants table with exact values: production_multiplier, research_multiplier, combat_modifier, starting_techs_count, ai_vision_range, etc."
+    },
+    {
+      "severity": "major",
+      "category": "completeness",
+      "description": "Event frequency modifiers mentioned in task description but not documented",
+      "location": "design/game-mechanics/difficulty.md - missing section",
+      "suggestion": "Add section documenting how difficulty affects random event frequency, e.g. event_frequency_multiplier: { easy: 0.75, normal: 1.0, hard: 1.25, impossible: 1.5 }"
     },
     {
       "severity": "minor",
       "category": "completeness",
-      "description": "Victory check algorithms not formally specified - document describes conditions but not the per-turn check logic",
-      "location": "design/game-mechanics/victory-conditions.md - all victory sections",
-      "suggestion": "Add an 'Algorithm' section describing when and how victory conditions are evaluated each turn (e.g., 'Check at end of turn phase, iterate through conditions in priority order')"
+      "description": "Starting conditions not fully specified - mentions 'extra tech' but no exact counts per difficulty",
+      "location": "design/game-mechanics/difficulty.md - Easy and Impossible sections",
+      "suggestion": "Specify exact starting resources: starting_techs, starting_money, starting_ships, homeworld_bonus"
     },
     {
       "severity": "minor",
       "category": "implementation",
-      "description": "Diplomatic Victory vote calculation formula incomplete - mentions 'votes = population %' but lacks full formula including relationship modifiers, fear factor, bribes",
-      "location": "design/game-mechanics/victory-conditions.md - Section 3: Diplomatic Victory",
-      "suggestion": "Add explicit formula: vote_weight = base_population_percent + relationship_modifier + fear_modifier + bribe_modifier, with constants for each factor"
-    },
-    {
-      "severity": "minor",
-      "category": "completeness",
-      "description": "Guardian combat requirements listed but stats not fully defined for implementation",
-      "location": "design/game-mechanics/victory-conditions.md - Section 2: The Guardian",
-      "suggestion": "Add concrete stats: HP value, damage values for each weapon, exact armor/shield values, regeneration formula"
-    },
-    {
-      "severity": "minor",
-      "category": "accuracy",
-      "description": "Transcendence Victory is not in MOO1 - this is a creative addition",
-      "location": "design/game-mechanics/victory-conditions.md - Section 5: Transcendence Victory",
-      "suggestion": "No fix needed - this is documented as a 'hidden' victory and aligns with LORE.md. Consider adding a note that this is a Hamster of Orion original feature."
+      "description": "Custom difficulty section lacks parameter ranges and defaults",
+      "location": "design/game-mechanics/difficulty.md - Custom Difficulty section",
+      "suggestion": "Add JSON schema for custom difficulty with min/max/default values for each adjustable parameter"
     }
   ],
-  "summary": "Victory Conditions specification is well-written with clear descriptions of all five victory paths, good thematic content matching LORE.md, and solid integration with other game mechanics. The document excels at conveying gameplay intent and strategy guidance. However, it reads more as a game design document than an implementation-ready specification - it lacks formal algorithms, JSON data structures, and precise formulas that developers would need. The core victory mechanics (population thresholds, council voting, elimination checks) are accurate to MOO1. Passing with score 82 - the document provides sufficient detail for implementation but would benefit from adding structured data tables and explicit check algorithms in a future pass."
+  "summary": "The Difficulty Levels document provides good gameplay descriptions and thematic content but fails the core requirement: the task explicitly requires 'JSON data' and the document contains none. The content reads as a player guide rather than an implementation specification. All bonuses are described in prose form without structured data tables that developers could directly use. Score 65 - requires revision to add JSON data structures with exact numeric modifiers for all five difficulty levels."
 }

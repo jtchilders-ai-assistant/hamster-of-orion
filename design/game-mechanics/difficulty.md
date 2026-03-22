@@ -1,159 +1,1086 @@
-# Difficulty Levels
+# Difficulty Level Modifiers
 
 ## Overview
-Five difficulty levels from beginner-friendly to brutally unfair. AI gets smarter and potentially cheats at higher levels.
+
+Hamster of Orion features five difficulty levels that scale the challenge from beginner-friendly to brutally unfair. Higher difficulties provide AI empires with significant production, research, and combat advantages while placing handicaps on the player. This document specifies exact modifiers for all game systems affected by difficulty.
+
+**Key MOO1 Faithful Mechanics:**
+- Five difficulty levels: Simple, Easy, Average, Hard, Impossible
+- AI bonuses scale exponentially with difficulty
+- Player starting conditions vary by difficulty
+- Tech costs for AI decrease at higher difficulties
+- Event frequency increases at higher difficulties
 
 ---
 
-## Easy (Beginner)
+## Difficulty Levels Summary
 
-**AI Behavior**:
-- Makes suboptimal decisions
-- Slow expansion
-- Weak military
-- Forgives quickly
-- Accepts bad deals
-
-**Player Advantages**:
-- +25% production
-- +25% research
-- +10% ship combat
-- Start with extra tech
-- AI doesn't exploit weaknesses
-
-**Recommended For**:
-- First-time players
-- Learning game mechanics
-- Testing strategies
-- Casual play
-
-**Victory Timeline**: 100-150 turns typical
+| Level | Description | Player Experience | AI Behavior |
+|-------|-------------|-------------------|-------------|
+| Simple | Tutorial mode | Significant advantages | Passive, forgiving |
+| Easy | Beginner friendly | Moderate advantages | Cautious, reactive |
+| Average | Balanced | No modifiers | Competent |
+| Hard | Challenging | Moderate handicaps | Aggressive, skilled |
+| Impossible | Unfair | Severe handicaps | Optimal, cheating |
 
 ---
 
-## Normal (Standard)
+## Starting Conditions
 
-**AI Behavior**:
-- Plays to racial strengths
-- Moderate expansion
-- Balanced military
-- Fair negotiations
-- Typical behavior
+### Player Homeworld Starting State
 
-**No Bonuses**: Player and AI on equal footing
+Starting conditions scale with difficulty level:
 
-**Recommended For**:
-- Experienced players
-- Standard challenge
-- Competitive play
-- Fair testing
+| Difficulty | Population | Factories | Ships | Reserve BC |
+|------------|------------|-----------|-------|------------|
+| Simple | 50 | 40 | 2 Scouts, 1 Fighter | 100 |
+| Easy | 45 | 35 | 2 Scouts | 50 |
+| Average | 40 | 30 | 1 Scout | 0 |
+| Hard | 40 | 30 | 1 Scout | 0 |
+| Impossible | 40 | 30 | 1 Scout | 0 |
 
-**Victory Timeline**: 120-180 turns typical
+**Notes:**
+- All players start on a Large or Huge Terran planet regardless of difficulty
+- Homeworld is always Normal mineral richness
+- AI empires always start with Average-level conditions (40 pop, 30 factories, 1 scout)
 
----
+### Starting Production Calculation
 
-## Hard (Challenge)
+```
+Starting_Production = (Population × 0.5) + (Factories × 1.0)
 
-**AI Advantages**:
-- +25% production
-- +25% research
-- Better decision-making
-- Aggressive expansion
-- Exploits weaknesses
-
-**Player Challenges**:
-- AI coordinates attacks
-- Ruthless negotiations
-- Forms anti-player alliances
-- Optimal tech choices
-
-**Recommended For**:
-- Veterans
-- Seeking challenge
-- Multiple playthrough mastery
-- Competitive edge
-
-**Victory Timeline**: 150-200 turns typical
+Simple:     (50 × 0.5) + (40 × 1.0) = 25 + 40 = 65 BC/turn
+Easy:       (45 × 0.5) + (35 × 1.0) = 22.5 + 35 = 57.5 BC/turn
+Average:    (40 × 0.5) + (30 × 1.0) = 20 + 30 = 50 BC/turn
+Hard:       (40 × 0.5) + (30 × 1.0) = 20 + 30 = 50 BC/turn
+Impossible: (40 × 0.5) + (30 × 1.0) = 20 + 30 = 50 BC/turn
+```
 
 ---
 
-## Impossible (Unfair)
+## Production Modifiers
 
-**AI Advantages**:
-- +50% production
-- +50% research
-- +25% ship combat
-- +2 free techs at start
-- Perfect information (sees everything)
-- Coordinated strategy
+Production output is multiplied by difficulty modifiers:
 
-**Player Challenges**:
-- AI cheats significantly
-- Knows your plans
-- United against you
-- Exploits every mistake
-- No mercy
+### Production Modifier Table
 
-**Recommended For**:
-- Masters only
-- Proving skill
-- Extreme challenge
-- Bragging rights
+| Difficulty | Player Modifier | AI Modifier | Net Ratio (AI:Player) |
+|------------|-----------------|-------------|----------------------|
+| Simple | 1.25 (125%) | 0.75 (75%) | 0.60:1 |
+| Easy | 1.10 (110%) | 0.90 (90%) | 0.82:1 |
+| Average | 1.00 (100%) | 1.00 (100%) | 1.00:1 |
+| Hard | 0.90 (90%) | 1.25 (125%) | 1.39:1 |
+| Impossible | 0.75 (75%) | 1.50 (150%) | 2.00:1 |
 
-**Victory Timeline**: 200-250+ turns (if at all)
+### Production Formula with Difficulty
 
-**Warning**: May feel unfair. AI literally cheats.
+```
+Effective_Production = Base_Production × Racial_Modifier × Difficulty_Modifier
 
----
+# Example: Ants empire on Hard difficulty
+Base_Production = 100 BC
+Racial_Modifier = 1.50 (Ants +50%)
+Difficulty_Modifier = 1.25 (AI on Hard)
 
-## Custom Difficulty
+Effective_Production = 100 × 1.50 × 1.25 = 187.5 BC
+```
 
-**Player Can Adjust**:
-- AI bonuses (0-100%)
-- Starting techs (0-10)
-- Galaxy size
-- Number of opponents
-- Starting resources
-- Victory conditions enabled/disabled
-
-**Presets**:
-- "Story Mode": Easy + extra resources
-- "Sandbox": No AI, creative mode
-- "Ironman": Normal + single save, no reload
-- "Nightmare": Impossible + extra AI opponents
+**Application:** Applies to all production including factory output, ship construction, and defensive installations.
 
 ---
 
-## Difficulty by Race
+## Research Modifiers
 
-**Easy Races** (Beginner-Friendly):
-- Hamsters: Balanced, forgiving
-- Ants: Production powerhouse
-- Mice: Tech advantage
+Research costs and output are modified by difficulty:
 
-**Medium Races**:
-- Rats: Research focus
-- Rabbits: Population strategy
-- Hermit Crabs: Defensive play
+### AI Research Cost Modifier
 
-**Hard Races**:
-- Guinea Pigs: Aggressive play required
-- Ferrets: Precision needed
-- Budgies: Tactical mastery
+| Difficulty | Player Tech Cost | AI Tech Cost | AI Research Speed |
+|------------|------------------|--------------|-------------------|
+| Simple | 1.00× | 1.50× | 0.67× slower |
+| Easy | 1.00× | 1.25× | 0.80× slower |
+| Average | 1.00× | 1.00× | Baseline |
+| Hard | 1.00× | 0.75× | 1.33× faster |
+| Impossible | 1.00× | 0.50× | 2.00× faster |
 
-**Expert Races**:
-- Chameleons: Complex espionage management
+**Note:** Player research cost is NOT modified by difficulty. Only AI receives cost reduction.
+
+### Research Formula with Difficulty
+
+```
+AI_Tech_Cost = Base_Tech_Cost × AI_Difficulty_Cost_Modifier
+
+# Example: Tier 5 tech (500 RP base) for AI on Impossible
+AI_Tech_Cost = 500 × 0.50 = 250 RP
+
+# Player always pays full cost
+Player_Tech_Cost = 500 × 1.00 = 500 RP
+```
+
+### AI Research Priority Intelligence
+
+| Difficulty | Research Selection |
+|------------|-------------------|
+| Simple | Random, no optimization |
+| Easy | Slight racial preference |
+| Average | Racial preference, some counter-tech |
+| Hard | Optimal counter-tech, racial synergy |
+| Impossible | Perfect counter-tech, knows player's research |
 
 ---
 
-## Difficulty Achievements
+## Combat Modifiers
 
-**Easy Completionist**: Win with all races on Easy
-**Normal Master**: Win all 5 victories on Normal
-**Hard Challenge**: Any victory on Hard
-**Impossible Legend**: Any victory on Impossible (rare!)
-**Perfect Balance**: Transcendence on Normal+
+### Ship Combat Bonuses
+
+| Difficulty | Player Attack | Player Defense | AI Attack | AI Defense |
+|------------|---------------|----------------|-----------|------------|
+| Simple | +10% | +10% | -10% | -10% |
+| Easy | +5% | +5% | -5% | -5% |
+| Average | +0% | +0% | +0% | +0% |
+| Hard | -5% | -5% | +5% | +5% |
+| Impossible | -10% | -10% | +10% | +10% |
+
+**Application:** These modify hit chance and damage in space combat.
+
+### Combat Modifier Formula
+
+```
+Effective_Hit_Chance = Base_Hit_Chance + Computer_Bonus - ECM_Penalty + Difficulty_Attack_Modifier
+
+# Example: Player ship vs AI ship on Impossible
+Base_Hit_Chance = 50%
+Computer_Bonus = +20% (Mark IV)
+ECM_Penalty = -10% (AI ECM II)
+Difficulty_Attack_Modifier = -10% (player on Impossible)
+
+Effective_Hit_Chance = 50 + 20 - 10 - 10 = 50%
+```
+
+### Ground Combat Modifiers
+
+| Difficulty | Player Ground Bonus | AI Ground Bonus |
+|------------|---------------------|-----------------|
+| Simple | +15% | -15% |
+| Easy | +10% | -10% |
+| Average | +0% | +0% |
+| Hard | -10% | +10% |
+| Impossible | -15% | +15% |
 
 ---
 
-Next: See `random-events.md` for space encounters.
+## Population Growth Modifiers
+
+### Growth Rate Modifiers
+
+| Difficulty | Player Growth | AI Growth |
+|------------|---------------|-----------|
+| Simple | 1.25× | 0.75× |
+| Easy | 1.10× | 0.90× |
+| Average | 1.00× | 1.00× |
+| Hard | 0.90× | 1.10× |
+| Impossible | 0.75× | 1.25× |
+
+### Growth Formula with Difficulty
+
+```
+Effective_Growth = Base_Growth × Racial_Modifier × Environment_Modifier × Difficulty_Modifier
+
+# Example: Rabbits on Terran planet, Hard difficulty (AI)
+Base_Growth = 10%
+Racial_Modifier = 2.00 (Rabbits +100%)
+Environment_Modifier = 1.00 (Terran)
+Difficulty_Modifier = 1.10 (AI on Hard)
+
+Effective_Growth = 10% × 2.00 × 1.00 × 1.10 = 22%
+```
+
+---
+
+## Diplomatic Modifiers
+
+### AI Diplomatic Behavior
+
+| Difficulty | AI Forgiveness | Treaty Duration | War Declaration Threshold |
+|------------|----------------|-----------------|---------------------------|
+| Simple | 1.50× | 1.25× longer | +30 (very reluctant) |
+| Easy | 1.25× | 1.10× longer | +15 (reluctant) |
+| Average | 1.00× | 1.00× baseline | +0 (normal) |
+| Hard | 0.75× | 0.90× shorter | -15 (eager) |
+| Impossible | 0.50× | 0.75× shorter | -30 (aggressive) |
+
+**Forgiveness:** Multiplier on how quickly negative relations decay.
+**Treaty Duration:** Affects AI willingness to maintain treaties.
+**War Declaration Threshold:** Modifier to the relation level at which AI considers war.
+
+### Anti-Player Coalition
+
+| Difficulty | Coalition Probability |
+|------------|----------------------|
+| Simple | 0% (never) |
+| Easy | 10% (rare) |
+| Average | 25% (occasional) |
+| Hard | 50% (common) |
+| Impossible | 75% (frequent) |
+
+**Coalition Mechanics:** At higher difficulties, AI empires coordinate against the leading player. When triggered:
+- AI empires share intelligence about player
+- Coordinated attack timing
+- Refuse separate peace treaties
+- Trade embargoes
+
+---
+
+## Espionage Modifiers
+
+### Spy Operation Modifiers
+
+| Difficulty | Player Spy Success | AI Spy Success | Player Detection | AI Detection |
+|------------|-------------------|----------------|------------------|--------------|
+| Simple | +20% | -20% | +20% | -20% |
+| Easy | +10% | -10% | +10% | -10% |
+| Average | +0% | +0% | +0% | +0% |
+| Hard | -10% | +10% | -10% | +10% |
+| Impossible | -20% | +20% | -20% | +20% |
+
+### Spy Cost Modifier
+
+| Difficulty | Player Spy Cost |
+|------------|-----------------|
+| Simple | 0.75× (37 BC) |
+| Easy | 0.90× (45 BC) |
+| Average | 1.00× (50 BC) |
+| Hard | 1.10× (55 BC) |
+| Impossible | 1.25× (62 BC) |
+
+**Note:** AI always pays baseline spy cost (50 BC).
+
+---
+
+## Event Frequency Modifiers
+
+### Random Event Probability
+
+| Difficulty | Event Frequency | Negative Event Bias | Monster Strength |
+|------------|-----------------|---------------------|------------------|
+| Simple | 0.50× | -25% | 0.75× |
+| Easy | 0.75× | -10% | 0.90× |
+| Average | 1.00× | +0% | 1.00× |
+| Hard | 1.25× | +10% | 1.25× |
+| Impossible | 1.50× | +25% | 1.50× |
+
+**Event Frequency:** Multiplier on base event probability.
+**Negative Event Bias:** Adjustment to negative vs. positive event probability.
+**Monster Strength:** HP and damage multiplier for space monsters.
+
+### Event Probability Formula
+
+```
+Event_Chance = Base_Event_Chance × Difficulty_Event_Multiplier
+
+Base_Event_Chance = 3% + (Turn × 0.1%) (max 15%)
+
+# Example: Turn 50 on Impossible
+Base_Event_Chance = min(3% + (50 × 0.1%), 15%) = 8%
+Difficulty_Multiplier = 1.50
+Effective_Chance = 8% × 1.50 = 12%
+```
+
+### Monster Stats by Difficulty
+
+| Monster | Stat | Simple | Easy | Average | Hard | Impossible |
+|---------|------|--------|------|---------|------|------------|
+| Cosmic Blob | HP | 750 | 900 | 1000 | 1250 | 1500 |
+| Cosmic Blob | Regen | 75 | 90 | 100 | 125 | 150 |
+| Crystal Horror | HP | 600 | 720 | 800 | 1000 | 1200 |
+| Crystal Horror | Shields | VIII | IX | X | XI | XII |
+| Void Wyrm | HP | 1125 | 1350 | 1500 | 1875 | 2250 |
+| Void Wyrm | Damage | 75 | 90 | 100 | 125 | 150 |
+
+---
+
+## Guardian of Orion Modifiers
+
+The Guardian's stats scale significantly with difficulty:
+
+| Stat | Simple | Easy | Average | Hard | Impossible |
+|------|--------|------|---------|------|------------|
+| HP | 16,000 | 24,000 | 32,000 | 40,000 | 48,000 |
+| Attack Rating | +5 | +7 | +10 | +12 | +15 |
+| Shields | Class X | Class XII | Class XV | Class XVIII | Class XX |
+| Armor | ×2.0 | ×3.0 | ×4.0 | ×5.0 | ×6.0 |
+| Speed | 2 | 3 | 4 | 5 | 6 |
+
+### Guardian Effective HP Calculation
+
+```
+Effective_HP = Base_HP × Armor_Multiplier
+
+Simple:     16,000 × 2.0 = 32,000 effective HP
+Easy:       24,000 × 3.0 = 72,000 effective HP
+Average:    32,000 × 4.0 = 128,000 effective HP
+Hard:       40,000 × 5.0 = 200,000 effective HP
+Impossible: 48,000 × 6.0 = 288,000 effective HP
+```
+
+---
+
+## Ship Maintenance Modifiers
+
+| Difficulty | Player Maintenance | AI Maintenance |
+|------------|-------------------|----------------|
+| Simple | 0.75× | 1.25× |
+| Easy | 0.90× | 1.10× |
+| Average | 1.00× | 1.00× |
+| Hard | 1.10× | 0.90× |
+| Impossible | 1.25× | 0.75× |
+
+**Application:** Affects fleet upkeep costs, allowing AI to field larger fleets at higher difficulties.
+
+---
+
+## AI Decision Intelligence
+
+### AI Quality by Difficulty
+
+| Difficulty | Decision Quality | Information Access | Planning Horizon |
+|------------|------------------|-------------------|------------------|
+| Simple | Random (±30) | Fog of War | 5 turns |
+| Easy | Suboptimal (±20) | Limited Intel | 10 turns |
+| Average | Competent (±10) | Normal Intel | 15 turns |
+| Hard | Skilled (±5) | Extended Intel | 25 turns |
+| Impossible | Perfect (±0) | Omniscient | Infinite |
+
+**Decision Quality:** Random noise added to AI scoring functions.
+**Information Access:** What the AI can "see" about player activities.
+**Planning Horizon:** How far ahead AI plans its strategy.
+
+### AI Information Access Details
+
+| Difficulty | Sees Player Ships | Sees Player Tech | Sees Player Production | Sees Player Plans |
+|------------|-------------------|------------------|------------------------|-------------------|
+| Simple | Only in combat | Never | Never | Never |
+| Easy | Adjacent systems | Combat encounters | Never | Never |
+| Average | Scanner range | Known + rumors | General strength | Never |
+| Hard | Extended range | Most techs | Detailed | Partial |
+| Impossible | All ships | All tech | Exact values | Full plans |
+
+---
+
+## Council Voting Modifiers
+
+### Council Formation Timing
+
+| Difficulty | Council Formation |
+|------------|-------------------|
+| Simple | 60% colonized |
+| Easy | 55% colonized |
+| Average | 50% colonized |
+| Hard | 45% colonized |
+| Impossible | 40% colonized |
+
+### AI Vote Behavior
+
+| Difficulty | AI Vote Loyalty | Bribe Effectiveness |
+|------------|-----------------|---------------------|
+| Simple | Low (player favored) | 1.50× |
+| Easy | Moderate | 1.25× |
+| Average | Normal | 1.00× |
+| Hard | High (AI coordinated) | 0.75× |
+| Impossible | Maximum (anti-player) | 0.50× |
+
+**Vote Loyalty:** Tendency for AI to vote against the player leader.
+**Bribe Effectiveness:** Multiplier on bribe value for vote influence.
+
+---
+
+## Constants Summary
+
+### DIFFICULTY_CONSTANTS
+
+| Constant | Value | Description |
+|----------|-------|-------------|
+| DIFFICULTY_COUNT | 5 | Number of difficulty levels |
+| MIN_DIFFICULTY_INDEX | 0 | Simple (0-indexed) |
+| MAX_DIFFICULTY_INDEX | 4 | Impossible (0-indexed) |
+| DEFAULT_DIFFICULTY | 2 | Average (default selection) |
+| COALITION_CHECK_INTERVAL | 25 | Turns between coalition checks |
+| COALITION_LEADER_THRESHOLD | 1.5 | Power ratio to trigger coalition |
+
+### DIFFICULTY_MODIFIER_CAPS
+
+| Modifier | Minimum | Maximum |
+|----------|---------|---------|
+| Production | 0.50× | 2.00× |
+| Research | 0.50× | 2.00× |
+| Combat | -20% | +20% |
+| Growth | 0.50× | 1.50× |
+| Event Frequency | 0.25× | 2.00× |
+
+---
+
+## JSON Data Schema
+
+```json
+{
+  "difficulty_levels": [
+    {
+      "id": "simple",
+      "name": "Simple",
+      "index": 0,
+      "description": "Tutorial mode with significant player advantages",
+      "starting_conditions": {
+        "player_population": 50,
+        "player_factories": 40,
+        "player_scouts": 2,
+        "player_fighters": 1,
+        "player_reserve_bc": 100
+      },
+      "production_modifier": {
+        "player": 1.25,
+        "ai": 0.75
+      },
+      "research_modifier": {
+        "player_cost": 1.00,
+        "ai_cost": 1.50
+      },
+      "combat_modifier": {
+        "player_attack": 0.10,
+        "player_defense": 0.10,
+        "ai_attack": -0.10,
+        "ai_defense": -0.10
+      },
+      "ground_combat_modifier": {
+        "player": 0.15,
+        "ai": -0.15
+      },
+      "growth_modifier": {
+        "player": 1.25,
+        "ai": 0.75
+      },
+      "diplomacy_modifier": {
+        "ai_forgiveness": 1.50,
+        "treaty_duration": 1.25,
+        "war_threshold": 30,
+        "coalition_probability": 0.00
+      },
+      "espionage_modifier": {
+        "player_success": 0.20,
+        "ai_success": -0.20,
+        "player_detection": 0.20,
+        "ai_detection": -0.20,
+        "player_spy_cost_multiplier": 0.75
+      },
+      "event_modifier": {
+        "frequency": 0.50,
+        "negative_bias": -0.25,
+        "monster_strength": 0.75
+      },
+      "maintenance_modifier": {
+        "player": 0.75,
+        "ai": 1.25
+      },
+      "ai_intelligence": {
+        "decision_noise": 30,
+        "information_access": "fog_of_war",
+        "planning_horizon": 5
+      },
+      "council_modifier": {
+        "formation_threshold": 0.60,
+        "ai_vote_loyalty": 0.50,
+        "bribe_effectiveness": 1.50
+      },
+      "guardian_stats": {
+        "hp": 16000,
+        "attack_rating": 5,
+        "shield_class": 10,
+        "armor_multiplier": 2.0,
+        "speed": 2
+      }
+    },
+    {
+      "id": "easy",
+      "name": "Easy",
+      "index": 1,
+      "description": "Beginner-friendly with moderate player advantages",
+      "starting_conditions": {
+        "player_population": 45,
+        "player_factories": 35,
+        "player_scouts": 2,
+        "player_fighters": 0,
+        "player_reserve_bc": 50
+      },
+      "production_modifier": {
+        "player": 1.10,
+        "ai": 0.90
+      },
+      "research_modifier": {
+        "player_cost": 1.00,
+        "ai_cost": 1.25
+      },
+      "combat_modifier": {
+        "player_attack": 0.05,
+        "player_defense": 0.05,
+        "ai_attack": -0.05,
+        "ai_defense": -0.05
+      },
+      "ground_combat_modifier": {
+        "player": 0.10,
+        "ai": -0.10
+      },
+      "growth_modifier": {
+        "player": 1.10,
+        "ai": 0.90
+      },
+      "diplomacy_modifier": {
+        "ai_forgiveness": 1.25,
+        "treaty_duration": 1.10,
+        "war_threshold": 15,
+        "coalition_probability": 0.10
+      },
+      "espionage_modifier": {
+        "player_success": 0.10,
+        "ai_success": -0.10,
+        "player_detection": 0.10,
+        "ai_detection": -0.10,
+        "player_spy_cost_multiplier": 0.90
+      },
+      "event_modifier": {
+        "frequency": 0.75,
+        "negative_bias": -0.10,
+        "monster_strength": 0.90
+      },
+      "maintenance_modifier": {
+        "player": 0.90,
+        "ai": 1.10
+      },
+      "ai_intelligence": {
+        "decision_noise": 20,
+        "information_access": "limited",
+        "planning_horizon": 10
+      },
+      "council_modifier": {
+        "formation_threshold": 0.55,
+        "ai_vote_loyalty": 0.75,
+        "bribe_effectiveness": 1.25
+      },
+      "guardian_stats": {
+        "hp": 24000,
+        "attack_rating": 7,
+        "shield_class": 12,
+        "armor_multiplier": 3.0,
+        "speed": 3
+      }
+    },
+    {
+      "id": "average",
+      "name": "Average",
+      "index": 2,
+      "description": "Balanced gameplay with no modifiers",
+      "starting_conditions": {
+        "player_population": 40,
+        "player_factories": 30,
+        "player_scouts": 1,
+        "player_fighters": 0,
+        "player_reserve_bc": 0
+      },
+      "production_modifier": {
+        "player": 1.00,
+        "ai": 1.00
+      },
+      "research_modifier": {
+        "player_cost": 1.00,
+        "ai_cost": 1.00
+      },
+      "combat_modifier": {
+        "player_attack": 0.00,
+        "player_defense": 0.00,
+        "ai_attack": 0.00,
+        "ai_defense": 0.00
+      },
+      "ground_combat_modifier": {
+        "player": 0.00,
+        "ai": 0.00
+      },
+      "growth_modifier": {
+        "player": 1.00,
+        "ai": 1.00
+      },
+      "diplomacy_modifier": {
+        "ai_forgiveness": 1.00,
+        "treaty_duration": 1.00,
+        "war_threshold": 0,
+        "coalition_probability": 0.25
+      },
+      "espionage_modifier": {
+        "player_success": 0.00,
+        "ai_success": 0.00,
+        "player_detection": 0.00,
+        "ai_detection": 0.00,
+        "player_spy_cost_multiplier": 1.00
+      },
+      "event_modifier": {
+        "frequency": 1.00,
+        "negative_bias": 0.00,
+        "monster_strength": 1.00
+      },
+      "maintenance_modifier": {
+        "player": 1.00,
+        "ai": 1.00
+      },
+      "ai_intelligence": {
+        "decision_noise": 10,
+        "information_access": "normal",
+        "planning_horizon": 15
+      },
+      "council_modifier": {
+        "formation_threshold": 0.50,
+        "ai_vote_loyalty": 1.00,
+        "bribe_effectiveness": 1.00
+      },
+      "guardian_stats": {
+        "hp": 32000,
+        "attack_rating": 10,
+        "shield_class": 15,
+        "armor_multiplier": 4.0,
+        "speed": 4
+      }
+    },
+    {
+      "id": "hard",
+      "name": "Hard",
+      "index": 3,
+      "description": "Challenging gameplay for experienced players",
+      "starting_conditions": {
+        "player_population": 40,
+        "player_factories": 30,
+        "player_scouts": 1,
+        "player_fighters": 0,
+        "player_reserve_bc": 0
+      },
+      "production_modifier": {
+        "player": 0.90,
+        "ai": 1.25
+      },
+      "research_modifier": {
+        "player_cost": 1.00,
+        "ai_cost": 0.75
+      },
+      "combat_modifier": {
+        "player_attack": -0.05,
+        "player_defense": -0.05,
+        "ai_attack": 0.05,
+        "ai_defense": 0.05
+      },
+      "ground_combat_modifier": {
+        "player": -0.10,
+        "ai": 0.10
+      },
+      "growth_modifier": {
+        "player": 0.90,
+        "ai": 1.10
+      },
+      "diplomacy_modifier": {
+        "ai_forgiveness": 0.75,
+        "treaty_duration": 0.90,
+        "war_threshold": -15,
+        "coalition_probability": 0.50
+      },
+      "espionage_modifier": {
+        "player_success": -0.10,
+        "ai_success": 0.10,
+        "player_detection": -0.10,
+        "ai_detection": 0.10,
+        "player_spy_cost_multiplier": 1.10
+      },
+      "event_modifier": {
+        "frequency": 1.25,
+        "negative_bias": 0.10,
+        "monster_strength": 1.25
+      },
+      "maintenance_modifier": {
+        "player": 1.10,
+        "ai": 0.90
+      },
+      "ai_intelligence": {
+        "decision_noise": 5,
+        "information_access": "extended",
+        "planning_horizon": 25
+      },
+      "council_modifier": {
+        "formation_threshold": 0.45,
+        "ai_vote_loyalty": 1.50,
+        "bribe_effectiveness": 0.75
+      },
+      "guardian_stats": {
+        "hp": 40000,
+        "attack_rating": 12,
+        "shield_class": 18,
+        "armor_multiplier": 5.0,
+        "speed": 5
+      }
+    },
+    {
+      "id": "impossible",
+      "name": "Impossible",
+      "index": 4,
+      "description": "Brutally unfair - AI cheats significantly",
+      "starting_conditions": {
+        "player_population": 40,
+        "player_factories": 30,
+        "player_scouts": 1,
+        "player_fighters": 0,
+        "player_reserve_bc": 0
+      },
+      "production_modifier": {
+        "player": 0.75,
+        "ai": 1.50
+      },
+      "research_modifier": {
+        "player_cost": 1.00,
+        "ai_cost": 0.50
+      },
+      "combat_modifier": {
+        "player_attack": -0.10,
+        "player_defense": -0.10,
+        "ai_attack": 0.10,
+        "ai_defense": 0.10
+      },
+      "ground_combat_modifier": {
+        "player": -0.15,
+        "ai": 0.15
+      },
+      "growth_modifier": {
+        "player": 0.75,
+        "ai": 1.25
+      },
+      "diplomacy_modifier": {
+        "ai_forgiveness": 0.50,
+        "treaty_duration": 0.75,
+        "war_threshold": -30,
+        "coalition_probability": 0.75
+      },
+      "espionage_modifier": {
+        "player_success": -0.20,
+        "ai_success": 0.20,
+        "player_detection": -0.20,
+        "ai_detection": 0.20,
+        "player_spy_cost_multiplier": 1.25
+      },
+      "event_modifier": {
+        "frequency": 1.50,
+        "negative_bias": 0.25,
+        "monster_strength": 1.50
+      },
+      "maintenance_modifier": {
+        "player": 1.25,
+        "ai": 0.75
+      },
+      "ai_intelligence": {
+        "decision_noise": 0,
+        "information_access": "omniscient",
+        "planning_horizon": -1
+      },
+      "council_modifier": {
+        "formation_threshold": 0.40,
+        "ai_vote_loyalty": 2.00,
+        "bribe_effectiveness": 0.50
+      },
+      "guardian_stats": {
+        "hp": 48000,
+        "attack_rating": 15,
+        "shield_class": 20,
+        "armor_multiplier": 6.0,
+        "speed": 6
+      }
+    }
+  ]
+}
+```
+
+---
+
+## Difficulty Selection Algorithm
+
+```pseudocode
+function apply_difficulty_modifiers(empire, difficulty):
+    diff = DIFFICULTY_LEVELS[difficulty]
+    
+    # Starting conditions (player only, turn 1)
+    if empire.is_player and turn == 1:
+        empire.homeworld.population = diff.starting_conditions.player_population
+        empire.homeworld.factories = diff.starting_conditions.player_factories
+        empire.reserve_bc = diff.starting_conditions.player_reserve_bc
+        spawn_starting_ships(empire, diff.starting_conditions)
+    
+    # Production modifier
+    if empire.is_player:
+        empire.production_multiplier = diff.production_modifier.player
+    else:
+        empire.production_multiplier = diff.production_modifier.ai
+    
+    # Research modifier
+    if empire.is_player:
+        empire.tech_cost_multiplier = diff.research_modifier.player_cost
+    else:
+        empire.tech_cost_multiplier = diff.research_modifier.ai_cost
+    
+    # Combat modifiers
+    if empire.is_player:
+        empire.attack_modifier = diff.combat_modifier.player_attack
+        empire.defense_modifier = diff.combat_modifier.player_defense
+    else:
+        empire.attack_modifier = diff.combat_modifier.ai_attack
+        empire.defense_modifier = diff.combat_modifier.ai_defense
+    
+    # Growth modifier
+    if empire.is_player:
+        empire.growth_multiplier = diff.growth_modifier.player
+    else:
+        empire.growth_multiplier = diff.growth_modifier.ai
+    
+    # Espionage modifier
+    if empire.is_player:
+        empire.spy_success_modifier = diff.espionage_modifier.player_success
+        empire.spy_detection_modifier = diff.espionage_modifier.player_detection
+        empire.spy_cost_multiplier = diff.espionage_modifier.player_spy_cost_multiplier
+    else:
+        empire.spy_success_modifier = diff.espionage_modifier.ai_success
+        empire.spy_detection_modifier = diff.espionage_modifier.ai_detection
+        empire.spy_cost_multiplier = 1.00  # AI always pays base cost
+    
+    # Maintenance modifier
+    if empire.is_player:
+        empire.maintenance_multiplier = diff.maintenance_modifier.player
+    else:
+        empire.maintenance_multiplier = diff.maintenance_modifier.ai
+    
+    # AI-specific settings
+    if not empire.is_player:
+        empire.ai_decision_noise = diff.ai_intelligence.decision_noise
+        empire.ai_information_access = diff.ai_intelligence.information_access
+        empire.ai_planning_horizon = diff.ai_intelligence.planning_horizon
+        empire.ai_war_threshold = diff.diplomacy_modifier.war_threshold
+        empire.ai_forgiveness = diff.diplomacy_modifier.ai_forgiveness
+
+function get_event_modifier(difficulty):
+    diff = DIFFICULTY_LEVELS[difficulty]
+    return {
+        frequency: diff.event_modifier.frequency,
+        negative_bias: diff.event_modifier.negative_bias,
+        monster_strength: diff.event_modifier.monster_strength
+    }
+
+function get_guardian_stats(difficulty):
+    return DIFFICULTY_LEVELS[difficulty].guardian_stats
+
+function get_coalition_probability(difficulty):
+    return DIFFICULTY_LEVELS[difficulty].diplomacy_modifier.coalition_probability
+
+function check_coalition_formation(leading_empire, difficulty):
+    if random() > get_coalition_probability(difficulty):
+        return false
+    
+    # Calculate power ratio
+    leader_power = calculate_empire_power(leading_empire)
+    average_power = calculate_average_ai_power()
+    
+    if leader_power / average_power < COALITION_LEADER_THRESHOLD:
+        return false
+    
+    # Form coalition
+    for empire in ai_empires:
+        if empire != leading_empire:
+            empire.join_coalition_against(leading_empire)
+    
+    return true
+```
+
+---
+
+## Difficulty by Race Recommendations
+
+### Beginner-Friendly Races (Recommended for Simple/Easy)
+
+| Race | Difficulty Rating | Why Beginner-Friendly |
+|------|-------------------|----------------------|
+| Hamsters | ★☆☆☆☆ | Balanced, diplomatic bonuses |
+| Ants | ★★☆☆☆ | Strong production, simple strategy |
+| Mice | ★★☆☆☆ | Tech advantage, automated factories |
+| Rabbits | ★★☆☆☆ | Population boom, quantity over quality |
+
+### Intermediate Races (Recommended for Average/Hard)
+
+| Race | Difficulty Rating | Challenge Factors |
+|------|-------------------|-------------------|
+| Rats | ★★★☆☆ | Research focus, need to stay ahead |
+| Hermit Crabs | ★★★☆☆ | Defensive, slow expansion |
+| Guinea Pigs | ★★★☆☆ | Aggressive play required |
+
+### Expert Races (Recommended for Hard/Impossible)
+
+| Race | Difficulty Rating | Challenge Factors |
+|------|-------------------|-------------------|
+| Ferrets | ★★★★☆ | Glass cannon, precision needed |
+| Budgies | ★★★★☆ | Tactical mastery required |
+| Chameleons | ★★★★★ | Complex espionage management |
+
+---
+
+## Achievements by Difficulty
+
+### Completion Achievements
+
+| Achievement | Requirement |
+|-------------|-------------|
+| First Steps | Win any victory on Simple |
+| Getting Started | Win any victory on Easy |
+| Competent Commander | Win any victory on Average |
+| Skilled Strategist | Win any victory on Hard |
+| Master of Orion | Win any victory on Impossible |
+
+### Challenge Achievements
+
+| Achievement | Requirement |
+|-------------|-------------|
+| Easy Champion | Win with all 10 races on Easy |
+| Balanced Master | Win all 5 victory types on Average |
+| Hardcore Hamster | Win with Hamsters on Impossible |
+| Against All Odds | Win Domination on Impossible |
+| Perfect Balance | Transcendence on Hard+ difficulty |
+
+### Speedrun Achievements
+
+| Achievement | Requirement |
+|-------------|-------------|
+| Swift Conquest | Win in under 100 turns on Average |
+| Blitz Victory | Win in under 75 turns on Hard |
+| Lightning Strike | Win in under 50 turns on any difficulty |
+
+---
+
+## Edge Cases
+
+### Difficulty Change Mid-Game
+
+Difficulty cannot be changed after game start. All modifiers are locked at game creation.
+
+### Custom Difficulty
+
+Custom difficulty allows individual modifier adjustment:
+- Each modifier can be set independently
+- Score multiplier calculated from average of all modifiers
+- Achievements disabled if any modifier easier than Average
+
+### Multiplayer Difficulty
+
+In multiplayer games:
+- All human players use the same difficulty setting
+- AI empires (if any) use selected difficulty for AI-specific modifiers
+- Combat modifiers do not apply to human vs. human battles
+
+### Minimum Viable Empire
+
+Even with Impossible modifiers, player must be able to:
+- Build 1 factory per turn minimum at start
+- Research tier 1 tech within 20 turns
+- Reach neighboring star with starting range tech
+- Survive first 50 turns without AI aggression (grace period)
+
+---
+
+## Worked Examples
+
+### Example 1: Production Comparison (Turn 1)
+
+**Scenario:** Ant empire (AI) vs Hamster empire (Player) on Hard difficulty
+
+**Hamster (Player):**
+```
+Starting Population: 40
+Starting Factories: 30
+Base Production: (40 × 0.5) + (30 × 1.0) = 50 BC
+Racial Modifier: 1.00 (Hamsters)
+Difficulty Modifier: 0.90 (Player on Hard)
+Effective Production: 50 × 1.00 × 0.90 = 45 BC/turn
+```
+
+**Ant (AI):**
+```
+Starting Population: 40 (AI always uses Average start)
+Starting Factories: 30
+Base Production: (40 × 0.5) + (30 × 1.0) = 50 BC
+Racial Modifier: 1.50 (Ants +50%)
+Difficulty Modifier: 1.25 (AI on Hard)
+Effective Production: 50 × 1.50 × 1.25 = 93.75 BC/turn
+```
+
+**Ratio:** AI produces 2.08× as much as player on turn 1.
+
+---
+
+### Example 2: Research Race (Tier 5 Tech)
+
+**Scenario:** Player vs Rat AI on Impossible, both racing for Tier 5 tech
+
+**Player:**
+```
+Base Tech Cost: 500 RP
+Player Cost Modifier: 1.00
+Actual Cost: 500 × 1.00 = 500 RP
+```
+
+**Rat AI:**
+```
+Base Tech Cost: 500 RP
+AI Cost Modifier: 0.50 (Impossible)
+Racial Modifier: 0.67 (Rats get +50% efficiency, inverted for cost)
+Actual Cost: 500 × 0.50 × 0.67 = 167.5 RP
+```
+
+**Result:** Rat AI needs only 33.5% of the RP the player needs.
+
+---
+
+### Example 3: Guardian Fight Comparison
+
+**Scenario:** Defeating Guardian on Average vs Impossible
+
+**Average:**
+```
+Guardian HP: 32,000
+Armor Multiplier: 4.0×
+Effective HP: 128,000
+Shield Class: XV (absorbs 15 damage/hit)
+```
+
+**Impossible:**
+```
+Guardian HP: 48,000
+Armor Multiplier: 6.0×
+Effective HP: 288,000
+Shield Class: XX (absorbs 20 damage/hit)
+```
+
+**Comparison:**
+- Impossible Guardian has 2.25× the effective HP
+- Requires significantly more late-game tech to defeat
+- Player combat penalty (-10% attack/defense) makes fight even harder
+
+---
+
+## Related Documents
+
+- `factory-formulas.md` - Production calculations
+- `population-growth.md` - Growth rate calculations
+- `research-formulas.md` - Tech cost calculations
+- `combat-algorithm.md` - Combat modifiers application
+- `espionage.md` - Spy success calculations
+- `random-events.md` - Event frequency and monster stats
+- `council.md` - Council voting behavior
+- `ai-implementation.md` - AI decision quality
+
+---
+
+*Last Updated: 2026-03-22*
+*Specification: spec-023 - Difficulty Level Modifiers*
