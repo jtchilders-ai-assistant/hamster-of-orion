@@ -688,3 +688,9 @@ Created comprehensive Fleet Command (F3) wireframe specification with detailed A
 - **Output**: design/ui-ux/wireframes/fleet-command.md
 - **Minor Issues**: 3 (Titan ship class terminology, rally points flagging, F6 hotkey consistency)
 - **State**: Transitioning to IDLE
+
+## [2026-03-22 13:44:45] Starting Task ui-005
+- **Task**: Research Tree UI - ASCII Wireframe
+- **Output**: design/ui-ux/wireframes/research-tree.md
+- **State**: WORKING
+- **Action**: Spawning worker agent

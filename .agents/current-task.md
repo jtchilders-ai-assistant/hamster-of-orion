@@ -1,26 +1,27 @@
-# Current Task: ui-004
+# Current Task: ui-005
 
-## Title
-Fleet Command UI - ASCII Wireframe
+## Research Tree UI - ASCII Wireframe
 
-## Description
-Create detailed ASCII wireframe for Fleet screen matching MOO1. Include: fleet list, ship counts, destination setting, rally points.
+**Priority:** 9
+**Output File:** design/ui-ux/wireframes/research-tree.md
 
-## Output File
-design/ui-ux/wireframes/fleet-command.md
+### Description
+Create detailed ASCII wireframe for Research screen matching MOO1. Show all 6 tech fields, current research, allocation sliders, tech details panel.
 
-## Requirements
-1. Complete ASCII wireframe for Fleet/Ships screen (F3)
-2. Fleet list view showing all player fleets
-3. Ship counts by design type
-4. Destination setting interface
-5. Rally point configuration
-6. Fleet movement status (in transit, orbiting, etc.)
-7. ETA calculations display
-8. Ship design quick-view
-9. Keyboard shortcuts and mouse interactions
-10. MOO1-faithful design (not MOO2)
+### Requirements
+- All 6 technology fields (Computers, Construction, Force Fields, Planetology, Propulsion, Weapons)
+- Current research display for each field
+- Allocation sliders (percentage-based, summing to 100%)
+- Tech details panel showing:
+  - Current tech being researched
+  - Estimated turns to completion
+  - Tech benefits/description
+- Tech tree progression visibility
+- Lock/unlock mechanism for slider allocation
+- Consistent with existing wireframe format (see galaxy-map.md, planet-management.md, fleet-command.md)
 
-## Reference
-- MOO1 Ships screen (F3 hotkey)
-- See .agents/moo1-references.md for StrategyWiki links
+### Reference Documents
+- design/mechanics/technology/tech-tree-structure.md (if exists)
+- design/ui-ux/wireframes/galaxy-map.md (format reference)
+- design/ui-ux/wireframes/planet-management.md (slider reference)
+- MOO1 research screen mechanics
