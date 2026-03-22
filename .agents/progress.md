@@ -893,3 +893,76 @@ Created comprehensive Ship Design (F6) wireframe specification with detailed ASC
 - **Task**: ui-007 (Diplomacy UI - ASCII Wireframe)
 - **Status**: Worker still in progress (runtime: ~2 minutes)
 - **Action**: No action needed, worker actively running
+
+## [2026-03-22 14:05] Worker Completed ui-007 ✅
+
+**Task:** ui-007 - Diplomacy UI - ASCII Wireframe
+**Output:** design/ui-ux/wireframes/diplomacy.md (83KB, ~2000 lines)
+**Status:** pending_verification
+
+### Summary:
+Created comprehensive Diplomacy (F5) wireframe specification with detailed ASCII art:
+
+**Main Wireframes Created:**
+1. Races Overview (Main Diplomacy Hub) - All known races with relation bars
+2. Race Selected (Pre-Audience View) - Intelligence report and treaties
+3. Diplomatic Audience - Main Menu (6 options)
+4. Propose Treaty Submenu (NAP, Trade, Alliance, Peace)
+5. Trade Negotiation Screen (tech and BC exchange)
+6. Threaten/Demand Screen (tribute, tech, break alliance, ultimatum)
+7. Declare War Confirmation (consequences display)
+8. War Declared Outcome (relation changes)
+9. Form Alliance Against (Joint War Proposal)
+10. AI Initiates Contact (Incoming Audience)
+11. AI Makes Proposal (Accept/Reject/Counter)
+12. AI Declares War On You (notification)
+13. Sue for Peace (During War)
+14. Spy Network Management (allocation sliders, missions)
+15. Counter-Espionage/Security (defense and frame enemy)
+16. Diplomatic History (timeline and breakdown)
+
+**Diplomatic Systems Documented (MOO1-Faithful):**
+
+**Treaty Types:**
+- Non-Aggression Pact (Relations ≥ 0)
+- Trade Agreement (Relations ≥ +10, grows from 25→100 BC/turn)
+- Alliance (Requires Trade, Relations ≥ +40)
+- Peace Treaty (ends war, sets relations to -20)
+
+**Diplomatic States:**
+- Allied (+80 to +100) - Green
+- Friendly (+40 to +79) - Light Green
+- Neutral (-20 to +39) - Yellow
+- Unfriendly (-50 to -21) - Orange
+- Hostile (-80 to -51) - Red
+- At War - Dark Red
+
+**Espionage System:**
+- Spy allocation sliders per race
+- Mission types: Hide, Espionage, Sabotage, Incite Rebellion
+- Infiltration levels and success rates
+- Counter-espionage/Security budget
+- Frame enemy special action
+
+**AI Personality Types (MOO1):**
+- Pacifist, Honorable, Erratic, Aggressive, Ruthless, Xenophobic
+
+**AI Objectives (MOO1):**
+- Militarist, Technologist, Ecologist, Industrialist, Expansionist, Diplomat
+
+**Additional Specifications:**
+- Keyboard shortcuts (F5, 1-9, A, S, C, H, Esc)
+- Relations bar visualization (color-coded, animated)
+- Relation modifiers table (gifts, trade, war, spying)
+- Treaty breaking consequences
+- JSON data schemas (race state, events, treaties, spy missions)
+- Edge cases (no contact, audience refused, race eliminated, final war)
+- Accessibility features (screen reader, color blind mode)
+- Animation & feedback specifications
+
+**References Used:**
+- MOO1 Official Strategy Guide Ch. 11: "Politics and Personalities"
+- MOO1 Official Strategy Guide Ch. 12: "Spies"
+- StrategyWiki MOO1 Diplomacy Page
+- design/LORE.md (pet-themed naming)
+- Existing wireframe styling patterns
