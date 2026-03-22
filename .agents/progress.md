@@ -170,3 +170,26 @@ The corrected gap analysis (Version 2.0) passed verification:
 
 ---
 
+
+
+## [2026-03-22 12:55] Worker - Gap Analysis v2.1 Update
+
+**Task:** review-001 - Comprehensive Gap Analysis vs MOO1 Manual
+**Action:** Final accuracy pass on version 2.0 (which passed verification at 88/100)
+
+### Changes Made (v2.1):
+1. Corrected file count from 68 to 71 (actual)
+2. Updated total lines from ~35,000 to exact 38,528
+3. Updated all category line counts with verified `wc -l` data:
+   - Technology: 6,870 → 7,232
+   - Diplomacy: 3,245 → 4,185  
+   - Technical: 4,896 → 6,889
+   - Species: 1,645 → 2,858
+   - Game Mechanics: 5,446 → 5,036
+   - Ships: 3,621 → 3,305
+   - Planets: 3,078 → 2,337
+4. Added Review and Root Design categories to inventory
+5. Updated version to 2.1 and metadata
+
+**File Modified:** design/review/gap-analysis-manual.md
+**Status:** pending_verification

@@ -33,24 +33,26 @@ This analysis was conducted by:
 
 ### File Inventory Summary
 
-**Total Design Documents:** 68 files  
-**Total Lines of Specification:** ~35,000+ lines  
+**Total Design Documents:** 71 files  
+**Total Lines of Specification:** 38,528 lines  
 **Major Systems Covered:** 100%
 
 ### Files by Category (with line counts)
 
 | Category | Files | Total Lines | Key Documents |
 |----------|-------|-------------|---------------|
-| Game Mechanics | 5 | 5,446 | random-events.md (1628), victory-conditions.md (1395), difficulty.md (1682) |
-| Ships | 9 | 3,621 | weapons-complete.md (900), components-complete.md (583), combat-algorithm.md (987) |
-| Technology | 9 | 6,870 | computers.md (949), force-fields.md (1192), planetology.md (1294) |
-| Diplomacy | 6 | 3,245 | relationship-formulas.md (1000), council.md (1151), espionage.md (1210) |
-| Planets | 8 | 3,078 | generation-tables.md (1109), slider-mathematics.md (737) |
+| Game Mechanics | 5 | 5,036 | random-events.md (1628), victory-conditions.md (1395), difficulty.md (1682) |
+| Ships | 9 | 3,305 | weapons-complete.md (900), components-complete.md (583), combat-algorithm.md (987) |
+| Technology | 9 | 7,232 | computers.md (949), force-fields.md (1192), planetology.md (1294) |
+| Diplomacy | 6 | 4,185 | relationship-formulas.md (1000), council.md (1151), espionage.md (1210) |
+| Planets | 8 | 2,337 | generation-tables.md (1109), slider-mathematics.md (737) |
 | Galaxy | 6 | 2,047 | generation-algorithm.md (1340) |
-| Species | 12 | 1,645 | race-stats-complete.md (1458) |
+| Species | 12 | 2,858 | race-stats-complete.md (1458) |
 | Economy | 3 | 1,921 | population-growth.md (720), ship-costs.md (675), factory-formulas.md (526) |
-| Technical | 6 | 4,896 | data-schemas.md (2323), ai-implementation.md (1331) |
+| Technical | 6 | 6,889 | data-schemas.md (2323), ai-implementation.md (1331) |
 | UI/UX | 4 | 2,267 | main-screens.md (616), information-displays.md (749), tactical-combat-ui.md (587) |
+| Review | 1 | 451 | gap-analysis-manual.md (this file) |
+| Root Design | 2 | 346 | LORE.md, PROJECT_STRUCTURE.md |
 
 ---
 
@@ -436,9 +438,9 @@ The design documentation is **production-ready**. No blocking issues.
 ## Document Metadata
 
 - **Created**: 2026-03-22
-- **Revised**: 2026-03-22 (Corrected false gap claims)
+- **Revised**: 2026-03-22 (Corrected false gap claims, verified file counts)
 - **Author**: Specification Worker Agent
-- **Version**: 2.0
+- **Version**: 2.1
 - **Status**: Verified Complete
 
 ---
@@ -449,3 +451,4 @@ The design documentation is **production-ready**. No blocking issues.
 |------|---------|---------|
 | 2026-03-22 | 1.0 | Initial gap analysis |
 | 2026-03-22 | 2.0 | **Major revision**: Corrected false gap claims for random-events.md, components-complete.md, weapons-complete.md, victory-conditions.md, slider-mathematics.md. Updated coverage from 78% to 93%. Removed 5 Priority 1 items that were already complete. Added file inventory methodology. |
+| 2026-03-22 | 2.1 | **Accuracy update**: Corrected file counts (71 files, 38,528 lines), updated category line counts with verified data from `wc -l`. |
