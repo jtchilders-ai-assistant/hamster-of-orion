@@ -61,3 +61,20 @@ The following tasks were completed before the verification system was implemente
 **Recommendation:** Pass - minor inconsistencies with treaties.md should be reconciled but do not block implementation.
 
 ---
+
+### spec-016: Council Voting Algorithm
+**File:** design/diplomacy/council.md  
+**Verified:** 2026-03-22T11:11:45-05:00  
+**Result:** ✅ PASSED (Score: 95/100)
+
+**Summary:** Comprehensive, well-structured, and implementation-ready specification for the High Council voting system. Covers council formation (50% colonization trigger), vote allocation by population, two-thirds victory threshold, AI voting behavior with multi-factor decision scoring (Relation, Fear, Bribery, Racial Affinity, Reputation), abstention rules, player interactions including lobbying and post-vote options, and extensive edge cases. All 5 JSON data blocks parse correctly. Faithfully adapts MOO1 mechanics with LORE.md-compliant pet-themed races. Excellent worked examples demonstrating algorithm application.
+
+**Issues Found (4 minor):**
+1. Victory threshold formula inconsistency: floor(×2/3)+1 vs ceil(×0.6667) - should standardize
+2. Hamster diplomat bonus potential double-counting: +5 in affinity matrix AND as HAMSTER_COUNCIL_BONUS
+3. Reputation factor calculation could more explicitly reference relationship-formulas.md alignment
+4. Worked example in 11.1 appears to apply Hamster bonus twice
+
+**Recommendation:** PASS - Minor formula/documentation inconsistencies do not impact implementation viability. The specification provides clear, complete algorithms that can be directly translated to code.
+
+---

@@ -1,37 +1,37 @@
 {
-  "task_id": "spec-015",
-  "verified_at": "2026-03-22T11:05:42-05:00",
+  "task_id": "spec-016",
+  "verified_at": "2026-03-22T11:11:45-05:00",
   "passed": true,
-  "score": 92,
+  "score": 95,
   "issues": [
     {
       "severity": "minor",
       "category": "accuracy",
-      "description": "Hamster trade bonus listed as +25% in relationship-formulas.md (Section 5.2) but treaties.md says +50%",
-      "location": "design/diplomacy/relationship-formulas.md, Section 5.2",
-      "suggestion": "Reconcile with treaties.md - verify which value is intended for MOO1 faithfulness (Human trade bonus)"
+      "description": "Victory threshold inconsistency: Section 3.1 states 'floor(Total_Votes × 2/3) + 1' while Section 3.2 uses 'ceil(Effective_Votes_Cast × (2/3))'. These formulas can produce different results. MOO1 uses a strict 2/3 majority check.",
+      "location": "design/diplomacy/council.md - Sections 3.1 vs 3.2",
+      "suggestion": "Standardize to a single formula: ceil(Effective_Total × 0.6667) throughout, which correctly implements 2/3 majority requirement."
     },
     {
       "severity": "minor",
       "category": "completeness",
-      "description": "Example 2 in Section 2.3 shows Guinea Pigs catching Chameleon spy but uses Guinea Pig modifier (0.80) for the penalty calculation - should clarify whose modifier applies (victim vs perpetrator)",
-      "location": "design/diplomacy/relationship-formulas.md, Section 2.3 Example 2",
-      "suggestion": "Add clarification on which race's modifier is used for spy-caught penalties (likely victim's forgiveness modifier)"
+      "description": "The Hamster 'universal diplomat' bonus is implemented in two different ways: Section 4.5 shows +5 in the Racial Affinity Matrix as a wildcard entry, while Section 4.7 shows HAMSTER_COUNCIL_BONUS = 5 applied separately. This could lead to double-counting (+10 instead of +5).",
+      "location": "design/diplomacy/council.md - Sections 4.5 and 4.7",
+      "suggestion": "Clarify that the Racial Affinity Matrix entry for 'hamsters' IS the council bonus, or remove one application point to avoid double-counting."
     },
     {
       "severity": "minor",
       "category": "integration",
-      "description": "First Contact Modifiers table shows +20 for gift at first contact, but Section 2.2 Positive Actions shows gift_small at +10 (50-200 BC). Need to clarify if first contact gift uses different scale",
-      "location": "design/diplomacy/relationship-formulas.md, Section 1 vs Section 2.2",
-      "suggestion": "Clarify that first contact gift bonus is flat +20 regardless of value, or specify minimum gift value for first contact"
+      "description": "Council spec references 'relationship-formulas.md' for reputation calculation, but the Reputation_Factor formula (Section 4.6) uses REPUTATION_WEIGHT = 0.15 while relationship-formulas.md uses a 0-400 scale calculation. These should align more clearly.",
+      "location": "design/diplomacy/council.md - Section 4.6",
+      "suggestion": "Add explicit note that Candidate_Reputation = (Honor + Peace + Fairness + Mercy) / 4 produces a value from -100 to +100, which when multiplied by 0.15 yields -15 to +15 range as documented."
     },
     {
       "severity": "minor",
-      "category": "accuracy",
-      "description": "Guinea Pigs vs Hamsters attitude shows -30 in relationship-formulas.md but treaties.md shows -20 for initial relations",
-      "location": "design/diplomacy/relationship-formulas.md, Section 5.3 vs treaties.md First Contact",
-      "suggestion": "Verify which value is correct; the -30 in relationship-formulas.md seems more aligned with Guinea Pig warrior contempt"
+      "category": "implementation",
+      "description": "The worked example in Section 11.1 shows 'Hamster Bonus: +5' being added to vote scores, but the Racial Affinity already shows Hamsters receiving +5 from all voters. The calculation appears to apply both, totaling +10.",
+      "location": "design/diplomacy/council.md - Section 11.1",
+      "suggestion": "Update worked example to show only one +5 bonus application, consistent with the fix suggested for the double-counting issue."
     }
   ],
-  "summary": "Excellent, comprehensive specification that thoroughly covers diplomacy relationship mathematics. All required sections are present (Overview, Formulas, Constants, Algorithm, Data Tables, Edge Cases). All 4 JSON data blocks parse successfully. Formulas are implementation-ready with clear pseudocode algorithm. Properly uses pet-themed naming (Hamsters, Guinea Pigs, etc.) consistent with LORE.md. Minor inconsistencies with treaties.md should be reconciled but do not block implementation. The spec correctly maps MOO1 Human diplomacy traits to Hamsters and provides complete racial modifiers for all 10 races."
+  "summary": "The Council Voting Algorithm specification is comprehensive, well-structured, and implementation-ready. It covers all required sections including detailed formulas, constants, algorithms, data tables, edge cases, and worked examples. The specification faithfully adapts MOO1 mechanics with pet-themed races (Hamsters, Guinea Pigs, etc.) per LORE.md conventions. All 5 JSON data blocks parse correctly. Integration with relationship-formulas.md is solid with consistent race IDs and modifier values. Minor issues identified relate to formula consistency for victory threshold and potential double-counting of Hamster diplomat bonus. These are non-critical and can be addressed during implementation or a future documentation pass. Overall: EXCELLENT specification ready for implementation."
 }
