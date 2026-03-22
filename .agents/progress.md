@@ -287,3 +287,48 @@ Created comprehensive coverage matrix mapping ALL MOO1 systems to HoO design doc
 - **Task**: Consistency Check Across All Specs
 - **Output**: design/review/consistency-report.md
 - **Action**: Spawning worker agent
+
+## 2026-03-22 13:15 - Worker Completed review-004 ✅
+
+**Task:** review-004 - Consistency Check Across All Specs
+**Output:** design/review/consistency-report.md (606 lines, 19KB)
+**Status:** DONE
+
+### Summary:
+Comprehensive consistency review of 30+ specification documents. Identified and categorized issues by severity:
+
+**Critical Issues (🔴):** 5
+- CRIT-001: Mice production modifier stacking unclear
+- CRIT-002: Hit chance formula differs across 3 documents (50% vs 70% base)
+- CRIT-003: Ship hull costs vs total costs unclear
+- CRIT-004: Engine costs/space differ between ship-costs.md and components-complete.md
+- CRIT-005: Ants growth modifier vs max pop bonus conflation
+
+**Major Issues (🟠):** 6
+- MAJ-001: Hamster diplomacy modifier (30% vs 60%)
+- MAJ-002: Ferrets attack bonus vs damage bonus conflated
+- MAJ-003: Budgies defense bonus calculation varies
+- MAJ-004: Robotic Controls tech levels differ
+- MAJ-005: Base growth rate (10% vs 2%)
+- MAJ-006: Shield absorption mechanic wording
+
+**Minor Issues (🟡):** 6
+- Variable naming inconsistencies
+- Tech level vs tier confusion
+- Formatting differences
+
+**Documentation Issues (🔵):** 5
+- Missing cross-references
+- Incomplete ability descriptions
+- JSON schema format variations
+- Missing worked examples
+- Version tracking inconsistencies
+
+### Key Deliverables:
+1. Full issue catalog with affected files
+2. Resolution recommendations for each issue
+3. Canonical source document assignments
+4. Future verification checklist
+5. Summary of required actions by priority
+
+**State:** WORKING → DONE
