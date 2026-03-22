@@ -16,9 +16,10 @@
       "id": "spec-002", 
       "title": "Population Growth Mathematics",
       "description": "Document exact formulas for: base growth rate, growth modifiers (planet type, tech, morale), maximum population by planet size, racial growth bonuses. Create design/economy/population-growth.md",
-      "status": "pending",
+      "status": "done",
       "priority": 2,
-      "output_file": "design/economy/population-growth.md"
+      "output_file": "design/economy/population-growth.md",
+      "completed": "2026-03-21"
     },
     {
       "id": "spec-003",

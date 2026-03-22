@@ -36,3 +36,38 @@ Created comprehensive factory and production system specification including:
 - Ready for implementation - includes JSON schemas
 
 ---
+
+### 2026-03-21 22:26 - spec-002: Population Growth Mathematics ✅
+**Completed:** `design/economy/population-growth.md`
+
+**Summary:**
+Created comprehensive population growth specification including:
+- Logistic growth formula with carrying capacity
+- Base growth rate (10% per turn) with diminishing returns
+- Maximum population calculation (base size + terraforming × soil enrichment × environment)
+- All 14 environment types with growth and capacity modifiers
+- Racial growth modifiers (Rabbits +100%, Ants +25%, Mice -25%, Hermit Crabs -50%)
+- Terraforming tech levels (+10 to +120 population bonus)
+- Soil Enrichment tech (1.25× and 1.50× multipliers)
+- Cloning technology (+2 and +5 flat bonus per turn)
+- Food production and consumption system
+- Starvation mechanics (50% of deficit dies per turn)
+- Morale effects on growth (50%-100% modifier)
+- Colony establishment rules (initial pop = 2)
+- Environment colonization tech requirements
+- Population transport mechanics
+- Complete JSON data schemas with all constants
+- Pseudocode algorithms for growth and food calculations
+- Worked examples (Hamsters, Rabbits, Hermit Crabs, starvation)
+- Special racial rules (Hermit Crabs ignore environment, Ants ignore morale)
+- Edge cases and difficulty modifiers
+
+**Files Created:**
+- `design/economy/population-growth.md` (21KB, 550+ lines)
+
+**Notes:**
+- Hermit Crabs have unique mechanics (no food, colonize anywhere)
+- Fractional population tracking for precise growth
+- Links to factory-formulas.md for production integration
+
+---
