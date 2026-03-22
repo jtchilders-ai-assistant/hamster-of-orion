@@ -88,9 +88,10 @@
       "id": "spec-010",
       "title": "Complete Tech Tree - Propulsion Field",
       "description": "Document all propulsion technologies: engines, fuel cells, speed bonuses, maneuverability. Include tier, cost, effect for each. Update design/technology/propulsion.md with JSON data",
-      "status": "pending",
+      "status": "done",
       "priority": 10,
-      "output_file": "design/technology/propulsion.md"
+      "output_file": "design/technology/propulsion.md",
+      "completed": "2026-03-22"
     },
     {
       "id": "spec-011",

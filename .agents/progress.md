@@ -373,3 +373,50 @@ Created complete Weapons technology tree specification including:
 - Starting techs: Laser + Nuclear Missile
 
 ---
+
+### 2026-03-22 07:31 - spec-010: Complete Tech Tree - Propulsion Field ✅
+**Completed:** `design/technology/propulsion.md`
+
+**Summary:**
+Created complete Propulsion technology tree specification including:
+- **15+ Technology Tiers** (50 RP to 50,000 RP)
+- **32 Total Technologies:**
+  - 11 Engines (Retro → Temporal Drive)
+  - 9 Fuel Cells (Standard → Thorium/Infinite)
+  - 7 Tactical Systems (Stabilizer → High Energy Focus)
+  - 2 Special Systems (Reserve Tanks)
+  - 1 Empire-wide bonus (Hyper-Space Flux)
+- **Engine Progression:**
+  - Speed 1-2: Early (Retro, Nuclear, Sub-Light)
+  - Speed 3-4: Mid (Fusion, Impulse, Ion)
+  - Speed 5-7: Late (Antimatter, Interphased, Hyper)
+  - Speed 8-10: Ultimate (Hyper-X, Temporal)
+- **Fuel Range Progression:**
+  - Range 3-4: Local expansion
+  - Range 5-6: Regional control
+  - Range 7-8: Cross-galaxy
+  - Range 9-10: Full map
+  - Infinite: Thorium Cells (Tech 45)
+- **Tactical Systems:**
+  - Inertial Stabilizer/Nullifier (defense)
+  - Energy Pulsar (area damage)
+  - Warp Dissipator (prevent retreat)
+  - Sub-Space Teleporter (instant movement)
+  - Displacement Device (33% dodge)
+- **Racial Bonuses:**
+  - Budgies: +1 combat speed, +3 initiative
+  - Rabbits: Colony/Scout speed +1
+  - Chameleons: +1 maneuver
+- Strategic importance by game phase
+- Complete JSON data schema
+
+**Files Created:**
+- `design/technology/propulsion.md` (23KB, 640+ lines)
+
+**Notes:**
+- Second of six technology field specifications
+- Fuel range critical for early game expansion
+- Starting techs: Retro Engine + Standard Fuel
+- Thorium Cells (infinite range) is game-changing
+
+---
