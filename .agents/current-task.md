@@ -1,23 +1,30 @@
-# Current Task
+# Current Task: ui-007
 
-**Task ID:** ui-006
-**Title:** Ship Design UI - ASCII Wireframe
-**Priority:** 10
-**Output File:** design/ui-ux/wireframes/ship-design.md
+## Title
+Diplomacy UI - ASCII Wireframe
 
 ## Description
-Create detailed ASCII wireframe for Ship Design screen matching MOO1. Include: hull selection, component slots, weapon assignment, stats display, save/load designs.
+Create detailed ASCII wireframe for Diplomacy screen matching MOO1. Include: race relations, treaty options, audience request, trade agreements. Show different diplomatic states.
+
+## Output File
+design/ui-ux/wireframes/diplomacy.md
 
 ## Requirements
-- ASCII wireframes for all Ship Design screen states
-- Hull selection interface (Scout, Fighter, Destroyer, Cruiser, Battleship, Dreadnought)
-- Component slots showing available space
-- Weapon assignment interface
-- Ship stats display (attack, defense, speed, cost, etc.)
-- Save/load design functionality
-- MOO1-faithful mechanics and visual style
-- Keyboard shortcuts and mouse interactions
-- Clear section organization
+1. Race relations display - show all known empires with relationship status
+2. Treaty options - NAP, Alliance, Trade Agreement, etc.
+3. Audience request interface - how to request diplomatic audience
+4. Trade agreement mechanics - technology and BC trade
+5. Different diplomatic states - peace, war, allied, hostile, etc.
+6. MOO1-accurate diplomatic mechanics
 
-## Reference
-Study existing wireframes in design/ui-ux/wireframes/ for style consistency.
+## Reference Materials
+- Look at existing wireframes in design/ui-ux/wireframes/ for format
+- Check design/mechanics/ for any diplomacy-related specs
+- Reference MOO1 diplomacy system behavior
+
+## Success Criteria
+- Detailed ASCII wireframes for all diplomacy screens/states
+- Keyboard and mouse interaction specs
+- All treaty types covered
+- Diplomatic state transitions documented
+- JSON data schema for implementation
