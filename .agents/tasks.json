@@ -55,7 +55,7 @@
       "id": "ui-003",
       "title": "Planet Management UI - ASCII Wireframe",
       "description": "Create detailed ASCII wireframe for Planet Management screen matching MOO1. Include: production sliders, population display, building queue, ship construction. Show slider interactions. Output: design/ui-ux/wireframes/planet-management.md",
-      "status": "pending_verification",
+      "status": "done",
       "priority": 7,
       "output_file": "design/ui-ux/wireframes/planet-management.md"
     },
