@@ -595,3 +595,76 @@ Created comprehensive Planet Management wireframe specification with detailed AS
 - **Worker Status**: Active (running for ~2 minutes)
 - **Action**: Worker still in progress, no action needed. Will check again next cycle.
 
+
+## 2026-03-22 13:45 - Worker Completed ui-004 ✅
+
+**Task:** ui-004 - Fleet Command UI - ASCII Wireframe
+**Output:** design/ui-ux/wireframes/fleet-command.md (70KB, ~1600 lines)
+**Status:** pending_verification
+
+### Summary:
+Created comprehensive Fleet Command (F3) wireframe specification with detailed ASCII art:
+
+**Main Wireframes Created:**
+1. Default View (Fleet List with empire summary)
+2. Fleet Selected State (with ship composition and mini-map)
+3. Fleet In Transit State (with journey progress)
+4. Set Destination Dialog (with range visualization)
+5. Split Fleet Dialog (with ship transfer interface)
+6. Rally Point Configuration (with ship type filters)
+7. Ship Design Quick View (detailed stats without screen switch)
+8. Merge Fleets Dialog
+9. Patrol Route Configuration (with waypoint map)
+10. Fleet Report Screen (empire-wide statistics)
+
+**Key Features Documented:**
+
+**Fleet List Component:**
+- Sort options (Location, Name, Size, Status)
+- Fleet status icons (📍 Orbiting, 🛫 In Transit, 🔄 Patrolling, ⚓ Rally, ⚔️ Combat)
+- Strength ratings (★☆☆☆☆ to ★★★★★)
+- Ship counts, speed, range display
+
+**Fleet Commands:**
+- Set Destination (with range circle visualization)
+- Split Fleet (transfer ships between fleets)
+- Merge Fleets (same-location requirement)
+- Rally Points (auto-gather new ships)
+- Patrol Routes (multi-waypoint cycling)
+- Cancel Orders / Redirect
+
+**ETA Calculations:**
+- Formula documented: CEILING(Distance / Fleet_Speed)
+- Progress bar visualization
+- Modifiers: Nebula (+50% time), Hyperspace Booster (-1 turn), Starlanes (instant)
+
+**Ship Composition Table:**
+- Design name, count, hull class columns
+- View details / Scrap actions
+- Fleet speed/range determined by slowest ship
+
+**Additional Specifications:**
+- Keyboard shortcuts (M=Move, S=Split, R=Rally, P=Patrol, etc.)
+- Mouse interactions (click, double-click, right-click, drag)
+- Context menus
+- Tooltips (fleet entry, star system)
+- Notification events (arrival, under attack)
+- JSON data structures (fleet, rally point, patrol route)
+- Edge cases (empty list, out of range, single ship split)
+- Accessibility features
+- Responsive behavior (1920px, 1280px, <1280px)
+- MOO1 faithfulness notes (what's preserved vs enhanced)
+
+**MOO1 Faithful Mechanics:**
+- Fleet speed = slowest ship
+- Fleet range = shortest-range ship
+- Cannot split/merge while in transit
+- Same-location merge requirement
+- Click-to-move destination interface
+
+**Enhancements over MOO1:**
+- Rally points (streamlined production)
+- Patrol routes (automation)
+- Fleet strength ratings
+- Mini-map preview
+- Ship design quick-view

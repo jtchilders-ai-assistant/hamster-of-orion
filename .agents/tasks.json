@@ -63,7 +63,7 @@
       "id": "ui-004",
       "title": "Fleet Command UI - ASCII Wireframe",
       "description": "Create detailed ASCII wireframe for Fleet screen matching MOO1. Include: fleet list, ship counts, destination setting, rally points. Output: design/ui-ux/wireframes/fleet-command.md",
-      "status": "in_progress",
+      "status": "pending_verification",
       "priority": 8,
       "output_file": "design/ui-ux/wireframes/fleet-command.md"
     },
