@@ -1,21 +1,27 @@
-# Current Task: review-004
+# Current Task: ui-001
 
 ## Title
-Consistency Check Across All Specs
+UI Screen Inventory vs MOO1
 
 ## Description
-Review all specification files for internal consistency: same variable names, matching formulas, no contradictions. Create list of inconsistencies to fix.
+List ALL screens from the original MOO1 and compare to our UI docs. Identify missing screens or screens that need updates. Reference MOO1 manual and StrategyWiki.
 
 ## Output File
-design/review/consistency-report.md
+design/ui-ux/screen-inventory.md
 
 ## Priority
-4
+5
 
 ## Requirements
-- Check all specification files in design/ directory
-- Verify consistent variable/constant names across documents
-- Verify formulas don't contradict each other
-- Check for duplicate or conflicting definitions
-- Identify any inconsistencies between related systems
-- Produce actionable list of issues to fix
+1. Create comprehensive inventory of ALL MOO1 screens/interfaces
+2. Compare against existing HoO UI documentation
+3. Identify gaps - screens not yet documented
+4. Identify updates needed - screens that exist but need more detail
+5. Use MOO1 manual and StrategyWiki as references
+6. Organize by game flow/category
+
+## Success Criteria
+- Complete list of MOO1 screens
+- Clear mapping to HoO documentation status
+- Gap analysis with actionable items
+- Reference sources cited
