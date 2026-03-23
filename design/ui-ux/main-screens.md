@@ -513,34 +513,61 @@ Based on `moo_design.png` screenshot.
 
 ---
 
-## 6. Fleet Management (F3)
+## 6. Fleet Screen (F3)
+
+**Full-screen modal with NO bottom command bar.** Click OK to return to Galaxy Map.
+
+Based on `moo_fleet_screen.png` screenshot.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
-│                              FLEET COMMAND                                      │
+│                                                                                 │
+│                              FLEET OVERVIEW                                     │
 │  ═══════════════════════════════════════════════════════════════════════════   │
 │                                                                                 │
-│  ┌─────────────────────────────────────────────────────────────────────────┐   │
-│  │ LOCATION          SHIPS                               DESTINATION       │   │
-│  ├─────────────────────────────────────────────────────────────────────────┤   │
-│  │ Firma             Scout x2, Fighter x6, Colony x1    (orbiting)        │   │
-│  │ Centauri          Fighter x4, Destroyer x2           (orbiting)        │   │
-│  │ In Transit        Scout x3                           Altair (2 turns)  │   │
-│  │ In Transit        Cruiser x1, Fighter x8             Kronos (5 turns)  │   │
-│  └─────────────────────────────────────────────────────────────────────────┘   │
+│  ┌────────────┬─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐    │
+│  │  SYSTEM    │ DESIGN1 │ DESIGN2 │ DESIGN3 │ DESIGN4 │ DESIGN5 │ DESIGN6 │    │
+│  │            │ (Scout) │(Fighter)│(Destroy)│(Cruiser)│(Battlesh│(Colony) │    │
+│  ├────────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤    │
+│  │            │         │         │         │         │         │         │    │
+│  │  FIRMA     │ ┌─────┐ │ ┌─────┐ │         │         │         │ ┌─────┐ │    │
+│  │            │ │SHIP │ │ │SHIP │ │         │         │         │ │SHIP │ │    │
+│  │            │ │  12 │ │ │   4 │ │         │         │         │ │   1 │ │    │
+│  │            │ └─────┘ │ └─────┘ │         │         │         │ └─────┘ │    │
+│  ├────────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤    │
+│  │            │         │         │         │         │         │         │    │
+│  │  → ALTAIR  │ ┌─────┐ │ ┌─────┐ │         │         │         │         │    │
+│  │  ETA: 3    │ │SHIP │ │ │SHIP │ │         │         │         │         │    │
+│  │            │ │   6 │ │ │   8 │ │         │         │         │         │    │
+│  │            │ └─────┘ │ └─────┘ │         │         │         │         │    │
+│  └────────────┴─────────┴─────────┴─────────┴─────────┴─────────┴─────────┘    │
 │                                                                                 │
-│  FLEET TOTALS:                                                                  │
-│  ─────────────────────────────────────────────────────────────────────────────  │
-│  Scout: 5    Fighter: 18    Destroyer: 2    Cruiser: 1    Battleship: 0        │
-│  Colony Ship: 1    Total Ships: 27    Maintenance: 35 BC/turn                   │
+│  ┌─────────────────────────────────────────────┐    ┌──────┐ ┌──────┐ ┌────┐   │
+│  │  Fleet Maintenance: 45 BC/turn              │    │SPECS │ │SCRAP │ │ OK │   │
+│  └─────────────────────────────────────────────┘    └──────┘ └──────┘ └────┘   │
 │                                                                                 │
-│  Click a fleet to select, then click destination on map                         │
-│                                                                                 │
-│  ┌──────┬────────┬───────┬─────┬───────┬─────────┬──────┬───────────────────┐  │
-│  │ GAME │ DESIGN │ FLEET │ MAP │ RACES │ PLANETS │ TECH │     NEXT TURN     │  │
-│  └──────┴────────┴───────┴─────┴───────┴─────────┴──────┴───────────────────┘  │
 └─────────────────────────────────────────────────────────────────────────────────┘
 ```
+
+### Column Structure (7 Columns)
+| Column | Content |
+|--------|---------|
+| 1 - SYSTEM | System name (or "→ destination, ETA: X" if in transit) |
+| 2-7 - SHIP DESIGNS | One column per ship design (max 6 designs in game) |
+
+### Ship Cells
+- Ship image with count in bottom-right corner
+- Empty if no ships of that type at that location
+
+### Row Behavior
+- Each row = one fleet at a location
+- **Click row** → returns to Galaxy Map with that fleet selected
+
+### Bottom Section
+- **Fleet Maintenance**: Total BC/turn for all ships
+- **SPECS**: View ship design specifications
+- **SCRAP**: Open ship scrapping interface
+- **OK**: Return to Galaxy Map
 
 ---
 
