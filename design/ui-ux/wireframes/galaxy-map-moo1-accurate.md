@@ -258,15 +258,19 @@ The info panel states are:
 └─────────────────────────────────────────────────────────────────────────────────┘
 
 BUTTON FUNCTIONS:
-  GAME    - Save, Load, Options, Quit (F10 or ESC)
-  DESIGN  - Ship Design screen (F6)
-  FLEET   - Fleet overview and management (F3)
+  GAME    - Save, Load, Options menu (F10 or ESC) [modal]
+  DESIGN  - Ship Design screen (F6) [modal - no command bar]
+  FLEET   - Fleet overview and management (F3) [modal - no command bar]
   MAP     - Return to Galaxy Map / current screen (F1)
-  RACES   - Diplomacy and race relations (F5)
-  PLANETS - Colony list and management (F2)
-  TECH    - Research allocation screen (F4)
+  RACES   - Diplomacy and race relations (F5) [modal - no command bar]
+  PLANETS - Colony list and management (F2) [modal - no command bar]
+  TECH    - Research allocation screen (F4) [modal - no command bar]
   
   NEXT TURN - End current turn, process AI turns (ENTER or SPACE)
+
+NOTE: All screens except MAP open as full-screen modals WITHOUT the
+bottom command bar. You exit these modals via OK/Close button or ESC
+to return to the Galaxy Map.
 ```
 
 ---

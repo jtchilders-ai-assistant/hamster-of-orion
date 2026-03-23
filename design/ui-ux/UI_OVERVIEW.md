@@ -164,18 +164,25 @@ TECH ■□□□□□□□□□□□□□□□   0%   (none)
 
 ---
 
-## Research Allocation
+## Technology Screen (F4)
 
-Used on Technology screen. Six fields with percentage allocation:
+**Full-screen modal with NO bottom command bar.** Click OK to return to Galaxy Map.
 
-```
-┌───────────┬───────────┬───────────┬───────────┬───────────┬───────────┐
-│ COMPUTERS │CONSTRUCTN │FORCE FIELD│PLANETOLOGY│PROPULSION │  WEAPONS  │
-├───────────┼───────────┼───────────┼───────────┼───────────┼───────────┤
-│  ████░░   │  ██████   │  ████░░   │  ██░░░░   │  ██████   │  ████░░   │
-│   25%     │   40%     │   15%     │   5%      │   10%     │   5%      │
-└───────────┴───────────┴───────────┴───────────┴───────────┴───────────┘
-```
+The Technology screen has two halves plus a bottom section:
+
+**Left Half - Tech Browser:**
+- Field tabs (6 fields) to select which tech category to browse
+- Discovered tech list showing researched techs in selected field
+- Click a tech to see its description
+
+**Right Half - Research Allocation:**
+- 6 sliders (one per field) to allocate research points
+- Must total 100%
+- Shows currently researching tech with progress
+
+**Bottom Section:**
+- Tech Description Panel (~80% width) - shows details of selected tech
+- Research Summary (~20% width) - "Total Research XXX BC" + OK button to exit
 
 ---
 

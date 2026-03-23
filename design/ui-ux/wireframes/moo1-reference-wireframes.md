@@ -241,62 +241,78 @@ After clicking a destination for a fleet, confirmation shown.
 
 ## 6. Technology Screen (`moo_tech.png`)
 
-Full-screen technology research interface.
+**Full-screen modal with NO bottom command bar.** Click OK to return to Galaxy Map.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
-│                              TECHNOLOGY                                         │
-│  ═══════════════════════════════════════════════════════════════════════════   │
 │                                                                                 │
-│  Research Points: 127/turn                              Total Labs: 45          │
+│  ┌─────────────────────────────────┐  ┌─────────────────────────────────────┐  │
+│  │                                 │  │                                     │  │
+│  │   LEFT HALF - TECH BROWSER      │  │   RIGHT HALF - ALLOCATION           │  │
+│  │   ════════════════════════      │  │   ════════════════════════          │  │
+│  │                                 │  │                                     │  │
+│  │   FIELD TABS:                   │  │   RESEARCH ALLOCATION SLIDERS       │  │
+│  │   [COMP][CONST][FORCE][PLAN]    │  │                                     │  │
+│  │   [PROP][WEAP]                  │  │   COMPUTERS     ████░░░░ 25%        │  │
+│  │                                 │  │   CONSTRUCTION  ██████░░ 40%        │  │
+│  │   ─────────────────────────     │  │   FORCE FIELD   ████░░░░ 15%        │  │
+│  │                                 │  │   PLANETOLOGY   ██░░░░░░  5%        │  │
+│  │   DISCOVERED TECH LIST          │  │   PROPULSION    ██░░░░░░ 10%        │  │
+│  │   (for selected field)          │  │   WEAPONS       ██░░░░░░  5%        │  │
+│  │                                 │  │                                     │  │
+│  │   • Battle Computer I           │  │   ─────────────────────────         │  │
+│  │   • Deep Space Scanner          │  │   Currently Researching:            │  │
+│  │   • ECM Jammer I               │  │   Battle Computer II                │  │
+│  │     (click to see description)  │  │   ████████░░ 80% - 2 turns          │  │
+│  │                                 │  │                                     │  │
+│  └─────────────────────────────────┘  └─────────────────────────────────────┘  │
 │                                                                                 │
-│  ┌───────────┬───────────┬───────────┬───────────┬───────────┬───────────┐     │
-│  │ COMPUTERS │CONSTRUCTN │FORCE FIELD│PLANETOLOGY│PROPULSION │  WEAPONS  │     │
-│  ├───────────┼───────────┼───────────┼───────────┼───────────┼───────────┤     │
-│  │           │           │           │           │           │           │     │
-│  │  ████░░   │  ██████   │  ████░░   │  ██░░░░   │  ██████   │  ████░░   │     │
-│  │   25%     │   40%     │   15%     │   5%      │   10%     │   5%      │     │
-│  │           │           │           │           │           │           │     │
-│  ├───────────┼───────────┼───────────┼───────────┼───────────┼───────────┤     │
-│  │           │           │           │           │           │           │     │
-│  │ Researching:          │           │           │           │           │     │
-│  │ Battle    │ Duralloy  │ Class III │ Improved  │ Range 5   │ Fusion    │     │
-│  │ Computer  │ Armor     │ Shields   │ Terraform │           │ Rifle     │     │
-│  │ Mk II     │           │           │ +20       │           │           │     │
-│  │           │           │           │           │           │           │     │
-│  │ ████████░░│ ██████░░░░│ ████░░░░░░│ ██░░░░░░░░│ ██████████│ ████████░░│     │
-│  │  80%      │  60%      │  40%      │  20%      │  DONE!    │  85%      │     │
-│  │  2 turns  │  4 turns  │  6 turns  │ 12 turns  │           │  1 turn   │     │
-│  │           │           │           │           │           │           │     │
-│  ├───────────┴───────────┴───────────┴───────────┴───────────┴───────────┤     │
-│  │                                                                       │     │
-│  │  AVAILABLE TECHNOLOGIES (click to select next research):              │     │
-│  │                                                                       │     │
-│  │  [Battle Computer III] [ECM Jammer II] [Deep Space Scanner]           │     │
-│  │                                                                       │     │
-│  └───────────────────────────────────────────────────────────────────────┘     │
+│  ┌───────────────────────────────────────────────────────────┐ ┌─────────────┐ │
+│  │                                                           │ │             │ │
+│  │   TECH DESCRIPTION PANEL (~80% width)                     │ │ Total       │ │
+│  │                                                           │ │ Research    │ │
+│  │   Battle Computer I                                       │ │             │ │
+│  │   ────────────────────────────────────────────────────    │ │ 127 BC      │ │
+│  │   Improves ship targeting accuracy by +1.                 │ │             │ │
+│  │   Unlocks: Mark I Battle Computer for ship design         │ │ ┌─────────┐ │ │
+│  │                                                           │ │ │   OK    │ │ │
+│  │   (Shows description of tech selected in list above)      │ │ └─────────┘ │ │
+│  │                                                           │ │             │ │
+│  └───────────────────────────────────────────────────────────┘ └─────────────┘ │
 │                                                                                 │
-│  ┌──────┬────────┬───────┬─────┬───────┬─────────┬──────┬───────────────────┐  │
-│  │ GAME │ DESIGN │ FLEET │ MAP │ RACES │ PLANETS │ TECH │     NEXT TURN     │  │
-│  └──────┴────────┴───────┴─────┴───────┴─────────┴──────┴───────────────────┘  │
 └─────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Technology Screen Elements:
-- **Header**: "TECHNOLOGY" title
-- **Research Points**: Empire-wide RP/turn and total labs
-- **6 Tech Field Columns**:
-  - Computers
-  - Construction  
-  - Force Fields
-  - Planetology
-  - Propulsion
-  - Weapons
-- **Allocation Sliders**: Percentage per field (must total 100%)
-- **Current Research**: Per-field current tech being researched
-- **Progress Bars**: Per-field progress + turns remaining
-- **Available Techs**: Clickable list of unlocked-but-not-researched options
-- **Bottom Command Bar**: Same as galaxy screen
+### Technology Screen Layout:
+
+**Left Half - Tech Browser:**
+- **Field Tabs**: 6 clickable tabs (COMPUTERS, CONSTRUCTION, FORCE FIELD, PLANETOLOGY, PROPULSION, WEAPONS)
+- **Discovered Tech List**: Scrollable list of techs already researched in selected field
+- Click a tech to view its description in the bottom panel
+
+**Right Half - Research Allocation:**
+- **6 Sliders**: One per tech field, shows percentage allocation
+- Drag sliders to adjust RP distribution (must total 100%)
+- **Current Research**: Shows what's being researched with progress bar and turns remaining
+
+**Bottom Left (~80%) - Tech Description Panel:**
+- Shows detailed description of the tech selected in the Discovered Tech List
+- Includes what the tech does and what it unlocks
+
+**Bottom Right (~20%) - Research Summary:**
+- "Total Research" label
+- Total RP value (e.g., "127 BC")
+- **OK Button**: Closes screen, returns to Galaxy Map
+
+### Technology Fields:
+| Field | Focus |
+|-------|-------|
+| Computers | Battle computers, ECM, scanners |
+| Construction | Armor, factories, ship hulls |
+| Force Fields | Shields, repulsors, cloaking |
+| Planetology | Terraforming, ecology, bio weapons |
+| Propulsion | Engines, fuel, range |
+| Weapons | Beams, missiles, bombs |
 
 ---
 
