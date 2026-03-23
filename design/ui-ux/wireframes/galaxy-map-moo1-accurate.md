@@ -86,41 +86,17 @@ SELECTION:
 
 ## Info Panel States
 
-### State 1: Nothing Selected (Empire Summary)
+### Selection Behavior
 
-```
-┌───────────────────────────┐
-│                           │
-│   ┌─────────────────┐     │
-│   │                 │     │
-│   │  [RACE EMBLEM]  │     │
-│   │                 │     │
-│   └─────────────────┘     │
-│                           │
-│   HAMSTER EMPIRE          │
-│   ─────────────────       │
-│                           │
-│   Colonies:      5        │
-│   Population:   42M       │
-│   Factories:   127        │
-│   Ships:        18        │
-│   Missile Bases: 3        │
-│                           │
-│   ─────────────────       │
-│   Income:     +120 BC     │
-│   Expenses:    -45 BC     │
-│   Reserve:     500 BC     │
-│                           │
-│   ─────────────────       │
-│   Research:               │
-│   Plasma Cannon           │
-│   ████████░░ 80%          │
-│   ETA: 2 turns            │
-│                           │
-└───────────────────────────┘
-```
+**Something is always selected in MOO1.** The game starts with your homeworld selected. Clicking empty space does NOT deselect - you must click another star or fleet to change selection.
 
-### State 2: Star Selected (Colony View)
+The info panel states are:
+1. Your colony selected (with production sliders)
+2. Unexplored star selected
+3. Enemy colony selected
+4. Your fleet selected (at colony or in transit)
+
+### State 1: Star Selected (Colony View)
 
 ```
 ┌───────────────────────────┐
@@ -158,7 +134,7 @@ SELECTION:
 └───────────────────────────┘
 ```
 
-### State 3: Star Selected (Uncolonized)
+### State 2: Unexplored Star Selected
 
 ```
 ┌───────────────────────────┐
@@ -194,7 +170,7 @@ SELECTION:
 └───────────────────────────┘
 ```
 
-### State 4: Star Selected (Enemy Colony)
+### State 3: Enemy Colony Selected
 
 ```
 ┌───────────────────────────┐
@@ -228,7 +204,7 @@ SELECTION:
 └───────────────────────────┘
 ```
 
-### State 5: Fleet Selected
+### State 4: Fleet Selected
 
 ```
 ┌───────────────────────────┐

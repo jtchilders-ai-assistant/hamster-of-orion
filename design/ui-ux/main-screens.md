@@ -217,38 +217,8 @@ When your own colony is selected, shows full colony details with production slid
 └─────────────────────┘
 ```
 
-### Info Panel State: Nothing Selected (Empire Summary)
-```
-┌─────────────────────┐
-│                     │
-│  ┌───────────────┐  │
-│  │               │  │
-│  │ [RACE EMBLEM] │  │
-│  │               │  │
-│  └───────────────┘  │
-│                     │
-│  HAMSTER EMPIRE     │
-│  ─────────────────  │
-│                     │
-│  Colonies:      5   │
-│  Population:   42M  │
-│  Factories:   127   │
-│  Ships:        18   │
-│  Missile Bases: 3   │
-│                     │
-│  ─────────────────  │
-│  Income:     +120BC │
-│  Expenses:    -45BC │
-│  Reserve:     500BC │
-│                     │
-│  ─────────────────  │
-│  Research:          │
-│  Plasma Cannon      │
-│  ████████░░ 80%     │
-│  ETA: 2 turns       │
-│                     │
-└─────────────────────┘
-```
+### Selection Behavior
+**Something is always selected.** When the game starts, your homeworld is automatically selected. Clicking empty space does NOT deselect - you must click another star or fleet to change selection.
 
 ### Bottom Command Bar
 Always present on Galaxy Map screen:
