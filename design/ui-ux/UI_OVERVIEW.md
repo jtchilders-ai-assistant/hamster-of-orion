@@ -124,12 +124,11 @@ All game screens follow the MOO1 layout pattern:
 
 ## Info Panel States (Galaxy Map)
 
-The right-side info panel changes based on selection:
+The right-side info panel changes based on selection.
 
-### Nothing Selected → Empire Summary
-Shows: Race emblem, colony count, population, ships, income, current research
+**Note: Something is always selected.** The game starts with your homeworld selected. Clicking empty space does NOT deselect - you must click another star or fleet to change selection.
 
-### Star Selected (Your Colony) → Colony Details
+### Your Colony Selected → Colony Details
 Shows: Star name, planet type, population, factories, bases, 5 production sliders
 
 ### Star Selected (Unexplored) → Star Info
