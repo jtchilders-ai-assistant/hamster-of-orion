@@ -204,15 +204,68 @@ The info panel states are:
 └───────────────────────────┘
 ```
 
-### State 4: Fleet Selected
+### State 4a: Fleet Deployment (Fleet Orbiting System)
+
+When clicking a fleet orbiting a system, the Fleet Deployment panel appears with 5 ship slots:
+
+```
+┌─────────────────────────┐
+│                         │
+│   FLEET DEPLOYMENT      │
+│   ═══════════════════   │
+│                         │
+│   ┌───────┐ ┌───────┐   │
+│   │ SCOUT │ │FIGHTER│   │
+│   │       │ │       │   │
+│   │    12 │ │     4 │   │  ← Ship count in corner
+│   └───────┘ └───────┘   │
+│   << < 12 > >>          │  ← Deploy count controls
+│   << <  4 > >>          │
+│                         │
+│   ┌───────┐ ┌───────┐   │
+│   │ empty │ │ empty │   │  ← Up to 5 ship slots
+│   └───────┘ └───────┘   │
+│   ┌───────┐             │
+│   │ empty │             │
+│   └───────┘             │
+│                         │
+│   ┌─────────────────┐   │
+│   │  ETA: 3 turns   │   │  ← Green text, shows ETA
+│   └─────────────────┘   │    after destination clicked
+│                         │
+│   [CANCEL]   [ACCEPT]   │
+│                         │
+└─────────────────────────┘
+```
+
+**Deployment Controls** (per ship type):
+- `<<` = Set to 0 (leave all)
+- `<` = Decrease by 1
+- `[number]` = Ships to deploy
+- `>` = Increase by 1
+- `>>` = Set to max (deploy all)
+
+**Flow**:
+1. All ships default to selected
+2. Adjust counts with buttons
+3. Click destination star → green line appears, ETA updates, ACCEPT enables
+4. Click ACCEPT → fleet departs
+
+**After ACCEPT**:
+- Departing fleet icon appears LEFT of system
+- Remaining ships icon stays RIGHT of system (if any left)
+- Selection moves to origin system
+
+### State 4b: Fleet In Transit
+
+When clicking a fleet that is traveling between systems:
 
 ```
 ┌───────────────────────────┐
 │                           │
-│   YOUR FLEET              │
+│   FLEET IN TRANSIT        │
 │   ═══════════════════     │
 │                           │
-│   Location: In Transit    │
 │   From: Sol               │
 │   To: Altair              │
 │   ETA: 3 turns            │
@@ -221,19 +274,13 @@ The info panel states are:
 │   SHIPS                   │
 │   ─────────────────       │
 │                           │
-│   Scout          x3       │
-│   Colony Ship    x1       │
-│   Fighter        x12      │
-│   Destroyer      x4       │
+│   Scout          x12      │
+│   Fighter        x4       │
 │                           │
 │   ─────────────────       │
-│   Total Ships:   20       │
-│   Fleet Power:   450      │
+│   Total Ships:   16       │
 │                           │
-│   ─────────────────       │
-│   [CHANGE DESTINATION]    │
-│   [SPLIT FLEET]           │
-│   [SCRAP SHIPS]           │
+│   [REDIRECT]              │  ← Change destination
 │                           │
 └───────────────────────────┘
 ```

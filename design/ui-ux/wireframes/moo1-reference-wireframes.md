@@ -102,49 +102,73 @@ When an unexplored star is selected, minimal info shown.
 
 ---
 
-## 3. Galaxy Map - Fleet Selected (`moo_galaxy_shipselect.png`)
+## 3. Galaxy Map - Fleet Deployment (`moo_galaxy_shipselect.png`)
 
-When a fleet icon is clicked, shows ship composition.
+When a fleet orbiting a system is clicked, the **Fleet Deployment** panel appears with 5 ship slots.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
 │                                                                                 │
 │  ┌────────────────────────────────────────────────────┐ ┌─────────────────────┐│
 │  │                                                    │ │                     ││
-│  │                    STAR MAP                        │ │  FLEET AT FIRMA     ││
+│  │                    STAR MAP                        │ │  FLEET DEPLOYMENT   ││
 │  │                                                    │ │  ════════════════   ││
 │  │                                                    │ │                     ││
-│  │         ·    ★         ·                          │ │  Orbiting:          ││
-│  │    ·              ·         ★     ·               │ │  Firma (Your Colony)││
-│  │              ✴                          ·         │ │                     ││
-│  │      ★             [●]▲◄─ Fleet selected          │ │  ─────────────────  ││
-│  │           ·    ·              ★                   │ │  SHIPS              ││
-│  │    ·                    ·           ·             │ │  ─────────────────  ││
+│  │         ·    ★         ·                          │ │  ┌─────┐ ┌─────┐    ││
+│  │    ·              ·         ★     ·               │ │  │SCOUT│ │FIGHT│    ││
+│  │              ✴                          ·         │ │  │  12 │ │   4 │    ││
+│  │      ★             [●]▲◄─ Fleet selected          │ │  └─────┘ └─────┘    ││
+│  │           ·    ·              ★                   │ │  << < 12 > >>       ││
+│  │    ·                    ·           ·             │ │  << <  4 > >>       ││
 │  │         ★       ·    ✦         ·                  │ │                     ││
-│  │                         ·                ★        │ │  Scout        x 2   ││
-│  │      ·        ·              ·                    │ │  Fighter      x 6   ││
-│  │           ✵          ★           ·                │ │  Colony Ship  x 1   ││
-│  │    ·              ·         ·          ·          │ │                     ││
-│  │                                                    │ │  ─────────────────  ││
-│  │                                                    │ │  Total: 9 ships     ││
+│  │                         ·                ★        │ │  ┌─────┐ ┌─────┐    ││
+│  │      ·        ·              ·                    │ │  │empty│ │empty│    ││
+│  │           ✵          ★           ·                │ │  └─────┘ └─────┘    ││
+│  │    ·              ·         ·          ·          │ │  ┌─────┐            ││
+│  │                                                    │ │  │empty│            ││
+│  │                                                    │ │  └─────┘            ││
 │  │                                                    │ │                     ││
-│  │                                                    │ │  Click destination  ││
-│  │                                                    │ │  to send fleet      ││
+│  │                                                    │ │  ┌───────────────┐  ││
+│  │                                                    │ │  │ ETA: -- turns │  ││
+│  │                                                    │ │  └───────────────┘  ││
 │  │                                                    │ │                     ││
+│  │                                                    │ │  [CANCEL] [ACCEPT]  ││
 │  └────────────────────────────────────────────────────┘ └─────────────────────┘│
 │                                                                                 │
-│  ┌──────┬────────┬───────┬─────┬───────┬─────────┬──────┬───────────────────┐  │
-│  │ GAME │ DESIGN │ FLEET │ MAP │ RACES │ PLANETS │ TECH │     NEXT TURN     │  │
-│  └──────┴────────┴───────┴─────┴───────┴─────────┴──────┴───────────────────┘  │
 └─────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Right Panel Elements (Fleet at Colony):
-- **"FLEET AT [location]"** header
-- **Orbiting** location name
-- **Ship list** with counts by design name
-- **Total ships** count
-- **Instructions** for sending fleet
+### Fleet Deployment Panel Elements:
+
+**Ship Slots (up to 5)**:
+- Ship image with total count in bottom-right corner
+- Deployment controls below each: `<<` `<` `[count]` `>` `>>`
+
+**Deployment Controls**:
+| Button | Action |
+|--------|--------|
+| `<<` | Set to 0 (leave all behind) |
+| `<` | Decrease by 1 |
+| `[number]` | Ships to deploy |
+| `>` | Increase by 1 |
+| `>>` | Set to max (deploy all) |
+
+**ETA Display**: Green text, shows "-- turns" until destination selected
+
+**Buttons**:
+- CANCEL: Close panel, no changes
+- ACCEPT: Disabled until destination selected, then confirms deployment
+
+### Deployment Flow:
+1. Click fleet → panel shows with all ships selected by default
+2. Adjust counts with `<<` `<` `>` `>>` buttons
+3. Click destination star → green line appears, ETA updates, ACCEPT enables
+4. Click ACCEPT → fleet departs
+
+### After Accepting:
+- Departing fleet icon appears **LEFT** of origin system
+- If ships remain, original icon stays **RIGHT** of system
+- Selection moves to origin system (not departing fleet)
 
 ---
 

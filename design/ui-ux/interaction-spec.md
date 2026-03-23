@@ -22,9 +22,10 @@ Single left-click is the primary selection and activation input.
 | Star (unexplored) | Select | Star info panel appears with "Unknown" status |
 | Star (explored) | Select | System detail panel with planets, fleets |
 | Star (your colony) | Select | System panel with [VIEW COLONY] button |
-| Fleet icon (yours) | Select | Fleet panel with composition, orders |
+| Fleet icon (yours, orbiting) | Select | Fleet Deployment panel appears |
+| Fleet icon (yours, in transit) | Select | Fleet In Transit panel with ETA |
 | Fleet icon (enemy) | Select | Fleet panel with estimated strength |
-| Empty space | Deselect | Close any open selection panel |
+| Empty space | No action | Something always selected (MOO1 behavior) |
 | Navigation buttons [F2-F7] | Navigate | Switch to respective screen |
 | [END TURN] button | Confirm | Open turn confirmation dialog |
 | Zoom [+]/[-] buttons | Zoom | Zoom map in/out by one step |
@@ -41,6 +42,23 @@ Single left-click is the primary selection and activation input.
 | [BUILD] button | Queue build | Add building to construction queue |
 | [CHANGE SHIP] button | Open picker | Show ship design selection dialog |
 | Ship queue item | Select | Highlight for removal |
+
+#### Fleet Deployment Panel (Galaxy Map - Fleet at System Selected)
+| Target | Action | Result |
+|--------|--------|--------|
+| Ship slot image | No action | Shows ship type and total count |
+| `<<` button | Set to zero | Set deployment count to 0 (leave all) |
+| `<` button | Decrease | Decrease deployment count by 1 |
+| `>` button | Increase | Increase deployment count by 1 |
+| `>>` button | Set to max | Set deployment count to total (deploy all) |
+| Destination star (map) | Select destination | Green line appears, ETA updates, ACCEPT enables |
+| [CANCEL] button | Cancel | Close panel, return to normal selection |
+| [ACCEPT] button | Confirm deployment | Send fleet (disabled until destination selected) |
+
+**After ACCEPT**:
+- Departing fleet icon appears LEFT of origin system
+- Remaining ships icon stays RIGHT of system (if any)
+- Selection moves to origin system
 
 #### Fleet Command (F3)
 | Target | Action | Result |

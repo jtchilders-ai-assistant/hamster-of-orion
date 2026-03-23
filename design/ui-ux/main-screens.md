@@ -164,32 +164,61 @@ When your own colony is selected, shows full colony details with production slid
 └─────────────────────┘
 ```
 
-### Info Panel State: Fleet Selected (at colony)
+### Info Panel State: Fleet Deployment (Fleet at Colony Selected)
+
+When you click a fleet orbiting a system, the **Fleet Deployment** panel appears. This panel has 5 ship slots and deployment controls.
+
 ```
-┌─────────────────────┐
-│  FLEET AT FIRMA     │
-│  ════════════════   │
-│                     │
-│  Orbiting:          │
-│  Firma (Your Colony)│
-│                     │
-│  ─────────────────  │
-│  SHIPS              │
-│  ─────────────────  │
-│                     │
-│  Scout        x 2   │
-│  Fighter      x 6   │
-│  Colony Ship  x 1   │
-│                     │
-│  ─────────────────  │
-│  Total: 9 ships     │
-│                     │
-│  Click destination  │
-│  to send fleet      │
-│                     │
-│                     │
-└─────────────────────┘
+┌─────────────────────────┐
+│                         │
+│   FLEET DEPLOYMENT      │
+│   ═══════════════════   │
+│                         │
+│   ┌───────┐ ┌───────┐   │
+│   │ SCOUT │ │FIGHTER│   │
+│   │       │ │       │   │
+│   │    12 │ │     4 │   │  ← Total count in corner
+│   └───────┘ └───────┘   │
+│   << < 12 > >>          │  ← Deployment selectors
+│   << <  4 > >>          │
+│                         │
+│   ┌───────┐ ┌───────┐   │
+│   │ empty │ │ empty │   │  ← Up to 5 ship type slots
+│   └───────┘ └───────┘   │
+│   ┌───────┐             │
+│   │ empty │             │
+│   └───────┘             │
+│                         │
+│   ┌─────────────────┐   │
+│   │  ETA: -- turns  │   │  ← Green text, updates when
+│   └─────────────────┘   │    destination selected
+│                         │
+│   [CANCEL]   [ACCEPT]   │  ← ACCEPT disabled until
+│                         │    destination chosen
+└─────────────────────────┘
 ```
+
+**Deployment Controls** (below each ship image):
+| Button | Action |
+|--------|--------|
+| `<<` | Set to 0 (leave all behind) |
+| `<` | Decrease by 1 |
+| `[number]` | Ships to deploy |
+| `>` | Increase by 1 |
+| `>>` | Set to max (deploy all) |
+
+**Default**: All ships selected for deployment.
+
+**Deployment Flow**:
+1. Click fleet icon at system → Fleet Deployment panel appears
+2. Adjust ship counts with `<<` `<` `>` `>>` buttons (optional)
+3. Click destination star → Green line appears, ETA updates, ACCEPT enables
+4. Click ACCEPT → Fleet departs
+
+**After Accepting**:
+- Departing fleet icon appears **LEFT** of origin system
+- If ships remain, original icon stays **RIGHT** of system
+- Selection moves to the **origin system** (not departing fleet)
 
 ### Info Panel State: Fleet In Transit
 ```
