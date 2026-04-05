@@ -24,19 +24,16 @@ Ship construction cost is determined by hull size and all installed components:
 Ship_Cost = Hull_Cost + Engine_Cost + Σ(Weapon_Costs) + Σ(Defense_Costs) + Σ(Special_Costs)
 ```
 
-#### Hull Base Costs
+#### Hull Base Costs (MOO1 Hull Sizes)
 
-| Ship Class | Space | Base Hull Cost |
-|------------|-------|----------------|
-| Scout | 50 | 25 BC |
-| Fighter | 100 | 40 BC |
-| Destroyer | 250 | 80 BC |
-| Cruiser | 500 | 150 BC |
-| Battle Cruiser | 1,000 | 300 BC |
-| Dreadnought | 1,500 | 500 BC |
-| Titan | 2,500 | 1,000 BC |
+| Hull Size | Base Space | Base Hull Cost | Notes |
+|-----------|------------|----------------|-------|
+| Small | ~40 | 6 BC | Scouts, fighters, colony ships |
+| Medium | ~100 | 36 BC | Multi-role warships |
+| Large | ~250 | 200 BC | Heavy warships |
+| Huge | ~500+ | 1200 BC | Capital ships |
 
-**Note:** Hull cost is the **base cost before adding engines, weapons, and other components**. Typical fully-equipped ships cost 2-20× the hull cost depending on technology level. See `ships/ship-classes.md` for typical total ship costs.
+**Note:** Hull cost is the **base cost before adding weapons and special equipment**. Ship systems (engines, shields, computers, ECM, armor, maneuver) are automatic and don't add to cost - they use your best available technology. Space values increase with Construction technology. See `ships/ship-classes.md` for details.
 
 ---
 
@@ -113,14 +110,14 @@ Maximum_Reduction = 0.80 (80% off, minimum 20% of base cost)
 Total_Ship_Cost = Hull_Cost + Σ(Component_Costs × Miniaturization_Modifier)
 ```
 
-**Example Destroyer:**
-- Hull: 80 BC
-- Ion Engine: 48 BC
+**Example Medium Hull Warship:**
+- Hull: 36 BC
 - 2× Heavy Laser: 2 × 10 = 20 BC
-- Class II Deflector: 30 BC
-- Battle Computer II: 15 BC
-- ECM Jammer I: 12 BC
-- **Total: 205 BC**
+- 1× Nuclear Missile: 8 BC
+- Battle Scanner (special): 15 BC
+- **Total: 79 BC**
+
+**Note:** Ship systems (engine, shield, computer, ECM, armor, maneuver) are automatic in MOO1 - they don't consume space or add to cost. Only weapons and specials are chosen by the player.
 
 ---
 
@@ -138,17 +135,14 @@ Maintenance_Rate = 0.02 (2% of construction cost per turn)
 
 **Minimum Maintenance:** 1 BC per ship (no ship is free to maintain).
 
-#### Maintenance by Ship Class (Typical)
+#### Maintenance by Hull Size (Typical)
 
-| Ship Class | Typical Cost | Typical Maintenance |
-|------------|--------------|---------------------|
-| Scout | 75 BC | 1-2 BC/turn |
-| Fighter | 150 BC | 3 BC/turn |
-| Destroyer | 400 BC | 8 BC/turn |
-| Cruiser | 1,000 BC | 20 BC/turn |
-| Battle Cruiser | 2,500 BC | 50 BC/turn |
-| Dreadnought | 5,000 BC | 100 BC/turn |
-| Titan | 15,000 BC | 300 BC/turn |
+| Hull Size | Typical Cost Range | Typical Maintenance |
+|-----------|-------------------|---------------------|
+| Small | 20-100 BC | 1-2 BC/turn |
+| Medium | 80-300 BC | 2-6 BC/turn |
+| Large | 300-1,000 BC | 6-20 BC/turn |
+| Huge | 1,500-5,000 BC | 30-100 BC/turn |
 
 ---
 
@@ -159,11 +153,11 @@ Fleet_Maintenance = Σ(Ship_Maintenance) for all ships in empire
 ```
 
 **Example Fleet:**
-- 20 Scouts: 20 × 2 = 40 BC/turn
-- 30 Fighters: 30 × 3 = 90 BC/turn
-- 15 Destroyers: 15 × 8 = 120 BC/turn
-- 5 Cruisers: 5 × 20 = 100 BC/turn
-- **Total Fleet Maintenance: 350 BC/turn**
+- 20 Small ships (scouts): 20 × 2 = 40 BC/turn
+- 15 Medium ships (warships): 15 × 5 = 75 BC/turn
+- 5 Large ships (heavy warships): 5 × 15 = 75 BC/turn
+- 2 Huge ships (capital ships): 2 × 50 = 100 BC/turn
+- **Total Fleet Maintenance: 290 BC/turn**
 
 ---
 
@@ -266,7 +260,7 @@ Refit_Rate = 0.50 (50% of the difference)
 #### Refit Restrictions
 
 - Ships must be at a planet with shipyard
-- Cannot change hull size (Scout → Cruiser impossible)
+- Cannot change hull size (Small → Large impossible)
 - Takes time proportional to cost difference
 - Ship unavailable during refit
 
@@ -336,7 +330,7 @@ Fixed installations have different economics:
 | Installation | Construction | Maintenance |
 |--------------|--------------|-------------|
 | Missile Base | 150 BC | 2 BC/turn |
-| Fighter Base | 300 BC | 5 BC/turn |
+| Starbase | 300 BC | 5 BC/turn |
 | Orbital Station | 800 BC | 15 BC/turn |
 | Star Fortress | 2,000 BC | 40 BC/turn |
 | Battlestation | 5,000 BC | 100 BC/turn |
@@ -532,14 +526,14 @@ function calculate_refit_time(refit_cost, planet):
 - Race: Hamsters (1.0 modifier)
 - No maintenance tech
 - Fleet:
-  - 10 Scouts (75 BC each)
-  - 20 Destroyers (400 BC each)
-  - 5 Cruisers (1,000 BC each)
+  - 10 Small ships (50 BC each)
+  - 20 Medium ships (200 BC each)
+  - 5 Large ships (800 BC each)
 
 **Calculation:**
-1. Scout maintenance: 75 × 0.02 = 1.5 → 2 BC each → 10 × 2 = 20 BC
-2. Destroyer maintenance: 400 × 0.02 = 8 BC each → 20 × 8 = 160 BC
-3. Cruiser maintenance: 1,000 × 0.02 = 20 BC each → 5 × 20 = 100 BC
+1. Small ship maintenance: 50 × 0.02 = 1 BC each → 10 × 1 = 10 BC
+2. Medium ship maintenance: 200 × 0.02 = 4 BC each → 20 × 4 = 80 BC
+3. Large ship maintenance: 800 × 0.02 = 16 BC each → 5 × 16 = 80 BC
 4. **Total: 280 BC/turn**
 
 ---
@@ -548,9 +542,9 @@ function calculate_refit_time(refit_cost, planet):
 
 **Same fleet as above, but Ants (0.75 modifier):**
 
-1. Scout: 2 × 0.75 = 1.5 → 2 BC × 10 = 20 BC
-2. Destroyer: 8 × 0.75 = 6 BC × 20 = 120 BC
-3. Cruiser: 20 × 0.75 = 15 BC × 5 = 75 BC
+1. Small: 1 × 0.75 = 0.75 → 1 BC × 10 = 10 BC
+2. Medium: 4 × 0.75 = 3 BC × 20 = 60 BC
+3. Large: 16 × 0.75 = 12 BC × 5 = 60 BC
 4. **Total: 215 BC/turn** (vs 280 BC for Hamsters)
 
 Ants save 65 BC/turn on the same fleet!
@@ -561,7 +555,7 @@ Ants save 65 BC/turn on the same fleet!
 
 **Situation:**
 - Treasury: -50 BC (bankruptcy)
-- Own a 2,000 BC Battle Cruiser
+- Own a 2,000 BC Huge ship
 
 **Options:**
 1. Emergency scrap (10%): 2,000 × 0.10 = 200 BC
@@ -573,8 +567,8 @@ Ants save 65 BC/turn on the same fleet!
 
 ### Example 4: Refit Analysis
 
-**Old Design:** Destroyer with Laser weapons (400 BC)
-**New Design:** Destroyer with Ion Cannons (600 BC)
+**Old Design:** Medium warship with Laser weapons (150 BC)
+**New Design:** Medium warship with Ion Cannons (250 BC)
 
 **Refit Cost:**
 1. Difference: 600 - 400 = 200 BC
@@ -595,10 +589,10 @@ Ants save 65 BC/turn on the same fleet!
 **Calculation:**
 1. Safe fleet budget: 400 × 0.40 = 160 BC/turn maintenance
 2. Max fleet value: 160 / 0.02 = 8,000 BC
-3. Can sustain: ~8 Cruisers OR ~20 Destroyers OR mix
+3. Can sustain: ~8 Large ships OR ~20 Medium ships OR mix
 
 **Reality Check:**
-- Building 10 Cruisers (10,000 BC value) = 200 BC/turn maintenance
+- Building 10 Large ships (8,000 BC value) = 160 BC/turn maintenance
 - That's 50% of income - strained but sustainable short-term
 
 ---
