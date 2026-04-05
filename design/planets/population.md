@@ -1,79 +1,95 @@
 # Population Management
 
 ## Overview
-Population is the fundamental resource. More people = more production + research + food + military.
+Population is the fundamental resource. More population = more factory operators = more production and research output.
 
 ---
 
 ## Population Growth
 
-**Base Growth Rate**: 
-- 0-25% of max: Fast (+5% per turn)
-- 25-75% of max: Medium (+3% per turn)  
-- 75-100% of max: Slow (+1% per turn)
+**Base Growth Rate**: Population grows each turn based on current population relative to maximum capacity.
 
-**Modifiers**:
-- Cloning Center: +50%
-- Advanced Cloning: +100%
-- Food surplus: +bonus
-- Racial bonuses (Rabbits +100%, Ants +25%)
+**Growth Phases**:
+- Low population (under 25% of max): Fastest growth
+- Medium population (25-75% of max): Moderate growth
+- High population (over 75% of max): Slow growth
+- At maximum: No natural growth
 
-**Example**: Rabbit colony with Advanced Cloning = +200% growth = fills planet in 20-30 turns
-
----
-
-## Population Roles
-
-Workers produce based on slider allocation:
-- **Farmers**: Produce food (2 food/pop, +bonuses)
-- **Workers**: Build factories/buildings (varies by production)
-- **Scientists**: Research (varies by tech)  
-
-**Optimal Balance**: Adjust sliders each turn based on needs
+**Racial Modifiers**:
+- Rabbits: +100% population growth
+- Ants: +25% population growth (estimated)
+- Other races: Standard growth
 
 ---
 
-## Morale & Unrest
+## Population and Production
 
-**Happy Population** (>75% morale):
-- +10% production
-- No rebellion risk
-- Fast growth
+**Operating Factories**: Population operates factories at a ratio determined by Robotic Controls technology:
+- Base: 2 factories per population
+- With tech upgrades: Up to 7 factories per population
 
-**Unhappy Population** (<50% morale):
-- -20% production
-- Rebellion possible
-- Slow growth
+**Direct Production**: Each population unit also contributes 0.5 BC of base production (representing manual labor).
 
-**Causes of Unrest**:
-- Enemy occupation (recently conquered)
-- High taxes
-- Overpopulation (at max capacity)
-- Starvation (insufficient food)
-
-**Remedies**:
-- Lower taxes
-- Build entertainment/happiness buildings
-- Garrison troops
-- Time (newly conquered worlds stabilize)
+**Formula**:
+```
+Total_Production = (Operating_Factories × 1 BC) + (Population × 0.5 BC)
+Total_Production *= Mineral_Richness_Modifier
+Total_Production *= Racial_Production_Modifier
+```
 
 ---
 
-## Strategic Population
+## Population and Research
 
-**Domination Victory**: 
-- Requires 2/3 total galactic population
-- Rabbits excel (exponential growth)
-- Ants strong (efficient growth)
-
-**Production Power**:
-- More pop = more factories = more ships
-- Quality of planet matters less with enough people
-
-**Research Output**:
-- Scientists generate research points
-- Rats leverage this best (+50% research)
+**Research Output**: When the Tech slider is allocated, population contributes to research:
+- Research points scale with population and tech allocation
+- No separate "scientist" units - just slider percentage
+- Rats get +50% research bonus
 
 ---
 
-Next: See `production.md` for MOO1-style sliders.
+## Maximum Population
+
+Determined by:
+1. **Planet Size**: Tiny to Huge base capacity
+2. **Environment**: Hostile environments reduce capacity
+3. **Terraforming**: Planetology tech can increase maximum
+
+**Example**: Large Terran planet = ~100 max population
+**With Terraforming**: Could increase to 120, 140, etc.
+
+---
+
+## Population Transport
+
+**Relocating Population**:
+- Can transport population between your colonies
+- Uses transport ships (built via Ship slider)
+- Takes time based on distance
+
+**Invasion**:
+- Transport population to enemy planets
+- Ground combat determines outcome
+- Captured planets retain infrastructure
+
+---
+
+## Population and Voting
+
+**Diplomatic Victory**: Council votes are proportional to population
+- More total population = more votes
+- Rabbits/Ants excel at population-based strategies
+
+---
+
+## Conquered Populations
+
+**Newly Captured Planets**:
+- Population may resist (morale penalty)
+- Production reduced until stabilized
+- Garrison troops help maintain order
+- Over time, population integrates
+
+---
+
+Next: See `production.md` for the slider system.

@@ -1,60 +1,113 @@
 # Special Planets
 
 ## Overview
-Unique worlds in the galaxy that offer significant strategic advantages or major discovery rewards.
+Certain planets in the galaxy offer significant strategic advantages or unique rewards.
 
 ---
 
-## Orion (The Galactic Crown Jewel)
+## Orion System
 
-**Location**: Always near the center of the galaxy.
-**Guardian**: Protected by a massive, high-tech ancient ship. 
-**Reward**: 
-- **Research Bonus**: 4x Research Points (RP).
-- **Discovery**: First race to defeat the Guardian and scout the world receives multiple high-level technologies.
-- **Weaponry**: The only source of the most powerful weapons in the game.
+**Location**: Near the center of the galaxy.
 
-**Strategy**: Defeating the Guardian is a late-game milestone. Owning Orion almost guarantees victory through technology and voting power in the High Council.
+**The Guardian**: 
+- Powerful automated warship guarding the system
+- Must be defeated before colonizing Orion
+- Extremely difficult - requires late-game fleet
+- One of the toughest battles in the game
+
+**Rewards (After Defeating Guardian)**:
+- Access to colonize Orion (excellent planet)
+- Multiple high-level technologies from all fields
+- **4x research multiplier** on Orion colony (ongoing)
+- Massive strategic advantage
+
+**Strategy**: 
+- Don't attempt until you have advanced weapons/shields
+- Losing your fleet to the Guardian is devastating
+- Defeating it can swing the game in your favor
+- The 4x research bonus makes Orion an incredible science world
 
 ---
 
 ## Artifacts Worlds
 
-**Description**: Systems containing remnants of advanced ancient civilizations.
-**Bonus**: 
-- **Research Bonus**: 2x Research Points (RP).
-- **Discovery**: The first race to scout an Artifacts world receives a random high-level technology for free.
-**Rarity**: 2-4 per galaxy.
+**Description**: Planets containing remnants of ancient civilizations.
 
-**Strategy**: High priority target. The free tech can provide a massive early-game advantage.
+**Bonus**: 
+- **One-time technology**: First empire to colonize receives a random technology for free
+- The tech could be from any field and any level
+- **2x research multiplier** on this planet (ongoing)
+
+**Rarity**: 2-6 per galaxy depending on galaxy size.
+
+**Strategy**: 
+- High priority early colonization targets
+- Race opponents to claim them
+- The free tech can provide significant advantage
 
 ---
 
 ## Homeworlds
 
-**Environment**: Always **Terran**.
-**Size**: Typically **Large** or **Huge**.
-**Infrastructure**: Starts with a base population and several factories.
-**Starting Fleet**: 2 Scouts, 1 Colony Ship.
+**Environment**: Always Terran
+**Size**: Large or Huge
+**Starting Infrastructure**: 
+- Base population
+- Starting factories
+- No missile bases initially
 
-**Strategic Importance**: Losing a Homeworld is a devastating blow to morale and often leads to elimination or crippling of the race.
+**Starting Fleet**: 
+- 2 Scout ships
+- 1 Colony ship
 
----
-
-## Mineral Rich / Ultra Rich Worlds
-
-**Rich**: Doubles (2x) industrial construction speed.
-**Ultra Rich**: Triples (3x) industrial construction speed.
-**Description**: Visible heavy metal deposits. These worlds develop factories and ships at incredible speeds.
-
----
-
-## The Doomsday Scenario
-
-**Stellar Converter**: Late-game technology capable of destroying a planet's habitability.
-- Results in the planet becoming an asteroid belt or empty system.
-- Usage causes massive diplomatic fallout with all other races.
+**Strategic Importance**: 
+- Core of your empire
+- Losing your homeworld is catastrophic
+- Often the most productive planet you have
 
 ---
 
-Next: See `map-generation.md` for star system distribution logic.
+## Rich & Ultra Rich Worlds
+
+**Rich Planets**:
+- ×2 industrial production modifier
+- Factories and ships build twice as fast
+- Very valuable production centers
+
+**Ultra Rich Planets**:
+- ×3 industrial production modifier  
+- Exceptional ship production speed
+- Extremely valuable - prioritize colonizing
+
+**Strategy**: 
+- Rich/Ultra Rich planets make excellent shipyards
+- Worth fighting over
+- Often found around Blue/White stars
+
+---
+
+## Poor & Ultra Poor Worlds
+
+**Poor Planets**:
+- ×1/2 industrial production modifier
+- Slow factory construction
+- Less valuable but still worth colonizing
+
+**Ultra Poor Planets**:
+- ×1/3 industrial production modifier
+- Very slow development
+- May still be worth colonizing for population/territory
+
+---
+
+## Stellar Converter Effect
+
+**Late-game weapon**: The Stellar Converter can destroy planets.
+- Transforms habitable planet into asteroid field
+- Planet is permanently lost
+- Causes massive diplomatic penalties with all races
+- Use with extreme caution
+
+---
+
+Next: See `planet-types.md` for environment details.

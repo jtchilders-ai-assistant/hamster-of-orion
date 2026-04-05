@@ -21,7 +21,7 @@ Total population capacity is calculated based on **Planet Size + Environment Typ
 - **Radiated Tiny**: Lowest capacity world.
 
 ## Terraforming
-Biotechnology can increase a planet's base size capacity by adding +10, +20, etc. to the maximum population.
+Planetology technology can increase a planet's maximum population capacity through terraforming (e.g., +10, +20, etc. per tech level).
 
 ---
 
