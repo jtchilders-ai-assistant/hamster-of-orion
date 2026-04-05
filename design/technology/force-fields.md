@@ -376,7 +376,7 @@ A ship with Zyro Shield and ECM V faces a 10-missile salvo:
 - Roll 1d4: result × 25% = percentage of stack destroyed
 - Affected ships are completely destroyed (no escape, no salvage)
 - 3 turn cooldown before can be used again
-- Requires capital ship (Dreadnought or Titan only)
+- Requires capital ship (Huge hull only)
 - Does NOT work on Orion Guardian (reduced to 10% damage)
 
 **Destruction Roll:**
@@ -388,9 +388,9 @@ A ship with Zyro Shield and ECM V faces a 10-missile salvo:
 | 4 | 100% of ships |
 
 **Example:**
-Enemy has 12 Cruisers. You activate Black Hole Generator and roll 3.
-- 75% × 12 = 9 Cruisers destroyed instantly
-- 3 Cruisers remain
+Enemy has 12 Large ships. You activate Black Hole Generator and roll 3.
+- 75% × 12 = 9 ships destroyed instantly
+- 3 ships remain
 
 ---
 
@@ -1129,7 +1129,7 @@ If not in your tree, must acquire via:
 - Stacks with ECM (multiplicative)
 
 ### Black Hole Generator Limitations
-- Only usable on Dreadnought or larger
+- Only usable on Huge hull ships
 - 3-turn cooldown between uses
 - Does NOT affect Orion Guardian (10% damage cap)
 - Does NOT affect planets
@@ -1163,11 +1163,11 @@ If not in your tree, must acquire via:
 - (Then ECM reduces hit chance on remaining 5)
 
 ### Example 4: Black Hole Generator
-**Situation:** Enemy has 8 Battle Cruisers. You activate Black Hole Generator.
+**Situation:** Enemy has 8 Large ships. You activate Black Hole Generator.
 - Roll 1d4: result is 3
 - Destruction: 3 × 25% = 75%
-- Ships destroyed: 8 × 0.75 = 6 Battle Cruisers
-- Ships remaining: 2 Battle Cruisers
+- Ships destroyed: 8 × 0.75 = 6 ships
+- Ships remaining: 2 ships
 
 ### Example 5: Hermit Crab Racial Bonus
 **Situation:** Hermit Crab ship with Class VIII Deflector (normally absorbs 8).

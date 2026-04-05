@@ -256,7 +256,7 @@ Fleet-wide speed improvements.
 
 ### Rabbits: Rapid Expansion
 - Colony ships get +1 speed
-- Scout ships get +1 speed
+- Small ships get +1 speed
 - First to reach new systems
 
 ### Chameleons: Evasive Maneuvers

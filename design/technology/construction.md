@@ -1,8 +1,10 @@
 # Construction Technology - Complete Tech Tree
 
+> **Note:** This file contains some legacy references to 7 ship classes. MOO1 uses 4 hull sizes (Small/Medium/Large/Huge). Construction tech increases SPACE within hulls, not unlocking new hull types. The JSON data sections need updating to reflect this.
+
 ## Overview
 
-The Construction technology field governs ship armor, industrial efficiency, pollution control, ship class unlocks, and ground combat equipment. It is one of six technology fields and is critical for both economic growth and military durability.
+The Construction technology field governs ship armor, industrial efficiency, pollution control, hull space improvements, and ground combat equipment. It is one of six technology fields and is critical for both economic growth and military durability.
 
 **Key Races:**
 - Ants: +50% Production
@@ -88,14 +90,14 @@ Armor and equipment for planetary invasions.
 
 ---
 
-### Tier 4 (Tech Level 12-15) - Cruiser Era
+### Tier 4 (Tech Level 12-15) - Mid Construction
 **Research Cost:** 250 RP
 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
 | Improved Industrial Tech 7 | 13 | — | Factory cost: 7 BC |
 | Automated Repair Unit | 14 | Auto Repair | +15% HP per turn |
-| Cruiser Construction | 15 | Cruiser hull | 500 space ships |
+| Improved Space (+20%) | 15 | — | +20% hull space |
 | Reduced Waste 60% | 15 | — | Pollution: 60% of normal |
 
 ---
@@ -110,12 +112,12 @@ Armor and equipment for planetary invasions.
 
 ---
 
-### Tier 6 (Tech Level 19-22) - Battle Cruiser Era
+### Tier 6 (Tech Level 19-22) - Advanced Construction
 **Research Cost:** 800 RP
 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
-| Battle Cruiser Construction | 20 | Battle Cruiser hull | 1,000 space ships |
+| Advanced Space (+40%) | 20 | — | +40% hull space |
 | Industrial Tech 5 | 23 | — | Factory cost: 5 BC |
 
 ---
@@ -137,7 +139,7 @@ Armor and equipment for planetary invasions.
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
 | Industrial Tech 4 | 28 | — | Factory cost: 4 BC |
-| Dreadnought Construction | 30 | Dreadnought hull | 1,500 space ships |
+| Superior Space (+60%) | 30 | — | +60% hull space |
 
 ---
 
@@ -167,7 +169,7 @@ Armor and equipment for planetary invasions.
 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
-| Titan Construction | 40 | Titan hull | 2,500 space ships |
+| Maximum Space (+80%) | 40 | — | +80% hull space |
 | Adamantium Armor | 42 | Adamantium Armor | HP ×3.5, +25 ground |
 
 ---
@@ -214,17 +216,14 @@ Armor and equipment for planetary invasions.
 | Adamantium | 42 | 3.5× | +25 | — |
 | Neutronium | 50 | 4.0× | +30 | Ultimate armor |
 
-### Base HP by Ship Class
+### Base HP by Hull Size (MOO1)
 
-| Ship Class | Base HP (Titanium) | Neutronium HP |
-|------------|-------------------|---------------|
-| Scout | 5 | 20 |
-| Fighter | 10 | 40 |
-| Destroyer | 25 | 100 |
-| Cruiser | 60 | 240 |
-| Battle Cruiser | 120 | 480 |
-| Dreadnought | 200 | 800 |
-| Titan | 400 | 1,600 |
+| Hull Size | Base HP (Titanium) | Neutronium HP |
+|-----------|-------------------|---------------|
+| Small | 3 | 12 |
+| Medium | 18 | 72 |
+| Large | 100 | 400 |
+| Huge | 600 | 2,400 |
 
 ### Industrial Technology Progression
 
@@ -251,17 +250,18 @@ Armor and equipment for planetary invasions.
 | Reduced Waste 20% | 35 | 20% | 80% |
 | Waste Elimination | 45 | 0% | 100% |
 
-### Ship Hull Unlocks
+### Hull Size Space (MOO1)
 
-| Hull | Tech Level | Space | Research Cost |
-|------|------------|-------|---------------|
-| Scout | 1 | 50 | Starting |
-| Fighter | 1 | 100 | Starting |
-| Destroyer | 1 | 250 | Starting |
-| Cruiser | 15 | 500 | ~250 RP |
-| Battle Cruiser | 20 | 1,000 | ~800 RP |
-| Dreadnought | 30 | 1,500 | ~2,500 RP |
-| Titan | 40 | 2,500 | ~8,000 RP |
+In MOO1, all 4 hull sizes are available from the start. Construction technology increases the SPACE available within each hull:
+
+| Hull Size | Base Space | With Advanced Construction |
+|-----------|------------|---------------------------|
+| Small | ~40 | Increases with tech |
+| Medium | ~100 | Increases with tech |
+| Large | ~250 | Increases with tech |
+| Huge | ~500+ | Increases with tech |
+
+**Note:** Higher Construction tech = more space per hull = more weapons/specials.
 
 ### Ground Combat Equipment
 
@@ -310,17 +310,17 @@ Armor and equipment for planetary invasions.
 **Critical Priority:** Industrial Tech (factory cost reduction)
 - **Factory 10→8 BC:** 20% more factories per BC
 - **Duralloy Armor:** First HP upgrade (1.5×)
-- **Cruiser unlock:** Major power spike
+- **Space upgrades:** Fit more weapons on hulls
 
 ### Mid Game (Tiers 5-9)
-**Focus:** Ship size and armor quality
-- **Battle Cruiser unlock:** Fleet dominance
+**Focus:** Hull space and armor quality
+- **Advanced Space:** More weapons per ship
 - **Zortrium/Andrium Armor:** 2.0-2.5× HP
 - **Pollution control:** Important for high-factory worlds
 
 ### Late Game (Tiers 10-14)
 **Focus:** Economic efficiency and ultimate durability
-- **Dreadnought/Titan unlock:** Endgame ships
+- **Maximum Space:** Endgame ship loadouts
 - **Adamantium/Neutronium:** Ships become tanks
 - **Waste Elimination:** Zero pollution cost
 
