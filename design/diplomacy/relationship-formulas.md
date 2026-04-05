@@ -206,7 +206,7 @@ CasualtyFactor = floor(ShipsLost × ShipWeight + PopulationLost × 0.01)
 ```
 
 Where:
-- `ShipWeight` = 0.1 (Scout), 0.5 (Destroyer), 1.0 (Cruiser), 2.0 (Battleship), 4.0 (Dreadnought), 6.0 (Titan)
+- `ShipWeight` = 0.1 (Small), 0.5 (Medium), 2.0 (Large), 6.0 (Huge)
 
 ```
 EconomicStrain = floor((WarMaintenanceCost / TotalIncome) × 20)
