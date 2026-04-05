@@ -53,17 +53,14 @@ Ship_Power = floor(
 )
 ```
 
-**Hull HP by Class:**
+**Hull HP by Size (MOO1):**
 
-| Ship Class | Base HP |
-|------------|---------|
-| Scout | 5 |
-| Fighter | 10 |
-| Destroyer | 25 |
-| Cruiser | 60 |
-| Battle Cruiser | 120 |
-| Dreadnought | 200 |
-| Titan | 400 |
+| Hull Size | Base HP |
+|-----------|---------|
+| Small | 3 |
+| Medium | 18 |
+| Large | 100 |
+| Huge | 600 |
 
 **Armor Multipliers:**
 
@@ -80,8 +77,8 @@ Ship_Power = floor(
 **Worked Example:**
 
 ```
-Enemy has: 10 Cruisers with Fusion Beams (20 dmg), Class V shields, Zortrium armor
-Our Fleet: 5 Cruisers with same loadout
+Enemy has: 10 Large ships with Fusion Beams (20 dmg), Class V shields, Zortrium armor
+Our Fleet: 5 Large ships with same loadout
 
 Enemy Ship_Power = floor((60 × 2.0 × 0.5) + (20 × 2.0) + (5 × 5) + (4 × 3))
                  = floor(60 + 40 + 25 + 12) = 137
@@ -351,8 +348,8 @@ Based on current strategic goal:
 | Tech Advantage | All fields +10, Computers +20 |
 | Expansion | Propulsion +40, Planetology +30, Construction +20 |
 | Diplomatic Victory | Computers +20 (scanners), Planetology +15 |
-| Discovery (Orion) | Weapons +50, Force Fields +40, Propulsion +30 |
-| Survival | Force Fields +40, Construction +30, Weapons +20 |
+| Orion Rush | Weapons +50, Force Fields +40, Propulsion +30 |
+| Defensive | Force Fields +40, Construction +30, Weapons +20 |
 
 ### 3.5 Racial Research Preferences
 
