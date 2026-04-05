@@ -1113,10 +1113,10 @@ function check_coalition_formation(leading_empire, difficulty):
 | Achievement | Requirement |
 |-------------|-------------|
 | Easy Champion | Win with all 10 races on Easy |
-| Balanced Master | Win all 5 victory types on Average |
+| Balanced Master | Win both victory types on Average |
 | Hardcore Hamster | Win with Hamsters on Impossible |
 | Against All Odds | Win Domination on Impossible |
-| Perfect Balance | Transcendence on Hard+ difficulty |
+| Master Diplomat | Win Diplomatic on Hard+ difficulty |
 
 ### Speedrun Achievements
 

@@ -27,18 +27,12 @@ Core design philosophy ensuring fun, strategic depth, and replayability.
 ## Victory Balance
 
 **No Single Path Dominant**:
-- Domination: Requires most territory
-- Discovery: Requires best tech + military
-- Diplomatic: Requires allies or population
-- Survival: Requires total war capability
-- Transcendence: Requires everything
+- Diplomatic: Requires allies or large population for Council votes
+- Domination: Requires military strength to eliminate all rivals
 
 **Timeline Variance**: Different speeds
-- Discovery: Fastest (Turn 100+)
-- Domination: Fast (Turn 120+)
-- Diplomatic: Medium (Turn 150+)
-- Survival: Slow (Turn 200+)
-- Transcendence: Variable (Turn 180+)
+- Diplomatic: Medium (Turn 100-200, depends on colonization rate)
+- Domination: Variable (Turn 80-300+, depends on aggression)
 
 ---
 

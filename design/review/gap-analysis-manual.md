@@ -117,15 +117,11 @@ The random events system is **comprehensively specified** with:
 
 | Victory Type | Status | Notes |
 |--------------|--------|-------|
-| Domination (2/3 population) | ✅ Complete | Full algorithm with edge cases |
-| Discovery (Orion) | ✅ Complete | Guardian stats, colonization requirements |
 | Diplomatic (Council) | ✅ Complete | 2/3 majority, voting mechanics |
-| Survival (Last Standing) | ✅ Complete | Single empire remaining |
-| Transcendence (Hidden) | ✅ Complete | Tech-based secret victory |
+| Domination (Eliminate All) | ✅ Complete | Last empire standing |
 | Score calculation | ✅ Complete | Multi-factor scoring formula |
-| Victory check order | ✅ Complete | Priority 1-5 system |
 
-**MOO1 Compliance:** All MOO1 victory types present with accurate formulas (2/3 population, 2/3 council vote).
+**MOO1 Compliance:** Both MOO1 victory types present with accurate formulas (2/3 council vote, eliminate all rivals).
 
 ---
 
@@ -336,10 +332,10 @@ The following differences from MOO1 are **intentional design choices** that enha
 - **Hamster of Orion**: 5-turn lobbying phase before council
 - **Assessment**: Enhances player agency; good addition
 
-### 6. 🔵 Transcendence Victory (Hidden)
-- **MOO1**: No hidden victory
-- **Hamster of Orion**: Secret tech-based victory path
-- **Assessment**: Adds replayability; interesting addition
+### 6. 🔵 Hex-Based Combat Grid
+- **MOO1**: Simplified linear combat (range-based)
+- **Hamster of Orion**: Hex grid tactical combat
+- **Assessment**: Adds tactical depth; intentional enhancement
 
 ### 7. 🔵 Ants Immune to Espionage
 - **MOO1**: Klackons have no espionage immunity

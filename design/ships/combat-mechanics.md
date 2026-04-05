@@ -54,16 +54,28 @@ Combat triggers when:
 
 ---
 
-## Combat Grid
+## Combat Grid (Hamster of Orion Enhancement)
 
-**Space**: Hexagonal grid (web-friendly)
+> **Note**: Original MOO1 used simplified linear combat. Hamster of Orion enhances this with a hex-based tactical grid for more strategic depth.
+
+**Hex Grid Layout**:
+- Ships are positioned on a hexagonal grid
 - Range matters (close/medium/long/very long)
-- Positioning matters (flank bonuses)
-- Line of sight matters (asteroids/debris)
+- Positioning matters (flank bonuses possible)
+- Line of sight can be affected by debris/asteroids
 
-**Size**: Dynamic based on fleet size
+**Grid Size**: Dynamic based on fleet size
 - Small battle: 20x20 hexes
 - Large battle: 40x40 hexes
+
+**Range Brackets**:
+- Point Blank (1 hex): Best for beam weapons
+- Close (2-4 hexes): Standard engagement
+- Medium (5-8 hexes): Mixed weapon range
+- Long (9-15 hexes): Missile advantage
+- Very Long (16+ hexes): Long-range only
+
+**Stacks**: Ships of the same design move and fire as a group (stack), similar to MOO1.
 
 ---
 
@@ -80,7 +92,7 @@ hit_chance = 50 + (battle_computer_rating × 5) - (target_defense × 5) + size_m
 Where:
 - **battle_computer_rating** = Battle Computer Mark (I=1, II=2, etc.)
 - **target_defense** = ecm_rating + maneuver_rating
-- **size_modifier** = (target_size_class - 1) × 5 (Scout = class 1, Fighter = 2, etc.)
+- **size_modifier** = (target_size_class - 1) × 5 (Small = class 1, Medium = 2, Large = 3, Huge = 4)
 - **range_penalty** = {point_blank: -10, close: 0, medium: +5, long: +10, very_long: +20}
 - **experience_modifier** = {rookie: -5, regular: 0, veteran: +5, elite: +10}
 

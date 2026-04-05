@@ -1517,14 +1517,11 @@ interface VictoryState {
   /** Council voting history */
   council: CouncilState;
   
-  /** Orion conquest status */
+  /** Orion conquest status (not a victory, but strategic milestone) */
   orion: OrionState;
-  
-  /** Transcendence progress (hidden) */
-  transcendence: TranscendenceProgress;
 }
 
-type VictoryType = "domination" | "discovery" | "diplomatic" | "survival" | "transcendence";
+type VictoryType = "domination" | "diplomatic";
 
 interface DominationProgress {
   /** Population by empire */
@@ -1579,20 +1576,6 @@ interface OrionState {
   
   /** Whether Orion is colonized */
   orion_colonized: boolean;
-}
-
-interface TranscendenceProgress {
-  /** Hidden scores by category */
-  scores: {
-    military: PositiveInteger;
-    economic: PositiveInteger;
-    diplomatic: PositiveInteger;
-    technological: PositiveInteger;
-    spiritual: PositiveInteger;
-  };
-  
-  /** Whether threshold reached */
-  threshold_reached: boolean;
 }
 
 interface EventState {

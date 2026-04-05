@@ -207,12 +207,6 @@ Population growth, terraforming, environmental colonization, and biological warf
 - See enemy movements
 - Cloak your own fleets
 
-### Transcendence Synergy
-**Balanced Excellence Across All Six** = Hidden Victory
-- No weaknesses
-- Master of all aspects
-- Orion recognizes worthiness
-
 ---
 
 ## Tech Tree Randomization
@@ -236,28 +230,16 @@ This creates **replayability** - each game has different tech paths available.
 
 ## Technology and Victory Conditions
 
-### Domination Victory
-- **Planetology**: Maximize population
-- **Propulsion**: Colonize everything quickly
+### Domination Victory (Military Conquest)
+- **Weapons**: Destroy enemy fleets
 - **Construction**: Outproduce everyone
+- **Force Fields**: Survive attacks
+- **Propulsion**: Project power across galaxy
 
-### Discovery Victory (Orion)
-- **Weapons**: Defeat the Guardian
-- **Force Fields**: Survive the Guardian
-- **Propulsion**: Reach Orion
-- **Computers**: Target the Guardian
-
-### Diplomatic Victory
+### Diplomatic Victory (Council Election)
 - **Planetology**: Large population = more votes
-- **All Fields**: Balanced power impresses Council
-
-### Survival Victory
-- **Weapons**: Destroy all enemies
-- **Construction**: Outproduce them
-- **Force Fields**: Survive their attacks
-
-### Transcendence Victory
-- **ALL FIELDS**: Balanced mastery of everything
+- **All Fields**: Balanced power impresses other races
+- **Computers**: Spy on rivals, know their intentions
 
 ---
 

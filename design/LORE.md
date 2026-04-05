@@ -118,60 +118,24 @@ One of them might be right.
 
 Or none of them.
 
-### The Hidden Truth (Transcendence Victory Path)
-
-What none of the races fully understand: Orion is not a prize to be claimed.
-
-It is a **transcendence gate**.
-
-The Ancient Ones did not disappear - they evolved beyond physical form. The Cosmic Wheel is not a weapon or tool, but a **catalyst for apotheosis**.
-
-A race that achieves perfect balance - not through domination, but through mastery of all aspects of civilization (military, economic, diplomatic, technological, and spiritual wisdom) - may be deemed worthy.
-
-The barrier will fall.
-
-The Wheel will activate.
-
-And that race will join the Ancient Ones in whatever realm lies beyond.
-
-This path is never explicitly stated in the game, but players who pursue balanced excellence across all victory conditions simultaneously may discover it.
-
 ## Victory Conditions
 
-There are five known paths to mastery of the galaxy:
+There are two paths to mastery of the galaxy:
 
-### 1. Domination Victory
-Control two-thirds of the total galactic population through conquest or colonization. The High Council, recognizing your supremacy, crowns you Master of Orion by unanimous acclamation (since you control most of the votes).
-
-*"In the end, numbers decide all things. The galaxy bows to the weight of your people."*
-
-### 2. Discovery Victory  
-Breach Orion's defenses and claim the Cosmic Wheel. The moment you set paw/claw/appendage upon it, its power flows through your civilization. The other races immediately acknowledge your supremacy - to resist would be to resist reality itself.
-
-*"The Wheel turns. The Ancient Ones have chosen. You are the Master of Orion."*
-
-### 3. Diplomatic Victory
+### 1. Diplomatic Victory (Council Election)
 When more than half the galaxy has been colonized, the High Council forms to elect a Master of Orion. Through cunning alliances, strategic trades, and careful diplomacy, secure a two-thirds majority vote. Races vote based on their relationship with you, their fear of your military, and your total population.
 
 Accept the Council's decision and rule through legitimacy, or reject it and prove your worth through fire and blood.
 
 *"Not all victories are won with plasma cannons. Some are won with words."*
 
-### 4. Survival Victory
-Eliminate all rival civilizations through conquest, biological warfare, or simply outlasting them. When you are the last race remaining in the galaxy, you are Master of Orion by default.
+### 2. Domination Victory (Military Conquest)
+Eliminate all rival civilizations through conquest. When you are the last race remaining in the galaxy, you are Master of Orion by default.
 
 *"In the silence of a dead galaxy, there can be no argument about who rules."*
 
-### 5. Transcendence Victory (Hidden)
-Achieve perfect balance across all aspects of civilization. This path has no explicit requirements - it emerges organically when a player excels at everything simultaneously. The game watches for patterns of excellence, and when a civilization reaches a threshold of balanced mastery, Orion recognizes them as worthy successors to the Ancient Ones.
-
-*"You do not claim Orion. Orion claims you. The Wheel turns, and you are transformed."*
-
-*The screen goes white. Your species begins to glow with an inner light. One by one, your people step through portals that appear in the air, moving beyond physical existence. Your empire does not fall - it ascends.*
-
-*In the centuries that follow, younger races will find your ruins and wonder what happened to the civilization that vanished at the height of its power, leaving behind only a single message:*
-
-*"We have gone ahead. When you are ready, you will understand. The Wheel waits for those with the wisdom to turn it."*
+### The Orion System
+Defeating the Guardian of Orion and claiming the Cosmic Wheel grants enormous technological advantages, but is not a victory condition itself. The ancient technologies found there may help you achieve Diplomatic or Domination victory more quickly.
 
 ## Tone and Style
 

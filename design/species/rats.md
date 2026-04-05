@@ -118,7 +118,7 @@ Their research bonus (+50%) is massive and compounds over time. By late game, Ra
 
 Balance consideration: Godlike late-game power but extremely vulnerable early. Guinea Pigs or Rabbits can crush them before research advantage kicks in. Must negotiate, hide, or beg for protection until tech superiority is established.
 
-Key weakness: Cannot win through military conquest. Must pursue Discovery (breach Orion with tech), Diplomatic (negotiate council victory), or Transcendence (achieve balanced excellence) victory conditions.
+Key weakness: Poor at military conquest. Must pursue Diplomatic victory (negotiate council votes) or use technological superiority to eventually overwhelm enemies for Domination victory.
 
 ---
 

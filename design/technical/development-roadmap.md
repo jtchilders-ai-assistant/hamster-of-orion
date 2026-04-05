@@ -355,11 +355,8 @@ This roadmap breaks down Hamster of Orion development into manageable phases, ea
 ### Deliverables
 
 **Week 31: Victory Conditions**
-- [ ] Implement Domination victory
-- [ ] Create Discovery victory (Guardian battle)
-- [ ] Add Diplomatic victory (Council)
-- [ ] Implement Survival victory
-- [ ] Add Transcendence victory (hidden)
+- [ ] Implement Domination victory (eliminate all rivals)
+- [ ] Add Diplomatic victory (Council election, 2/3 vote)
 - [ ] Create victory screens
 
 **Week 32: Game Balance**

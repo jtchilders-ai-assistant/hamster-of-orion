@@ -110,7 +110,7 @@ The galaxy is divided into four distinct regions from the lore, each with unique
 - Planet Orion at exact center
 - Guardian orbits
 - Cosmic Wheel on surface
-- Discovery Victory goal
+- Major strategic milestone (not a victory condition)
 
 **Approach Strategy**:
 - Don't attempt before Turn 100
@@ -154,17 +154,17 @@ The galaxy is divided into four distinct regions from the lore, each with unique
 - Tech rush to Guardian-killing weapons
 - Build fleet in secret
 - One massive push for Orion
-- Discovery Victory or die trying
+- Gain massive tech advantage to win Diplomatic or Domination
 
 ---
 
-## Regional Control Victory Condition
+## Regional Control (Strategic Advantages)
 
-**Domination Alternate**: Control entire region
-- Safe Zones: Control all (win by security)
-- Pellet Fields: Control majority (win by conquest)
-- Dark Sectors: Control all (win by stealth)
-- Omega: Defeat Guardian (Discovery Victory)
+Controlling regions provides strategic bonuses:
+- Safe Zones: Secure core territory
+- Pellet Fields: Resource abundance
+- Dark Sectors: Hidden bases, surprise attacks
+- Omega: Orion technologies (after defeating Guardian)
 
 ---
 

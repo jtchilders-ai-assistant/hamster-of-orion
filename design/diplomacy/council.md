@@ -565,7 +565,7 @@ If only two races remain:
 
 If only one race remains:
 - Council does not convene
-- That race wins by **Survival Victory** instead
+- That race wins by **Domination Victory** instead
 
 ### 7.3 Tied Candidates
 
@@ -1053,7 +1053,7 @@ If a candidate receives 0% votes (everyone abstained or voted for opponent):
 ### 12.3 Both Candidates Extinct Mid-Turn
 
 - Council does not convene
-- Survival Victory check triggered instead
+- Domination Victory check triggered instead
 
 ### 12.4 Player is Only Non-Candidate
 

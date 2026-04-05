@@ -48,11 +48,8 @@ Reports, statistics, graphs, and data visualization screens. Essential for strat
 ║ └───────────────────────────────────────────────────────────┘
 ║                                                             ║
 ║ ┌─Victory─Progress──────────────────────────────────────────┐
-║ │ Domination:    [████████░░░░░░] 42% / 67% needed         │
-║ │ Discovery:     Orion located, fleet insufficient          │
 ║ │ Diplomatic:    32% votes secured (need 67%)               │
-║ │ Survival:      4 empires remain                           │
-║ │ Transcendence: ??? (hidden condition)                     │
+║ │ Domination:    4 empires remain                           │
 ║ └───────────────────────────────────────────────────────────┘
 ║                                                             ║
 ║ [Detailed Reports] [Graphs] [Compare Empires] [F1: Map]    ║
@@ -564,13 +561,12 @@ Reports, statistics, graphs, and data visualization screens. Essential for strat
 ║ ════════════════════════════════════════════════════════   ║
 ║                                                             ║
 ║ Projected Winner (if current trends continue):             ║
-║ → Rats via Discovery Victory in ~50 turns                  ║
+║ → Rats via Diplomatic Victory in ~50 turns                 ║
 ║ → Alternative: Guinea Pigs via Domination in ~80 turns     ║
 ║                                                             ║
 ║ Your Position: STRONG                                       ║
 ║ → Can win Diplomatic (need 35% more votes)                 ║
-║ → Can win Discovery (need better fleet + 30 turns)         ║
-║ → Can win Domination (need 25% more population)            ║
+║ → Can win Domination (need to eliminate 3 more empires)    ║
 ║                                                             ║
 ║ [Detailed Breakdown] [Historical Trends] [Projections]     ║
 ╚════════════════════════════════════════════════════════════╝
@@ -691,30 +687,30 @@ Reports, statistics, graphs, and data visualization screens. Essential for strat
 ╠════════════════════════════════════════════════════════════╣
 ║                                                             ║
 ║ ┌─Entry─1─(Highest─Score)─────────────────────────────────┐
-║ │ 🏆 Transcendence Victory                                │
+║ │ 🏆 Diplomatic Victory                                   │
 ║ │ Empire: Hamster Collective                              │
 ║ │ Difficulty: Hard                                        │
 ║ │ Year: 2742 (Turn 219)                                   │
 ║ │ Score: 12,450 points ⭐ LEGENDARY                       │
 ║ │                                                          │
 ║ │ Achievements:                                            │
-║ │ • All tech fields maxed                                 │
+║ │ • Won Council election with 78% vote                    │
 ║ │ • 65 planets controlled                                 │
-║ │ • No wars in final 50 turns                             │
-║ │ • Orion accepted you without fight                      │
+║ │ • Allied with 4 races                                   │
+║ │ • Defeated Guardian of Orion                            │
 ║ │                                                          │
 ║ │ [View Replay] [Share]                                    │
 ║ └──────────────────────────────────────────────────────────┘
 ║                                                             ║
 ║ ┌─Entry─2─(Fastest─Victory)───────────────────────────────┐
-║ │ ⚡ Discovery Victory                                     │
-║ │ Empire: Rat Scientific Directorate                      │
+║ │ ⚡ Domination Victory                                    │
+║ │ Empire: Guinea Pig Empire                               │
 ║ │ Difficulty: Normal                                       │
 ║ │ Year: 2605 (Turn 82) ⭐ SPEEDRUN                        │
 ║ │ Score: 6,200 points                                      │
 ║ │                                                          │
-║ │ Strategy: Pure research rush, defeated Guardian         │
-║ │          with minimal fleet                              │
+║ │ Strategy: Early rush, eliminated all opponents          │
+║ │          before tech advantage kicked in                 │
 ║ │                                                          │
 ║ │ [View Replay] [Share]                                    │
 ║ └──────────────────────────────────────────────────────────┘
@@ -727,11 +723,8 @@ Reports, statistics, graphs, and data visualization screens. Essential for strat
 ║ │ Defeats: 15                                             │
 ║ │                                                          │
 ║ │ Victory Types:                                          │
-║ │ • Domination: 3                                         │
-║ │ • Discovery: 4                                          │
-║ │ • Diplomatic: 2                                         │
-║ │ • Survival: 0                                           │
-║ │ • Transcendence: 1 ⭐                                    │
+║ │ • Diplomatic: 6                                         │
+║ │ • Domination: 4                                         │
 ║ │                                                          │
 ║ │ Average Score: 7,250 points                             │
 ║ │ Best Difficulty: Hard (1 victory)                       │

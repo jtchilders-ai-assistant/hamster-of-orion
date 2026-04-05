@@ -156,15 +156,15 @@ Rather than unique tech trees, races get **bonuses when researching certain tech
 - More expensive techs are harder to steal
 - Can steal techs you don't have available in your tree
 
-## Tech Victory Path
+## Orion System (Strategic Milestone)
 
-Certain tech combinations enable **Discovery Victory** (breaching Orion):
+Defeating the Guardian of Orion requires advanced technology:
 - Advanced propulsion (reach Orion)
 - Powerful weapons (defeat Guardian)
 - Strong shields (survive Guardian)
 - High-tier computers (target Guardian)
 
-No single path - multiple tech combos can work.
+**Note**: Defeating the Guardian is NOT a victory condition, but grants major technological advantages that help achieve Diplomatic or Domination victory.
 
 ## Balancing Notes
 

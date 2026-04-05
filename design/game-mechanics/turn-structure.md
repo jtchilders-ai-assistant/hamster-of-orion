@@ -118,11 +118,8 @@ Hamster of Orion is turn-based. Each turn represents one galactic cycle (~1 year
 
 ### Phase 10: Victory Check
 **Evaluate**:
-- Domination: 2/3 population controlled?
-- Discovery: Orion claimed?
-- Diplomatic: Council vote passed?
-- Survival: All enemies eliminated?
-- Transcendence: Hidden threshold met?
+- Diplomatic: Council vote passed? (2/3 majority)
+- Domination: All enemies eliminated?
 
 **If Victory**: End game, show ending
 **If None**: Advance to next turn
