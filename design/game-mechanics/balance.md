@@ -67,9 +67,9 @@ Core design philosophy ensuring fun, strategic depth, and replayability.
 ## Military Balance
 
 **Quality vs Quantity**:
-- 10 scouts ≠ 1 destroyer
-- But 30 fighters can beat 1 cruiser
-- Dreadnought can solo 5 cruisers
+- 10 Small ships ≠ 1 Large ship
+- But 30 Small ships can beat 1 Huge ship
+- Huge ship can solo 5 Large ships
 
 **Tech Advantage Scaling**:
 - 1 tier ahead: +30% effective power

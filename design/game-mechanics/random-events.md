@@ -192,6 +192,9 @@ function meetsGalaxyRequirements(event, galaxy_state):
 
 Space monsters are powerful neutral entities that attack systems or guard valuable locations. They cannot be negotiated with and must be destroyed through combat.
 
+**MOO1 Monsters**: Space Amoeba (Cosmic Blob) and Space Crystal (Crystal Horror)
+**Hamster of Orion Addition**: Void Wyrm (provides additional late-game challenge)
+
 ### Cosmic Blob (Space Amoeba equivalent)
 
 A massive single-celled organism that drifts through space, consuming everything in its path. Regenerates damage rapidly.
@@ -255,7 +258,9 @@ A massive crystalline entity that reflects beam weapon energy back at attackers.
 - Crystal armor technology (+25% to Construction research for 10 turns)
 - 300-600 BC salvage
 
-### Void Wyrm (Space Dragon equivalent)
+### Void Wyrm (Hamster of Orion Addition)
+
+> **Note**: The Void Wyrm is a Hamster of Orion addition. MOO1 only has Space Amoeba and Space Crystal. This third monster provides additional late-game challenge.
 
 An ancient predator that guards a treasure hoard. The most dangerous random space monster.
 

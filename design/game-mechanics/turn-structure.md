@@ -229,4 +229,4 @@ Hamster of Orion is turn-based. Each turn represents one galactic cycle (~1 year
 
 ---
 
-Next: See `victory-conditions.md` for all five victory paths.
+Next: See `victory-conditions.md` for victory conditions (Diplomatic and Domination).
