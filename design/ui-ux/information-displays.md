@@ -253,24 +253,21 @@ Reports, statistics, graphs, and data visualization screens. Essential for strat
 ║                                                             ║
 ║ Total Ships: 87                                             ║
 ║                                                             ║
-║ ┌─By─Class──────────────────────────────────────────────┐  ║
+║ ┌─By─Hull─Size───────────────────────────────────────────┐  ║
 ║ │                                                        │  ║
-║ │ Scouts:         12  [████░░░░░░] 14%                  │  ║
-║ │ Fighters:       18  [██████░░░░] 21%                  │  ║
-║ │ Destroyers:     28  [█████████░] 32% ← Backbone       │  ║
-║ │ Cruisers:       15  [█████░░░░░] 17%                  │  ║
-║ │ Battle Cruisers: 8  [███░░░░░░░]  9%                  │  ║
-║ │ Dreadnoughts:    6  [██░░░░░░░░]  7%                  │  ║
-║ │ Titans:          0  [░░░░░░░░░░]  0% (none built)     │  ║
+║ │ Small:    30  [████████░░] 35%  (scouts, fighters)    │  ║
+║ │ Medium:   28  [███████░░░] 32%  (warships) ← Backbone │  ║
+║ │ Large:    23  [██████░░░░] 26%  (heavy warships)      │  ║
+║ │ Huge:      6  [██░░░░░░░░]  7%  (capital ships)       │  ║
 ║ │                                                        │  ║
 ║ └────────────────────────────────────────────────────────┘  ║
 ║                                                             ║
 ║ ┌─By─Role────────────────────────────────────────────────┐  ║
-║ │ Exploration:  12 scouts (sufficient)                   │  ║
-║ │ Patrol:       18 fighters + 15 destroyers              │  ║
-║ │ Battle Line:  13 destroyers + 15 cruisers              │  ║
-║ │ Heavy Strike:  8 battle cruisers + 6 dreadnoughts     │  ║
-║ │ Titan Force:   0 (none)                                │  ║
+║ │ Exploration:  12 ships (Small hull scouts)             │  ║
+║ │ Patrol:       18 ships (Small/Medium combat)           │  ║
+║ │ Battle Line:  28 ships (Medium warships)               │  ║
+║ │ Heavy Strike: 23 ships (Large warships)                │  ║
+║ │ Capital:       6 ships (Huge hulls)                    │  ║
 ║ └────────────────────────────────────────────────────────┘  ║
 ║                                                             ║
 ║ ┌─By─Location────────────────────────────────────────────┐  ║
@@ -289,12 +286,12 @@ Reports, statistics, graphs, and data visualization screens. Essential for strat
 ║ └────────────────────────────────────────────────────────┘ ║
 ║                                                             ║
 ║ Analysis:                                                   ║
-║ • Destroyer-heavy fleet (good balance)                     ║
+║ • Medium-hull-heavy fleet (good balance)                   ║
 ║ • Lacking titans (consider building for Guardian fight)    ║
 ║ • Fleet spread thin (35 ships on front)                    ║
 ║                                                             ║
 ║ Recommendations:                                            ║
-║ → Build 3-5 Dreadnoughts for Orion assault                 ║
+║ → Build 3-5 Huge ships for Orion assault                   ║
 ║ → Replace aging scouts with newer designs                  ║
 ║                                                             ║
 ║ [Build Queue] [Ship Designs] [Fleet Deployment] [Back]     ║

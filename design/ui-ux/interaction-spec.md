@@ -384,7 +384,7 @@ Middle mouse button enables map panning on scrollable views.
 
 | Key | Action | Description |
 |-----|--------|-------------|
-| `1-6` | Select Hull | Choose hull class (1=Scout, 6=Titan) |
+| `1-4` | Select Hull | Choose hull size (1=Small, 2=Medium, 3=Large, 4=Huge) |
 | `W` | Weapons Panel | Focus weapons component list |
 | `A` | Armor Panel | Focus armor/defense list |
 | `P` | Propulsion Panel | Focus propulsion list |
