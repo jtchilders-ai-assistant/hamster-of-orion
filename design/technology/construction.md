@@ -1,7 +1,5 @@
 # Construction Technology - Complete Tech Tree
 
-> **Note:** This file contains some legacy references to 7 ship classes. MOO1 uses 4 hull sizes (Small/Medium/Large/Huge). Construction tech increases SPACE within hulls, not unlocking new hull types. The JSON data sections need updating to reflect this.
-
 ## Overview
 
 The Construction technology field governs ship armor, industrial efficiency, pollution control, hull space improvements, and ground combat equipment. It is one of six technology fields and is critical for both economic growth and military durability.
@@ -475,13 +473,13 @@ In MOO1, all 4 hull sizes are available from the start. Construction technology 
             }
           },
           {
-            "id": "cruiser_construction",
-            "name": "Cruiser Construction",
+            "id": "improved_space",
+            "name": "Improved Hull Space",
             "tech_level": 15,
-            "category": "hull",
-            "unlocks": "cruiser",
+            "category": "hull_space",
             "effect": {
-              "hull_space": 500
+              "space_bonus_percent": 20,
+              "description": "+20% hull space for all ship sizes"
             }
           },
           {
@@ -528,13 +526,13 @@ In MOO1, all 4 hull sizes are available from the start. Construction technology 
         "research_cost": 800,
         "technologies": [
           {
-            "id": "battle_cruiser_construction",
-            "name": "Battle Cruiser Construction",
+            "id": "advanced_space",
+            "name": "Advanced Hull Space",
             "tech_level": 20,
-            "category": "hull",
-            "unlocks": "battle_cruiser",
+            "category": "hull_space",
             "effect": {
-              "hull_space": 1000
+              "space_bonus_percent": 40,
+              "description": "+40% hull space for all ship sizes"
             }
           },
           {
@@ -600,13 +598,13 @@ In MOO1, all 4 hull sizes are available from the start. Construction technology 
             }
           },
           {
-            "id": "dreadnought_construction",
-            "name": "Dreadnought Construction",
+            "id": "superior_space",
+            "name": "Superior Hull Space",
             "tech_level": 30,
-            "category": "hull",
-            "unlocks": "dreadnought",
+            "category": "hull_space",
             "effect": {
-              "hull_space": 1500
+              "space_bonus_percent": 60,
+              "description": "+60% hull space for all ship sizes"
             }
           }
         ]
@@ -679,13 +677,13 @@ In MOO1, all 4 hull sizes are available from the start. Construction technology 
         "research_cost": 8000,
         "technologies": [
           {
-            "id": "titan_construction",
-            "name": "Titan Construction",
+            "id": "maximum_space",
+            "name": "Maximum Hull Space",
             "tech_level": 40,
-            "category": "hull",
-            "unlocks": "titan",
+            "category": "hull_space",
             "effect": {
-              "hull_space": 2500
+              "space_bonus_percent": 80,
+              "description": "+80% hull space for all ship sizes"
             }
           },
           {
@@ -835,14 +833,16 @@ In MOO1, all 4 hull sizes are available from the start. Construction technology 
 | 20% | 35 | 20% |
 | Elimination | 45 | 0% |
 
-### Ship Hulls (4 unlocks)
+### Hull Space Improvements (4 techs)
 
-| Hull | Tech Level | Space |
-|------|------------|-------|
-| Cruiser | 15 | 500 |
-| Battle Cruiser | 20 | 1,000 |
-| Dreadnought | 30 | 1,500 |
-| Titan | 40 | 2,500 |
+| Tech | Tech Level | Space Bonus |
+|------|------------|-------------|
+| Improved Hull Space | 15 | +20% |
+| Advanced Hull Space | 20 | +40% |
+| Superior Hull Space | 30 | +60% |
+| Maximum Hull Space | 40 | +80% |
+
+**Note:** In MOO1, all 4 hull sizes (Small/Medium/Large/Huge) are available from game start. Construction tech increases the SPACE within each hull, allowing more weapons/specials.
 
 ---
 
