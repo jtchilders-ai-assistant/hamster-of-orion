@@ -1,99 +1,159 @@
 # Ship Design System
 
 ## Overview
-Players design custom ships by selecting hull size, engines, weapons, defenses, and special systems. MOO1-style: simple but strategic.
+
+Players design custom ships by selecting hull size, appearance, weapons, and special equipment. Ship systems (engines, shields, computers, etc.) are **automatically set to your best available technology** - no manual selection required.
 
 ---
 
-## Design Process
+## Design Philosophy (MOO1-Faithful)
 
-### Step 1: Choose Hull
-- Scout (50) → Titan (2,500)
-- Determines total space available
-- Locked hulls require Construction tech
+### Automatic Systems
+The following are **automatically equipped** with your best researched tech:
+- **Computer** - Attack bonus (Battle Computer)
+- **Shield** - Deflector shields
+- **ECM** - Electronic countermeasures (Missile Defense)
+- **Armor** - Hull armor type
+- **Engine** - Propulsion (determines Warp Speed)
+- **Maneuver** - Combat maneuverability
 
-### Step 2: Select Engine
-- **Required** - every ship needs propulsion
-- Takes 10-20% of hull space
-- Better engines = faster ship = higher initiative
+**When you research better tech, ALL your ships automatically upgrade** to use it. No retrofitting needed.
 
-### Step 3: Add Weapons
-- Optional but recommended for combat ships
-- Beam weapons: instant hit
-- Missiles: can be intercepted
-- Bombs: for planetary attack
-- Mix weapon types for flexibility
+### Player Choices
+Players only select:
+1. **Hull Size** - Small, Medium, Large, Huge (determines space available)
+2. **Ship Appearance** - Visual style (cosmetic only)
+3. **Weapons** - Up to 4 weapon slots with type and quantity
+4. **Special Equipment** - Up to 3 special slots
 
-### Step 4: Add Defenses
-- **Shields**: Absorb damage, regenerate between battles
-- **Armor**: Automatic based on tech, covers remaining space
-- **ECM**: Reduces enemy accuracy
+---
 
-### Step 5: Add Special Systems
-- Battle Computers: +accuracy
-- Repair Systems: Regenerate hull
-- Cloaking: Invisibility
-- Scanners: Detection range
+## Hull Sizes
 
-### Step 6: Name & Save
-- Give design a name
-- Save to library
-- Can build unlimited copies
+| Size | Space | Typical Use |
+|------|-------|-------------|
+| Small | ~40 | Scouts, fighters, colony ships |
+| Medium | ~100 | Multi-role, destroyers |
+| Large | ~250 | Heavy warships |
+| Huge | ~500+ | Battleships, dreadnoughts |
+
+Larger hulls unlock with Construction technology research.
+
+---
+
+## Weapons
+
+### Weapon Slots
+- 4 weapon slots available per ship
+- Each slot can hold one weapon type
+- **Count** determines how many of that weapon (uses more space)
+
+### Weapon Types
+- **Beam Weapons**: Instant hit (Laser, Gatling Laser, Ion Cannon, etc.)
+- **Missiles**: Can be intercepted, limited racks (Nuclear, Merculite, etc.)
+- **Torpedoes**: Heavy damage, slower
+- **Bombs**: For planetary bombardment only
+
+### Space Consumption
+Each weapon has a space cost. More weapons = more space used.
+```
+Example: 
+- Laser × 2 = 6 space
+- Nuclear Missiles × 1 = 8 space
+```
+
+---
+
+## Special Equipment
+
+### Special Slots
+- 3 special equipment slots available
+- These provide utility, not combat power
+
+### Common Special Equipment
+
+| Equipment | Effect | Typical Use |
+|-----------|--------|-------------|
+| **Colony Module** | Allows colonizing planets | Required for colony ships |
+| **Reserve Fuel Tanks** | +3 parsec range | Extended exploration |
+| **Extended Fuel Tanks** | +6 parsec range | Deep space missions |
+| **Battle Scanner** | See enemy ship details | Intel in combat |
+| **Anti-Missile Rockets** | Point defense vs missiles | Defense ships |
+
+---
+
+## Space Management
+
+**Only weapons and specials consume space.**
+
+Ship systems (Computer, Shield, ECM, Armor, Engine, Maneuver) are automatic and do NOT use space.
+
+```
+Example Small Hull (40 space):
+- Laser × 3 = 9 space
+- Nuclear Missiles × 1 = 8 space  
+- Reserve Fuel Tanks = 10 space
+- Available: 13 space remaining
+```
 
 ---
 
 ## Design Constraints
 
-**Space Limit**: Total systems ≤ Hull Size  
-**Engine Required**: Must have propulsion  
-**Cost Scales**: Bigger/better = more expensive  
-
-**Example Destroyer Design (250 space)**:
-```
-"Guardian" Class Destroyer
-- Ion Drive: 35 space
-- 2x Heavy Laser: 60 space
-- Class III Shield: 25 space
-- Battle Computer II: 15 space
-- ECM Jammer I: 20 space
-- Armor (Duralloy): Fills remaining 95 space
-Total: 250 space
-Cost: ~450 BC
-```
+- **6 Design Limit**: Empire can have only 6 active ship designs
+- **Space Limit**: Weapons + Specials cannot exceed hull space
+- **Production**: Once designed, ships can be built at any colony
 
 ---
 
-## Pre-Made Templates
+## Automatic Tech Upgrades
 
-Game includes default designs:
-- Scout: Fast exploration ship
-- Fighter: Light combat
-- Bomber: Planet attack
-- Defender: Colony protection
-- Battleship: Heavy assault
+When you research better technology:
+- **Existing designs** automatically use the new tech
+- **Ships already built** also upgrade (for systems, not weapons)
+- **No retrofitting cost** for system upgrades
 
-Players can modify or create custom designs.
+Example: Research "Class II Shields" → All your ships now have Class II Shields automatically.
 
 ---
 
 ## Miniaturization
 
-As tech advances, old systems shrink:
-- Each tech tier: -50% space
-- Example: Laser (4 space) → (2 space) after Gatling Laser researched
-- Frees space for more systems
-- Allows retrofitting old designs
+As tech advances, weapons shrink:
+- Each tech tier above a weapon: **-50% space cost**
+- Allows fitting more weapons on same hull
+- Encourages upgrading to new weapon types
 
 ---
 
-## Race-Specific Design Tips
+## Example Designs
 
-**Budgies**: Speed + Light Weapons  
-**Ferrets**: Maximum Firepower  
-**Hermit Crabs**: Maximum Defense  
-**Rabbits**: Minimum Cost  
-**Ants**: Efficient Production  
+### Scout (Small Hull)
+- Weapons: None
+- Specials: Reserve Fuel Tanks
+- Role: Exploration
+
+### Colony Ship (Small Hull)
+- Weapons: None  
+- Specials: Colony Module
+- Role: Colonization
+
+### Fighter (Small Hull)
+- Weapons: Laser × 4
+- Specials: None
+- Role: Cheap combat ship
+
+### Destroyer (Large Hull)
+- Weapons: Ion Cannon × 2, Merculite Missiles × 1
+- Specials: Battle Scanner
+- Role: Multi-role warship
 
 ---
 
-Next: See `weapons-systems.md` and `defense-systems.md` for detailed system behaviors.
+## Race-Specific Tips
+
+- **Budgies**: Leverage defense bonus with speed
+- **Ferrets**: Maximize attack weapons
+- **Hermit Crabs**: Heavy armor benefits your resilience
+- **Rabbits**: Build many cheap small ships
+- **Ants**: Efficient production of any design

@@ -2,10 +2,22 @@
 
 ## Overview
 
-The Ship Design screen is a **full-screen modal** opened by clicking DESIGN on the Galaxy Map's bottom command bar. It allows players to create and modify ship designs. **No bottom command bar** - exit via Cancel or Build buttons.
+The Ship Design screen is a **full-screen modal** opened by clicking DESIGN on the Galaxy Map's bottom command bar. Players create ship designs by selecting size, weapons, and special equipment. **Ship systems are automatically set to the best available technology** - no manual selection required.
 
 **Reference**: `design/moo_screens/moo_ship_design.png`  
 **Hotkey**: F6
+
+---
+
+## Key Design Principle
+
+**Automatic Systems**: Computer, Shield, ECM, Armor, Engine, and Maneuver are **automatically equipped with your best available tech**. The player does NOT select these - they're determined by your current research level.
+
+**Player Choices**:
+1. Ship Size (determines space available)
+2. Ship Appearance (visual style)
+3. Weapons (type and count for 4 slots)
+4. Special Equipment (3 slots)
 
 ---
 
@@ -15,37 +27,41 @@ The Ship Design screen is a **full-screen modal** opened by clicking DESIGN on t
 ┌─────────────────────────────────────────────────────────────────────────────────────┐
 │                                                                                     │
 │  ┌─────────────────────────────────────────────────────────────────────────────┐   │
-│  │                         TOP PANEL — SHIP SYSTEMS                            │   │
+│  │                   TOP PANEL — SHIP SYSTEMS (AUTO-ASSIGNED)                  │   │
 │  │  ┌───────────────────────────────┐  ┌───────────────────────────────────┐  │   │
 │  │  │  Computer    Attack Level: 0  │  │  Armor    Titanium    3 Hit Pts   │  │   │
 │  │  │  Shield      (none)           │  │  Engine   Retros  Warp 1  Def 3   │  │   │
 │  │  │  ECM         Missile Def: 3   │  │  Maneuver Rating 1  Combat Spd 1  │  │   │
 │  │  └───────────────────────────────┘  └───────────────────────────────────┘  │   │
+│  │                                                                             │   │
+│  │  (These are READ-ONLY — automatically set to your best available tech)     │   │
 │  └─────────────────────────────────────────────────────────────────────────────┘   │
 │                                                                                     │
 │  ┌─────────────────────────────────────────────────────────────────────────────┐   │
-│  │                         MIDDLE PANEL — WEAPONS                              │   │
+│  │                    MIDDLE PANEL — WEAPONS (PLAYER SELECTS)                  │   │
 │  │  ┌────────┬───────┬──────────────────┬────────┬──────┬─────────────────┐   │   │
 │  │  │  Slot  │ Count │   Ship Weapons   │ Damage │ Arc  │     Notes       │   │   │
 │  │  ├────────┼───────┼──────────────────┼────────┼──────┼─────────────────┤   │   │
-│  │  │ Weap 1 │       │     (empty)      │        │      │                 │   │   │
-│  │  │ Weap 2 │       │     (empty)      │        │      │                 │   │   │
+│  │  │ Weap 1 │   2   │ Laser            │  1-4   │  —   │                 │   │   │
+│  │  │ Weap 2 │   1   │ Nuclear Missiles │  4     │  —   │ 2 shots/rack    │   │   │
 │  │  │ Weap 3 │       │     (empty)      │        │      │                 │   │   │
 │  │  │ Weap 4 │       │     (empty)      │        │      │                 │   │   │
 │  │  └────────┴───────┴──────────────────┴────────┴──────┴─────────────────┘   │   │
 │  └─────────────────────────────────────────────────────────────────────────────┘   │
 │                                                                                     │
 │  ┌──────────────────────────────────────────┐  ┌────────────────────────────────┐ │
-│  │         SPECIAL EQUIPMENT                │  │        SHIP PREVIEW            │ │
+│  │    SPECIAL EQUIPMENT (PLAYER SELECTS)    │  │        SHIP PREVIEW            │ │
 │  │  ┌────────┬────────────────────────────┐ │  │                                │ │
 │  │  │ Spec 1 │ Reserve Fuel Tanks (+3 rng)│ │  │     ┌──────────────────┐       │ │
-│  │  │ Spec 2 │        (empty)             │ │  │     │                  │       │ │
+│  │  │ Spec 2 │ Colony Module              │ │  │     │                  │       │ │
 │  │  │ Spec 3 │        (empty)             │ │  │     │   [3D RENDERED   │       │ │
 │  │  └────────┴────────────────────────────┘ │  │     │    SHIP IMAGE]   │       │ │
 │  │                                          │  │     │                  │       │ │
-│  │                                          │  │     └──────────────────┘       │ │
-│  │                                          │  │                                │ │
-│  │                                          │  │   (space backdrop w/ planet)  │ │
+│  │  Examples:                               │  │     └──────────────────┘       │ │
+│  │  • Reserve Fuel Tanks (extended range)   │  │                                │ │
+│  │  • Colony Module (colonize planets)      │  │   (space backdrop w/ planet)  │ │
+│  │  • Battle Scanner                        │  │                                │ │
+│  │  • Extended Fuel Tanks                   │  │   [STYLE ◄ ►] (appearance)    │ │
 │  └──────────────────────────────────────────┘  └────────────────────────────────┘ │
 │                                                                                     │
 │  ┌─────────────────────────────────────────────────────────────────────────────┐   │
@@ -68,71 +84,72 @@ The Ship Design screen is a **full-screen modal** opened by clicking DESIGN on t
 
 ## Panel Details
 
-### Top Panel — Ship Systems
+### Top Panel — Ship Systems (AUTO-ASSIGNED)
 
-Split into **two columns** covering core ship stats:
+These are **read-only displays** showing what systems will be equipped automatically based on your current technology level:
 
 **Left Column:**
 | System | Description |
 |--------|-------------|
-| **Computer** | Attack Level bonus (e.g., 0, +1, +2...) |
-| **Shield** | Deflector shields (or "none") |
-| **ECM** | Missile Defense rating (electronic countermeasures) |
+| **Computer** | Attack Level bonus - uses your best Battle Computer |
+| **Shield** | Deflector shields - uses your best Shield tech (or "none" if not researched) |
+| **ECM** | Missile Defense rating - uses your best ECM tech |
 
 **Right Column:**
 | System | Description |
 |--------|-------------|
-| **Armor** | Armor type + Hit Points (e.g., "Titanium, 3 Hit Pts") |
-| **Engine** | Engine type + Warp Speed + Defense bonus (e.g., "Retros, Warp 1, Def 3") |
-| **Maneuver** | Maneuver Rating + Combat Speed (e.g., "Rating 1, Combat Spd 1") |
+| **Armor** | Automatically uses your best armor tech + shows Hit Points |
+| **Engine** | Automatically uses your best engine + shows Warp Speed + Defense bonus |
+| **Maneuver** | Automatically uses your best maneuver tech + Combat Speed |
 
-These are foundational defensive and mobility components.
+**Important**: Player cannot change these. They upgrade automatically when you research better technology.
 
 ---
 
-### Middle Panel — Weapons
+### Middle Panel — Weapons (PLAYER SELECTS)
 
-A **table with 4 weapon slots**, each showing:
+A **table with 4 weapon slots** that the player can configure:
 
 | Column | Description |
 |--------|-------------|
 | **Slot** | Weapon 1, Weapon 2, Weapon 3, Weapon 4 |
-| **Count** | Number of this weapon equipped |
-| **Ship Weapons** | Weapon type name |
-| **Damage** | Damage dealt |
+| **Count** | Number of this weapon to equip (uses space) |
+| **Ship Weapons** | Weapon type selected from available tech |
+| **Damage** | Damage dealt per weapon |
 | **Arc** | Firing angle/arc |
-| **Notes** | Special properties |
+| **Notes** | Special properties (shots per rack, etc.) |
 
-```
-┌────────┬───────┬──────────────────┬────────┬──────┬─────────────────┐
-│  Slot  │ Count │   Ship Weapons   │ Damage │ Arc  │     Notes       │
-├────────┼───────┼──────────────────┼────────┼──────┼─────────────────┤
-│ Weap 1 │   2   │ Laser            │  1-4   │  —   │                 │
-│ Weap 2 │   1   │ Nuclear Missiles │  4     │  —   │ 2 shots/rack    │
-│ Weap 3 │       │     (empty)      │        │      │                 │
-│ Weap 4 │       │     (empty)      │        │      │                 │
-└────────┴───────┴──────────────────┴────────┴──────┴─────────────────┘
-```
+**Player actions**:
+- Click a slot to select weapon type from available weapons
+- Adjust count (more weapons = more space used)
+- Leave empty if not needed
 
 ---
 
-### Special Equipment
+### Special Equipment (PLAYER SELECTS)
 
-**Three special slots** for non-weapon equipment:
+**Three slots** for special equipment:
 
-| Slot | Example Equipment |
-|------|-------------------|
-| Special 1 | Reserve Fuel Tanks (+3 parsec range) |
-| Special 2 | (empty) |
-| Special 3 | (empty) |
+| Slot | Example Equipment | Effect |
+|------|-------------------|--------|
+| Special 1 | Reserve Fuel Tanks | +3 parsec range |
+| Special 2 | Colony Module | Allows colonizing planets |
+| Special 3 | Battle Scanner | See enemy ship details in combat |
 
-Special equipment provides utility bonuses like extended range, scanners, etc.
+**Common special equipment**:
+- **Colony Module** - Required for colony ships
+- **Reserve Fuel Tanks** - Extended travel range
+- **Extended Fuel Tanks** - Even more range
+- **Battle Scanner** - Intel on enemy ships
+- **Anti-Missile Rockets** - Point defense
 
 ---
 
 ### Ship Preview
 
-A **rendered 3D image** of the ship displayed against a space backdrop (with planet visible). This gives a visual sense of the hull design.
+- **3D rendered ship image** against space backdrop
+- **Style selector** (◄ ►) to choose ship appearance/visual style
+- Appearance is cosmetic only - does not affect stats
 
 ---
 
@@ -142,37 +159,35 @@ A **rendered 3D image** of the ship displayed against a space backdrop (with pla
 ```
 (•) Small   ( ) Medium   ( ) Large   ( ) Huge
 ```
-Radio buttons to select hull size. Each size has different total space.
+Determines total space available for weapons and specials.
 
-**Ship Icon:**
-A tiny pixel sprite showing how the ship will appear on the galaxy map.
+**Ship Icon**: Pixel sprite showing galaxy map appearance
 
-**Design Name:**
-Editable text field (e.g., "GUNBOAT")
+**Design Name**: Editable text field
 
-**Cost & Space:**
+**Stats:**
 | Stat | Description |
 |------|-------------|
-| **Ship Cost** | BC (billion credits) to build one ship |
-| **Total Space** | Maximum space units for this hull size |
-| **Available** | Space remaining after equipped components |
+| **Ship Cost** | BC to build one ship |
+| **Total Space** | Maximum space for this hull size |
+| **Available** | Space remaining after weapons/specials |
 
-**Action Buttons:**
+**Buttons:**
 | Button | Function |
 |--------|----------|
-| **CANCEL** | Exit without saving changes |
-| **CLEAR** | Remove all components, reset to empty hull |
-| **BUILD** | Save design (makes it available for production) |
+| **CANCEL** | Exit without saving |
+| **CLEAR** | Remove all weapons/specials |
+| **BUILD** | Save design |
 
 ---
 
-## Visual Style
+## What Uses Space
 
-Classic early-90s aesthetic:
-- **Green-on-black** terminal text
-- **Orange accent** highlights
-- Functional layout prioritizing **information density**
-- Remarkably readable despite the era
+Only these player-selected items consume space:
+- **Weapons** (count × weapon size)
+- **Special Equipment**
+
+Ship systems (Computer, Shield, ECM, Armor, Engine, Maneuver) do **NOT** consume space - they are automatically included.
 
 ---
 
@@ -180,20 +195,25 @@ Classic early-90s aesthetic:
 
 | Action | Result |
 |--------|--------|
-| Click hull size radio button | Changes ship size, updates total space |
-| Click system slot | Opens component selection for that slot |
-| Click weapon slot | Opens weapon selection/count dialog |
+| Click hull size | Changes available space |
+| Click weapon slot | Opens weapon selection popup |
+| Adjust weapon count | Changes space used |
 | Click special slot | Opens special equipment selection |
-| Edit name field | Changes ship design name |
-| Click CLEAR | Removes all components |
+| Click style arrows | Changes ship appearance (cosmetic) |
+| Edit name | Changes design name |
+| Click CLEAR | Removes all weapons/specials |
 | Click CANCEL | Exits without saving |
-| Click BUILD | Saves design, exits to Galaxy Map |
+| Click BUILD | Saves design |
 
 ---
 
-## Space Management
+## Design Workflow
 
-- **Total Space** determined by hull size (Small=40, Medium=?, Large=?, Huge=?)
-- Each component consumes space
-- **Available Space** = Total Space - Used Space
-- Cannot add components if insufficient space remains
+1. **Select hull size** (determines total space)
+2. **Choose ship appearance** (cosmetic style)
+3. **Add weapons** to up to 4 slots with desired counts
+4. **Add special equipment** if needed (colony module, fuel tanks, etc.)
+5. **Name the design**
+6. **Click BUILD** to save
+
+Ship systems are handled automatically - no selection needed!
