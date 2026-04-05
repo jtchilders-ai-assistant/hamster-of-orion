@@ -1,87 +1,152 @@
 # Star Systems
 
 ## Overview
-Based on MOO1 mechanics, each star system contains exactly **one habitable planet**. The star type influences the climate and resource potential of that planet.
+Based on MOO1 mechanics, each star system contains exactly **one planet**. The star color influences the habitability and characteristics of that planet.
 
 ---
 
-## Star Types
+## Star Colors
 
-### Yellow Star
-**Description**: The best stars for habitability. Most likely to produced balanced, life-friendly worlds.
-**Habitability Probability**: High chance for Terran, Jungle, and Ocean worlds.
-**Appearance**: Classic yellow sun.
+In MOO1, star color affects the probability of planet types:
 
-### Green Star
-**Description**: Second best. These stars are close to optimal conditions for life.
-**Habitability Probability**: Good chance for Fertile and Standard environments.
+### Yellow Stars
+- **Best habitability** - Most likely to have good planets
+- High chance for: Terran, Jungle, Ocean, Arid
+- Standard mineral distribution
+- Ideal colonization targets
 
-### Red Star
-**Description**: Generally older and less hospitable. 
-**Habitability Probability**: High chance for hostile or poor environments (Dead, Tundra, Barren).
+### Orange Stars  
+- **Good habitability** - Slightly below yellow
+- Good chance for: Steppe, Desert, Minimal
+- Normal mineral distribution
 
-### Blue Star
-**Description**: Young and energetic stars.
-**Habitability Probability**: Often host very hostile environments (Radiated, Toxic) but have higher chances for rich mineral deposits.
+### Red Stars
+- **Poor habitability** - Older, dimmer stars
+- High chance for: Barren, Tundra, Dead
+- Can still have habitable worlds (luck)
 
-### White Star
-**Description**: Hostile proximity. Planets are often too close or receive too much radiation.
-**Habitability Probability**: High chance for Inferno and Radiated environments.
+### Blue Stars
+- **Variable habitability** - Young, energetic
+- More likely to have: Radiated, Toxic environments
+- BUT: Higher chance of Rich/Ultra Rich minerals
+- Risk/reward targets
 
-### Purple Star (Neutron Star/Black Hole)
-**Description**: The rarest type. 
-**Habitability Probability**: Usually very hostile environments but highly likely to be Mineral Rich or Ultra Rich.
+### White Stars
+- **Harsh habitability** - Intense radiation
+- High chance for: Inferno, Radiated
+- Sometimes have Ultra Rich minerals
+- Late-game colonization with tech
 
----
-
-## Planet Per System
-**Standard**: Exactly 1 habitable planet per star system.
-- MOO1 does not feature multi-planet systems or empty systems (except for Orion's uniqueness).
-
----
-
-## Special System Features
-
-### Nebula
-**Frequency**: Rarest regions of the galaxy.
-**Effect**: 
-- Shields do not function in combat.
-- Starships are reduced to Warp 1 speed.
-- Increased chance of planets inside being mineral rich.
-**Appearance**: Great purple clouds on the galaxy map.
-
-### Orion
-**Frequency**: Exactly 1 per galaxy.
-**Location**: Galactic center.
-**Special**: Former home of the Orions. Research on this planet is 4x normal. First scout gains multiple high-level techs.
-**Protection**: Guarded by the Guardian ship.
+### Purple/Neutron Stars (if present)
+- **Very rare** - Special cases
+- Usually hostile environments
+- Often Ultra Rich minerals
 
 ---
 
-## System Value Rating
+## One Planet Per System
 
-**High Value**:
-- Terran/Gaia worlds.
-- Artifacts worlds.
-- Mineral Rich or Ultra Rich worlds.
+**MOO1 Rule**: Each star system has exactly one planet.
+- No multi-planet systems
+- No empty systems (every star has something)
+- Simplifies colonization decisions
 
-**Average Value**:
-- Standard environments (Desert, Arid, Steppe, etc.).
-- Normal resources.
+---
 
-**Low Value**:
-- Hostile environments (Toxic, Radiated).
-- Ultra Poor mineral deposits.
+## Planet Environments
+
+From most to least habitable:
+
+| Environment | Base Pop Cap | Notes |
+|-------------|--------------|-------|
+| Gaia | Huge | Perfect world (rare) |
+| Terran | Large | Earth-like |
+| Jungle | Large | Dense vegetation |
+| Ocean | Large | Water world |
+| Arid | Medium | Dry but livable |
+| Steppe | Medium | Grasslands |
+| Desert | Medium | Hot and dry |
+| Minimal | Small | Barely habitable |
+| Tundra | Small | Frozen |
+| Barren | Tiny | Requires tech |
+| Dead | Tiny | Requires tech |
+| Inferno | Tiny | Requires Controlled Environment |
+| Toxic | Tiny | Requires Controlled Environment |
+| Radiated | Tiny | Requires Controlled Environment |
+
+**Hostile Environments** (Inferno, Toxic, Radiated): Cannot be colonized without Controlled Environment tech.
+
+---
+
+## Planet Size
+
+Separate from environment, planets have a size modifier:
+
+- **Tiny**: Low population cap
+- **Small**: Below average
+- **Medium**: Standard
+- **Large**: Above average
+- **Huge**: Maximum population potential
+
+Final population cap = Environment base × Size modifier
+
+---
+
+## Mineral Richness
+
+Affects factory output on the planet:
+
+| Richness | Production Modifier |
+|----------|---------------------|
+| Ultra Poor | 1/3 normal |
+| Poor | 1/2 normal |
+| Normal | 1x (standard) |
+| Rich | 2x normal |
+| Ultra Rich | 3x normal |
+
+**Strategic Value**: Rich/Ultra Rich planets are extremely valuable production centers.
+
+---
+
+## Special Planet Types
+
+### Artifacts Worlds
+- Contain ancient technology
+- Colonizing gives free tech breakthrough
+- Highly valuable - colonize early!
+
+### Orion System
+- Located near galactic center
+- Guarded by the powerful Guardian ship
+- **After defeating Guardian**: 
+  - Access to excellent planet
+  - Multiple advanced technologies
+  - Major strategic advantage
+
+---
+
+## Nebulae
+
+**Purple clouds** on the galaxy map:
+
+**Combat Effect**: 
+- Shields do NOT function inside nebulae
+- Makes combat more dangerous/decisive
+- Beam weapons hit unshielded targets
+
+**Strategic Consideration**:
+- Avoid nebula combat if you rely on shields
+- Or exploit it against shield-dependent enemies
 
 ---
 
 ## System Naming
 
-**Auto-Generated Names**:
-- Traditional star names (Sirius, Vega, Deneb).
-- System names from the original MOO1 list.
+**Generated Names**: 
+- Traditional star names (Alpha Centauri, Sirius, Vega, etc.)
+- Based on MOO1's original star name list
 
-**Player Renaming**: Allowed upon colonization.
+**Player Naming**: Can rename after colonizing
 
 ---
 

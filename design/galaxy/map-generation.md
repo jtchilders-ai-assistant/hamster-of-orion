@@ -7,77 +7,66 @@ The galaxy is procedurally generated at game start. Each game creates a unique s
 
 ## Galaxy Size Options
 
-### Small (24 stars)
-**Standard**: Minimum size, fast play.
-**Players**: 2-4 races.
-
-### Medium (48 stars)
-**Standard**: Balanced game length.
-**Players**: 4-6 races.
-
-### Large (70 stars)
-**Standard**: Broad expansion opportunities.
-**Players**: 6-10 races.
-
-### Huge (108 stars)
-**Standard**: Epic scale, long-term strategic depth.
-**Players**: 10 races.
+| Size | Stars | Recommended Players |
+|------|-------|---------------------|
+| Small | 24 | 2-4 races |
+| Medium | 48 | 4-6 races |
+| Large | 70 | 6-8 races |
+| Huge | 108 | 8-10 races |
 
 ---
 
 ## Map Shape
 
-### Square Grid (Default)
-**MOO1 Classic**: Systems are distributed across a rectangular coordinate system.
-**Orion**: Usually near the center but not strictly fixed to the exact centroid.
+**2D Rectangular Grid**: Stars are distributed across a coordinate space.
+- X and Y positions for each star
+- Orion system placed near center
+- Homeworlds distributed around edges for fairness
 
 ---
 
-## Generation Algorithm
+## Generation Steps
 
 ### Step 1: Place Stars
-- Stars are placed randomly with a minimum distance between them.
-- Total count based on galaxy size (24, 48, 70, 108).
-- Assign star color (Yellow, Green, Red, Blue, White, Purple).
+- Stars placed with minimum distance between them
+- Total count based on galaxy size
+- Assign star color: Yellow, Orange, Red, Blue, White
 
 ### Step 2: Assign Planets
-- Each star system is assigned exactly one habitable planet.
-- Environment type and mineral richness determined by star color and random rolls.
+- Each star gets exactly one planet
+- Environment determined by star color + random roll
+- Size (Tiny to Huge) assigned randomly
+- Mineral richness assigned (Ultra Poor to Ultra Rich)
 
 ### Step 3: Place Special Systems
-- **Orion**: One system designated as Orion, guarded by the Guardian.
-- **Artifacts**: 2-4 systems designated as Artifacts worlds (Research x2).
+- **Orion**: Near galactic center, guarded by Guardian
+- **Artifacts**: 2-6 systems with ancient technology (one-time tech bonus when colonized)
 
-### Step 4: Starting Positions
-- Homeworlds are distributed to ensure a fair start.
-- Players start with:
-  - 1 Homeworld (Terran, typically Large/Huge).
-  - 2 Scout ships.
-  - 1 Colony ship.
-- Distance between homeworlds is maximized within constraints.
+### Step 4: Place Nebulae
+- 1-5 nebula regions depending on galaxy size
+- Stars inside nebulae have special combat rules (no shields)
 
-### Step 5: Nebulas
-- Areas of the map designated as nebulas.
-- Affects ship speed (Warp 1) and combat (No shields).
-
----
-
-## Starting Positions Balance
-
-**Fair Start Algorithm**:
-1. Maximize distance between player homeworlds.
-2. Homeworlds are always highly habitable (Terran).
-3. Ensure initial star systems within reach are not all extremely hostile.
+### Step 5: Starting Positions
+- Homeworlds distributed for fair start
+- Maximum distance between player homeworlds
+- Each player starts with:
+  - 1 Homeworld (Terran, good size)
+  - 2 Scout ships
+  - 1 Colony ship
 
 ---
 
-## Web Implementation Notes
+## Fairness Balancing
 
-**2D Map Display**:
-- Canvas or SVG rendering.
-- MOO1 aesthetic: Black background, colored stars, range circles.
-- Hover details for explored stars.
+**Starting Position Rules**:
+- Homeworlds are always highly habitable
+- Each player has similar nearby colonization options
+- No player starts adjacent to Orion
 
 ---
 
-Next: See `star-systems.md` for system composition details.
+## See Also
+
+- `generation-algorithm.md` - Full technical specification
+- `star-systems.md` - Star and planet details
+- `space-regions.md` - Regional gameplay zones

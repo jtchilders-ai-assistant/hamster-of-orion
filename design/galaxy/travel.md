@@ -1,7 +1,7 @@
 # Travel & Movement
 
 ## Overview
-Ships travel through hyperspace between star systems. Distance, engine tech, and fuel capacity determine movement.
+Ships travel through hyperspace between star systems. Warp speed (engines) determines travel time. Fuel range (fuel cells) determines maximum distance from colonies.
 
 ---
 
@@ -13,169 +13,193 @@ Ships travel through hyperspace between star systems. Distance, engine tech, and
 - Dimensional travel, not physical
 
 **Gameplay**:
-- Click destination system
+- Select fleet, click destination system
 - Fleet travels in straight line
-- Takes multiple turns based on distance/speed
+- Takes multiple turns based on distance ÷ warp speed
 
 ---
 
-## Movement Speed
+## Warp Speed (Engine Technology)
 
-**Base Speed**: Engine tech determines parsecs/turn
-- Retro Engines: 1 parsec/turn
-- Nuclear: 2 parsecs/turn
-- Fusion: 3 parsecs/turn
-- Ion: 4 parsecs/turn
-- Antimatter: 5 parsecs/turn
-- Interphased: 6 parsecs/turn
+Engine tech determines parsecs traveled per turn:
 
-**Modifiers**:
-- Combat Speed tech: +1 parsec/turn
-- Budgies racial: +1 parsec/turn
-- Star Gates: +2 parsecs/turn (ships built here)
+| Engine | Warp Speed | Tech Level |
+|--------|------------|------------|
+| Retro Engines | 1 | Starting |
+| Nuclear Engines | 2 | Early |
+| Sub-Light Drives | 3 | Early-Mid |
+| Fusion Drives | 4 | Mid |
+| Impulse Drives | 5 | Mid |
+| Ion Drives | 6 | Mid-Late |
+| Anti-Matter Drives | 7 | Late |
+| Inter-Phased Drives | 8 | Late |
+| Hyper Drives | 9 | End-game |
 
-**Example**: Budgie ship with Antimatter Drive + Combat Speed
-= 5 + 1 + 1 = 7 parsecs/turn
+**Travel Time**: Distance (parsecs) ÷ Warp Speed = Turns to arrive (rounded up)
+
+**Example**: 12 parsec journey with Warp 4 (Fusion) = 3 turns
 
 ---
 
-## Fuel Range
+## Fuel Range (Fuel Cell Technology)
 
-**Standard Range**: Engine determines max distance
-- Retro: 3 parsecs
-- Nuclear: 4 parsecs
-- Fusion: 5 parsecs
-- Ion: 6 parsecs
-- Antimatter: 7 parsecs
+Fuel cells determine maximum distance ships can travel from any friendly colony:
 
-**Extended Range**:
-- Range 5 Fuel Cells: +2 parsecs
-- Range 7 Fuel Cells: +3 parsecs
-- Range 9 Fuel Cells: +4 parsecs
+| Fuel Cells | Range (Parsecs) | Tech Level |
+|------------|-----------------|------------|
+| Hydrogen | 4 | Starting |
+| Deuterium | 5 | Early |
+| Irridium | 6 | Early-Mid |
+| Dotomite Crystals | 7 | Mid |
+| Uridium | 8 | Mid |
+| Reajax II | 9 | Mid-Late |
+| Trilithium Crystals | 10 | Late |
+| Thorium Cells | Unlimited | End-game |
 
-**Sub-Space Teleporter**: Infinite range (game-changer!)
+**Critical**: Ships cannot travel farther than their fuel range from the nearest friendly colony!
 
-**Refueling**:
-- At any colonized planet (instant, free)
-- At enemy planet (if captured)
-- Cannot refuel in empty systems
+---
+
+## Extending Ship Range
+
+### Reserve Fuel Tanks (Special Equipment)
+- +3 parsecs to ship range
+- Takes up ship space
+- Essential for early exploration
+
+### Extended Fuel Tanks (Special Equipment)  
+- +6 parsecs to ship range (replaces Reserve)
+- Takes more space
+- Good for deep space operations
+
+### Example
+- Hydrogen Fuel Cells (Range 4) + Reserve Tanks (+3) = 7 parsec range
+- Allows reaching systems 7 parsecs from your colonies
 
 ---
 
 ## Strategic Movement
 
 ### Fleet Staging
-- Position fleets at border systems
+- Position fleets at border colonies
 - Quick response to threats
-- Fuel range limits deep strikes
+- Colonies extend your fuel range
 
 ### Invasion Routes
-- Plot path to enemy homeworld
-- Need refueling points
-- Capture planets along route
+- Plan path to enemy territory
+- Need to capture planets along the way
+- Each captured planet extends your range
 
-### Retreat Routes
-- Always plan escape path
-- Fuel to reach friendly planet
-- Don't get stranded deep in enemy territory
-
----
-
-## Movement Interception
-
-**Enemy Fleets**:
-- If you're faster, can chase/intercept
-- If slower, can't escape
-- Position matters
-
-**Budgies**: +1 movement = tactical advantage
-- Can engage or disengage at will
-- Control battle timing
+### Getting Stranded
+- Ships beyond fuel range cannot move
+- Must wait for colony to come to them (capture/colonize nearby)
+- Or build ships with longer range to rescue them
 
 ---
 
-## Special Movement Systems
+## Star Gates (Special Technology)
 
-### Star Gates
-- Ships built here: Permanently +2 parsecs/turn
-- Doesn't affect existing ships
-- Build at major shipyards
+**Intergalactic Star Gates** (Propulsion tech):
+- Build gates on two or more colonies (3000 BC each)
+- Ships travel instantly between any gated planets
+- Ignores fuel range for gate-to-gate travel
+- Does NOT increase warp speed
 
-### Wormholes (Rare)
-- Instant travel between paired systems
-- Strategic chokepoint
-- Worth controlling
+**Strategic Use**:
+- Connect distant parts of empire
+- Rapid response to invasions
+- Move reinforcements instantly
 
-### Displacement Device
-- Teleport 1 system once per turn
-- Tactical repositioning
-- Escape mechanism
+---
 
-### Dimensional Portal
-- Instant travel between any portal-equipped planets
-- Late-game super-mobility
-- Extremely expensive
+## Combat Speed vs Warp Speed
+
+**Warp Speed**: Travel between star systems (map movement)
+**Combat Speed**: Movement within tactical combat (see combat-mechanics.md)
+
+These are related but separate:
+- Better engines improve both
+- Maneuver tech affects combat speed only
+- Inertial Stabilizer/Nullifier add combat maneuverability
+
+---
+
+## Special Movement Technologies
+
+### Sub-Space Teleporter (Propulsion)
+- Teleport anywhere on combat map
+- Grants first initiative in combat
+- Does NOT affect map travel
+
+### Displacement Device (Propulsion)
+- 33% chance to avoid non-area attacks
+- Defensive, not movement related
+
+### Combat Transporters (Propulsion)
+- 50% chance troops land before combat
+- For planetary invasion, not ship movement
 
 ---
 
 ## Fleet Organization
 
-**Single Fleet**: All ships move together
-**Split Fleet**: Divide into groups
-- Fast scouts ahead
-- Slow capital ships follow
-- Bomber squadrons separate
+**Combined Fleet**: All ships move at slowest ship's warp speed
+**Split Fleet**: Divide fast and slow ships
+- Scouts can reach destination first
+- Capital ships follow
 
-**Merge Fleet**: Combine at destination
-
----
-
-## Movement UI (Web Implementation)
-
-**Click to Move**:
-1. Select fleet
-2. Click destination
-3. Path drawn
-4. Confirm movement
-
-**Info Display**:
-- Turns to arrival
-- Fuel consumption
-- Interception risk
-- Enemy detection chance
-
-**Range Circles**:
-- Green: Can reach with current fuel
-- Yellow: Can reach but need refuel
-- Red: Out of range
+**Strategy**: Don't mix warp speeds unless necessary
 
 ---
 
-## Strategic Mobility Races
+## Movement UI
 
-**Fastest**: Budgies (natural +1, prioritize propulsion)
-**Slowest**: Hermit Crabs (patient, don't care)
-**Cheaters**: Chameleons (Displacement Device abuse)
-**Networked**: Mice (Dimensional Portals)
+**Selecting Destination**:
+1. Select fleet on map
+2. Click destination system
+3. Path shows: turns to arrival, fuel check
+4. Confirm or cancel
+
+**Range Indicator**:
+- Systems within fuel range: Reachable
+- Systems beyond range: Grayed out (unless have tanks)
+
+**ETA Display**:
+- Shows turns to arrival
+- Updates as you research better engines
+
+---
+
+## Racial Movement Bonuses
+
+**Budgies** (Superior Pilots): 
+- No direct warp speed bonus
+- Combat speed bonus helps in battle
+- Prioritize propulsion research for fleet advantage
+
+**Other Races**: No inherent movement bonuses
 
 ---
 
 ## Movement and Victory
 
-**Domination**: Need mobility to claim systems
-**Discovery**: Must reach Orion (center of galaxy)
+**Domination**: Mobility essential for conquering
+- Faster fleets control engagement timing
+- Range limits deep strike options
+
 **Diplomatic**: Mobility less critical
-**Survival**: Chase down enemy colonies
+- Population matters more than fleet position
+- But still need defense capability
 
 ---
 
 ## The Orion Journey
 
-**Distance from Edge**: 40-60 parsecs typically
-**Fuel Required**: Sub-Space Teleporter or staging bases
-**Guardian Response**: Attacks approaching fleets
-**One-Way Trip**: Plan to win or lose, no retreat
+**Location**: Near galactic center
+**Distance**: Often 30-50+ parsecs from starting position
+**Challenge**: May need staging colonies or extended range
+**With Thorium Cells**: Can reach from anywhere (unlimited range)
 
 ---
 
-Galaxy & Exploration complete! All travel mechanics defined.
+Next: See `star-systems.md` for system details.
