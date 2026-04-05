@@ -118,7 +118,7 @@ Their food penalty (-50%) is actually a hidden advantage - they need less agricu
 
 Balance consideration: Slow early game (low growth, small empire). Devastating late game (tech advantage becomes insurmountable). Must survive early aggression from Guinea Pigs or Rabbits.
 
-Key weakness: Low population means vulnerable to Domination victory. Must win through technology (Discovery) or diplomacy (Council) rather than population control.
+Key weakness: Low population means vulnerable to Domination victory. Must win through technological superiority or diplomacy (Council) rather than population control.
 
 ---
 
