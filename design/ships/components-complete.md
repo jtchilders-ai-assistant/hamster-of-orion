@@ -172,19 +172,16 @@ Armor determines base hull hit points. Higher-tier armor multiplies HP and provi
 
 ### Armor Notes
 
-**Base HP by Ship Class:**
+**Base HP by Hull Size (MOO1):**
 
-| Ship Class | Base HP (Titanium) |
-|------------|--------------------|
-| Scout | 5 |
-| Fighter | 10 |
-| Destroyer | 25 |
-| Cruiser | 60 |
-| Battle Cruiser | 120 |
-| Dreadnought | 200 |
-| Titan | 400 |
+| Hull Size | Base HP (Titanium) |
+|-----------|--------------------|
+| Small | 3 |
+| Medium | 18 |
+| Large | 100 |
+| Huge | 600 |
 
-**Example:** A Cruiser with Zortrium Armor has 60 × 2.0 = 120 HP.
+**Example:** A Large hull with Zortrium Armor has 100 × 2.0 = 200 HP.
 
 **Armor Space:** Armor does not consume ship space - it fills remaining space automatically.
 
@@ -315,17 +312,16 @@ Planetary production enhancement (not ship component).
 
 ## Component Space by Ship Class
 
-Maximum space available for components (after engine):
+Maximum space available for components (MOO1 hull sizes):
 
-| Ship Class | Total Space | Typical Engine | Available |
-|------------|-------------|----------------|-----------|
-| Scout | 50 | 15-20 | 30-35 |
-| Fighter | 100 | 15-22 | 78-85 |
-| Destroyer | 250 | 18-25 | 225-232 |
-| Cruiser | 500 | 15-22 | 478-485 |
-| Battle Cruiser | 1,000 | 14-20 | 980-986 |
-| Dreadnought | 1,500 | 12-18 | 1,482-1,488 |
-| Titan | 2,500 | 11-15 | 2,485-2,489 |
+| Hull Size | Base Space | Notes |
+|-----------|------------|-------|
+| Small | ~40 | Scouts, fighters, colony ships |
+| Medium | ~100 | Multi-role warships |
+| Large | ~250 | Heavy warships |
+| Huge | ~500+ | Capital ships |
+
+**Note:** In MOO1, ship systems (engines, shields, etc.) are automatic and don't consume space. Only weapons and specials use space. Space increases with Construction technology.
 
 ---
 

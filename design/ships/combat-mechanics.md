@@ -111,8 +111,8 @@ Where:
 - Budgies: +5 Defense Level (+50%), +3 Initiative, +20% Evasion (Superior Pilots)
 
 **Example**:
-- Ion Cannon at long range vs Destroyer with ECM III
-- Attacker: Battle Computer Mark V (+5 × 5% = +25%), Size target (Destroyer = 3, so +2 × 5% = +10%)
+- Ion Cannon at long range vs Medium ship with ECM III
+- Attacker: Battle Computer Mark V (+5 × 5% = +25%), Size target (Medium = 2, so +1 × 5% = +5%)
 - Defender: ECM III (3 × 5% = 15%), Maneuver 2 (2 × 5% = 10%), Long Range (+10%)
 - Hit Chance: 50% + 25% + 10% - 15% - 10% - 10% = 50%
 

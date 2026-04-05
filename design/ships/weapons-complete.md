@@ -203,17 +203,18 @@ Personal weapons provide bonuses to all ground combat.
 
 ## Weapon Mounting Rules
 
-### Weapon Slots by Ship Class
+### Weapon Slots by Hull Size (MOO1)
 
-| Ship Class | Max Weapon Slots | Max Heavy Weapons |
-|------------|------------------|-------------------|
-| Scout | 1 | 0 |
-| Fighter | 2 | 0 |
-| Destroyer | 4 | 1 |
-| Cruiser | 6 | 2 |
-| Battle Cruiser | 10 | 4 |
-| Dreadnought | 15 | 6 |
-| Titan | 25 | 10 |
+In MOO1, all ships have **4 weapon slots** regardless of hull size. The difference is how much space is available for weapons:
+
+| Hull Size | Weapon Slots | Available Space |
+|-----------|--------------|-----------------|
+| Small | 4 | ~40 |
+| Medium | 4 | ~100 |
+| Large | 4 | ~250 |
+| Huge | 4 | ~500+ |
+
+Larger hulls can fit more weapons per slot or heavier weapons.
 
 ### Heavy Weapons
 
@@ -875,7 +876,7 @@ The following weapons are "Heavy" and have mounting limits:
 | `no_range_penalty` | Full damage at all ranges |
 | `chain_lightning_4` | Damage spreads to 4 adjacent ships |
 | `double_shield_damage` | Does 2× damage to shields |
-| `instant_kill_small` | 100% kill vs Scout/Fighter |
+| `instant_kill_small` | 100% kill vs Small hull ships |
 | `always_hits` | 100% accuracy, ignores ECM |
 | `destroys_planets` | Can destroy entire planets |
 | `mirv_5` | Single launch, 5 separate warheads |

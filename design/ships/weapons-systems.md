@@ -31,4 +31,4 @@
 
 ## Weapon Targeting AI
 Ships auto-target nearest threat unless player directs otherwise.  
-Priority: Bombers > Capital Ships > Fighters > Scouts
+Priority: Bombers > Huge ships > Medium ships > Small ships

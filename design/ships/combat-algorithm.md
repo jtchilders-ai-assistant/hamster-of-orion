@@ -53,7 +53,7 @@ Each ship tracks:
 ```json
 {
   "id": "ship_001",
-  "design": "Destroyer-Class",
+  "design": "Warship-Class",
   "side": "attacker",
   "position": {"x": 5, "y": 3},
   "current_hp": 60,
@@ -216,7 +216,7 @@ Where:
     + (Battle_Computer_Rating × 5%)
     + Experience_Bonus (Rookie: -5%, Regular: 0%, Veteran: +5%, Elite: +10%)
     + Point_Blank_Bonus (1 hex: +10%)
-    + Size_Target_Bonus (per size class above Scout: +5%)
+    + Size_Target_Bonus (per size class above Small: +5%)
   
   Defense_Modifiers:
     + (Target_Maneuver × 3%)
@@ -249,7 +249,7 @@ function calculate_hit_chance(attacker, weapon, target):
         hit_chance -= 20  # Very long range
     
     # Size modifier (larger targets easier to hit)
-    size_diff = target.size_class - 1  # Scout = 1
+    size_diff = target.size_class - 1  # Small = 1, Medium = 2, Large = 3, Huge = 4
     hit_chance += size_diff * 5
     
     # Defense modifiers
@@ -339,14 +339,11 @@ Ship HP is determined by:
 ```
 Ship_HP = Base_HP × Armor_Multiplier
 
-Base_HP by Class:
-  Scout: 5
-  Fighter: 10
-  Destroyer: 25
-  Cruiser: 60
-  Battle Cruiser: 120
-  Dreadnought: 200
-  Titan: 400
+Base_HP by Hull Size (MOO1):
+  Small: 3
+  Medium: 18
+  Large: 100
+  Huge: 600
 
 Armor_Multiplier:
   Titanium: 1.0×
@@ -358,7 +355,7 @@ Armor_Multiplier:
   Neutronium: 4.0×
 ```
 
-**Example:** A Cruiser with Zortrium armor has 60 × 2.0 = 120 HP.
+**Example:** A Large hull with Zortrium armor has 100 × 2.0 = 200 HP.
 
 ---
 
@@ -556,7 +553,7 @@ function resolve_torpedo_impact(torpedo, combat):
 | `no_range_penalty` | No damage reduction at range |
 | `chain_lightning` | After hitting primary, hits up to 3 adjacent enemies |
 | `double_shield_damage` | Shield takes 2× damage |
-| `instant_kill_small` | 100% kill vs Scout/Fighter class |
+| `instant_kill_small` | 100% kill vs Small hull ships |
 | `always_hits` | 100% accuracy, ignores all defense |
 | `destroys_planets` | Can be used in bombardment phase |
 
@@ -905,8 +902,8 @@ function resolve_bombardment(ship, bomb, planet):
       }
     ],
     "combat_log": [
-      "Round 1: Destroyer fires Fusion Beam at Cruiser, hits for 12 damage",
-      "Round 1: Cruiser launches Merculite Missiles at Destroyer"
+      "Round 1: Medium ship fires Fusion Beam at Large ship, hits for 12 damage",
+      "Round 1: Large ship launches Merculite Missiles at Medium ship"
     ]
   }
 }
