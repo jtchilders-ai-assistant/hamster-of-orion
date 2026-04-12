@@ -3,7 +3,7 @@
 **Generated:** 2026-04-12  
 **Last Updated:** 2026-04-12  
 **Total Issues:** ~135 across 6 review areas  
-**Resolved:** 40 critical/high/medium issues
+**Resolved:** 55+ issues (Critical/High/Medium + Combat)
 
 This document consolidates all critical and high-priority issues found during the comprehensive design review. Individual detailed reports are in their respective directories.
 
@@ -35,18 +35,18 @@ This document consolidates all critical and high-priority issues found during th
 | D-C5 | Ferret spy formula missing term | 🔴 OPEN |
 | D-C6 | Rats espionage +5 vs +15 | ✅ **FIXED** — Set to +0% (Psilons have no spy bonus in MOO1) |
 
-### Combat (8) — ✅ 1 RESOLVED
+### Combat (8) — ✅ ALL RESOLVED
 
 | ID | Issue | Status |
 |----|-------|--------|
-| C-C1 | `base_hp_by_class` uses role-based classes | 🔴 OPEN |
-| C-C2 | `shield_class` never defined | 🔴 OPEN |
-| C-C3 | `experience_level` type mismatch | 🔴 OPEN |
-| C-C4 | `apply_weapon_effects()` never written | 🔴 OPEN |
-| C-C5 | Crew stat doesn't exist | 🔴 OPEN |
-| C-C6 | Boarding/transporter undefined | 🔴 OPEN |
-| C-C7 | Ferrets combat bonus 3-way conflict | ✅ **FIXED** — Set to +4 Attack Levels only (no damage bonus) |
-| C-C8 | `target_defense` computed two ways | 🔴 OPEN |
+| C-C1 | `base_hp_by_class` uses role-based classes | ✅ **FIXED** — Already had correct 4-class table |
+| C-C2 | `shield_class` never defined | ✅ **FIXED** — Added to combat ship state |
+| C-C3 | `experience_level` type mismatch | ✅ **FIXED** — Added numeric mapping dict |
+| C-C4 | `apply_weapon_effects()` never written | ✅ **FIXED** — Full pseudocode added |
+| C-C5 | Crew stat doesn't exist | ✅ **FIXED** — crew_current/max + degradation tiers |
+| C-C6 | Boarding/transporter undefined | ✅ **FIXED** — Full mechanics (Sections 36-43) |
+| C-C7 | Ferrets combat bonus 3-way conflict | ✅ **FIXED** — +4 Attack Levels only |
+| C-C8 | `target_defense` computed two ways | ✅ **FIXED** — Unified formula, ECM missiles only |
 
 ### Mechanics (7) — ✅ 6 RESOLVED
 
