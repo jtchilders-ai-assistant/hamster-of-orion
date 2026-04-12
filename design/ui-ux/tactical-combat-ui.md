@@ -312,7 +312,7 @@ Turn-based tactical combat on a hexagonal grid. Inspired by MOO1's auto-resolve 
      ║   Enemy HP: 30/50         ║
      ║   [███████░░░] 60%        ║
      ║                           ║
-     ║   CRITICAL HIT! +50%      ║
+     ║   CRITICAL HIT! ×2 damage  ║
      ║                           ║
      ╚═══════════════════════════╝
 

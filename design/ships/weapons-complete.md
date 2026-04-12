@@ -204,12 +204,12 @@ Personal weapons provide bonuses to all ground combat.
 
 | Race | Modifier | Effect |
 |------|----------|--------|
-| Ferrets | +4 Attack Level, +15% Damage | Deadly Accuracy ability: +4 to attack rating AND 1.15× weapon damage multiplier. These stack! |
+| Ferrets | +4 Attack Level | Deadly Accuracy ability: +4 to attack rating (hit chance only — no damage bonus). |
 | Guinea Pigs | +0% ship, +50% ground | Ground weapons are devastating |
-| Budgies | +0% damage | But +50% defense (+5 effective), +3 initiative, +20% evasion (Superior Pilots) |
+| Budgies | +0% damage | But +50% ship defense (+3 Defense Level), +3 initiative, +20% evasion (Superior Pilots) |
 | All others | 0% | No weapon modifier |
 
-**Note:** Ferrets' +30% ship combat bonus in `race-stats-complete.md` translates to the +4 attack level bonus shown here. The +15% damage is from the separate Deadly Accuracy special ability. Both always apply.
+**Note:** Ferrets' +30% ship combat bonus in `race-stats-complete.md` translates to the +4 Attack Level bonus shown here (Deadly Accuracy). This increases hit chance only — no weapon damage bonus.
 
 ---
 
@@ -859,7 +859,7 @@ The following weapons are "Heavy" and have mounting limits:
   ],
 
   "racial_weapon_modifiers": {
-    "ferrets": { "ship_damage": 1.25, "ground_damage": 1.00 },
+    "ferrets": { "ship_damage": 1.00, "ground_damage": 1.00 },
     "guinea_pigs": { "ship_damage": 1.00, "ground_damage": 1.50 },
     "budgies": { "ship_damage": 1.00, "ground_damage": 1.00 },
     "hamsters": { "ship_damage": 1.00, "ground_damage": 1.00 },
@@ -880,20 +880,20 @@ The following weapons are "Heavy" and have mounting limits:
 | Special | Effect |
 |---------|--------|
 | `multi_attack` | Fires multiple times per turn |
-| `armor_piercing` | Ignores 50% of armor |
+| `armor_piercing` | Hull damage ×1.5 (amplifies damage that passes shields; does NOT bypass shields) |
 | `halves_shields` | Shield absorb is halved |
 | `ignores_half_shields` | 50% damage bypasses shields |
 | `kills_crew` | Each hit kills 1% of crew |
 | `stream` | Continuous damage while targeted |
 | `no_range_penalty` | Full damage at all ranges |
-| `chain_lightning_4` | Damage spreads to 4 adjacent ships |
+| `chain_lightning_4` | Damage spreads to up to 4 adjacent ships |
 | `double_shield_damage` | Does 2× damage to shields |
 | `instant_kill_small` | 100% kill vs Small hull ships |
 | `always_hits` | 100% accuracy, ignores ECM |
 | `destroys_planets` | Can destroy entire planets |
 | `mirv_5` | Single launch, 5 separate warheads |
 | `no_intercept` | Cannot be shot down |
-| `bonus_vs_shields` | +10 damage vs shielded targets |
+| `bonus_vs_shields` | +10 bonus damage directly to `shields_current` (Hellfire Torpedo); does not increase hull damage |
 | `disable_engines` | Target speed becomes 0 |
 | `crew_damage` | Kills X% crew per hit |
 | `area_damage` | Damages all ships in hex |

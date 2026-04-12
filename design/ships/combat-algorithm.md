@@ -60,6 +60,10 @@ Each ship tracks:
   "max_hp": 60,
   "shields_current": 30,
   "shields_max": 30,
+  "shield_class": 5,
+  "combat_speed": 3,
+  "crew_current": 100,
+  "crew_max": 100,
   "weapons": [...],
   "weapon_cooldowns": {},
   "missile_ammo": {},
@@ -71,6 +75,10 @@ Each ship tracks:
   "cloaked": false
 }
 ```
+
+**`shield_class`** — The tier number of the installed deflector shield (1–15, matching the Class I–XV Deflector table). Used by `apply_damage()` to determine how much damage is absorbed per hit: `shield_absorb = min(ship.shield_class, remaining_damage)`. A ship with no shields has `shield_class: 0`.
+
+**`combat_speed`** — Hexes the ship can move per combat round, taken directly from the installed engine's `combat_speed` value (1–8). Used by the movement and retreat systems.
 
 ---
 
@@ -283,22 +291,50 @@ Damage is applied in this order:
 function apply_damage(target, damage, weapon):
     remaining_damage = damage
     
-    # Step 1: Shield absorption
+    # Step 1: Compute effective shield absorption for this hit
     if target.shields_current > 0:
-        shield_absorb = min(target.shield_class, remaining_damage)
-        remaining_damage -= shield_absorb
+        effective_shield_class = target.shield_class
         
-        # Some weapons do extra shield damage
-        if weapon.has_special("double_shield_damage"):
-            target.shields_current -= shield_absorb * 2
-        else:
+        # halves_shields (Ion Cannon): shield absorbs only half its class rating
+        if weapon.has_special("halves_shields"):
+            effective_shield_class = floor(target.shield_class / 2)
+        
+        # ignores_half_shields (Mass Driver): split damage into two halves
+        #   - Half bypasses shields entirely
+        #   - Half is absorbed by shields normally
+        if weapon.has_special("ignores_half_shields"):
+            bypass_damage = floor(remaining_damage / 2)
+            shielded_damage = remaining_damage - bypass_damage
+            shield_absorb = min(effective_shield_class, shielded_damage)
             target.shields_current -= shield_absorb
-        
-        target.shields_current = max(0, target.shields_current)
+            target.shields_current = max(0, target.shields_current)
+            remaining_damage = bypass_damage + (shielded_damage - shield_absorb)
+        else:
+            # Normal (or halves_shields) shield absorption path
+            shield_absorb = min(effective_shield_class, remaining_damage)
+            remaining_damage -= shield_absorb
+            
+            # bonus_vs_shields (Hellfire Torpedo): deals +10 bonus damage
+            # directly to shields_current, on top of normal absorption.
+            # This does NOT increase damage to hull.
+            if weapon.has_special("bonus_vs_shields") and target.shields_current > 0:
+                extra_shield_damage = min(10, target.shields_current)
+                target.shields_current -= extra_shield_damage
+            
+            # Some weapons do extra shield damage
+            if weapon.has_special("double_shield_damage"):
+                target.shields_current -= shield_absorb * 2
+            else:
+                target.shields_current -= shield_absorb
+            
+            target.shields_current = max(0, target.shields_current)
     
     # Step 2: Armor/Hull damage
     if remaining_damage > 0:
-        # Check for armor piercing
+        # armor_piercing (Neutron Pellet Gun): multiplies hull damage by 1.5×.
+        # Applies ONLY to damage that has already passed through shields —
+        # it does NOT bypass or reduce shield absorption. The ×1.5 amplifies
+        # whatever reaches the hull, making it effective against armored targets.
         if weapon.has_special("armor_piercing"):
             remaining_damage = floor(remaining_damage * 1.5)
         
@@ -311,6 +347,142 @@ function apply_damage(target, damage, weapon):
     
     # Step 4: Apply weapon special effects
     apply_weapon_effects(target, weapon, damage)
+```
+
+### 11b. Weapon Special Effects Application
+
+This function handles all weapon special effects after base damage is applied. Called only if the target survived (HP > 0 after damage). The `combat` context is passed in for chain-lightning AoE resolution.
+
+```pseudocode
+function apply_weapon_effects(target, weapon, damage, combat):
+    effects = weapon.special_effects  # List of effect strings
+    
+    # --- kills_crew ---
+    # Each hit kills a percentage of crew.
+    # Weapons: Neutron Blaster (1%), Neutron Stream Projector (10% per turn via stream).
+    if "kills_crew" in effects:
+        crew_kill_pct = weapon.crew_kill_percent  # Default: 0.01 (1% of crew_max per hit)
+        crew_killed = max(1, floor(target.crew_max * crew_kill_pct))
+        target.crew_current = max(0, target.crew_current - crew_killed)
+        apply_crew_loss_penalties(target)
+    
+    # --- stream ---
+    # Beam locks onto target — damage repeats each End Phase until target breaks free
+    # or the holding ship stops maintaining the beam.
+    # Used by: Graviton Beam, Neutron Stream Projector.
+    if "stream" in effects:
+        if not has_status(target, "stream"):
+            target.status_effects.append({
+                type: "stream",
+                source_ship_id: weapon.attacker_id,
+                weapon_id: weapon.id,
+                damage_per_turn: floor(damage * 0.5),  # Ongoing tick = 50% of initial hit
+                duration: 99  # Persists until source ship stops or is destroyed
+            })
+        # Break-free check (resolved in process_status_effects each End Phase):
+        #   roll = random(1, 100)
+        #   break_chance = target.maneuver_rating * 10  # 10% per maneuver point
+        #   if roll <= break_chance: remove "stream" status
+    
+    # --- chain_lightning ---
+    # After hitting the primary, arcs to up to N additional adjacent enemies at 50% damage.
+    # chain_lightning_count is set per-weapon (canonical value TBD per issue 1.4).
+    # Used by: Megabolt Cannon.
+    if "chain_lightning" in effects:
+        chain_count = weapon.chain_lightning_count  # e.g., 3 or 4
+        arc_damage = floor(damage * 0.5)
+        
+        adjacent_enemies = get_ships_within_range(
+            center=target.position,
+            range=2,
+            side=get_enemy_side(target.side),
+            combat=combat
+        )
+        adjacent_enemies = [s for s in adjacent_enemies if s.id != target.id]
+        
+        arcs_fired = 0
+        for arc_target in adjacent_enemies:
+            if arcs_fired >= chain_count:
+                break
+            if arc_target.current_hp > 0:
+                # Apply arc — no further chaining from arc hits
+                apply_damage(arc_target, arc_damage, weapon)
+                arcs_fired += 1
+    
+    # --- disable_engines ---
+    # Reduces target's combat_speed to 1 for N turns. Refreshes if already applied.
+    # Used by: Ion Stream Projector.
+    if "disable_engines" in effects:
+        duration = weapon.disable_duration  # Default: 2 turns
+        existing = get_status(target, "engines_disabled")
+        if existing:
+            existing.duration = max(existing.duration, duration)  # Refresh, don't stack
+        else:
+            target.status_effects.append({
+                type: "engines_disabled",
+                duration: duration,
+                saved_speed: target.combat_speed
+            })
+            target.combat_speed = 1
+    
+    # --- instant_kill_small ---
+    # Destroys Small hull ships outright regardless of remaining HP.
+    # No effect on Medium/Large/Huge hulls.
+    if "instant_kill_small" in effects:
+        if target.size_class == 1:  # Small hull
+            destroy_ship(target)
+            return  # No further effects
+    
+    # --- double_shield_damage and armor_piercing ---
+    # Both handled directly inside apply_damage() before this function is called.
+    # No additional action needed here.
+```
+
+### 11c. Crew Loss Penalties
+
+Crew are not just flavor — performance degrades as crew falls. Thresholds are rechecked after every crew loss event.
+
+**Crew scaling by hull size (base complement):**
+
+| Hull | Base Crew |
+|------|-----------|
+| Small | 20 |
+| Medium | 60 |
+| Large | 200 |
+| Huge | 500 |
+
+`crew_max` is set from this table at combat initialization. `crew_current` starts equal to `crew_max`.
+
+```pseudocode
+function apply_crew_loss_penalties(ship):
+    crew_ratio = ship.crew_current / ship.crew_max
+    
+    # Clear previous crew-loss status effects before reapplying
+    remove_status(ship, "skeleton_crew")
+    remove_status(ship, "undermanned")
+    remove_status(ship, "adrift")
+    
+    if crew_ratio <= 0.0:
+        # No crew — ship drifts, all systems fail
+        # Ship is NOT destroyed; it becomes a boarding prize
+        ship.can_act = false
+        ship.combat_speed = 0
+        ship.status_effects.append({type: "adrift", duration: 99})
+    
+    elif crew_ratio <= 0.25:
+        # Skeleton crew — severe degradation
+        ship.status_effects.append({type: "skeleton_crew", duration: 99})
+        # Effects applied in combat resolution:
+        #   - attack accuracy: -20%
+        #   - combat_speed: floor(original / 2)
+        #   - each weapon: 50% chance it cannot fire this turn (unmanned)
+    
+    elif crew_ratio <= 0.50:
+        # Undermanned — moderate degradation
+        ship.status_effects.append({type: "undermanned", duration: 99})
+        # Effects applied in combat resolution:
+        #   - attack accuracy: -10%
+        #   - combat_speed: original - 1 (minimum 1)
 ```
 
 ### 12. Shield Mechanics
@@ -545,13 +717,14 @@ function resolve_torpedo_impact(torpedo, combat):
 | Effect | Implementation |
 |--------|----------------|
 | `multi_attack` | Fire N times, each attack resolved separately |
-| `armor_piercing` | Damage to hull ×1.5 |
-| `halves_shields` | Target's shield absorption halved for this hit |
-| `ignores_half_shields` | 50% of damage bypasses shields |
+| `armor_piercing` | Damage that passes shields is multiplied ×1.5 before hitting hull. Does **not** bypass or reduce shield absorption. |
+| `halves_shields` | Target's effective shield class is halved (floor) for this hit only. Remaining damage is still applied to hull. |
+| `ignores_half_shields` | Damage is split: half bypasses shields entirely; other half absorbed normally. Both halves combine for hull damage calculation. |
+| `bonus_vs_shields` | Deals +10 bonus damage directly to `shields_current` (capped at remaining shield HP). Does not increase hull damage. |
 | `kills_crew` | Each hit kills 1% of crew (reduces combat effectiveness) |
 | `stream` | Damage continues each round while target is held |
 | `no_range_penalty` | No damage reduction at range |
-| `chain_lightning` | After hitting primary, hits up to 3 adjacent enemies |
+| `chain_lightning` | After hitting primary, hits up to 4 adjacent enemies |
 | `double_shield_damage` | Shield takes 2× damage |
 | `instant_kill_small` | 100% kill vs Small hull ships |
 | `always_hits` | 100% accuracy, ignores all defense |
@@ -1137,7 +1310,9 @@ function calculate_ship_combat_power(ship):
     power = ship.max_hp
     power += ship.shield_class * 10
     power += sum(weapon.avg_damage for weapon in ship.weapons) * 5
-    power *= 1 + (ship.experience_level * 0.1)
+    # experience_level is a string; map to numeric for math
+    exp_numeric = {"rookie": 0, "regular": 1, "veteran": 2, "elite": 3}
+    power *= 1 + (exp_numeric.get(ship.experience_level, 1) * 0.1)
     return power
 ```
 
@@ -1202,6 +1377,171 @@ function run_combat(attacker_fleet, defender_fleet, location):
 
 ---
 
+---
+
+## Boarding and Transporter Mechanics
+
+### 36. Boarding Overview
+
+Ships equipped with Transporters can capture enemy vessels instead of destroying them. A successful boarding grants a prize ship — re-crewed by the attacker and added to their fleet. Boarding is high-risk, high-reward: both sides suffer crew casualties, and failure leaves the target under enemy control.
+
+**Requirements to attempt boarding:**
+- Attacker has a Transporter installed (Standard, Improved, or Combat tier)
+- Target is within 1 hex
+- Target is in a weakened condition: ≥ 50% crew lost **OR** HP ≤ 25% max (Combat Transporter relaxes HP threshold to ≤ 50%)
+- Attacker has at least 2× the minimum boarding party in available crew (so the home ship remains crewed)
+
+### 37. Crew State on Ships
+
+Each combat ship tracks crew as part of its combat state (see Section 2). Crew complement scales with hull size:
+
+```
+Base_Crew_by_Hull:
+  Small:  20
+  Medium: 60
+  Large:  200
+  Huge:   500
+```
+
+Crew loss below key thresholds degrades combat effectiveness (see Section 11c). A ship reduced to 0 crew becomes **adrift** — it can be boarded without resistance and without the HP threshold requirement.
+
+### 38. Boarding Attempt
+
+```pseudocode
+function attempt_boarding(attacker, target, combat):
+    # --- Prerequisite checks ---
+    transporter = attacker.get_system("transporter")
+    if not transporter:
+        return {success: false, reason: "no_transporter"}
+    
+    if hex_distance(attacker.position, target.position) > 1:
+        return {success: false, reason: "out_of_range"}
+    
+    crew_ratio = target.crew_current / target.crew_max
+    hp_ratio = target.current_hp / target.max_hp
+    hp_threshold = 0.50 if transporter.tier == "combat" else 0.25
+    
+    if not has_status(target, "adrift"):
+        if crew_ratio > 0.50 and hp_ratio > hp_threshold:
+            return {success: false, reason: "target_not_weakened"}
+    
+    # Minimum boarding party: 10% of attacker's crew_max, at least 1
+    boarding_party_size = max(floor(attacker.crew_max * 0.10), 1)
+    
+    # Attacker must keep enough crew to remain operational
+    if attacker.crew_current < boarding_party_size * 2:
+        return {success: false, reason: "insufficient_crew"}
+    
+    # --- Success formula ---
+    # Adrift targets are auto-captured (trivially easy)
+    if has_status(target, "adrift"):
+        return capture_ship(attacker, target, boarding_party_size, combat)
+    
+    success_chance = 50
+    success_chance += transporter.boarding_bonus     # Standard: +0, Improved: +15, Combat: +30
+    
+    # Crew advantage: net crew difference, capped at ±20%
+    crew_advantage = attacker.crew_current - target.crew_current
+    success_chance += clamp(floor(crew_advantage / 10), -20, 20)
+    
+    # Racial modifier
+    success_chance += get_racial_boarding_bonus(attacker.race)
+    
+    success_chance = clamp(success_chance, 5, 95)
+    
+    # --- Resolve ---
+    roll = random(1, 100)
+    
+    resolve_boarding_casualties(attacker, target, attacker_wins=(roll <= success_chance))
+    
+    if roll <= success_chance:
+        return capture_ship(attacker, target, boarding_party_size, combat)
+    else:
+        return {success: false, reason: "repelled"}
+```
+
+### 39. Boarding Casualties
+
+Both sides take crew casualties whenever boarding is attempted, win or lose.
+
+```pseudocode
+function resolve_boarding_casualties(attacker, target, attacker_wins):
+    base_attacker_loss = floor(target.crew_current * 0.20)  # Defenders fight back
+    base_defender_loss = floor(attacker.crew_current * 0.15)
+    
+    if attacker_wins:
+        # Boarding party overwhelmed defenders; defenders take more losses
+        attacker.crew_current = max(1, attacker.crew_current - base_attacker_loss)
+        target.crew_current = max(0, target.crew_current - floor(base_defender_loss * 1.5))
+    else:
+        # Defenders repelled; attackers take heavier losses
+        attacker.crew_current = max(1, attacker.crew_current - floor(base_attacker_loss * 1.5))
+        target.crew_current = max(1, target.crew_current - base_defender_loss)
+    
+    apply_crew_loss_penalties(attacker)
+    apply_crew_loss_penalties(target)
+```
+
+### 40. Ship Capture
+
+```pseudocode
+function capture_ship(attacker, target, boarding_party_size, combat):
+    # Detach boarding party from attacker
+    attacker.crew_current -= boarding_party_size
+    apply_crew_loss_penalties(attacker)
+    
+    # Prize ship is now crewed by the boarding party and switches sides
+    target.crew_current = boarding_party_size
+    target.side = attacker.side
+    target.race = attacker.race  # For racial modifiers going forward
+    
+    # Prize ships operate at reduced effectiveness — unfamiliar controls
+    target.status_effects.append({
+        type: "prize_ship",
+        duration: 99,
+        accuracy_penalty: -20,
+        speed_penalty: -1
+    })
+    
+    # Cannot be boarded again this battle
+    target.boarding_immune = true
+    
+    log_combat("BOARDING SUCCESS: " + target.design + " captured by " + attacker.side + "!")
+    
+    return {success: true, prize_ship: target}
+```
+
+### 41. Transporter Tiers
+
+| Tier | Boarding Bonus | HP Threshold | Notes |
+|------|---------------|--------------|-------|
+| Standard Transporter | +0% | ≤ 25% HP | Baseline |
+| Improved Transporter | +15% | ≤ 25% HP | — |
+| Combat Transporter | +30% | ≤ 50% HP | Relaxed HP requirement |
+
+### 42. Racial Boarding Modifiers
+
+```pseudocode
+function get_racial_boarding_bonus(race):
+    bonuses = {
+        "guinea_pigs": 20,   # Fierce close-quarters fighters
+        "hermit_crabs": 10,  # Good at holding/defending spaces
+        "ferrets":       5,
+        "hamsters":      0,
+        "rabbits":       0,
+        "budgies":     -10   # Terrible ground combatants
+    }
+    return bonuses.get(race, 0)
+```
+
+### 43. Counter-Boarding
+
+A ship that has been successfully boarded (`boarding_immune = true`) cannot be boarded again this battle. A ship that **repelled** a boarding attempt can be boarded again next turn — each attempt costs both sides crew casualties.
+
+Ships with **Marine Barracks** (future component, if implemented) receive a +10% bonus to boarding defense (applied as -10% to attacker's success_chance).
+
+---
+
 ## Related Documents
 
 - `weapons-complete.md` - Weapon statistics
@@ -1212,5 +1552,5 @@ function run_combat(attacker_fleet, defender_fleet, location):
 
 ---
 
-*Last Updated: 2026-03-22*
+*Last Updated: 2026-04-12*
 *Specification: spec-008 - Combat Damage Resolution Algorithm*
