@@ -109,15 +109,20 @@ RelationChange = floor(BaseChange × RacialMod × ReputationMod × DifficultyMod
 
 ```
 BaseChange = +20
-RacialMod = 1.60 (Hamsters get 2× diplomatic bonus for positive actions)
-                 (Note: Rats have +0% diplomacy modifier = 1.0)
-                 Combined: (1.60 + 1.0) / 2 = 1.30 average, but positive actions
-                 use initiator's bonus primarily
-RacialMod = 1.60 (Hamster-initiated, uses Hamster's 2× bonus)
+
+// Hamster RacialMod is applied in two stages:
+//   Stage 1 — Base diplomacy modifier: +30% → multiplier 1.30
+//   Stage 2 — Universal Diplomat (positive actions only): ×2.0
+//   Combined for positive actions: 1.30 × 2.0 = 2.60
+//
+// NOTE: Earlier drafts used 1.60 here — that was an error.
+// The correct combined multiplier is 2.60 (see Section 5.2 and Constants).
+
+RacialMod = 2.60 (1.30 base × 2.0 Universal Diplomat, Hamster-initiated)
 ReputationMod = 1.0 (neutral reputation)
 DifficultyMod = 1.0 (Normal difficulty)
 
-RelationChange = floor(20 × 1.60 × 1.0 × 1.0) = floor(32) = +32
+RelationChange = floor(20 × 2.60 × 1.0 × 1.0) = floor(52) = +52
 ```
 
 **Example 2: Guinea Pigs catch a Chameleon spy stealing technology**
@@ -262,7 +267,7 @@ Each race has inherent diplomatic abilities that modify relationship calculation
 
 | Race | Diplomacy Modifier | Effect |
 |------|-------------------|--------|
-| Hamsters | +30% (1.30) | Base diplomacy modifier. **Additionally:** Universal Diplomat ability grants 2× multiplier on positive diplomatic action effects (separate from base modifier). |
+| Hamsters | +30% (1.30) | Base diplomacy modifier applied to all relationship changes. **Additionally:** Universal Diplomat ability grants a separate 2× multiplier on positive diplomatic action effects (see Section 5.2). Combined effective multiplier for positive actions = 1.30 × 2.0 = **2.60**, but implemented as two distinct modifiers in code (see worked example in Section 2.3). |
 | Chameleons | +20% | Skilled manipulators |
 | Rabbits | +5% | Non-threatening demeanor |
 | Mice | +0% | Neutral |
@@ -277,11 +282,12 @@ Each race has inherent diplomatic abilities that modify relationship calculation
 
 Hamsters (equivalent to MOO1 Humans) receive special diplomatic bonuses:
 
-1. **Double Positive Actions:** All positive diplomatic actions have 2× effect
-2. **Trade Bonus:** +25% income from trade agreements
-3. **Treaty Bonus:** +5 effective relationship when proposing treaties
-4. **Council Bonus:** +5 effective relationship in Council voting
-5. **Universal Neutrality:** Start at Neutral with all races (not Unfriendly)
+1. **Base Diplomacy Modifier:** +30% (multiplier 1.30) applied to all relationship changes
+2. **Universal Diplomat (Double Positive Actions):** All positive diplomatic actions gain an additional 2× multiplier, applied on top of the base modifier. Combined effective multiplier for positive actions = **2.60** (1.30 × 2.0).
+3. **Trade Bonus:** +25% income from trade agreements (matches MOO1 Human +25% trade curve shift)
+4. **Treaty Bonus:** +5 effective relationship when proposing treaties
+5. **Council Bonus:** +5 effective relationship in Council voting
+6. **Relaxed Starting Relations:** Start at "Relaxed" (Neutral) with all races — best starting disposition in the game (MOO1 Human equivalent)
 
 ### 5.3 Racial Attitude Matrix
 
@@ -547,8 +553,10 @@ OpportunityBonus = +20% if target is at war with another race
 | BORDER_FRICTION_PER_SYSTEM | -5 | Relation penalty per contested system |
 | BORDER_FRICTION_MAX | -25 | Maximum border friction penalty |
 | TREATY_BREAKER_DURATION | 50 | Turns as treaty breaker |
-| HAMSTER_POSITIVE_MULTIPLIER | 2.0 | Hamster bonus on positive actions |
-| HAMSTER_TRADE_BONUS | 1.25 | Hamster trade income multiplier |
+| HAMSTER_POSITIVE_MULTIPLIER | 2.0 | Hamster Universal Diplomat bonus on positive actions (applied on top of base diplomacy modifier) |
+| HAMSTER_DIPLOMACY_BASE | 1.30 | Hamster base diplomacy modifier (+30%) applied to all actions |
+| HAMSTER_POSITIVE_COMBINED | 2.60 | Combined effective multiplier for positive actions (1.30 × 2.0) |
+| HAMSTER_TRADE_BONUS | 1.25 | Hamster trade income multiplier (+25%, matches MOO1 Human trade curve shift) |
 | HAMSTER_TREATY_BONUS | +5 | Effective relation boost for treaties |
 | REPUTATION_TRACK_MAX | +100 | Maximum reputation per track |
 | REPUTATION_TRACK_MIN | -100 | Minimum reputation per track |
@@ -897,29 +905,29 @@ Initial Relation: +10 (Neutral)
 **Turn 10: Establish Trade Agreement**
 ```
 Base Change: +20
-Hamster 2× Bonus: ×2.0
-Total Change: +40
-New Relation: +10 + 40 = +50 (Friendly)
+Hamster Combined Multiplier: ×2.60 (1.30 base × 2.0 Universal Diplomat)
+Total Change: floor(20 × 2.60) = +52
+New Relation: +10 + 52 = +62 (Friendly)
 ```
 
 **Turn 30: Sign Research Pact**
 ```
-Current Relation: +50 (+ minor decay/treaty bonus)
-Actual: ~+48 after decay
+Current Relation: +62 (+ minor decay/treaty bonus)
+Actual: ~+60 after decay
 Base Change: +15
-Hamster 2× Bonus: ×2.0
-Total Change: +30
-New Relation: +48 + 30 = +78 (Friendly, near Allied)
+Hamster Combined Multiplier: ×2.60
+Total Change: floor(15 × 2.60) = +39
+New Relation: +60 + 39 = +99 (Allied)
 ```
 
 **Turn 50: Propose Military Alliance**
 ```
-Current Relation: ~+80 (treaty maintenance offset decay)
-Minimum Required: +65 (Rats) 
-Relation exceeds minimum by +15: Accept likely
-AI Acceptance: 30% + (80 × 0.5) + 0 + 0 = 70%
+Current Relation: ~+95 (treaty maintenance offset decay)
+Minimum Required: +65 (Rats)
+Relation exceeds minimum by +30: Accept very likely
+AI Acceptance: 30% + (95 × 0.5) + 0 + 0 = 77.5%
 Result: Alliance formed
-New Relation: +80 + 50 = +100 (capped at Allied maximum)
+New Relation: +95 + 50 = +100 (capped at Allied maximum)
 ```
 
 ### Example 2: War and Recovery (Guinea Pigs → Hamsters)
@@ -988,9 +996,9 @@ After 100 turns: approximately -30 (Unfriendly)
 ```
 Send Large Gift (800 BC):
   Base: +35
-  Hamster 2× Bonus: ×2.0
-  Change: +70
-  New Relation: -30 + 70 = +40 (Neutral!)
+  Hamster Combined Multiplier: ×2.60 (1.30 base × 2.0 Universal Diplomat)
+  Change: floor(35 × 2.60) = +91
+  New Relation: -30 + 91 = +61 (Friendly!)
 ```
 
 ---

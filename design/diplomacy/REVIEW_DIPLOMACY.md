@@ -23,31 +23,32 @@ The diplomacy system is impressively detailed overall. `espionage.md` and `counc
 
 ### C1: Hamsters Trade Bonus Is Inconsistent Across Documents
 
-Three different values are specified for the Hamsters trade income bonus:
+**STATUS: RESOLVED (2026-04-12)**
 
-| Document | Value |
-|----------|-------|
-| `trade.md` | +50% trade income |
-| `treaties.md` | +50% trade income |
-| `relationship-formulas.md` | +25% (`HAMSTER_TRADE_BONUS = 1.25`) |
-| `race-stats-complete.md` (`trade_hub` ability) | +20% |
+All documents now use **+25%** (multiplier 1.25), matching MOO1 Human trade curve shift.
 
-**Resolution needed:** Pick one authoritative value. `relationship-formulas.md` constants should be the source of truth.
+| Document | Old Value | Fixed Value |
+|----------|-----------|-------------|
+| `trade.md` | +50% | **+25%** |
+| `treaties.md` | +50% | **+25%** |
+| `relationship-formulas.md` | +25% (was correct) | +25% |
+| `race-stats-complete.md` (`trade_hub`) | +20% | **+25%** |
+
+Source of truth: MOO1 StrategyWiki — Humans have a +25% trade curve shift.
 
 ---
 
 ### C2: Hamsters Diplomacy Modifier Is Inconsistent
 
-| Document | Value |
-|----------|-------|
-| `relationship-formulas.md` Section 5.1 | +30% (modifier 1.30) |
-| `relationship-formulas.md` Section 5.2 | "2× multiplier on positive diplomatic action effects (separate from base modifier)" |
-| `relationship-formulas.md` Example 2.3 | Uses `1.60` as the Hamster `RacialMod` (implies 60% or 2× base) |
-| `species/hamsters.md` | +30% diplomacy bonus |
+**STATUS: RESOLVED (2026-04-12)**
 
-The example in 2.3 uses 1.60 but the table says 1.30. It appears the intent is 1.30 base × 2× positive-action multiplier = effective 2.0× for positive actions, but this is not clearly stated anywhere and the example uses a combined 1.60 which fits neither interpretation.
+The two modifiers are distinct and both apply:
+- **Base modifier**: +30% (multiplier 1.30) — applied to ALL relationship changes
+- **Universal Diplomat**: ×2.0 on positive actions only — applied on top of base
+- **Combined for positive actions**: 1.30 × 2.0 = **2.60**
 
-**Resolution needed:** Clarify whether 1.30 is the only modifier or if the 2× positive-action multiplier stacks with it, and fix the example to match.
+The old example used 1.60 (incorrect). All examples updated to use 2.60.
+Constants table updated with `HAMSTER_DIPLOMACY_BASE`, `HAMSTER_POSITIVE_MULTIPLIER`, and `HAMSTER_POSITIVE_COMBINED` entries.
 
 ---
 

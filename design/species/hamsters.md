@@ -26,7 +26,7 @@ Optimistic but not naive. Believe all races can coexist if they find common grou
 
 ### Racial Bonuses
 - **Production**: +0% (balanced)
-- **Research**: +0% (balanced)
+- **Research**: +0% overall, but field-specific bonuses apply (see below)
 - **Food**: +10% (efficient foragers)
 - **Growth**: +0% (balanced)
 - **Ground Combat**: -10% (small and not naturally aggressive)
@@ -34,9 +34,15 @@ Optimistic but not naive. Believe all races can coexist if they find common grou
 - **Espionage**: -20% (too honest for subterfuge)
 - **Diplomacy**: +30% (natural mediators)
 
+### Research Focus Bonuses (MOO1-accurate)
+- **Force Fields**: +40% research rate
+- **Propulsion**: +20% research rate
+- **Planetology**: +20% research rate
+- All other fields: standard rate
+
 ### Special Abilities
-- **Universal Diplomat**: All other races start at Neutral rather than Unfriendly
-- **Trade Hub**: +20% credits from trade agreements
+- **Universal Diplomat**: All races start at "Relaxed" relations (best starting disposition in game — equivalent to MOO1 Human diplomacy bonus)
+- **Trade Hub**: +25% credits from trade agreements (matches MOO1 Human +25% trade curve shift)
 - **Council Favorite**: +1 vote in High Council elections
 - **Adaptive**: Can colonize any planet type at reduced penalty
 

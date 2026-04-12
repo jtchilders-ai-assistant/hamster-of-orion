@@ -35,7 +35,7 @@ Respect those who prove themselves in battle. Contemptuous of ground-dwellers wh
 - **Diplomacy**: +0% (respected but aloof)
 
 ### Special Abilities
-- **Superior Pilots**: All ships gain +1 combat initiative and +20% evasion
+- **Superior Pilots**: All ships gain +3 combat initiative, +3 Defense Levels (maneuverability/dodge), and +20% evasion
 - **Three-Dimensional Tactics**: Enemy missile accuracy reduced by 30%
 - **Dogfighter**: Small ships get additional combat bonuses
 - **Flight School**: New ships enter combat with veteran crew status

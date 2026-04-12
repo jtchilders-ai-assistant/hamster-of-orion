@@ -31,7 +31,8 @@ Fascinating but inefficient. Individuality appears to cause 43.7% productivity l
 - **Growth**: +25% (rapid reproduction)
 - **Ground Combat**: +20% (overwhelming numbers)
 - **Ship Combat**: +0% (adequate but not exceptional)
-- **Espionage**: Immune (hive mind cannot be infiltrated)
+- **Espionage (Offensive)**: None (hive mind cannot conduct individual infiltration)
+- **Espionage (Defensive)**: Immune (hive mind cannot be infiltrated)
 - **Diplomacy**: -30% (alien mindset disturbs others)
 
 ### Special Abilities
@@ -118,7 +119,9 @@ Their production bonus (+50%) is huge and stacks with growth (+25%). They can fi
 
 Balance consideration: Strongest in mid-game when production matters most. Vulnerable early (before economy scales up) and late (when technology gap becomes critical). Must leverage industrial advantage before enemies out-tech them.
 
-Key weakness: Predictable. Cannot adapt to unexpected strategies. Poor espionage immunity means they're safe from spies, but also cannot conduct intelligence operations themselves.
+Key weakness: Predictable. Cannot adapt to unexpected strategies. Complete espionage isolation — their hive mind immunity protects them from all spying, but also prevents them from conducting any intelligence operations themselves.
+
+**Design deviation from MOO1:** In the original Master of Orion, Klackons had no special espionage traits — they were merely xenophobic industrialists. The Ants' two-way espionage isolation (cannot spy / immune to spying) is a deliberate design choice to reinforce the hive-mind theme. This makes them mechanically distinct from Klackons in a way that fits their flavor.
 
 ---
 

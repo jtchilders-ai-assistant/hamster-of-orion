@@ -43,22 +43,24 @@ SpyCost = BASE_SPY_COST × DifficultyMod
 Every spy has an effectiveness rating that modifies all mission success chances:
 
 ```
-SpyEffectiveness = BaseEffectiveness + RacialBonus + TechBonus - TargetSecurity
+SpyEffectiveness = BaseEffectiveness + RacialBonus + SpyRollBonus + TechBonus - TargetSecurity
 ```
 
 **Variables:**
 - `BaseEffectiveness` = 30 (all spies start here)
-- `RacialBonus` = Espionage racial modifier (see Section 2)
+- `RacialBonus` = Espionage racial modifier percentage (see Section 2)
+- `SpyRollBonus` = Flat bonus added directly to spy rolls (Chameleons only: +30, matches MOO1)
 - `TechBonus` = Computer tech level advantage × 2 (see Section 3)
 - `TargetSecurity` = Target empire's security level × 10 (see Section 4)
 
 **Example: Chameleon spy vs Hamster with moderate security**
 ```
-RacialBonus = 60 (Chameleons)
+RacialBonus = 60 (Chameleons percentage modifier)
+SpyRollBonus = 30 (Chameleons flat +30 to spy rolls, MOO1 mechanic)
 TechBonus = (15 - 12) × 2 = 6 (Chameleon tech level 15, Hamster 12)
 TargetSecurity = 3 × 10 = 30 (Security Level 3)
 
-SpyEffectiveness = 30 + 60 + 6 - 30 = 66
+SpyEffectiveness = 30 + 60 + 30 + 6 - 30 = 96
 ```
 
 ---
@@ -71,22 +73,22 @@ SpyEffectiveness = 30 + 60 + 6 - 30 = 66
 |------|-----------------|------------|-------|
 | Chameleons | +60 | 1.60× | Masters of infiltration |
 | Ferrets | +10 | 1.10× | Natural hunters and stalkers |
-| Rats | +5 | 1.05× | Intelligent, careful operators |
+| Rats | +0 | 1.00× | Psilons have no espionage bonus in MOO1 — pure researchers only |
 | Hamsters | +0 | 1.00× | Balanced baseline |
 | Mice | +0 | 1.00× | Cybernetic, but standard |
 | Budgies | +0 | 1.00× | No spy aptitude |
 | Rabbits | -5 | 0.95× | Too nervous for spy work |
 | Guinea Pigs | -10 | 0.90× | Too direct, despise subterfuge |
 | Hermit Crabs | -15 | 0.85× | Slow, obvious, patient not sneaky |
-| Ants | -100 | 0.00× | Hive-mind cannot infiltrate |
+| Ants | N/A | N/A | Cannot conduct espionage — see flag `can_conduct_espionage: false` |
 
-**Ants Special Case:** Ants cannot conduct espionage operations. Their hive-mind nature makes individual infiltration impossible.
+**Ants Special Case:** Ants cannot conduct any espionage operations (`can_conduct_espionage: false`). Numeric modifiers do not apply — the flag short-circuits mission resolution before the formula runs. The hive mind has no concept of individual infiltration; all spy assignments for Ants are blocked at the UI level.
 
 ### 2.2 Defensive Security Bonuses
 
 | Race | Defense Bonus | Notes |
 |------|---------------|-------|
-| Ants | Immune | Hive-mind detects all infiltration instantly |
+| Ants | Immune | Hive-mind has no individuals to subvert — see flag `immune_to_espionage: true` |
 | Chameleons | +30 | "Takes one to catch one" |
 | Mice | +10 | Cybernetic surveillance |
 | Rats | +5 | Paranoid academics |
@@ -696,13 +698,24 @@ Removes 15-30% of accumulated research points in target field.
 
 ```pseudocode
 function ResolveMission(spy, target, mission_type):
+    // Step 0: Pre-checks — short-circuit before formula runs
+    if not spy.empire.race.can_conduct_espionage:
+        // Attacker race (e.g. Ants) cannot spy at all — blocked at UI, but guard here too
+        return { success: false, detected: false, spy_alive: true, reason: "cannot_conduct_espionage" }
+    
+    if target.race.immune_to_espionage:
+        // Target race (e.g. Ants) is fully immune — mission silently fails
+        // No formula run, no detection, no diplomatic penalty, no spy death, no BC refund
+        return { success: false, detected: false, spy_alive: true, reason: "target_immune" }
+    
     // Step 1: Calculate spy effectiveness
-    racial_bonus = GetRacialEspionageBonus(spy.empire.race)
+    racial_bonus = GetRacialEspionageBonus(spy.empire.race)      // percentage modifier
+    spy_roll_bonus = GetSpyRollBonus(spy.empire.race)            // flat roll bonus (Chameleons: +30)
     tech_bonus = (spy.empire.computer_tech - target.computer_tech) * 2
     tech_bonus = clamp(tech_bonus, -20, 20)
     target_security = target.security_level * 10
     
-    spy_effectiveness = 30 + racial_bonus + tech_bonus - target_security
+    spy_effectiveness = 30 + racial_bonus + spy_roll_bonus + tech_bonus - target_security
     
     // Step 2: Calculate success chance
     base_success = GetBaseMissionSuccess(mission_type)
@@ -899,11 +912,13 @@ function ResolveMission(spy, target, mission_type):
     {
       "id": "chameleons",
       "offensive_bonus": 60,
+      "spy_roll_bonus": 30,
       "defensive_bonus": 30,
       "can_conduct_espionage": true,
       "special_abilities": ["sleeper_agents", "false_flag", "choose_tech_category"],
       "spy_cost_modifier": 0.50,
-      "execution_chance": 0.10
+      "execution_chance": 0.10,
+      "moo1_note": "Darloks: +30 flat bonus added directly to spying rolls (separate from the percentage multiplier). This matches MOO1's +30 to spy rolls mechanic."
     },
     {
       "id": "ferrets",
@@ -916,12 +931,13 @@ function ResolveMission(spy, target, mission_type):
     },
     {
       "id": "rats",
-      "offensive_bonus": 5,
+      "offensive_bonus": 0,
       "defensive_bonus": 5,
       "can_conduct_espionage": true,
       "special_abilities": [],
       "spy_cost_modifier": 1.00,
-      "execution_chance": 0.30
+      "execution_chance": 0.30,
+      "moo1_note": "Psilons have NO offensive espionage bonus in MOO1. Removed erroneous +5. Defensive +5 retained (paranoid academics)."
     },
     {
       "id": "hamsters",
@@ -979,12 +995,14 @@ function ResolveMission(spy, target, mission_type):
     },
     {
       "id": "ants",
-      "offensive_bonus": -100,
-      "defensive_bonus": 100,
+      "offensive_bonus": null,
+      "defensive_bonus": null,
       "can_conduct_espionage": false,
-      "special_abilities": ["immune_to_espionage"],
+      "immune_to_espionage": true,
+      "special_abilities": ["hive_mind_espionage_isolation"],
       "spy_cost_modifier": null,
-      "execution_chance": 1.00
+      "execution_chance": 1.00,
+      "design_note": "Ants are fully isolated from the espionage system in both directions. Use boolean flags only — do NOT use -100/+100 numeric modifiers, which are contradictory with flag-based resolution. Deviation from MOO1 Klackons, who had no special espionage traits."
     }
   ]
 }
@@ -1032,7 +1050,7 @@ function ResolveMission(spy, target, mission_type):
 
 - **No tech to steal:** Mission auto-fails, spy returns safely, BC refunded
 - **No planets with low morale:** Cannot attempt rebellion
-- **Target is Ants:** Cannot conduct any espionage (100% detection, immune)
+- **Target is Ants:** All espionage missions auto-fail at resolution (`immune_to_espionage: true`). Do not run the success formula — skip directly to mission failure. No BC refunded (the attempt was made), no spy death (no engagement), no diplomatic penalty (nothing was detected). The Ants' hive mind simply has no individuals to compromise.
 
 ### 14.2 Simultaneous Operations
 
@@ -1063,9 +1081,10 @@ function ResolveMission(spy, target, mission_type):
 
 Both sides apply full offensive and defensive bonuses:
 ```
-ChameleonVsChameleon_NetBonus = 60 (attack) - 30 (defense) = 30
+ChameleonVsChameleon_NetBonus = 60 (attack%) + 30 (flat roll) - 30 (defense) = 60
 ```
-Still gives Chameleon attacker an advantage.
+The flat +30 spy roll bonus is not negated by the defensive bonus, so Chameleon attackers
+still have a significant edge even against other Chameleons.
 
 ### 14.7 Integer Math
 
@@ -1122,29 +1141,34 @@ floor(SuccessChance) for final probability
 **Calculations:**
 ```
 Step 1: Spy Effectiveness
-RacialBonus = 60
+RacialBonus = 60    (Chameleon percentage modifier)
+SpyRollBonus = 30   (Chameleon flat +30 to spy rolls, MOO1 mechanic)
 TechBonus = (18 - 22) × 2 = -8
 TargetSecurity = 3 × 10 = 30
 
-SpyEffectiveness = 30 + 60 + (-8) - 30 = 52
+SpyEffectiveness = 30 + 60 + 30 + (-8) - 30 = 82
 
 Step 2: Success Chance
 BaseMissionSuccess = 30 (tech theft)
 TechValueModifier = 0 (assume tier 5 tech)
 
-SuccessChance = 30 + 52 + 0 = 82% (capped at 95%)
+SuccessChance = 30 + 82 + 0 = 112 → capped at 95%
 
 Step 3: Detection Chance
-RatDefenseBonus = 5
+RatDefenseBonus = 5  (Rats have defensive +5, but NO offensive bonus — Psilons are researchers, not spies)
 ScannerBonus = 10 (Improved Scanner)
 
 DetectionChance = 10 + 30 + 5 + 10 = 55%
 
 Step 4: Resolution
-Roll 1 (Success): 45 → SUCCESS (45 ≤ 82)
+Roll 1 (Success): 45 → SUCCESS (45 ≤ 95)
 Roll 2 (Detection): 60 → NOT DETECTED (60 > 55)
 
 Result: Technology stolen, spy undetected!
+
+Note: With the Chameleon +30 flat spy roll bonus on top of their 60% modifier,
+stealing from Rats is nearly guaranteed. Rats must win through research speed,
+not counter-espionage.
 ```
 
 ### Example 2: Guinea Pig Assassination Attempt
@@ -1204,7 +1228,10 @@ Result: Almost certainly fails, probably detected, spy likely dies.
 
 ---
 
-*Document Version: 1.0*
-*Last Updated: 2026-03-22*
+*Document Version: 1.1*
+*Last Updated: 2026-04-12*
 *Specification: spec-017 - Espionage Success Formulas*
 *Status: Complete*
+
+### Changelog
+- **v1.1 (2026-04-12):** Corrected Rats (Psilons) offensive espionage bonus: +5 → +0. Psilons have no espionage bonus in MOO1. Added Chameleon (Darlok) flat +30 spy roll bonus to formula, pseudocode, JSON, and worked examples. Updated Chameleon vs Chameleon edge case to reflect flat bonus stacking.

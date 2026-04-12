@@ -35,7 +35,7 @@ Evaluate all beings as potential prey or threats. Respect Budgies as fellow hunt
 - **Diplomacy**: -10% (predatory instincts unnerve others)
 
 ### Special Abilities
-- **Deadly Accuracy**: All weapons deal +25% damage and have better hit chance
+- **Deadly Accuracy**: All weapons gain +4 Attack Levels (equivalent to 4 tiers of targeting computers) — increases hit chance, not raw damage
 - **First Strike**: Ferret ships fire first in combat, often destroying enemies before they can respond
 - **Hunter's Instinct**: Can detect cloaked/hidden enemy ships more easily
 - **Efficient Killers**: Ships cost 10% less to build (streamlined weapon systems)
@@ -113,9 +113,9 @@ Ferrets are the "weapon specialist" race - devastating damage output but must pl
 
 Design intent: High-skill gameplay. Requires good tactical positioning and target prioritization. Glass cannon - deadly but vulnerable if caught. Perfect for players who love tactical combat.
 
-Their weapon bonuses (+25% damage, +30% ship combat, First Strike ability) make them arguably the best combat race in a straight fight, but their small empire size means they can be overwhelmed by numbers.
+Their attack bonuses (+4 Attack Levels from Deadly Accuracy, First Strike ability) make them arguably the best combat race in a straight fight, but their small empire size means they can be overwhelmed by numbers.
 
-Balance consideration: Extremely powerful in small engagements, vulnerable to swarm tactics. Must maintain technological edge and pick battles carefully. Cannot afford prolonged wars of attrition.
+Balance consideration: Extremely powerful in small engagements due to superior hit rates, vulnerable to swarm tactics. Must maintain technological edge and pick battles carefully. Cannot afford prolonged wars of attrition.
 
 Key weakness: Low population tolerance for casualties. A pyrrhic victory is still a loss for Ferrets. Must win decisively or disengage.
 

@@ -26,12 +26,12 @@ Everyone is either a research subject or potential collaborator. Frustrated by G
 
 ### Racial Bonuses
 - **Production**: -10% (focus on labs over factories)
-- **Research**: +50% (unmatched scientific capability)
+- **Research**: +75% to ALL fields (unmatched scientific capability — matches MOO1 Psilons)
 - **Food**: +0% (balanced)
 - **Growth**: -10% (reproduction interferes with research)
 - **Ground Combat**: -20% (poor fighters, better thinkers)
 - **Ship Combat**: +10% (superior technology compensates)
-- **Espionage**: +15% (good at information gathering)
+- **Espionage**: +0% (Psilons have no espionage bonus in MOO1 — they win through pure research, not spying)
 - **Diplomacy**: +10% (rational negotiators)
 
 ### Special Abilities
@@ -114,7 +114,7 @@ Rats are the "pure research" race - fastest tech advancement in the game but wea
 
 Design intent: Technology race gameplay. Research everything, stay 2-3 tech levels ahead, win through sheer innovation. Perfect for players who love tech trees and long-term planning.
 
-Their research bonus (+50%) is massive and compounds over time. By late game, Rats have technologies no one else can match. However, their military weakness means they must survive early aggression.
+Their research bonus (+75% to ALL fields) is massive and compounds over time. By late game, Rats have technologies no one else can match. However, their military weakness means they must survive early aggression.
 
 Balance consideration: Godlike late-game power but extremely vulnerable early. Guinea Pigs or Rabbits can crush them before research advantage kicks in. Must negotiate, hide, or beg for protection until tech superiority is established.
 

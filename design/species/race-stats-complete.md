@@ -18,7 +18,7 @@ Each race has:
 | Hamsters | Humans | Diplomatic, Balanced |
 | Ants | Klackons | +50% Production, Hive Mind |
 | Mice | Meklar | +25% Production (Cybernetic) |
-| Rats | Psilons | +50% Research |
+| Rats | Psilons | +75% Research (ALL fields) |
 | Rabbits | Sakkra | +100% Population Growth |
 | Hermit Crabs | Silicoids | Universal Planet Colonization |
 | Guinea Pigs | Bulrathi | +50% Ground Combat |
@@ -130,6 +130,12 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
         "espionage": -20,
         "diplomacy": 30
       },
+      "research_field_bonuses": {
+        "force_fields": 40,
+        "propulsion": 20,
+        "planetology": 20
+      },
+      "moo1_note": "Matches MOO1 Humans: +40% Force Fields, +20% Propulsion, +20% Planetology research bonuses",
       "special_abilities": [
         {
           "id": "universal_diplomat",
@@ -144,10 +150,10 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
         {
           "id": "trade_hub",
           "name": "Trade Hub",
-          "description": "+20% credits from trade agreements",
+          "description": "+25% credits from trade agreements (matches MOO1 Human +25% trade curve shift)",
           "effect": {
             "type": "trade_bonus",
-            "value": 20
+            "value": 25
           }
         },
         {
@@ -478,6 +484,7 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
       "name": "Rats",
       "moo1_equivalent": "Psilons",
       "description": "Hyper-intelligent researchers dedicated to pure science. Knowledge above all; ignorance is the only true evil.",
+      "moo1_note": "Psilons: +75% research ALL fields, no espionage bonus, Pacifistic Technologist personality, always gets multiple tech choices per field.",
       "homeworld": {
         "name": "Scientifica",
         "type": "terran",
@@ -487,14 +494,15 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
       },
       "bonuses": {
         "production": -10,
-        "research": 50,
+        "research": 75,
         "food": 0,
         "growth": -10,
         "ground_combat": -20,
         "ship_combat": 10,
-        "espionage": 15,
+        "espionage": 0,
         "diplomacy": 10
       },
+      "research_note": "+75% applies to ALL research fields equally (Physics, Math, Chemistry, Biology, Computers, Sociology).",
       "special_abilities": [
         {
           "id": "genius_researchers",
@@ -998,13 +1006,12 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
         {
           "id": "deadly_accuracy",
           "name": "Deadly Accuracy",
-          "description": "All weapons have +4 Attack Level (accuracy) and deal +15% damage on hit",
+          "description": "All weapons gain +4 Attack Levels (equivalent to 4 tiers of targeting computers). Increases hit chance only \u2014 no damage bonus.",
           "effect": {
             "type": "weapon_attack_bonus",
-            "attack_level_bonus": 4,
-            "damage_bonus_percent": 15
+            "attack_level_bonus": 4
           },
-          "moo1_note": "Matches Mrrshan +4 Attack Level bonus"
+          "moo1_note": "Matches Mrrshan +4 Attack Level bonus. MOO1 Mrrshan get no damage bonus, only attack roll bonus."
         },
         {
           "id": "first_strike",
@@ -1212,6 +1219,7 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
       "name": "Chameleons",
       "moo1_equivalent": "Darloks",
       "description": "Color-shifting spies whose true allegiance no one can discern. Information is power; trust no one.",
+      "moo1_note": "Darloks: +30 flat bonus to spying rolls, +20% Computers research only (good not expert), Unease diplomatic status with most races (second worst), Aggressive Diplomat personality.",
       "homeworld": {
         "name": "Chromatia",
         "type": "jungle",
@@ -1221,14 +1229,17 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
       },
       "bonuses": {
         "production": -10,
-        "research": 10,
+        "research": 20,
+        "research_fields": ["computers"],
         "food": 0,
         "growth": -10,
         "ground_combat": 0,
         "ship_combat": -10,
         "espionage": 60,
-        "diplomacy": 20
+        "spy_roll_bonus": 30,
+        "diplomacy": -15
       },
+      "diplomacy_note": "Chameleons start at Unease with most races (second worst relations in MOO1, behind only Guinea Pigs). The -15 diplomacy penalty reflects this hostile baseline.",
       "special_abilities": [
         {
           "id": "master_spies",
@@ -1344,17 +1355,17 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
 | Race | PROD | RES | FOOD | GROW | GND | SHIP | SPY | DIP | Primary Advantage |
 |------|------|-----|------|------|-----|------|-----|-----|-------------------|
 | Hamsters | +0% | +0% | +10% | +0% | -10% | +0% | -20% | +30% | Diplomacy, Trade |
-| Ants | +50% | -10% | +20% | +25% | +20% | +0% | 0* | -30% | Production, Hive Mind |
+| Ants | +50% | -10% | +20% | +25% | +20% | +0% | N/A† | -30% | Production, Hive Mind |
 | Mice | +25% | +15% | -50% | -25% | +15% | +15% | +0% | -10% | Automation, Tech |
-| Rats | -10% | +50% | +0% | -10% | -20% | +10% | +15% | +10% | Research |
+| Rats | -10% | +75% | +0% | -10% | -20% | +10% | +0% | +10% | Research (ALL fields, +30 spy roll bonus removed) |
 | Rabbits | +10% | -10% | +25% | +100% | +5% | -10% | -5% | +5% | Population Growth |
 | Hermit Crabs | +25% | +0% | N/A | -50% | +25% | +0% | -30% | +0% | Universal Colonization |
 | Guinea Pigs | +10% | -20% | +0% | +10% | +50% | +10% | -20% | -20% | Ground Combat |
 | Ferrets | +0% | +10% | +5% | +0% | +15% | +30% | +10% | -10% | Ship Attack |
 | Budgies | -10% | +0% | -10% | +0% | -20% | +50% | -10% | +0% | Ship Defense/Evasion |
-| Chameleons | -10% | +10% | +0% | -10% | +0% | -10% | +60% | +20% | Espionage |
+| Chameleons | -10% | +20% (Computers) | +0% | -10% | +0% | -10% | +60% (+30 flat spy roll) | -15% (Unease) | Espionage |
 
-*Note: Ants are immune to espionage (cannot be spied on), but also cannot conduct spy operations themselves.*
+† Ants are fully isolated from the espionage system in both directions — use the boolean flags `can_conduct_espionage: false` and `immune_to_espionage: true`, **not** a numeric modifier. See the Ants and Espionage edge case below and `diplomacy/espionage.md` Section 2 for details. **MOO1 deviation:** Klackons had no special espionage traits; this is an original design choice.
 
 ---
 
@@ -1365,11 +1376,18 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
 - Their "food" budget is automatically allocated to production/research
 - When calculating empire totals, Hermit Crab planets contribute 0 to food but their full population to other categories
 
-### Ants and Espionage
-- Ants are completely immune to enemy spy operations (100% failure rate)
-- Ants cannot assign population to espionage
-- Frame operations against Ants automatically fail
-- Ants can still be affected by overt diplomatic actions
+### Ants and Espionage (Design Deviation from MOO1)
+
+In MOO1, Klackons had no special espionage traits — they were just xenophobic industrialists and could be spied on normally. The Ants' two-way espionage isolation is a deliberate design choice to reinforce the hive-mind theme.
+
+**Canonical rules (both directions):**
+- Ants **cannot conduct** any espionage operations (`can_conduct_espionage: false`). A hive mind cannot infiltrate individuals.
+- Ants are **immune to all enemy espionage** (`immune_to_espionage: true`). The hive mind has no individuals to bribe, flip, or subvert — all spy missions auto-fail at resolution.
+- Ants cannot assign population to the espionage slider; the UI should hide or disable this option.
+- Frame operations targeting Ants automatically fail (nothing to attribute to an individual).
+- Ants can still be affected by **overt** diplomatic actions (war declarations, treaties, council votes).
+
+**Implementation note:** Use the boolean flags `can_conduct_espionage` and `immune_to_espionage` exclusively. Do **not** model this as a -100/+100 numeric modifier — that approach is contradictory with the flag system and breaks at formula boundaries.
 
 ### Stacking Bonuses
 - Racial bonuses stack multiplicatively with technology bonuses
@@ -1412,10 +1430,12 @@ BaseCost = 1000 RP
 GeniusResearchers = 0.50 (50% cost reduction)
 EffectiveCost = 1000 × 0.50 = 500 RP
 
-With 20 scientists and +50% research bonus:
+With 20 scientists and +75% research bonus (ALL fields):
 BaseRP = 20 × 1.0 = 20 RP/turn
-EffectiveRP = 20 × 1.50 = 30 RP/turn
-TurnsToComplete = 500 / 30 = 17 turns
+EffectiveRP = 20 × 1.75 = 35 RP/turn
+TurnsToComplete = 500 / 35 = 15 turns
+
+Note: The +75% applies equally to Physics, Math, Chemistry, Biology, Computers, and Sociology.
 ```
 
 ### Example 3: Guinea Pig Ground Combat
@@ -1432,12 +1452,15 @@ EffectiveDamage = BaseDamage × 1.50 = 1.5× damage output
 Budgie destroyer in combat:
 ```
 BaseDefense = 1
-ShipCombatBonus = +50% = +5 defense
+ShipCombatBonus = +50% (percentage bonus) = +5 defense from racial stat
+SuperiorPilots = +3 Defense Levels (maneuverability/dodge, MOO1 Alkari mechanic)
+SuperiorPilots = +3 Initiative (fires earlier in combat round)
 SuperiorPilots = +20% evasion
 Dogfighter (small ship) = +15% combat bonus
 ThreeDimensionalTactics = Enemy missiles at -30% accuracy
 
-EffectiveDefense = 1 + 5 = 6
+EffectiveDefense = 1 + 5 + 3 = 9
+Initiative bonus = +3
 Evasion = 20%
 Enemy missile hit chance reduced by 30%
 ```
@@ -1458,6 +1481,9 @@ Enemy missile hit chance reduced by 30%
 
 ---
 
-*Document Version: 1.0*
-*Last Updated: 2026-03-22*
+*Document Version: 1.1*
+*Last Updated: 2026-04-12*
 *Specification: spec-024*
+
+### Changelog
+- **v1.1 (2026-04-12):** Corrected Rats (Psilons) research bonus: +50% → +75% ALL fields. Removed Rats espionage bonus (+15 → +0). Added Chameleon flat spy_roll_bonus: +30. Updated Chameleon research to +20% Computers only. Updated Chameleon diplomacy to -15 (Unease). Updated Example 2 to reflect +75% research and faster research speed.

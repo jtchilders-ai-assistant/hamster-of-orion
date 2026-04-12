@@ -56,24 +56,24 @@ All 10 species files contain every required section from `_TEMPLATE.md`:
 
 ## 3. Stat Mismatches: Individual Files vs. `race-stats-complete.md`
 
-### 🔴 BUDGIES — Superior Pilots ability
+### ✅ BUDGIES — Superior Pilots ability — **FIXED 2026-04-12**
 
 | Source | Description |
 |--------|-------------|
-| `budgies.md` | All ships gain **+1 combat initiative** and +20% evasion |
+| `budgies.md` | ~~All ships gain **+1 combat initiative** and +20% evasion~~ → **+3 combat initiative, +3 Defense Levels, and +20% evasion** |
 | `race-stats-complete.md` | All ships gain **+3 combat initiative, +3 defense level**, and +20% evasion |
 
-The individual file is missing "+3 defense level" and understates initiative by 2. The JSON in `race-stats-complete.md` also carries the `moo1_note` ("Matches Alkari +3 Defense AND +3 Initiative bonuses"), suggesting that document is authoritative. **The individual file needs updating.**
+Fixed: `budgies.md` updated to match `race-stats-complete.md` (MOO1 Alkari: +3 Defense, +3 Initiative).
 
-### 🔴 FERRETS — Deadly Accuracy ability
+### ✅ FERRETS — Deadly Accuracy ability — **FIXED 2026-04-12**
 
 | Source | Description |
 |--------|-------------|
-| `ferrets.md` | All weapons deal **+25% damage** and have better hit chance |
-| `race-stats-complete.md` | All weapons have **+4 Attack Level** and deal **+15% damage** on hit |
-| `technology/categories.md` | "All weapons deal **+25% damage**" |
+| `ferrets.md` | ~~All weapons deal **+25% damage** and have better hit chance~~ → **+4 Attack Levels (hit chance only, no damage bonus)** |
+| `race-stats-complete.md` | ~~+4 Attack Level and deal **+15% damage** on hit~~ → **+4 Attack Levels only** |
+| `technology/categories.md` | ~~"All weapons deal **+25% damage**"~~ → **"+4 Attack Levels (hit chance bonus, not damage)"** |
 
-Three-way inconsistency. `race-stats-complete.md` has the most specific definition (with `moo1_note` citing Mrrshan equivalence). `categories.md` matches the old `ferrets.md` figure of +25%. Recommend settling on the `race-stats-complete.md` version (+4 Attack Level, +15% damage) as canonical and updating both `ferrets.md` and `categories.md`.
+Fixed: MOO1 Mrrshan get **only +4 Attack Levels** — no damage bonus. All three documents corrected. The `damage_bonus_percent` field removed from `race-stats-complete.md` JSON.
 
 ### 🟡 ANTS — Espionage stat representation
 
@@ -251,15 +251,12 @@ This ability does **not appear** in `budgies.md` or `race-stats-complete.md`. Ei
 
 Needs resolution — if real, add it to `budgies.md` and `race-stats-complete.md`.
 
-### 🟡 Ferrets: damage bonus inconsistency across three documents
+### ✅ Ferrets: damage bonus inconsistency — **FIXED 2026-04-12**
 
-| Document | Ferret weapon damage bonus |
-|----------|---------------------------|
-| `ferrets.md` | +25% damage |
-| `race-stats-complete.md` | +15% damage on hit (plus +4 Attack Level) |
-| `technology/categories.md` | +25% damage |
-
-`race-stats-complete.md` is the most detailed and carries the MOO1 alignment note. Recommend that as canonical; update the other two.
+MOO1 Mrrshan have **no damage bonus** — only +4 Attack Levels (hit chance). All three documents corrected:
+- `ferrets.md`: removed damage claim, now shows +4 Attack Levels only
+- `race-stats-complete.md`: removed `damage_bonus_percent` from JSON, updated `moo1_note`
+- `technology/categories.md`: updated to "+4 Attack Levels (hit chance bonus, not damage)"
 
 ### 🔵 Naming inconsistency: weapon IDs
 
@@ -301,8 +298,8 @@ These are not bugs but may warrant design review:
 
 | # | Issue | Severity | File(s) |
 |---|-------|----------|---------|
-| 1 | Budgies `Superior Pilots` ability understated in individual file | 🔴 | `budgies.md` |
-| 2 | Ferrets `Deadly Accuracy` 3-way inconsistency | 🔴 | `ferrets.md`, `categories.md`, `race-stats-complete.md` |
+| 1 | ~~Budgies `Superior Pilots` ability understated in individual file~~ | ✅ FIXED | `budgies.md` |
+| 2 | ~~Ferrets `Deadly Accuracy` 3-way inconsistency~~ | ✅ FIXED | `ferrets.md`, `categories.md`, `race-stats-complete.md` |
 | 3 | 5 unique technologies use invalid tech field names (`sociology`, `physics`, `biology`) | 🔴 | `race-stats-complete.md` |
 | 4 | Hamsters missing from `ai-personalities.md` | 🔴 | `diplomacy/ai-personalities.md` |
 | 5 | `standard_missiles`, `standard_colony_base`, `stealth_suit` not defined in any tech doc | 🔴 | `race-stats-complete.md` + tech docs |

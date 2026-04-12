@@ -26,13 +26,13 @@ Everyone is a potential mark. Trust is a weakness to exploit. They particularly 
 
 ### Racial Bonuses
 - **Production**: -10% (focus on espionage over industry)
-- **Research**: +10% (stolen technology and intelligence)
+- **Research**: +20% Computers only (Darloks are good at Computers, not expert — matches MOO1)
 - **Food**: +0% (balanced)
 - **Growth**: -10% (slow reproduction, secretive)
 - **Ground Combat**: +0% (balanced)
 - **Ship Combat**: -10% (avoid direct confrontation)
-- **Espionage**: +60% (masters of infiltration)
-- **Diplomacy**: +20% (master manipulators)
+- **Espionage**: +60% (masters of infiltration) with +30 flat bonus to spy rolls (matches MOO1 Darlok spy bonus)
+- **Diplomacy**: “Unease” — second worst starting relations with most races (matches MOO1 Darlok diplomatic penalty)
 
 ### Special Abilities
 - **Master Spies**: Espionage missions cost 50% less and succeed more often

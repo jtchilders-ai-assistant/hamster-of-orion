@@ -7,27 +7,35 @@ Each race has distinct AI behavior patterns affecting diplomacy, warfare, expans
 
 ## Personality Archetypes
 
-### Hamsters - The Peacemakers
-**Archetype**: Balanced Diplomat
+### Hamsters - The Honorable Diplomats
+**Archetype**: Honorable Diplomat *(MOO1 Human personality: Honorable Diplomat)*
 
 **Expansion**: Moderate, peaceful colonization
 **Military**: Defensive fleets, not aggressive
-**Diplomacy**: Friendly to all, build alliances
-**Technology**: Balanced research
-**Trade**: Generous, fair deals
+**Diplomacy**: "Relaxed" with all races (best starting relations in game — MOO1 Human trait); friendly to all, build alliances early
+**Technology**: Balanced, with field emphasis on Force Fields (+40%), Propulsion (+20%), Planetology (+20%) — matches MOO1 Human research bonuses
+**Trade**: +25% trade income bonus; generous, fair deals; prefers trade agreements over tribute demands
+
+**MOO1 Equivalence Notes**:
+- MOO1 Humans start with "Relaxed" relations (best in game)—all AI races begin friendlier to them
+- Trade curve shifted +25% (implemented as Trade Hub ability)
+- Personality: "Honorable Diplomat" — keeps treaties, never backstabs, mediates, honest even when costly
+- Research strengths: Force Fields (shields/defense), Propulsion (mobility), Planetology (terraforming/ecology)
 
 **Behavior Patterns**:
-- Offers treaties early
-- Rarely declares war first
-- Accepts peace quickly
-- Shares technology
-- Mediates conflicts
+- Offers treaties early and honors them always
+- Never declares war first (must be attacked)
+- Accepts peace quickly and fairly
+- Shares technology freely with allies
+- Mediates conflicts between other races
+- Invests in Force Field and Propulsion tech before late-game push
 
 **Player Strategy vs Hamsters**:
-- Easy ally (trustworthy)
-- Won't backstab
-- Diplomatic victory easier with them
-- Can be pushed around militarily
+- Easy ally (extremely trustworthy — Honorable Diplomat never breaks treaties)
+- Won't backstab under any circumstances
+- Diplomatic victory easier with their support
+- Can be pressured militarily but will fight if cornered
+- Their tech focus (Force Fields) makes them harder to conquer over time
 
 ---
 

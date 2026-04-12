@@ -28,7 +28,7 @@ Offensive capabilities for ships and planetary bombardment.
 - **Mix and Match**: Different weapon types counter different defenses
 
 ### Race Specializations
-- **Ferrets**: All weapons deal +25% damage
+- **Ferrets**: All weapons gain +4 Attack Levels (hit chance bonus, not damage)
 - **Guinea Pigs**: Prefer bigger, slower weapons
 - **Budgies**: Prefer fast-firing, light weapons
 

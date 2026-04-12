@@ -111,7 +111,7 @@ Negotiate treaties with other races to secure peace, trade benefits, or military
 - Technology trade enabled
 - Mutual growth
 
-**Hamsters**: +50% trade income (diplomatic bonus)
+**Hamsters**: +25% trade income (Trade Hub ability — matches MOO1 Human +25% trade curve shift)
 
 ### Research Agreement
 **Cost**: Free

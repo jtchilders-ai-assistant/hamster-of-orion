@@ -25,7 +25,7 @@ Modified by:
 - Total: 1800 / 20 = 90 BC/turn each
 - Distance 40 parsecs: -20% = 72 BC/turn each
 
-**Hamsters**: +50% trade income (diplomatic bonus)
+**Hamsters**: +25% trade income (Trade Hub ability — matches MOO1 Human trade curve shift of +25%)
 
 ---
 
@@ -116,7 +116,7 @@ Modified by:
 
 **Economic Hamsters**:
 - Maximum trade agreements
-- +50% bonus = huge income
+- +25% bonus = significant income advantage
 - Peaceful expansion funded by trade
 
 **Ants Production**:
