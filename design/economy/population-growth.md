@@ -39,7 +39,7 @@ Where:
 Maximum population is determined by planet size, environment, and terraforming:
 
 ```
-Max_Population = (Base_Size + Terraforming_Bonus) × Soil_Enrichment_Modifier × Environment_Capacity_Modifier
+Max_Population = (Base_Size + Terraforming_Bonus + Soil_Enrichment_Bonus) × Environment_Capacity_Modifier
 ```
 
 #### Base Planet Sizes
@@ -57,27 +57,29 @@ Max_Population = (Base_Size + Terraforming_Bonus) × Soil_Enrichment_Modifier ×
 | Technology Level | Technology Name | Bonus |
 |------------------|-----------------|-------|
 | 2 | Terraforming +10 | +10 |
-| 8 | Terraforming +20 | +20 |
-| 14 | Terraforming +30 | +30 |
-| 20 | Terraforming +40 | +40 |
-| 26 | Terraforming +50 | +50 |
-| 32 | Terraforming +60 | +60 |
-| 38 | Terraforming +80 | +80 |
-| 44 | Terraforming +100 | +100 |
-| 50 | Terraforming +120 | +120 |
+| 6 | Terraforming +20 | +20 |
+| 10 | Terraforming +30 | +30 |
+| 14 | Terraforming +40 | +40 |
+| 18 | Terraforming +50 | +50 |
+| 22 | Terraforming +60 | +60 |
+| 30 | Terraforming +80 | +80 |
+| 38 | Terraforming +100 | +100 |
+| 46 | Terraforming +120 | +120 |
 
 **Note:** Terraforming bonuses are NOT cumulative in the traditional sense. You only get the highest level you've researched.
 
-#### Soil Enrichment Multiplier
+#### Soil Enrichment Bonus (Flat Population Capacity)
 
-| Technology Level | Technology Name | Multiplier |
-|------------------|-----------------|------------|
-| None | — | 1.00 |
-| 16 | Soil Enrichment | 1.25 |
-| 30 | Advanced Soil Enrichment (Gaia) | 1.50 |
+Soil Enrichment works like terraforming — it permanently raises maximum population capacity by a flat amount, applied per-planet when you pay the one-time BC cost. Effects do **not** stack; Advanced replaces Basic.
 
-**Example:** A Large planet (80 base) with Terraforming +40 and Soil Enrichment:
-- Max Population = (80 + 40) × 1.25 = 150
+| Technology Level | Technology Name | Max Pop Bonus | One-Time Cost |
+|------------------|-----------------|---------------|---------------|
+| None | — | +0 | — |
+| 14 | Soil Enrichment | +25 | 150 BC |
+| 26 | Advanced Soil Enrichment | +50 | 300 BC |
+
+**Example:** A Large planet (80 base) with Terraforming +40 and Advanced Soil Enrichment:
+- Max Population = (80 + 40) + 50 = 170
 
 ---
 
@@ -353,20 +355,20 @@ To colonize hostile environments, specific technology is required:
   "terraforming": [
     { "tech_level": 0, "name": "None", "bonus": 0 },
     { "tech_level": 2, "name": "Terraforming +10", "bonus": 10 },
-    { "tech_level": 8, "name": "Terraforming +20", "bonus": 20 },
-    { "tech_level": 14, "name": "Terraforming +30", "bonus": 30 },
-    { "tech_level": 20, "name": "Terraforming +40", "bonus": 40 },
-    { "tech_level": 26, "name": "Terraforming +50", "bonus": 50 },
-    { "tech_level": 32, "name": "Terraforming +60", "bonus": 60 },
-    { "tech_level": 38, "name": "Terraforming +80", "bonus": 80 },
-    { "tech_level": 44, "name": "Terraforming +100", "bonus": 100 },
-    { "tech_level": 50, "name": "Terraforming +120", "bonus": 120 }
+    { "tech_level": 6, "name": "Terraforming +20", "bonus": 20 },
+    { "tech_level": 10, "name": "Terraforming +30", "bonus": 30 },
+    { "tech_level": 14, "name": "Terraforming +40", "bonus": 40 },
+    { "tech_level": 18, "name": "Terraforming +50", "bonus": 50 },
+    { "tech_level": 22, "name": "Terraforming +60", "bonus": 60 },
+    { "tech_level": 30, "name": "Terraforming +80", "bonus": 80 },
+    { "tech_level": 38, "name": "Terraforming +100", "bonus": 100 },
+    { "tech_level": 46, "name": "Terraforming +120", "bonus": 120 }
   ],
 
   "soil_enrichment": [
-    { "tech_level": 0, "name": "None", "multiplier": 1.00 },
-    { "tech_level": 16, "name": "Soil Enrichment", "multiplier": 1.25 },
-    { "tech_level": 30, "name": "Advanced Soil Enrichment", "multiplier": 1.50 }
+    { "tech_level": 0, "name": "None", "max_pop_bonus": 0, "upgrade_cost": 0 },
+    { "tech_level": 14, "name": "Soil Enrichment", "max_pop_bonus": 25, "upgrade_cost": 150 },
+    { "tech_level": 26, "name": "Advanced Soil Enrichment", "max_pop_bonus": 50, "upgrade_cost": 300 }
   ],
 
   "cloning": [
@@ -505,14 +507,14 @@ function calculate_population_growth(planet, empire):
 function calculate_max_population(planet, empire):
     base_size = planet.base_max_population  # 20/40/60/80/100
     terraforming_bonus = get_terraforming_bonus(empire)
-    soil_multiplier = get_soil_enrichment_multiplier(empire)
+    soil_bonus = get_soil_enrichment_bonus(planet)  # 0, 25, or 50 — per-planet, paid at upgrade time
     env_capacity = get_environment_capacity_modifier(planet.environment)
     
     # Hermit Crabs ignore environment capacity penalty
     if empire.race == "hermit_crabs":
         env_capacity = 1.0
     
-    max_pop = floor((base_size + terraforming_bonus) * soil_multiplier * env_capacity)
+    max_pop = floor((base_size + terraforming_bonus + soil_bonus) * env_capacity)
     
     return max_pop
 
@@ -604,17 +606,17 @@ function process_food(planet, empire):
 - Planet: Huge Jungle (100 base pop)
 - Current Population: 30
 - Terraforming: +40
-- Soil Enrichment: 1.25×
+- Soil Enrichment: +25 (Basic)
 - Morale: 100 (Ecstatic)
 - Advanced Cloning: +5/turn
 
 **Calculation:**
-1. Max Population: (100 + 40) × 1.25 × 1.0 = 175
+1. Max Population: (100 + 40 + 25) × 1.0 = 165
 2. Environment modifier: 0.9 (Jungle)
 3. Racial modifier: 2.0 (Rabbits)
 4. Morale modifier: 1.0 (Ecstatic)
 5. Growth factor: 1 - (30/175) = 0.829
-6. Natural growth: 30 × 0.10 × 0.9 × 2.0 × 1.0 × 0.829 = **4.48**
+6. Natural growth: 30 × 0.10 × 0.9 × 2.0 × 1.0 × (1 - 30/165) = 30 × 0.10 × 0.9 × 2.0 × 0.818 = **4.42**
 7. Cloning bonus: +5
 8. Total growth: 4.48 + 5 = **9.48**
 9. **Growth this turn: 9 (fractional 0.48 carries over)**

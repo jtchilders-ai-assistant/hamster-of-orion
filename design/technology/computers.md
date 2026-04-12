@@ -103,7 +103,7 @@ Unique targeting and combat abilities.
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
 | ECM Jammer IV | 18 | ECM IV | +4 Missile Defense |
-| Robotic Controls IV | 20 | RC IV | 4 factories per pop |
+| Robotic Controls IV | 18 | RC IV | 4 factories per pop |
 
 ---
 
@@ -125,6 +125,7 @@ Unique targeting and combat abilities.
 |-----------|------------|---------|--------|
 | Battle Computer VI | 26 | BC Mark VI | +6 Attack Rating |
 | ECM Jammer VI | 28 | ECM VI | +6 Missile Defense |
+| Robotic Controls V | 28 | RC V | 5 factories per pop |
 
 ---
 
@@ -134,7 +135,6 @@ Unique targeting and combat abilities.
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
 | Battle Computer VII | 31 | BC Mark VII | +7 Attack Rating |
-| Robotic Controls V | 30 | RC V | 5 factories per pop |
 
 ---
 
@@ -156,7 +156,7 @@ Unique targeting and combat abilities.
 |-----------|------------|---------|--------|
 | Battle Computer VIII | 36 | BC Mark VIII | +8 Attack Rating |
 | ECM Jammer VIII | 38 | ECM VIII | +8 Missile Defense |
-| Robotic Controls VI | 40 | RC VI | 6 factories per pop |
+| Robotic Controls VI | 38 | RC VI | 6 factories per pop |
 
 ---
 
@@ -187,7 +187,7 @@ Unique targeting and combat abilities.
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
 | ECM Jammer X | 48 | ECM X | +10 Missile Defense |
-| Robotic Controls VII | 50 | RC VII | 7 factories per pop |
+| Robotic Controls VII | 48 | RC VII | 7 factories per pop |
 | Technology Nullifier | 49 | Tech Nullifier | Target -2 to -5 attack rating |
 
 ---
@@ -251,10 +251,12 @@ Missile_Hit = Base_Accuracy - (ECM_Level × 5%)
 |------------|------------|---------------|-----------------|
 | RC II | 1 | 2 | Starting |
 | RC III | 8 | 3 | +50% factory capacity |
-| RC IV | 20 | 4 | +100% factory capacity |
-| RC V | 30 | 5 | +150% factory capacity |
-| RC VI | 40 | 6 | +200% factory capacity |
-| RC VII | 50 | 7 | +250% factory capacity |
+| RC IV | 18 | 4 | +100% factory capacity |
+| RC V | 28 | 5 | +150% factory capacity |
+| RC VI | 38 | 6 | +200% factory capacity |
+| RC VII | 48 | 7 | +250% factory capacity |
+
+**Meklars (Mice) Special Ability:** Mice receive +2 to their effective Robotic Controls level. At game start they have RC II (2 factories/pop) but operate at RC IV level (4 factories/pop). This bonus applies at all times — e.g., when they research RC III they operate at RC V level.
 
 ### Scanner Progression
 
@@ -544,7 +546,7 @@ The Computers field creates an arms race:
           {
             "id": "robotic_controls_4",
             "name": "Robotic Controls IV",
-            "tech_level": 20,
+            "tech_level": 18,
             "category": "industry",
             "effect": {
               "factories_per_pop": 4
@@ -636,7 +638,7 @@ The Computers field creates an arms race:
           {
             "id": "robotic_controls_5",
             "name": "Robotic Controls V",
-            "tech_level": 30,
+            "tech_level": 28,
             "category": "industry",
             "effect": {
               "factories_per_pop": 5
@@ -710,7 +712,7 @@ The Computers field creates an arms race:
           {
             "id": "robotic_controls_6",
             "name": "Robotic Controls VI",
-            "tech_level": 40,
+            "tech_level": 38,
             "category": "industry",
             "effect": {
               "factories_per_pop": 6
@@ -802,7 +804,7 @@ The Computers field creates an arms race:
           {
             "id": "robotic_controls_7",
             "name": "Robotic Controls VII",
-            "tech_level": 50,
+            "tech_level": 48,
             "category": "industry",
             "effect": {
               "factories_per_pop": 7
@@ -917,10 +919,10 @@ The Computers field creates an arms race:
 |-------|------------|---------------|
 | II | 1 | 2:1 |
 | III | 8 | 3:1 |
-| IV | 20 | 4:1 |
-| V | 30 | 5:1 |
-| VI | 40 | 6:1 |
-| VII | 50 | 7:1 |
+| IV | 18 | 4:1 |
+| V | 28 | 5:1 |
+| VI | 38 | 6:1 |
+| VII | 48 | 7:1 |
 
 ### Scanners (5 total)
 

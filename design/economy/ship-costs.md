@@ -95,7 +95,7 @@ As technology advances, older components become cheaper:
 Miniaturized_Cost = Base_Cost × (1 - Miniaturization_Reduction)
 
 Miniaturization_Reduction = (Current_Tier - Component_Tier) × 0.05
-Maximum_Reduction = 0.80 (80% off, minimum 20% of base cost)
+Maximum_Reduction = 0.50 (50% off, minimum 50% of base cost)
 ```
 
 **Example:** A Laser (5 BC, Tier 1) at Tier 10 weapons:

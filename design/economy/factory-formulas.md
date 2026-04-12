@@ -24,14 +24,18 @@ Max_Operable_Factories = Population × Robotic_Controls_Level
 
 | Technology | Tech Level | Factory Ratio |
 |------------|------------|---------------|
-| None (Base) | 0 | 2:1 |
-| Robotic Controls II | 10 | 3:1 |
-| Robotic Controls III | 16 | 4:1 |
-| Robotic Controls IV | 23 | 5:1 |
-| Robotic Controls V | 30 | 6:1 |
-| Robotic Controls VI | 38 | 7:1 |
+| Robotic Controls II | 1 (starting) | 2:1 |
+| Robotic Controls III | 8 | 3:1 |
+| Robotic Controls IV | 18 | 4:1 |
+| Robotic Controls V | 28 | 5:1 |
+| Robotic Controls VI | 38 | 6:1 |
+| Robotic Controls VII | 48 | 7:1 |
 
-**Example:** A planet with 50 population and Robotic Controls IV can operate up to 50 × 5 = 250 factories.
+**Starting Tech:** All races begin with Robotic Controls II (2 factories per pop). RC II is free at tech level 1.
+
+**Meklars (Mice) Special Ability:** Mice receive +2 to their effective Robotic Controls level. They effectively start with RC IV (4 factories/pop) at game start, despite only having researched RC II. This bonus stacks with all subsequent RC upgrades.
+
+**Example:** A planet with 50 population and Robotic Controls IV can operate up to 50 × 4 = 200 factories.
 
 ---
 
@@ -194,20 +198,26 @@ Cleanup_Cost = Pollution_Generated × Cleanup_Cost_Per_Unit
 Base_Cleanup_Cost_Per_Unit = 0.5 BC
 ```
 
-**Eco Restoration Technology** reduces cleanup cost:
+**Eco Restoration Technology** reduces cleanup cost via a `Cleanup_Modifier` multiplier. Tech levels and names are authoritative from `../technology/planetology.md`.
 
-| Technology Level | Technology Name | Cleanup Modifier |
-|------------------|-----------------|------------------|
-| 0 (None) | — | 1.00 |
-| 6 | Eco Restoration 20% | 0.80 |
-| 16 | Eco Restoration 40% | 0.60 |
-| 26 | Eco Restoration 60% | 0.40 |
-| 36 | Eco Restoration 80% | 0.20 |
-| 46 | Atmospheric Terraform | 0.00 |
+| Tech Level | Technology Name | Cleanup Modifier | Equivalent Waste/BC |
+|------------|-----------------|------------------|---------------------|
+| 1 (Starting) | Ecological Restoration | 1.00 | 2 waste/BC |
+| 4 | Improved Eco Restoration | 0.67 | 3 waste/BC |
+| 11 | Enhanced Eco Restoration | 0.40 | 5 waste/BC |
+| 22 | Advanced Eco Restoration | 0.20 | 10 waste/BC |
+| 29 | Complete Eco Restoration | 0.10 | 20 waste/BC |
 
 ```
 Effective_Cleanup_Cost = Pollution × 0.5 × Cleanup_Modifier
 ```
+
+**Conversion:** `Cleanup_Modifier = 2 / Waste_Per_BC`. Both formulations are equivalent:
+```
+  Pollution × 0.5 × Cleanup_Modifier  =  Pollution / Waste_Per_BC
+```
+
+**Note:** There is no longer a 0.00 modifier tier in Eco Restoration. Near-zero cleanup costs are achieved by combining Complete Eco Restoration (0.10×) with Reduced Industrial Waste 20% (waste reduction from Construction tech). See `../technology/construction.md`.
 
 ---
 
@@ -250,13 +260,16 @@ Effective_Operating_Factories = min(Factories_Built, Workers_For_Production × R
   },
   
   "robotic_controls": [
-    { "tech_level": 0, "name": "None (Base)", "factory_ratio": 2 },
-    { "tech_level": 10, "name": "Robotic Controls II", "factory_ratio": 3 },
-    { "tech_level": 16, "name": "Robotic Controls III", "factory_ratio": 4 },
-    { "tech_level": 23, "name": "Robotic Controls IV", "factory_ratio": 5 },
-    { "tech_level": 30, "name": "Robotic Controls V", "factory_ratio": 6 },
-    { "tech_level": 38, "name": "Robotic Controls VI", "factory_ratio": 7 }
+    { "tech_level": 1, "name": "Robotic Controls II", "factory_ratio": 2, "starting_tech": true },
+    { "tech_level": 8, "name": "Robotic Controls III", "factory_ratio": 3 },
+    { "tech_level": 18, "name": "Robotic Controls IV", "factory_ratio": 4 },
+    { "tech_level": 28, "name": "Robotic Controls V", "factory_ratio": 5 },
+    { "tech_level": 38, "name": "Robotic Controls VI", "factory_ratio": 6 },
+    { "tech_level": 48, "name": "Robotic Controls VII", "factory_ratio": 7 }
   ],
+  "racial_robotic_controls_bonus": {
+    "mice": { "rc_level_bonus": 2, "description": "Meklars effectively add +2 to Robotic Controls level; start at RC IV equivalent" }
+  },
   
   "industrial_tech": [
     { "tech_level": 0, "name": "None", "factory_cost": 10 },
@@ -280,12 +293,11 @@ Effective_Operating_Factories = min(Factories_Built, Workers_For_Production × R
   ],
   
   "eco_restoration": [
-    { "tech_level": 0, "name": "None", "cleanup_modifier": 1.00 },
-    { "tech_level": 6, "name": "Eco Restoration 20%", "cleanup_modifier": 0.80 },
-    { "tech_level": 16, "name": "Eco Restoration 40%", "cleanup_modifier": 0.60 },
-    { "tech_level": 26, "name": "Eco Restoration 60%", "cleanup_modifier": 0.40 },
-    { "tech_level": 36, "name": "Eco Restoration 80%", "cleanup_modifier": 0.20 },
-    { "tech_level": 46, "name": "Atmospheric Terraform", "cleanup_modifier": 0.00 }
+    { "tech_level": 1,  "name": "Ecological Restoration",         "cleanup_modifier": 1.00, "waste_per_bc": 2  },
+    { "tech_level": 4,  "name": "Improved Eco Restoration",        "cleanup_modifier": 0.67, "waste_per_bc": 3  },
+    { "tech_level": 11, "name": "Enhanced Eco Restoration",        "cleanup_modifier": 0.40, "waste_per_bc": 5  },
+    { "tech_level": 22, "name": "Advanced Eco Restoration",        "cleanup_modifier": 0.20, "waste_per_bc": 10 },
+    { "tech_level": 29, "name": "Complete Eco Restoration",        "cleanup_modifier": 0.10, "waste_per_bc": 20 }
   ],
   
   "racial_production_modifiers": {
@@ -423,12 +435,12 @@ When capturing an enemy planet:
 - Race: Hamsters (1.0 modifier)
 - Population: 40
 - Factories: 80
-- Robotic Controls: II (3:1)
+- Robotic Controls: II (2:1)
 - No waste reduction
 
 **Calculation:**
-1. Max operable factories: 40 × 3 = 120
-2. Operating factories: min(80, 120) = 80
+1. Max operable factories: 40 × 2 = 80
+2. Operating factories: min(80, 80) = 80
 3. Factory production: 80 × 1 × 1.0 = 80 BC
 4. Population production: 40 × 0.5 × 1.0 = 20 BC
 5. Gross production: 100 BC
@@ -444,19 +456,19 @@ When capturing an enemy planet:
 - Race: Ants (1.5 modifier)
 - Population: 60
 - Factories: 300
-- Robotic Controls: V (6:1)
+- Robotic Controls: V (5:1)
 - Reduced Industrial Waste 40%
-- Eco Restoration 40%
+- Enhanced Eco Restoration (tech level 11, cleanup_modifier 0.40)
 
 **Calculation:**
-1. Max operable factories: 60 × 6 = 360
-2. Operating factories: min(300, 360) = 300
+1. Max operable factories: 60 × 5 = 300
+2. Operating factories: min(300, 300) = 300
 3. Factory production: 300 × 1 × 1.5 = 450 BC
 4. Population production: 60 × 0.5 × 1.5 = 45 BC
 5. Gross production: 495 BC
 6. Pollution: 300 × 0.40 = 120 units
-7. Cleanup cost: 120 × 0.5 × 0.60 = 36 BC
-8. **Net production: 495 - 36 = 459 BC/turn**
+7. Cleanup cost: 120 × 0.5 × 0.40 = 24 BC
+8. **Net production: 495 - 24 = 471 BC/turn**
 
 ---
 

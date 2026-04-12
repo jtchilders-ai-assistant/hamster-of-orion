@@ -14,89 +14,75 @@ Overall, the design documents are thorough and internally consistent. The major 
 
 ## CRITICAL Issues (Will Cause Implementation Bugs)
 
-### C1 — Cloning formula mismatch between two docs
+### ~~C1 — Cloning formula mismatch between two docs~~ **[FIXED 2026-04-12]**
 **Files:** `economy/population-growth.md` §5 vs `technology/planetology.md` Cloning section
 
-**In `population-growth.md`:**
-```
-Cloning: +2 pop/turn (flat, added to growth)
-Advanced Cloning: +5 pop/turn
-Tech levels: Cloning @ 11, Advanced Cloning @ 22
-```
+**Resolution:** Adopted the flat bonus model from `population-growth.md` as authoritative, matching MOO1 design philosophy. `planetology.md` updated to match:
+- Cloning: tech level 11, +2 pop/turn flat bonus
+- Advanced Cloning: tech level 22, +5 pop/turn flat bonus
+- BC-investment model removed from `planetology.md`
+- JSON `effect` updated from `bc_per_million` to `bonus_per_turn`
+- Prose, summary tables, worked example, and JSON all reconciled
 
-**In `planetology.md`:**
-```
-Cloning (Tech Level 19, 7,050 RP): 1M per 10 BC invested
-Advanced Cloning (Tech Level 34, 28,220 RP): 1M per 5 BC invested
-```
-
-These are **completely different mechanics**. `population-growth.md` models cloning as a flat per-turn growth bonus (regardless of spending). `planetology.md` models it as a BC investment → population conversion. The tech levels also conflict (11 vs 19 for basic Cloning; 22 vs 34 for Advanced). One of these definitions must be authoritative; the other must be reconciled or removed.
+Both docs now agree on mechanic, tech levels, and formula.
 
 ---
 
-### C2 — Soil Enrichment multiplier conflicts with Max Population formula
+### C2 — Soil Enrichment multiplier conflicts with Max Population formula ✅ FIXED (2026-04-12)
 **Files:** `economy/population-growth.md` §2, §4 vs `technology/planetology.md` Soil Enrichment section
 
-**In `population-growth.md`:**
-- Soil Enrichment: `multiplier = 1.25` (25% more)
-- Advanced Soil Enrichment: `multiplier = 1.50` (50% more)
-- Listed as tech levels 16 and 30
+**Resolution:** MOO1 approach adopted — Soil Enrichment works exactly like terraforming: a flat permanent increase to maximum population capacity per planet, paid as a one-time BC cost.
 
-**In `planetology.md`:**
-- Soil Enrichment: `base_size_bonus = 0.25` (+25% base size), `growth_rate_bonus = 0.50` (+50% growth), tech level 14
-- Advanced Soil Enrichment: `base_size_bonus = 0.50`, converts planet to Gaia, tech level 26
+```
+Max_Population = (Base_Size + Terraforming_Bonus + Soil_Enrichment_Bonus) × Environment_Capacity_Modifier
+# Soil_Enrichment_Bonus: 0 (none), 25 (Basic), 50 (Advanced) — tracked per planet
+```
 
-Three conflicts here:
-1. Tech levels differ (16 vs 14 for basic; 30 vs 26 for advanced)
-2. `population-growth.md` applies Soil Enrichment as a `Max_Population` multiplier; `planetology.md` applies it as a base size bonus separately from growth rate bonus
-3. `planetology.md` says Advanced Soil Enrichment converts to Gaia (environment type changes), but `population-growth.md` has no mention of environment conversion and treats it as a flat 1.5× multiplier
+| Technology | Tech Level | RP Cost | Max Pop Bonus | One-Time Cost |
+|------------|------------|---------|---------------|---------------|
+| Soil Enrichment | 14 | 4,090 | +25 | 150 BC |
+| Advanced Soil Enrichment | 26 | 14,400 | +50 | 300 BC |
 
-The `Max_Population` formula in `population-growth.md` uses `Soil_Enrichment_Modifier` as a single multiplier on `(base_size + terraforming_bonus)`, which doesn't match the separate `base_size_bonus` + `growth_rate_bonus` + Gaia conversion described in `planetology.md`.
+Resolved conflicts:
+1. **Tech levels unified** at 14 (Basic) and 26 (Advanced) — `planetology.md` values are authoritative
+2. **Mechanic unified:** flat `max_pop_bonus` additive to Base_Size + Terraforming_Bonus; no multipliers
+3. **Gaia conversion removed:** Advanced Soil Enrichment does NOT change environment type or growth rate modifier
+4. Both docs updated: `population-growth.md` and `planetology.md` now use identical formula, tech levels, and JSON schema
 
 ---
 
-### C3 — Robotic Controls tech levels differ across docs
+### C3 — Robotic Controls tech levels differ across docs ✅ FIXED (2026-04-12)
 **Files:** `economy/factory-formulas.md` §1 vs `technology/computers.md` RC table
 
-**In `factory-formulas.md`:**
+**Resolution:** Canonical MOO1 values from StrategyWiki applied to both files:
 ```
-RC II @ tech level 10
-RC III @ tech level 16
-RC IV @ tech level 23
-RC V @ tech level 30
-RC VI @ tech level 38
+RC II  @ tech level 1  (FREE starting tech) — 2 factories/pop
+RC III @ tech level 8                        — 3 factories/pop
+RC IV  @ tech level 18                       — 4 factories/pop
+RC V   @ tech level 28                       — 5 factories/pop
+RC VI  @ tech level 38                       — 6 factories/pop
+RC VII @ tech level 48                       — 7 factories/pop
 ```
-
-**In `computers.md`:**
-```
-RC II @ tech level 1 (starting tech)
-RC III @ tech level 8
-RC IV @ tech level 20
-RC V @ tech level 30
-RC VI @ tech level 40
-RC VII @ tech level 50
-```
-
-RC II is a starting tech in `computers.md` but listed at tech level 10 in `factory-formulas.md`. RC III is at 16 in one and 8 in the other. RC VI is at 38 vs 40. `computers.md` also lists RC VII (7:1 ratio @ tech 50) which is absent from `factory-formulas.md`.
+Both `factory-formulas.md` and `computers.md` now use these values.
+Meklars (Mice) +2 RC level bonus documented in both files.
+Worked examples in `factory-formulas.md` corrected (RC II is 2:1, RC V is 5:1).
 
 ---
 
 ### C4 — Ecological Restoration defined incompatibly in two docs
+**Status: FIXED (2026-04-12)**
+
 **Files:** `economy/factory-formulas.md` §7–§8 vs `technology/planetology.md` Eco Restoration section
 
-**In `factory-formulas.md`:**
-- Eco Restoration tech reduces `cleanup_modifier` (a multiplier on cleanup cost), ranging from 1.00 down to 0.00
-- Tech is named "Eco Restoration 20/40/60/80%" with tech levels 6, 16, 26, 36, 46
-- Cleanup formula: `Effective_Cleanup_Cost = Pollution × 0.5 × Cleanup_Modifier`
-
-**In `planetology.md`:**
-- Eco Restoration tech is defined as `waste_per_bc` (how much pollution is eliminated per BC spent), ranging from 2 to 20
-- Tech levels 1, 4, 11, 22, 29
-
-These are mathematically equivalent approaches, but:
-1. The tech levels don't match (base Eco Restoration is a starting tech at level 1 in `planetology.md`, but listed at level 6 in `factory-formulas.md`)
-2. The tech names differ completely
-3. Implementation cannot use both formulas simultaneously — one must be chosen
+**Resolution:**
+- **Authoritative mechanic:** `cleanup_modifier` multiplier approach (from `factory-formulas.md`)
+- **Authoritative tech levels and names:** from `planetology.md` (tech levels 1/4/11/22/29)
+- **Authoritative tech names:** Ecological Restoration / Improved / Enhanced / Advanced / Complete
+- **Formula:** `Effective_Cleanup_Cost = Pollution × 0.5 × Cleanup_Modifier`
+- **Cleanup modifiers:** 1.00 / 0.67 / 0.40 / 0.20 / 0.10 (derived as `2 / Waste_Per_BC`)
+- **Both docs** now use `cleanup_modifier` as the primary field and retain `waste_per_bc` as a cross-reference
+- **Conversion identity:** `Cleanup_Modifier = 2 / Waste_Per_BC` (both formulations are mathematically equivalent)
+- The old 0.00 modifier / "Atmospheric Terraform" tier at level 46 was removed from eco_restoration; near-zero cleanup is achieved by stacking Complete Eco Restoration with Reduced Industrial Waste (Construction tech)
 
 ---
 
@@ -125,57 +111,42 @@ These actually match — no issue here. Note for completeness.
 
 ---
 
-### C6 — Terraforming tech levels conflict between docs
+### C6 — Terraforming tech levels conflict between docs ✅ FIXED (2026-04-12)
 **Files:** `economy/population-growth.md` Terraforming table vs `technology/planetology.md` Terraforming table
 
-**In `population-growth.md`** (tech levels 2, 8, 14, 20, 26, 32, 38, 44, 50):
+**Resolution:** Both files updated to match MOO1 canonical tech levels:
 ```
-+10 @ tech 2
-+20 @ tech 8
-+30 @ tech 14
-+40 @ tech 20
-+50 @ tech 26
-+60 @ tech 32
-+80 @ tech 38
-+100 @ tech 44
-+120 @ tech 50
-```
-
-**In `planetology.md`** (tech levels 2, 7, 12, 18, 24, 28, 32, 36, 38):
-```
-+10 @ tech 2   ✓
-+20 @ tech 7   ✗ (8 in other doc)
-+30 @ tech 12  ✗ (14)
-+40 @ tech 18  ✗ (20)
-+50 @ tech 24  ✗ (26)
-+60 @ tech 28  ✗ (32)
-+80 @ tech 32  ✗ (38)
-+100 @ tech 36 ✗ (44)
-+120 @ tech 38 ✗ (50)
++10  @ tech 2   (unchanged)
++20  @ tech 6
++30  @ tech 10
++40  @ tech 14
++50  @ tech 18
++60  @ tech 22
++80  @ tech 30
++100 @ tech 38
++120 @ tech 46
 ```
 
-Only the +10 bonus matches. All subsequent tech levels differ. `planetology.md` also assigns RP costs per tier that `population-growth.md` doesn't address. The `planetology.md` version appears more authoritative (it has RP costs, BC costs, and is the dedicated tech doc), but the conflict must be resolved.
-
-Also: `population-growth.md` says "Terraforming bonuses are NOT cumulative — you only get the highest level you've researched." `planetology.md`'s edge case section says "New terraforming tech replaces old (takes you to new limit)" — consistent in intent, but implementation note in `population-growth.md` labeled the table as "cumulative" in the heading before contradicting itself in the note. The heading should be fixed.
+`planetology.md` updated as authoritative source (has RP costs, BC costs, full tier structure). `population-growth.md` Terraforming table and JSON array updated to match. `planetology.md` tier structure restructured to accommodate the new level distribution — Complete Terraforming +120 moved to Tier 13 at level 46; Advanced Planetology Tech IV (which previously occupied level 46) removed from future tech section. All summary tables, JSON schema, and category summaries updated consistently.
 
 ---
 
-### C7 — Miniaturization cap inconsistency
+### C7 — Miniaturization cap inconsistency ✅ FIXED
 **Files:** `economy/ship-costs.md` §3 vs `technology/research-formulas.md` §9
 
-**In `ship-costs.md`:**
+**Resolution:** Updated `ship-costs.md` to use 50% max reduction (matching MOO1 and `research-formulas.md`). Both files now consistently cap miniaturization at 50% (minimum 50% of base cost).
+
+**In `ship-costs.md` (fixed):**
 ```
 Miniaturization_Reduction = (Current_Tier - Component_Tier) × 0.05
-Maximum_Reduction = 0.80 (80% off)
+Maximum_Reduction = 0.50 (50% off, minimum 50% of base cost)
 ```
 
-**In `research-formulas.md`:**
+**In `research-formulas.md` (was already correct):**
 ```
 miniaturization_maximum = 0.50 (50%)
 miniaturization_minimum = 0.50 (50% of base — i.e., same cap)
 ```
-
-One doc says max reduction is 80%, the other says 50%. `research-formulas.md` explicitly notes this matches MOO1, which capped at 50%. The 80% figure in `ship-costs.md` appears to be an error.
 
 ---
 
@@ -613,9 +584,9 @@ Planetary Shields have explicit maintenance costs (5–20 BC/turn). The `ship-co
 ## Recommended Priority Order
 
 1. **Resolve C1 (Cloning)** — two completely incompatible mechanics
-2. **Resolve C3 (Robotic Controls tech levels)** — foundational to economy
+2. ~~**Resolve C3 (Robotic Controls tech levels)**~~ ✅ FIXED
 3. **Resolve C6 (Terraforming tech levels)** — foundational to population
-4. **Resolve C2 (Soil Enrichment formula)** — affects max population empire-wide
+4. ~~**Resolve C2 (Soil Enrichment formula)**~~ ✅ FIXED
 5. **Resolve C4 (Eco Restoration)** — affects all factory calculations
 6. **Resolve C7 (Miniaturization cap)** — affects all ship design costs
 7. **Create `slider-mathematics.md`** (H4) — core to all per-turn calculations
