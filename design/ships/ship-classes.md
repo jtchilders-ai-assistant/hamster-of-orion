@@ -10,12 +10,12 @@ In Hamster of Orion (following MOO1), there are **4 hull sizes**. The player ass
 
 | Hull Size | Base Space | Base Cost | Typical Roles |
 |-----------|------------|-----------|---------------|
-| **Small** | 25-40 | Low | Scouts, fighters, colony ships |
-| **Medium** | 60-100 | Medium | Multi-role warships |
-| **Large** | 160-250 | High | Heavy warships |
-| **Huge** | 400-600 | Very High | Capital ships, dreadnoughts |
+| **Small** | 25 | 6 BC | Scouts, fighters, colony ships |
+| **Medium** | 70 | 36 BC | Multi-role warships |
+| **Large** | 280 | 200 BC | Heavy warships |
+| **Huge** | 1400 | 1200 BC | Capital ships, dreadnoughts |
 
-**Note**: Exact space values depend on Construction technology level. Higher tech = more space per hull size.
+**Note**: These are MOO1 canonical space values. Space may increase with Construction technology research.
 
 ---
 
@@ -72,12 +72,12 @@ Ship_Cost = Hull_Base_Cost + Weapon_Costs + Special_Costs
 
 Larger ships have more hit points and are easier to hit:
 
-| Hull Size | Base Hits | Size Modifier (to be hit) |
-|-----------|-----------|---------------------------|
-| Small | 3 | -2 (harder to hit) |
-| Medium | 18 | 0 (baseline) |
-| Large | 100 | +2 (easier to hit) |
-| Huge | 600 | +4 (much easier to hit) |
+| Hull Size | Base Space | Base Hits | Size Modifier (to be hit) |
+|-----------|------------|-----------|---------------------------|
+| Small | 25 | 3 | -2 (harder to hit) |
+| Medium | 70 | 18 | 0 (baseline) |
+| Large | 280 | 100 | +2 (easier to hit) |
+| Huge | 1400 | 600 | +4 (much easier to hit) |
 
 ---
 

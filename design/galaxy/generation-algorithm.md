@@ -459,25 +459,25 @@ Planet size probabilities are independent of star color but weighted toward medi
 }
 ```
 
-**Size to Base Population Capacity**:
+**Size to Base Population Capacity** (MOO1 canonical fixed values):
 
-| Size | Min Population | Max Population | Typical |
-|------|----------------|----------------|---------|
-| Tiny | 10 | 20 | 15 |
-| Small | 25 | 40 | 32 |
-| Medium | 45 | 70 | 55 |
-| Large | 75 | 100 | 85 |
-| Huge | 100 | 150 | 120 |
+| Size | Base Population |
+|------|-----------------|
+| Tiny | 20 |
+| Small | 40 |
+| Medium | 60 |
+| Large | 80 |
+| Huge | 100 |
 
 ```pseudocode
 function RollSize():
     roll = random_int(1, 100)
     
-    if roll <= 15: return {type: "tiny", base_pop: random_int(10, 20)}
-    if roll <= 40: return {type: "small", base_pop: random_int(25, 40)}
-    if roll <= 70: return {type: "medium", base_pop: random_int(45, 70)}
-    if roll <= 90: return {type: "large", base_pop: random_int(75, 100)}
-    return {type: "huge", base_pop: random_int(100, 150)}
+    if roll <= 15: return {type: "tiny", base_pop: 20}
+    if roll <= 40: return {type: "small", base_pop: 40}
+    if roll <= 70: return {type: "medium", base_pop: 60}
+    if roll <= 90: return {type: "large", base_pop: 80}
+    return {type: "huge", base_pop: 100}
 ```
 
 ### 4.5 Environment Modifiers
@@ -621,7 +621,7 @@ function PlaceOrion(stars, map_center):
     best_star.special = "orion"
     best_star.planet = {
         environment: "dead",       // Hostile but irrelevant
-        size: {type: "huge", base_pop: 150},
+        size: {type: "huge", base_pop: 100},
         resources: "ultra_rich",
         special: "orion",
         research_multiplier: 4.0,  // 4× research
@@ -877,7 +877,7 @@ function ConfigureAsHomeworld(star):
     star.planet.environment = "terran"
     star.planet.size = {
         type: random_choice(["large", "huge"]),
-        base_pop: random_int(85, 120)
+        base_pop: random_choice([80, 100])  // large=80 or huge=100 (MOO1 fixed values)
     }
     star.planet.resources = "normal"  // Fair start - no rich homeworlds
     star.planet.special = "homeworld"
@@ -1257,7 +1257,7 @@ After generation, expected distribution:
     "environment": "enum (14 types)",
     "size": {
       "type": "enum (tiny|small|medium|large|huge)",
-      "base_pop": "number (10-150)"
+      "base_pop": "number (20|40|60|80|100)"
     },
     "resources": "enum (ultra_poor|poor|normal|rich|ultra_rich)",
     "special": "enum (null|orion|artifacts|homeworld)",

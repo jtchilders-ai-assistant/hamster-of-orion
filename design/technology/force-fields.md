@@ -974,7 +974,7 @@ If not in your tree, must acquire via:
             "component": {
               "space": 100,
               "cost": 250,
-              "requires_ship_class": ["dreadnought", "titan"]
+              "requires_ship_class": ["huge"]
             }
           },
           {

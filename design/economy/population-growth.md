@@ -194,11 +194,13 @@ Transport_Time = Distance_In_Parsecs ÷ Warp_Speed (turns)
 
 #### Transport Construction
 
-| Ship Type | Cost | Capacity |
-|-----------|------|----------|
-| Transport | 5 BC | 1 million pop |
+Population transports are **civilian colony ships** distinct from military troop transports (see `economy/ship-costs.md` §16). They carry colonists between friendly planets and have no combat capability.
 
-**Note:** Transported population departs the source planet immediately and arrives at destination after travel time. Population in transit does not contribute to either planet.
+| Ship Type | Cost | Maintenance | Capacity |
+|-----------|------|-------------|----------|
+| Colony Transport | 50 BC | 1 BC/turn | 1 million pop |
+
+**Note:** Transported population departs the source planet immediately and arrives at destination after travel time. Population in transit does not contribute to either planet. The 50 BC cost reflects a Small hull with minimal equipment — comparable to a scout or colony ship base cost (see `economy/ship-costs.md` hull cost tables).
 
 ### 8. Overflow Population
 
@@ -687,10 +689,20 @@ When conquering an enemy planet:
 - Your terraforming tech applies, potentially increasing capacity
 
 ### Biological Weapon Damage
-Bio weapons reduce max population capacity:
-- Death Spores: -10% max population permanently
-- Doom Virus: -25% max population permanently
-- Bio Terminator: -50% max population permanently
+Bio weapons (researched in the Planetology field) kill population each combat round and permanently reduce max population capacity:
+
+| Weapon | Kill Rate | Max Pop Reduction |
+|--------|-----------|-------------------|
+| Death Spores (Planetology TL 9) | 1M per combat round | -10% permanent |
+| Doom Virus (Planetology TL 25) | 2M per combat round | -25% permanent |
+| Bio Terminator (Planetology TL 33) | 3M per combat round | -50% permanent |
+
+```
+Population_Killed = Weapon_Kill_Rate × Number_Of_Weapons × Combat_Rounds_Survived
+New_Max_Pop = Old_Max_Pop × (1 - Max_Pop_Reduction)
+```
+
+Max population reduction is permanent until the planet is re-terraformed. See `technology/planetology.md` for full bio weapon mechanics.
 
 ---
 

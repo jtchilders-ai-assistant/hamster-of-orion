@@ -49,14 +49,14 @@ Fuel cells determine maximum range from the nearest friendly colony. Ships canno
 
 | Fuel Cell | Tech Level | Range | Space | Cost |
 |-----------|------------|-------|-------|------|
-| Standard Fuel | 1 | 3 | 0 | 0 BC |
-| Extended Fuel | 4 | 4 | 3 | 5 BC |
-| Improved Fuel | 8 | 5 | 3 | 8 BC |
-| Advanced Fuel | 13 | 6 | 3 | 12 BC |
-| Superior Fuel | 18 | 7 | 3 | 16 BC |
-| High-Capacity | 24 | 8 | 3 | 22 BC |
-| Ultra Fuel | 30 | 9 | 3 | 28 BC |
-| Maximum Fuel | 37 | 10 | 3 | 35 BC |
+| Standard Fuel | 1 | 4 | 0 | 0 BC |
+| Extended Fuel | 4 | 5 | 3 | 5 BC |
+| Improved Fuel | 8 | 6 | 3 | 8 BC |
+| Advanced Fuel | 13 | 7 | 3 | 12 BC |
+| Superior Fuel | 18 | 8 | 3 | 16 BC |
+| High-Capacity | 24 | 9 | 3 | 22 BC |
+| Ultra Fuel | 30 | 10 | 3 | 28 BC |
+| Maximum Fuel | 37 | 11 | 3 | 35 BC |
 | Thorium Cells | 45 | ∞ | 5 | 50 BC |
 
 ### Fuel Notes
@@ -433,14 +433,14 @@ Maximum space available for components (MOO1 hull sizes):
   ],
 
   "fuel_cells": [
-    { "id": "standard_fuel", "name": "Standard Fuel", "tech_level": 1, "range": 3, "space": 0, "cost": 0 },
-    { "id": "extended_fuel", "name": "Extended Fuel", "tech_level": 4, "range": 4, "space": 3, "cost": 5 },
-    { "id": "improved_fuel", "name": "Improved Fuel", "tech_level": 8, "range": 5, "space": 3, "cost": 8 },
-    { "id": "advanced_fuel", "name": "Advanced Fuel", "tech_level": 13, "range": 6, "space": 3, "cost": 12 },
-    { "id": "superior_fuel", "name": "Superior Fuel", "tech_level": 18, "range": 7, "space": 3, "cost": 16 },
-    { "id": "high_capacity", "name": "High-Capacity", "tech_level": 24, "range": 8, "space": 3, "cost": 22 },
-    { "id": "ultra_fuel", "name": "Ultra Fuel", "tech_level": 30, "range": 9, "space": 3, "cost": 28 },
-    { "id": "maximum_fuel", "name": "Maximum Fuel", "tech_level": 37, "range": 10, "space": 3, "cost": 35 },
+    { "id": "standard_fuel", "name": "Standard Fuel", "tech_level": 1, "range": 4, "space": 0, "cost": 0 },
+    { "id": "extended_fuel", "name": "Extended Fuel", "tech_level": 4, "range": 5, "space": 3, "cost": 5 },
+    { "id": "improved_fuel", "name": "Improved Fuel", "tech_level": 8, "range": 6, "space": 3, "cost": 8 },
+    { "id": "advanced_fuel", "name": "Advanced Fuel", "tech_level": 13, "range": 7, "space": 3, "cost": 12 },
+    { "id": "superior_fuel", "name": "Superior Fuel", "tech_level": 18, "range": 8, "space": 3, "cost": 16 },
+    { "id": "high_capacity", "name": "High-Capacity", "tech_level": 24, "range": 9, "space": 3, "cost": 22 },
+    { "id": "ultra_fuel", "name": "Ultra Fuel", "tech_level": 30, "range": 10, "space": 3, "cost": 28 },
+    { "id": "maximum_fuel", "name": "Maximum Fuel", "tech_level": 37, "range": 11, "space": 3, "cost": 35 },
     { "id": "thorium_cells", "name": "Thorium Cells", "tech_level": 45, "range": -1, "space": 5, "cost": 50 }
   ],
 
@@ -500,13 +500,10 @@ Maximum space available for components (MOO1 hull sizes):
   ],
 
   "base_hp_by_class": {
-    "scout": 5,
-    "fighter": 10,
-    "destroyer": 25,
-    "cruiser": 60,
-    "battle_cruiser": 120,
-    "dreadnought": 200,
-    "titan": 400
+    "small": 3,
+    "medium": 18,
+    "large": 100,
+    "huge": 600
   },
 
   "scanners": [

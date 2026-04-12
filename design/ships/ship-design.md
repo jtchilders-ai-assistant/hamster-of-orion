@@ -30,12 +30,12 @@ Players only select:
 
 ## Hull Sizes
 
-| Size | Space | Typical Use |
-|------|-------|-------------|
-| Small | ~40 | Scouts, fighters, colony ships |
-| Medium | ~100 | Multi-role, destroyers |
-| Large | ~250 | Heavy warships |
-| Huge | ~500+ | Battleships, dreadnoughts |
+| Size | Space | Base Cost | Typical Use |
+|------|-------|-----------|-------------|
+| Small | 25 | 6 BC | Scouts, fighters, colony ships |
+| Medium | 70 | 36 BC | Multi-role warships |
+| Large | 280 | 200 BC | Heavy warships |
+| Huge | 1400 | 1200 BC | Battleships, dreadnoughts |
 
 Larger hulls unlock with Construction technology research.
 
@@ -89,11 +89,11 @@ Example:
 Ship systems (Computer, Shield, ECM, Armor, Engine, Maneuver) are automatic and do NOT use space.
 
 ```
-Example Small Hull (40 space):
-- Laser × 3 = 9 space
+Example Small Hull (25 space):
+- Laser × 1 = 3 space
 - Nuclear Missiles × 1 = 8 space  
 - Reserve Fuel Tanks = 10 space
-- Available: 13 space remaining
+- Available: 4 space remaining
 ```
 
 ---

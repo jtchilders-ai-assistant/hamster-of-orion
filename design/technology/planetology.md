@@ -104,7 +104,7 @@ Converts hostile planets to habitable environments.
 | Tech Name | Tech Level | RP Cost | Category | Effect |
 |-----------|------------|---------|----------|--------|
 | Controlled Dead Environment | 8 | 1,290 | colonization | Colonize dead planets |
-| Death Spores | 9 | 1,600 | bio_weapon | -1M pop per attack |
+| Death Spores | 9 | 1,600 | bio_weapon | -1M pop per combat round, -10% max pop permanent |
 
 ---
 
@@ -150,7 +150,7 @@ Converts hostile planets to habitable environments.
 |-----------|------------|---------|----------|--------|
 | Improved Terraforming +60 | 22 | 9,210 | terraforming | +60 max pop, 3 BC/million |
 | Advanced Eco Restoration | 22 | 9,210 | eco_restoration | Eliminates 10 waste per 1 BC |
-| Doom Virus | 25 | 11,660 | bio_weapon | -2M pop per attack |
+| Doom Virus | 25 | 11,660 | bio_weapon | -2M pop per combat round, -25% max pop permanent |
 
 ---
 
@@ -171,7 +171,7 @@ Converts hostile planets to habitable environments.
 |-----------|------------|---------|----------|--------|
 | Improved Terraforming +80 | 30 | 20,730 | terraforming | +80 max pop, 2 BC/million |
 | Universal Antidote | 30 | 20,730 | bio_defense | Reduces bio casualties by 2M |
-| Bio Terminator | 33 | 25,600 | bio_weapon | -3M pop per attack |
+| Bio Terminator | 33 | 25,600 | bio_weapon | -3M pop per combat round, -50% max pop permanent |
 
 ---
 
@@ -338,18 +338,19 @@ Effective_Cleanup_Cost = Total_Waste × 0.5 × Cleanup_Modifier
 
 Bio weapons are ship-mounted special weapons that kill planetary population. Each attack reduces the target planet's population. They carry severe diplomatic penalties.
 
-| Weapon | Tech Level | RP Cost | Kill Rate | Space | Cost |
-|--------|------------|---------|-----------|-------|------|
-| Death Spores | 9 | 1,600 | 1M per attack | 150 | 100 BC |
-| Doom Virus | 25 | 11,660 | 2M per attack | 200 | 200 BC |
-| Bio Terminator | 33 | 25,600 | 3M per attack | 250 | 300 BC |
+| Weapon | Tech Level | RP Cost | Kill Rate | Space | Cost | Max Pop Reduction |
+|--------|------------|---------|-----------|-------|------|-------------------|
+| Death Spores | 9 | 1,600 | 1M per combat round | 150 | 100 BC | -10% permanent |
+| Doom Virus | 25 | 11,660 | 2M per combat round | 200 | 200 BC | -25% permanent |
+| Bio Terminator | 33 | 25,600 | 3M per combat round | 250 | 300 BC | -50% permanent |
 
 **Bio Weapon Mechanics:**
 - Ship must have bio weapon equipped in design
-- Attack reduces population each combat round the ship survives
-- Multiple bio weapons stack (2 Death Spores = 2M per attack)
+- Kill rate applies each combat round the ship survives in-system
+- Multiple bio weapons stack additively (2 Death Spores = 2M per combat round)
 - Does NOT affect factories or planetary defenses
 - Kills defenders during ground invasion phase
+- **Max pop reduction is permanent** until planet is re-terraformed
 
 **Diplomatic Penalty:**
 - Using bio weapons causes -100 relation with ALL races
@@ -543,7 +544,7 @@ Max_Population = (Base_Size + Terraforming_Bonus + Soil_Enrichment_Bonus) × Env
 # Soil_Enrichment_Bonus: 0, 25 (Basic), or 50 (Advanced) — tracked per planet
 ```
 - Cannot exceed hard cap of 300 per planet
-- Base sizes range from 10 (tiny) to 120 (huge)
+- Base sizes (fixed): Tiny=20, Small=40, Medium=60, Large=80, Huge=100
 
 ### Stacking Bio Weapons
 - Multiple bio weapons on same ship stack additively
@@ -1216,9 +1217,9 @@ See `../economy/factory-formulas.md` §8 for full pollution calculation.
 
 | Weapon | Tech Level | RP Cost | Kill Rate | Space | Cost |
 |--------|------------|---------|-----------|-------|------|
-| Death Spores | 9 | 1,600 | 1M/attack | 150 | 100 BC |
-| Doom Virus | 25 | 11,660 | 2M/attack | 200 | 200 BC |
-| Bio Terminator | 33 | 25,600 | 3M/attack | 250 | 300 BC |
+| Death Spores | 9 | 1,600 | 1M per combat round | 150 | 100 BC |
+| Doom Virus | 25 | 11,660 | 2M per combat round | 200 | 200 BC |
+| Bio Terminator | 33 | 25,600 | 3M per combat round | 250 | 300 BC |
 
 ### Bio-Defense (2 technologies)
 

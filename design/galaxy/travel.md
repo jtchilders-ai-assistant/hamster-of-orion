@@ -27,17 +27,19 @@ Engine tech determines parsecs traveled per turn:
 |--------|------------|------------|
 | Retro Engines | 1 | Starting |
 | Nuclear Engines | 2 | Early |
-| Sub-Light Drives | 3 | Early-Mid |
-| Fusion Drives | 4 | Mid |
-| Impulse Drives | 5 | Mid |
-| Ion Drives | 6 | Mid-Late |
-| Anti-Matter Drives | 7 | Late |
-| Inter-Phased Drives | 8 | Late |
-| Hyper Drives | 9 | End-game |
+| Sub-Light Drives | 2 | Early-Mid |
+| Fusion Drives | 3 | Mid |
+| Impulse Drives | 3 | Mid |
+| Ion Drives | 4 | Mid-Late |
+| Anti-Matter Drives | 5 | Late |
+| Interphased Drives | 6 | Late |
+| Hyperdrives | 7 | End-game |
+| Hyper-X Drives | 8 | End-game |
+| Temporal Drive | 9 | End-game |
 
 **Travel Time**: Distance (parsecs) ÷ Warp Speed = Turns to arrive (rounded up)
 
-**Example**: 12 parsec journey with Warp 4 (Fusion) = 3 turns
+**Example**: 12 parsec journey with Warp 4 (Ion) = 3 turns
 
 ---
 

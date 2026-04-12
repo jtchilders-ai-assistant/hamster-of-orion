@@ -88,7 +88,7 @@ In each game, players are offered **2-3 random technologies** at each tier. Not 
 | Neutron Blaster | 13 | Neutron Blaster | 3-12 damage, kills crew |
 | Graviton Beam | 15 | Graviton Beam | 1-15 damage, stream |
 | Stinger Missiles | 15 | Stinger Missile | 15 damage, speed 4.5 |
-| Death Spores | 15 | Death Spores | Bio weapon, -10% max pop |
+| Death Spores | 15 | — | **See Planetology field** (bio weapons are not in Weapons field) |
 
 ---
 
@@ -133,7 +133,7 @@ In each game, players are offered **2-3 random technologies** at each tier. Not 
 | Megabolt Cannon | 25 | Megabolt Cannon | 2-20 damage, chain to 4 ships |
 | Phasor | 27 | Phasor | 5-20 damage, long range |
 | Hand Phasors | 27 | Hand Phasors | +20 ground combat |
-| Doom Virus | 28 | Doom Virus | Bio weapon, -25% max pop |
+| Doom Virus | 28 | — | **See Planetology field** (bio weapons are not in Weapons field) |
 
 ---
 
@@ -186,7 +186,7 @@ In each game, players are offered **2-3 random technologies** at each tier. Not 
 | Particle Beam | 40 | Particle Beam | 10-20 damage |
 | Plasma Cannon | 42 | Plasma Cannon | 6-30 damage, ×2 shield damage |
 | Proton Torpedo | 42 | Proton Torpedo | 40 damage, no intercept |
-| Bio Terminator | 42 | Bio Terminator | Bio weapon, -50% max pop |
+| Bio Terminator | 42 | — | **See Planetology field** (bio weapons are not in Weapons field) |
 
 ---
 
@@ -328,11 +328,13 @@ Planetary bombardment weapons.
 ### Biological Weapons (3 total)
 Kill population, permanent damage, diplomatic penalty.
 
-| Tech Level | Weapon | Pop Damage | Max Pop Reduction |
-|------------|--------|------------|-------------------|
-| 15 | Death Spores | 2-10/turn | -10% |
-| 28 | Doom Virus | 5-20/turn | -25% |
-| 42 | Bio Terminator | 10-40/turn | -50% |
+**Note:** Bio weapons are researched in the **Planetology** technology field, not here.
+
+| Tech Level (Planetology) | Weapon | Kill Rate | Max Pop Reduction |
+|--------------------------|--------|-----------|-------------------|
+| 9 | Death Spores | 1M per combat round | -10% permanent |
+| 25 | Doom Virus | 2M per combat round | -25% permanent |
+| 33 | Bio Terminator | 3M per combat round | -50% permanent |
 
 ### Ground Combat Weapons (6 total)
 Passive bonuses to ground combat.
@@ -850,7 +852,8 @@ Passive bonuses to ground combat.
       "missile": 11,
       "torpedo": 4,
       "bomb": 5,
-      "biological": 3,
+      "biological": 0,
+      "biological_note": "Bio weapons are in the Planetology field (see technology/planetology.md)",
       "ground": 6
     },
     

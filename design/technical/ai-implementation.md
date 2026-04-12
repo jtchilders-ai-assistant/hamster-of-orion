@@ -550,12 +550,13 @@ Ships are classified into roles based on their design:
 function classify_fleet_role(fleet):
     total_ships = count(fleet.ships)
     
-    scout_count = count(ships where class == 'scout')
+    # Hull sizes: small, medium, large, huge (MOO1 canonical)
+    small_count = count(ships where class == 'small')
     bomber_count = count(ships where has_bombs == true)
-    capital_count = count(ships where class in ['cruiser', 'battle_cruiser', 'dreadnought', 'titan'])
-    fighter_count = count(ships where class in ['scout', 'fighter', 'destroyer'])
+    capital_count = count(ships where class in ['large', 'huge'])
+    light_count = count(ships where class in ['small', 'medium'])
     
-    if scout_count > total_ships * 0.7:
+    if small_count > total_ships * 0.7:
         return 'reconnaissance'
     
     if bomber_count > capital_count:
@@ -564,7 +565,7 @@ function classify_fleet_role(fleet):
     if capital_count >= 3:
         return 'strike_force'
     
-    if fighter_count > capital_count * 2:
+    if light_count > capital_count * 2:
         return 'patrol'
     
     return 'defense'
@@ -691,26 +692,25 @@ When building fleets, the AI targets compositions based on role:
 {
   "fleet_compositions": {
     "reconnaissance": {
-      "scout": {"min": 3, "max": 10},
-      "destroyer": {"min": 0, "max": 2}
+      "small": {"min": 3, "max": 10},
+      "medium": {"min": 0, "max": 2}
     },
     "patrol": {
-      "fighter": {"min": 5, "max": 20},
-      "destroyer": {"min": 2, "max": 8}
+      "small": {"min": 5, "max": 20},
+      "medium": {"min": 2, "max": 8}
     },
     "defense": {
-      "destroyer": {"min": 5, "max": 15},
-      "cruiser": {"min": 2, "max": 6},
-      "battle_cruiser": {"min": 0, "max": 2}
+      "medium": {"min": 5, "max": 15},
+      "large": {"min": 2, "max": 6},
+      "huge": {"min": 0, "max": 2}
     },
     "strike_force": {
-      "cruiser": {"min": 3, "max": 10},
-      "battle_cruiser": {"min": 2, "max": 5},
-      "dreadnought": {"min": 1, "max": 3}
+      "large": {"min": 3, "max": 10},
+      "huge": {"min": 2, "max": 5}
     },
     "invasion": {
-      "destroyer": {"min": 5, "max": 15},
-      "cruiser": {"min": 3, "max": 8},
+      "medium": {"min": 5, "max": 15},
+      "large": {"min": 3, "max": 8},
       "bomber": {"min": 5, "max": 20}
     }
   }

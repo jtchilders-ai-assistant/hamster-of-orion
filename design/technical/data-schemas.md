@@ -125,15 +125,12 @@ enum StarType {
   PURPLE = "purple"
 }
 
-/** Ship class sizes */
+/** Ship hull sizes (MOO1 canonical) */
 enum ShipClass {
-  SCOUT = "scout",
-  FIGHTER = "fighter",
-  DESTROYER = "destroyer",
-  CRUISER = "cruiser",
-  BATTLE_CRUISER = "battle_cruiser",
-  DREADNOUGHT = "dreadnought",
-  TITAN = "titan"
+  SMALL = "small",
+  MEDIUM = "medium",
+  LARGE = "large",
+  HUGE = "huge"
 }
 
 /** Weapon categories */

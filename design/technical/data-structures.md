@@ -374,8 +374,7 @@ interface ShipDesign {
   shipsBuilt: number;          // How many built
 }
 
-type ShipClass = 'scout' | 'fighter' | 'destroyer' | 'cruiser' |
-                 'battle_cruiser' | 'dreadnought' | 'titan';
+type ShipClass = 'small' | 'medium' | 'large' | 'huge'; // MOO1 canonical hull sizes
 
 interface ShipComponent {
   id: string;

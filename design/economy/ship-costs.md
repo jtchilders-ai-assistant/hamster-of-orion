@@ -28,10 +28,10 @@ Ship_Cost = Hull_Cost + Engine_Cost + Σ(Weapon_Costs) + Σ(Defense_Costs) + Σ(
 
 | Hull Size | Base Space | Base Hull Cost | Notes |
 |-----------|------------|----------------|-------|
-| Small | ~40 | 6 BC | Scouts, fighters, colony ships |
-| Medium | ~100 | 36 BC | Multi-role warships |
-| Large | ~250 | 200 BC | Heavy warships |
-| Huge | ~500+ | 1200 BC | Capital ships |
+| Small | 25 | 6 BC | Scouts, fighters, colony ships |
+| Medium | 70 | 36 BC | Multi-role warships |
+| Large | 280 | 200 BC | Heavy warships |
+| Huge | 1400 | 1200 BC | Capital ships |
 
 **Note:** Hull cost is the **base cost before adding weapons and special equipment**. Ship systems (engines, shields, computers, ECM, armor, maneuver) are automatic and don't add to cost - they use your best available technology. Space values increase with Construction technology. See `ships/ship-classes.md` for details.
 
@@ -341,7 +341,17 @@ Fixed installations have different economics:
 
 ### 16. Transport Costs
 
-Troop transports have minimal combat value but strategic importance:
+There are two distinct transport classes in the game:
+
+#### A. Population (Colony) Transports
+Civilian ships used to move colonists between friendly planets. No combat capability. See `economy/population-growth.md` §7 for usage details.
+
+| Transport Type | Cost | Maintenance | Capacity |
+|----------------|------|-------------|----------|
+| Colony Transport | 50 BC | 1 BC/turn | 1 million pop |
+
+#### B. Military (Troop) Transports
+Military vessels used to carry soldiers for planetary invasion. Have limited self-defense but are primary combat targets.
 
 | Transport Type | Cost | Maintenance | Capacity |
 |----------------|------|-------------|----------|
@@ -367,13 +377,10 @@ Troop transports have minimal combat value but strategic importance:
   },
 
   "hull_costs": [
-    { "class": "scout", "space": 50, "hull_cost": 25 },
-    { "class": "fighter", "space": 100, "hull_cost": 40 },
-    { "class": "destroyer", "space": 250, "hull_cost": 80 },
-    { "class": "cruiser", "space": 500, "hull_cost": 150 },
-    { "class": "battle_cruiser", "space": 1000, "hull_cost": 300 },
-    { "class": "dreadnought", "space": 1500, "hull_cost": 500 },
-    { "class": "titan", "space": 2500, "hull_cost": 1000 }
+    { "class": "small",  "space": 25,   "hull_cost": 6 },
+    { "class": "medium", "space": 70,   "hull_cost": 36 },
+    { "class": "large",  "space": 280,  "hull_cost": 200 },
+    { "class": "huge",   "space": 1400, "hull_cost": 1200 }
   ],
 
   "racial_maintenance_modifiers": {
@@ -403,10 +410,14 @@ Troop transports have minimal combat value but strategic importance:
     { "type": "battlestation", "cost": 5000, "maintenance": 100 }
   ],
 
-  "transports": [
-    { "type": "light_transport", "cost": 50, "maintenance": 1, "capacity": 5 },
-    { "type": "heavy_transport", "cost": 100, "maintenance": 2, "capacity": 10 },
-    { "type": "assault_transport", "cost": 200, "maintenance": 4, "capacity": 20 }
+  "population_transports": [
+    { "type": "colony_transport", "cost": 50, "maintenance": 1, "capacity_millions": 1 }
+  ],
+
+  "troop_transports": [
+    { "type": "light_transport", "cost": 50, "maintenance": 1, "capacity_troops": 5 },
+    { "type": "heavy_transport", "cost": 100, "maintenance": 2, "capacity_troops": 10 },
+    { "type": "assault_transport", "cost": 200, "maintenance": 4, "capacity_troops": 20 }
   ],
 
   "budget_guidelines": {

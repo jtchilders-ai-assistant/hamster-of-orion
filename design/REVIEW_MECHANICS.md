@@ -164,36 +164,22 @@ But the complete formula in §6 and the pseudocode in the algorithm section both
 
 ---
 
-### H2 — Biological weapon max-population reduction is defined differently in each doc
+### ~~H2 — Biological weapon max-population reduction is defined differently in each doc~~ ✅ FIXED (2026-04-12)
 **Files:** `economy/population-growth.md` Edge Cases vs `technology/weapons.md` Bio Weapons table vs `technology/planetology.md` Bio Weapon Mechanics
 
-**In `population-growth.md`:**
-> Death Spores: -10% max population permanently
-> Doom Virus: -25% max population permanently
-> Bio Terminator: -50% max population permanently
+**Resolution:** `planetology.md` adopted as authoritative. Bio weapons are in the **Planetology** technology field, not the Weapons field. All docs now use fixed integer kill rates per combat round with permanent max-pop reductions:
 
-**In `weapons.md`** bio weapons table:
-```
-Death Spores: 2-10 pop/turn, -10% max pop
-Doom Virus:   5-20 pop/turn, -25% max pop
-Bio Terminator: 10-40 pop/turn, -50% max pop
-```
+| Weapon | Tech Level (Planetology) | Kill Rate | Max Pop Reduction |
+|--------|--------------------------|-----------|-------------------|
+| Death Spores | 9 | 1M per combat round | -10% permanent |
+| Doom Virus | 25 | 2M per combat round | -25% permanent |
+| Bio Terminator | 33 | 3M per combat round | -50% permanent |
 
-**In `planetology.md`** bio weapon stats:
-```
-Death Spores:   1M per attack, no max pop reduction mentioned
-Doom Virus:     2M per attack, no max pop reduction mentioned
-Bio Terminator: 3M per attack, no max pop reduction mentioned
-```
-
-Three different kill rates for the same weapons:
-- `population-growth.md`: implicitly flat (percentage of max pop)
-- `weapons.md`: `2-10/turn`, `5-20/turn`, `10-40/turn` (ranges)
-- `planetology.md`: `1M/attack`, `2M/attack`, `3M/attack` (fixed integers)
-
-The per-attack vs per-turn distinction also creates ambiguity. `planetology.md` treats each combat round as one "attack"; `weapons.md` says per-turn. Are these the same? Additionally, `planetology.md` omits the permanent max-population reduction that the other two docs specify. This needs a single authoritative definition.
-
-Also: `weapons.md` places Death Spores at tech level 15 (Weapons field), while `planetology.md` places them at tech level 9 (Planetology field). These are different fields — which field are bio weapons in?
+**Changes made:**
+- `technology/planetology.md`: Added max pop reduction column to bio weapons table; clarified "per combat round" wording; added note that max pop reduction is permanent
+- `ships/weapons-complete.md`: Updated bio weapons table and JSON with canonical values (tech levels 9/25/33, kill rates 1M/2M/3M, Planetology field, correct space/cost); added note that bio weapons are in Planetology field
+- `technology/weapons.md`: Removed bio weapons from Weapons field entries; updated summary table to point to Planetology; set biological category count to 0
+- `economy/population-growth.md`: Updated bio weapon section to include kill rate table alongside max-pop reduction; added formula; cross-referenced `planetology.md`
 
 ---
 
@@ -208,10 +194,20 @@ max_pop = floor((base_size + terraforming_bonus) * soil_multiplier * env_capacit
 
 ---
 
-### H4 — `slider-mathematics.md` referenced but does not exist
+### H4 — `slider-mathematics.md` referenced but does not exist ✅ FIXED (2026-04-12)
 **Files:** `economy/population-growth.md`, `economy/factory-formulas.md`, `economy/ship-costs.md`, `technology/research-formulas.md`
 
-All four economy docs reference `slider-mathematics.md` for worker/production allocation. This file does not appear to exist in the design directory. The slider system (ECO/PROD/SHIP/DEF/RES allocation) is central to all per-turn calculations but is entirely undefined in the reviewed documents.
+**Resolution:** Created `economy/slider-mathematics.md` defining the complete 5-slider system (SHIP/DEF/IND/ECO/TECH). Document includes:
+- Overview of all 5 sliders and their functions
+- Net production formula showing how TECH diverts population before production is calculated
+- ECO priority-ordered spending: (1) pollution cleanup, (2) population growth bonus, (3) terraforming
+- Locking mechanics and re-balancing algorithm
+- Reserve/overflow mechanics per slider
+- 3 worked examples including cleanup shortfall scenario
+- JSON schema for implementation
+- Governor AI notes
+
+All four referencing documents now have a valid target for their `slider-mathematics.md` cross-reference links.
 
 ---
 
@@ -222,107 +218,115 @@ Mice production bonus notes: "See `species/race-stats-complete.md` for full calc
 
 ---
 
-### H6 — Transport cost discrepancy
+### H6 — Transport cost discrepancy ✅ FIXED
 **Files:** `economy/population-growth.md` §7 vs `economy/ship-costs.md` §16
 
-**In `population-growth.md`:**
-```
-Transport: 5 BC, capacity 1 million pop
-```
+**Resolution:** These were two different transport classes that were never clearly distinguished. Fixed as follows:
 
-**In `ship-costs.md`:**
-```
-Light Transport:   50 BC, 1 BC/turn maintenance, capacity 5 troops
-Heavy Transport:  100 BC, 2 BC/turn maintenance, capacity 10 troops
-Assault Transport: 200 BC, 4 BC/turn maintenance, capacity 20 troops
-```
+- **Population (Colony) Transports** — civilian ships moving colonists between friendly planets. Updated from implausible 5 BC to **50 BC** (1 BC/turn maintenance, 1M pop capacity). Consistent with Small hull cost tables.
+- **Military (Troop) Transports** — invasion vessels. Unchanged: Light 50 BC / Heavy 100 BC / Assault 200 BC.
 
-`population-growth.md` defines a single "Transport" at 5 BC carrying 1M colonists. `ship-costs.md` defines three troop transport types at 50–200 BC with troop capacities. These appear to be two different classes of transport (population vs troops), but neither doc explains the distinction or cross-references the other. The 5 BC transport cost is also implausibly low given the hull cost tables.
+Both `population-growth.md` §7 and `ship-costs.md` §16 updated to clearly document both types with cross-references. JSON schema in ship-costs.md split into `population_transports` and `troop_transports` keys.
 
 ---
 
-### H7 — Planet base sizes differ between ecology doc and planetology doc
-**Files:** `economy/population-growth.md` and `economy/factory-formulas.md` vs `technology/planetology.md` constants section
+### H7 — Planet base sizes differ between ecology doc and planetology doc ✅ FIXED
+**Files:** `economy/population-growth.md` and `economy/factory-formulas.md` vs `technology/planetology.md` constants section and `galaxy/generation-algorithm.md`
 
-**In `population-growth.md` and `factory-formulas.md`:**
+**Resolution:** Unified to MOO1 canonical fixed values across all docs:
 ```
 Tiny: 20, Small: 40, Medium: 60, Large: 80, Huge: 100
 ```
 
-**In `planetology.md`** constants:
-```
-max_population_cap: 300
-Base sizes range from 10 (tiny) to 120 (huge)
-```
-
-The `planetology.md` constants comment says "Base sizes range from 10 (tiny) to 120 (huge)" which directly contradicts the 20–100 range in the economy docs. The JSON `environment_types` section and Soil Enrichment example (Large Ocean planet with base 100) are consistent with the economy docs' 20–100 range, making the constants comment appear to be an error — but it should be explicitly corrected.
+**Changes made:**
+- `technology/planetology.md` constants comment updated: "Base sizes range from 10 (tiny) to 120 (huge)" → "Base sizes (fixed): Tiny=20, Small=40, Medium=60, Large=80, Huge=100"
+- `galaxy/generation-algorithm.md` size table replaced (ranges → fixed values); `RollSize()` pseudocode updated to return fixed values; Orion base_pop corrected 150→100; homeworld base_pop corrected from random_int(85,120) to fixed large=80 or huge=100
+- `economy/population-growth.md` and `economy/factory-formulas.md` were already correct (authoritative source)
 
 ---
 
-### H8 — Hull cost tables are inconsistent
+### H8 — Hull cost tables are inconsistent ✅ FIXED
 **File:** `economy/ship-costs.md` §1 vs JSON schema
 
-**In the prose table (§1):**
-```
-Small:  Base Space ~40,  Hull Cost 6 BC
-Medium: Base Space ~100, Hull Cost 36 BC
-Large:  Base Space ~250, Hull Cost 200 BC
-Huge:   Base Space ~500, Hull Cost 1200 BC
-```
+**Resolution (2026-04-12):** Unified all hull class definitions to MOO1's 4-class system with canonical space values from MOO1:
 
-**In the JSON `hull_costs` array:**
-```json
-{ "class": "scout",        "space": 50,   "hull_cost": 25 },
-{ "class": "fighter",      "space": 100,  "hull_cost": 40 },
-{ "class": "destroyer",    "space": 250,  "hull_cost": 80 },
-{ "class": "cruiser",      "space": 500,  "hull_cost": 150 },
-{ "class": "battle_cruiser","space": 1000, "hull_cost": 300 },
-{ "class": "dreadnought",  "space": 1500, "hull_cost": 500 },
-{ "class": "titan",        "space": 2500, "hull_cost": 1000 }
-```
+| Hull Size | Space | Base Cost |
+|-----------|-------|----------|
+| Small  | 25    | 6 BC     |
+| Medium | 70    | 36 BC    |
+| Large  | 280   | 200 BC   |
+| Huge   | 1400  | 1200 BC  |
 
-The prose uses 4 hull sizes (Small/Medium/Large/Huge) matching MOO1. The JSON defines 7 named classes (scout/fighter/destroyer/etc.) with entirely different space and cost values. These two systems need to be reconciled. Are the 4 MOO1-style sizes mapped to some of the 7 JSON classes? Which is the canonical list?
-
-Also: `construction.md` notes "all 4 hull sizes are available from the start" and lists hull sizes as Small/Medium/Large/Huge with space values matching the prose in `ship-costs.md`, inconsistent with the 7-class JSON in `ship-costs.md`.
+**Changes made:**
+- `economy/ship-costs.md`: Prose table corrected (~40/~100/~250/~500+ → 25/70/280/1400); JSON `hull_costs` array replaced 7 old named classes (scout/fighter/destroyer/cruiser/battle_cruiser/dreadnought/titan) with 4 MOO1 classes (small/medium/large/huge)
+- `ships/ship-classes.md`: Hull size table updated to exact MOO1 space values; note updated; combat stats table updated with correct space values
+- `ships/ship-design.md`: Hull sizes table updated from approximations to exact values
+- `ships/components-complete.md`: `base_hp_by_class` JSON updated from 7 old classes to 4 MOO1 classes (small=3, medium=18, large=100, huge=600)
+- `technical/data-schemas.md`: `ShipClass` enum updated from 7 old classes to 4 MOO1 hull sizes
+- `technical/data-structures.md`: `ShipClass` type updated from 7 old classes to 4 MOO1 hull sizes
+- `technical/ai-implementation.md`: Fleet classification logic and fleet composition JSON updated to use MOO1 hull sizes
+- `technology/force-fields.md`: Black Hole Generator `requires_ship_class` updated from ["dreadnought", "titan"] to ["huge"]
 
 ---
 
-### H9 — Uridium Fuel Cells tech level conflict
+### H9 — Uridium Fuel Cells tech level conflict ✅ FIXED (2026-04-12)
 **Files:** `technology/propulsion.md` vs `galaxy/travel.md`
 
-**In `propulsion.md`** (Tier 5):
-- Uridium Fuel Cells @ tech level 18, range 7
+**Resolution:** Unified to MOO1 canonical values. Standard Fuel Cells now give **4 parsecs** range in all docs.
 
-**In `travel.md`** fuel cell table:
+- `propulsion.md`: Standard Fuel corrected from range 3 → 4; full progression shifted up by 1 throughout prose tables, detailed stats table, and JSON
+- `components-complete.md`: Fuel cell table and JSON array updated identically (Standard: 3→4, Extended: 4→5, … Maximum: 10→11)
+- `travel.md`: Starting fuel (Hydrogen) was already 4 — no change needed. Ranges now consistent with propulsion.md
+
+**Canonical fuel cell progression (all docs now agree):**
 ```
-Reajax II (listed as "Mid-Late", range 9) — but propulsion.md puts Reajax at tier 7 (range 8)
-Trilithium Crystals (range 10) — propulsion.md puts this at range 9
+Standard/Hydrogen: 4
+Extended/Deuterium: 5
+Improved/Irridium:  6
+Advanced/Dotomite:  7
+Superior/Uridium:   8
+High-Capacity/Reajax: 9
+Ultra/Trilithium:  10
+Maximum:           11
+Thorium:            ∞
 ```
 
-The `travel.md` table has 9 fuel cell entries but `propulsion.md` only has 9 too — however the ranges assigned differ. `travel.md` lists:
-```
-Hydrogen: 4, Deuterium: 5, Irridium: 6, Dotomite: 7, Uridium: 8, Reajax: 9, Trilithium: 10, Thorium: Unlimited
-```
-
-`propulsion.md` lists:
-```
-Standard: 3, Extended: 4, Improved: 5, Advanced: 6, Superior: 7, High-Capacity: 8, Ultra: 9, Maximum: 10, Thorium: ∞
-```
-
-The starting range is 3 in `propulsion.md` (Standard Fuel Cells) vs 4 in `travel.md` (Hydrogen). Also `travel.md` uses MOO1 lore names while `propulsion.md` uses generic names — which set of names is canonical? The starting range discrepancy (3 vs 4) matters for early-game balance.
+Note: `travel.md` uses MOO1 lore names; `propulsion.md`/`components-complete.md` use generic names. Name canonicalization is a separate concern (see L-series issues).
 
 ---
 
-### H10 — Travel doc uses different engine table than propulsion doc
+### H10 — Travel doc uses different engine table than propulsion doc ✅ FIXED (2026-04-12)
 **File:** `galaxy/travel.md` vs `technology/propulsion.md`
 
-`travel.md` lists warp speeds 1–9 with engine types:
-```
-Retro → Nuclear → Sub-Light → Fusion → Impulse → Ion → Anti-Matter → Inter-Phased → Hyper Drives
-```
-Max warp = 9.
+**Resolution:** Unified to MOO1 canonical warp speeds 1–9 (max warp 9). Both docs now agree.
 
-`propulsion.md` engine table goes up to Speed 10 (Temporal Drive, tech 55) and Speed 8 (Hyper-X Drive, tech 48). `travel.md` does not mention Hyper-X or Temporal drives, leaving a gap for end-game engines. The Hyper Drive in `travel.md` is listed as "End-game" at warp 9, but `propulsion.md` puts Hyperdrives at Speed 7 with Hyper-X at Speed 8.
+- `propulsion.md`: Temporal Drive corrected from Speed 10 → **9** (prose table, detailed stats table, JSON). Hyper-X Drive stays at Speed 8.
+- `travel.md`: Engine table expanded and corrected to match `propulsion.md` speed values:
+  - Sub-Light Drives corrected from warp 3 → **2** (matches propulsion.md Speed 2)
+  - Fusion Drives corrected from warp 4 → **3**
+  - Impulse Drives corrected from warp 5 → **3**
+  - Ion Drives corrected from warp 6 → **4**
+  - Anti-Matter Drives corrected from warp 7 → **5**
+  - Interphased Drives corrected from warp 8 → **6**
+  - Hyperdrives corrected from warp 9 → **7**
+  - Hyper-X Drives added at warp **8**
+  - Temporal Drive added at warp **9**
+- Travel example corrected: "Warp 4 (Fusion)" → "Warp 4 (Ion)"
+
+**Canonical engine warp speed table (all docs now agree):**
+```
+Retro Engines:    warp 1
+Nuclear Engines:  warp 2
+Sub-Light Drives: warp 2
+Fusion Drives:    warp 3
+Impulse Drives:   warp 3
+Ion Drives:       warp 4
+Antimatter Drive: warp 5
+Interphased Drive:warp 6
+Hyperdrive:       warp 7
+Hyper-X Drive:    warp 8
+Temporal Drive:   warp 9
+```
 
 ---
 
@@ -544,7 +548,7 @@ Planetary Shields have explicit maintenance costs (5–20 BC/turn). The `ship-co
 
 | Document | Referenced In | Content Needed |
 |----------|--------------|----------------|
-| `economy/slider-mathematics.md` | 4 docs | Complete slider (ECO/PROD/SHIP/DEF/RES) formulas |
+| ~~`economy/slider-mathematics.md`~~ | ~~4 docs~~ | ~~Complete slider (ECO/PROD/SHIP/DEF/RES) formulas~~ — **CREATED 2026-04-12** |
 | `species/race-stats-complete.md` | `factory-formulas.md` | Mice triple-stacking bonus formula |
 | `diplomacy/council.md` | `population-growth.md` | Council vote formula |
 | `game-mechanics/victory-conditions.md` | `population-growth.md` | Domination victory threshold |
@@ -566,13 +570,13 @@ Planetary Shields have explicit maintenance costs (5–20 BC/turn). The `ship-co
 | File | Critical | High | Medium | Low |
 |------|----------|------|--------|-----|
 | `economy/population-growth.md` | C1, C2, C6 | H1, H2, H3 | M5, M11 | L3, L4 |
-| `economy/factory-formulas.md` | C3, C4, C5 | H4, H5 | M12 | L1, L2 |
-| `economy/ship-costs.md` | C7 | H6, H8 | M6, M12 | L8 |
-| `technology/research-formulas.md` | C7 | H4 | M1, M4, M10 | L6 |
+| `economy/factory-formulas.md` | C3, C4, C5 | ~~H4~~✅, H5 | M12 | L1, L2 |
+| `economy/ship-costs.md` | C7 | H6, ~~H8~~✅ | M6, M12 | L8 |
+| `technology/research-formulas.md` | C7 | ~~H4~~✅ | M1, M4, M10 | L6 |
 | `technology/TECH_OVERVIEW.md` | — | — | — | — |
 | `technology/computers.md` | C3 | — | — | L10, L11 |
-| `technology/construction.md` | — | H8 | — | L1 |
-| `technology/force-fields.md` | — | — | M6, M7, M13 | L12 |
+| `technology/construction.md` | — | ~~H8~~✅ | — | L1 |
+| `technology/force-fields.md` | — | — | ~~M6~~✅, M7, M13 | L12 |
 | `technology/planetology.md` | C1, C2, C4, C6 | H2, H7 | M2 | L4, L5 |
 | `technology/propulsion.md` | — | H9, H10 | M3, M8, M9 | L7, L9 |
 | `technology/weapons.md` | — | H2 | — | — |
@@ -589,10 +593,10 @@ Planetary Shields have explicit maintenance costs (5–20 BC/turn). The `ship-co
 4. ~~**Resolve C2 (Soil Enrichment formula)**~~ ✅ FIXED
 5. **Resolve C4 (Eco Restoration)** — affects all factory calculations
 6. **Resolve C7 (Miniaturization cap)** — affects all ship design costs
-7. **Create `slider-mathematics.md`** (H4) — core to all per-turn calculations
-8. **Reconcile hull classes** (H8) — must choose MOO1 4-class or 7-class system
+7. ~~**Create `slider-mathematics.md`** (H4)~~ ✅ DONE — core to all per-turn calculations
+8. ~~**Reconcile hull classes** (H8)~~ ✅ FIXED — unified to MOO1 4-class system (Small/Medium/Large/Huge)
 9. **Resolve bio weapon stats** (H2) — three-way inconsistency
-10. **Resolve fuel range starting value** (H9, H10) — affects early game
+10. ~~**Resolve fuel range starting value** (H9, H10)~~ ✅ FIXED
 
 ---
 

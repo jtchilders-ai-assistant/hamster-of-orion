@@ -142,20 +142,32 @@ Effective_Damage = Bomb_Damage - Shield_Absorb
 
 Biological weapons kill population without destroying infrastructure. They have severe diplomatic penalties.
 
-| Weapon | Tech Level | Effect | Space | Cost | Special |
-|--------|------------|--------|-------|------|---------|
-| Death Spores | 15 | Kill 2-10 pop/turn | 40 | 30 BC | -10% max pop permanent |
-| Doom Virus | 28 | Kill 5-20 pop/turn | 60 | 60 BC | -25% max pop permanent |
-| Bio Terminator | 42 | Kill 10-40 pop/turn | 80 | 100 BC | -50% max pop permanent |
+**Note:** Bio weapons are researched in the **Planetology** technology field, not the Weapons field.
+
+| Weapon | Tech Level (Planetology) | Kill Rate | Space | Cost | Max Pop Penalty |
+|--------|--------------------------|-----------|-------|------|-----------------|
+| Death Spores | 9 | 1M per combat round | 150 | 100 BC | -10% permanent |
+| Doom Virus | 25 | 2M per combat round | 200 | 200 BC | -25% permanent |
+| Bio Terminator | 33 | 3M per combat round | 250 | 300 BC | -50% permanent |
+
+**Kill Rate Formula:**
+```
+Population_Killed = Weapon_Kill_Rate × Number_Of_Weapons × Combat_Rounds_Survived
+```
+
+**Example:** A ship with 2 Death Spores survives 3 combat rounds:
+- 1M × 2 × 3 = 6M population killed
 
 ### Biological Weapon Notes
 
 **Diplomatic Penalty:** Using biological weapons causes:
-- -50 relations with all races
-- -100 relations with victim race
+- -100 relations with all races
+- Some races will declare war immediately
 - Possible galaxy-wide war declarations
 
 **Permanent Damage:** Max population reduction is permanent until planet is re-terraformed.
+
+**Stacking:** Multiple bio weapons on the same ship stack additively (2 Death Spores = 2M per round).
 
 ---
 
@@ -726,34 +738,34 @@ The following weapons are "Heavy" and have mounting limits:
     {
       "id": "death_spores",
       "name": "Death Spores",
-      "tech_level": 15,
-      "pop_damage_min": 2,
-      "pop_damage_max": 10,
+      "tech_level": 9,
+      "tech_field": "planetology",
+      "pop_kill_per_round": 1,
       "max_pop_reduction": 0.10,
-      "space": 40,
-      "cost": 30,
+      "space": 150,
+      "cost": 100,
       "heavy": true
     },
     {
       "id": "doom_virus",
       "name": "Doom Virus",
-      "tech_level": 28,
-      "pop_damage_min": 5,
-      "pop_damage_max": 20,
+      "tech_level": 25,
+      "tech_field": "planetology",
+      "pop_kill_per_round": 2,
       "max_pop_reduction": 0.25,
-      "space": 60,
-      "cost": 60,
+      "space": 200,
+      "cost": 200,
       "heavy": true
     },
     {
       "id": "bio_terminator",
       "name": "Bio Terminator",
-      "tech_level": 42,
-      "pop_damage_min": 10,
-      "pop_damage_max": 40,
+      "tech_level": 33,
+      "tech_field": "planetology",
+      "pop_kill_per_round": 3,
       "max_pop_reduction": 0.50,
-      "space": 80,
-      "cost": 100,
+      "space": 250,
+      "cost": 300,
       "heavy": true
     }
   ],

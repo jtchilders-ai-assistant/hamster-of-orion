@@ -54,7 +54,7 @@ Fleet-wide speed improvements.
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
 | Retro Engines | 1 | Retro Engine | Speed 1, Combat 1, Maneuver 1 |
-| Standard Fuel Cells | 1 | Standard Fuel | Range 3 parsecs |
+| Standard Fuel Cells | 1 | Standard Fuel | Range 4 parsecs |
 | Inertial Stabilizer | 3 | Inertial Stabilizer | +2 Defense, +2 Initiative |
 
 **Starting Tech:** All races begin with Retro Engines and Standard Fuel Cells.
@@ -67,7 +67,7 @@ Fleet-wide speed improvements.
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
 | Nuclear Engines | 5 | Nuclear Engine | Speed 2, Combat 2, Maneuver 1 |
-| Range Fuel Cells | 4 | Extended Fuel | Range 4 parsecs |
+| Range Fuel Cells | 4 | Extended Fuel | Range 5 parsecs |
 | Reserve Fuel Tanks | 6 | Reserve Fuel Tank | +3 range (ship component) |
 
 ---
@@ -78,7 +78,7 @@ Fleet-wide speed improvements.
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
 | Sub-Light Drives | 8 | Sub-Light Drive | Speed 2, Combat 3, Maneuver 2 |
-| Deuterium Fuel Cells | 8 | Improved Fuel | Range 5 parsecs |
+| Deuterium Fuel Cells | 8 | Improved Fuel | Range 6 parsecs |
 
 ---
 
@@ -88,7 +88,7 @@ Fleet-wide speed improvements.
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
 | Fusion Drives | 12 | Fusion Drive | Speed 3, Combat 3, Maneuver 2 |
-| Dotomite Crystals | 13 | Advanced Fuel | Range 6 parsecs |
+| Dotomite Crystals | 13 | Advanced Fuel | Range 7 parsecs |
 | Energy Pulsar | 12 | Energy Pulsar | Area damage (1-6 to adjacent) |
 
 ---
@@ -99,7 +99,7 @@ Fleet-wide speed improvements.
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
 | Impulse Drives | 16 | Impulse Drive | Speed 3, Combat 4, Maneuver 2 |
-| Uridium Fuel Cells | 18 | Superior Fuel | Range 7 parsecs |
+| Uridium Fuel Cells | 18 | Superior Fuel | Range 8 parsecs |
 | Extended Reserve Tanks | 15 | Extended Reserve | +5 range (ship component) |
 
 ---
@@ -119,7 +119,7 @@ Fleet-wide speed improvements.
 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
-| Reajax Fuel Cells | 24 | High-Capacity Fuel | Range 8 parsecs |
+| Reajax Fuel Cells | 24 | High-Capacity Fuel | Range 9 parsecs |
 | Warp Dissipator | 24 | Warp Dissipator | Prevent enemy retreat |
 
 ---
@@ -139,7 +139,7 @@ Fleet-wide speed improvements.
 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
-| Trilithium Crystals | 30 | Ultra Fuel | Range 9 parsecs |
+| Trilithium Crystals | 30 | Ultra Fuel | Range 10 parsecs |
 | Combat Transporters | 30 | Combat Transporter | Board enemy ships |
 
 ---
@@ -158,7 +158,7 @@ Fleet-wide speed improvements.
 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
-| Iridium Fuel Cells | 37 | Maximum Fuel | Range 10 parsecs |
+| Iridium Fuel Cells | 37 | Maximum Fuel | Range 11 parsecs |
 
 ---
 
@@ -197,7 +197,7 @@ Fleet-wide speed improvements.
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
 | Hyper-Space Flux | 52 | — | All ships +1 speed empire-wide |
-| Temporal Drive | 55 | Temporal Drive | Speed 10, Combat 10, Maneuver 6 |
+| Temporal Drive | 55 | Temporal Drive | Speed 9, Combat 9, Maneuver 6 |
 
 ---
 
@@ -217,20 +217,20 @@ Fleet-wide speed improvements.
 | Interphased Drive | 34 | 6 | 6 | 12 | 90 BC | 4 |
 | Hyperdrive | 42 | 7 | 7 | 11 | 120 BC | 4 |
 | Hyper-X Drive | 48 | 8 | 8 | 10 | 150 BC | 5 |
-| Temporal Drive | 55 | 10 | 10 | 8 | 250 BC | 6 |
+| Temporal Drive | 55 | 9 | 9 | 8 | 250 BC | 6 |
 
 ### Fuel Cell Progression
 
 | Fuel Cell | Tech Level | Range | Space | Cost |
 |-----------|------------|-------|-------|------|
-| Standard Fuel | 1 | 3 | 0 | 0 BC |
-| Extended Fuel | 4 | 4 | 3 | 5 BC |
-| Improved Fuel | 8 | 5 | 3 | 8 BC |
-| Advanced Fuel | 13 | 6 | 3 | 12 BC |
-| Superior Fuel | 18 | 7 | 3 | 16 BC |
-| High-Capacity | 24 | 8 | 3 | 22 BC |
-| Ultra Fuel | 30 | 9 | 3 | 28 BC |
-| Maximum Fuel | 37 | 10 | 3 | 35 BC |
+| Standard Fuel | 1 | 4 | 0 | 0 BC |
+| Extended Fuel | 4 | 5 | 3 | 5 BC |
+| Improved Fuel | 8 | 6 | 3 | 8 BC |
+| Advanced Fuel | 13 | 7 | 3 | 12 BC |
+| Superior Fuel | 18 | 8 | 3 | 16 BC |
+| High-Capacity | 24 | 9 | 3 | 22 BC |
+| Ultra Fuel | 30 | 10 | 3 | 28 BC |
+| Maximum Fuel | 37 | 11 | 3 | 35 BC |
 | Thorium Cells | 45 | ∞ | 5 | 50 BC |
 
 ### Tactical Systems
@@ -269,8 +269,8 @@ Fleet-wide speed improvements.
 
 ### Early Game (Tiers 1-4)
 **Critical Priority:** Fuel range is the #1 constraint
-- **Range 3:** Can only reach nearby systems
-- **Range 4-5:** Opens mid-range expansion
+- **Range 4:** Can only reach nearby systems
+- **Range 5-6:** Opens mid-range expansion
 - **Priority:** Nuclear Engines + Extended Fuel
 
 ### Mid Game (Tiers 5-9)
@@ -349,7 +349,7 @@ At each tier, players choose from 2-3 randomly selected technologies:
             "unlocks": "standard_fuel",
             "starting_tech": true,
             "effect": {
-              "range": 3
+              "range": 4
             }
           },
           {
@@ -389,7 +389,7 @@ At each tier, players choose from 2-3 randomly selected technologies:
             "category": "fuel",
             "unlocks": "extended_fuel",
             "effect": {
-              "range": 4
+              "range": 5
             }
           },
           {
@@ -428,7 +428,7 @@ At each tier, players choose from 2-3 randomly selected technologies:
             "category": "fuel",
             "unlocks": "improved_fuel",
             "effect": {
-              "range": 5
+              "range": 6
             }
           }
         ]
@@ -457,7 +457,7 @@ At each tier, players choose from 2-3 randomly selected technologies:
             "category": "fuel",
             "unlocks": "advanced_fuel",
             "effect": {
-              "range": 6
+              "range": 7
             }
           },
           {
@@ -496,7 +496,7 @@ At each tier, players choose from 2-3 randomly selected technologies:
             "category": "fuel",
             "unlocks": "superior_fuel",
             "effect": {
-              "range": 7
+              "range": 8
             }
           },
           {
@@ -553,7 +553,7 @@ At each tier, players choose from 2-3 randomly selected technologies:
             "category": "fuel",
             "unlocks": "high_capacity_fuel",
             "effect": {
-              "range": 8
+              "range": 9
             }
           },
           {
@@ -609,7 +609,7 @@ At each tier, players choose from 2-3 randomly selected technologies:
             "category": "fuel",
             "unlocks": "ultra_fuel",
             "effect": {
-              "range": 9
+              "range": 10
             }
           },
           {
@@ -655,7 +655,7 @@ At each tier, players choose from 2-3 randomly selected technologies:
             "category": "fuel",
             "unlocks": "maximum_fuel",
             "effect": {
-              "range": 10
+              "range": 11
             }
           }
         ]
@@ -757,8 +757,8 @@ At each tier, players choose from 2-3 randomly selected technologies:
             "category": "engine",
             "unlocks": "temporal_drive",
             "effect": {
-              "speed": 10,
-              "combat_speed": 10,
+              "speed": 9,
+              "combat_speed": 9,
               "maneuver": 6
             }
           }
@@ -802,16 +802,16 @@ At each tier, players choose from 2-3 randomly selected technologies:
 | Early (Retro-Sub-Light) | 1-8 | 1-2 | 1-3 |
 | Mid (Fusion-Ion) | 12-20 | 3-4 | 3-4 |
 | Late (Antimatter-Hyper) | 26-42 | 5-7 | 5-7 |
-| Ultimate (Hyper-X+) | 48-55 | 8-10 | 8-10 |
+| Ultimate (Hyper-X+) | 48-55 | 8-9 | 8-9 |
 
 ### Fuel Cells (9 total)
 
 | Range | Tech Level | Strategic Impact |
 |-------|------------|------------------|
-| 3-4 | 1-4 | Local expansion |
-| 5-6 | 8-13 | Regional control |
-| 7-8 | 18-24 | Cross-galaxy operations |
-| 9-10 | 30-37 | Full map access |
+| 4-5 | 1-4 | Local expansion |
+| 6-7 | 8-13 | Regional control |
+| 8-9 | 18-24 | Cross-galaxy operations |
+| 10-11 | 30-37 | Full map access |
 | ∞ | 45 | Complete freedom |
 
 ### Tactical Systems (7 total)
