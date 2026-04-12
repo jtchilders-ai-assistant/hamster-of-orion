@@ -11,10 +11,20 @@ The galaxy starts covered in fog of war. Send scouts to reveal star systems, fin
 **Explored Systems**: Visible, planet data known
 **Owned Systems**: Full visibility within scanner range
 
-**Scanner Range** (based on propulsion tech):
-- Base range: 3 parsecs from owned colonies
-- Improved with fuel cell technology (see Propulsion tech tree)
-- Extended Range / Reserve Fuel Tanks add to ship range, not scanner range
+**Scanner Range** (M3 canonical definition):
+- Base range: **2 parsecs** from every owned colony (passive empire-wide sensor)
+- Scanner range is **not** affected by fuel cells or fuel tank components — those extend ship travel range only
+- Scanner range is improved by **Computers field** technologies (e.g., Deep Space Scanner, Subspace Scanner)
+- Extended Range / Reserve Fuel Tanks add to ship travel range, not scanner range
+
+| Technology (Computers Field) | Scanner Range |
+|------------------------------|---------------|
+| None (base)                  | 2 parsecs     |
+| Deep Space Scanner           | 4 parsecs     |
+| Subspace Scanner             | 6 parsecs     |
+| Deep Space Scanner II        | 8 parsecs     |
+
+See `technology/computers.md` for scanner tech details.
 
 ---
 
@@ -92,17 +102,22 @@ The galaxy starts covered in fog of war. Send scouts to reveal star systems, fin
 
 ## Artifacts Worlds
 
-**Ancient Technology Sites** (randomly placed during galaxy generation):
-- Colonizing reveals ancient tech
-- Immediate technology breakthrough
-- One-time bonus per planet
+**Ancient Technology Sites** (randomly placed during galaxy generation). Colonizing an Artifacts world provides **two distinct bonuses** (M2 clarification):
 
-**Discovery Results**:
-- Random technology from any field
-- Could be tech you already have (no benefit)
-- Could be advanced tech (major advantage)
+**1. One-Time Tech Unlock (upon colonization)**
+- Immediately grants a random technology from any field
+- Could be a tech you already own — in that case, no benefit
+- Could be an advanced tech from any field — potentially a major advantage
+- This fires exactly once per planet; reconquering does not re-trigger it
 
-**Strategy**: Prioritize colonizing Artifacts worlds early
+**2. Ongoing RP Multiplier (persistent)**
+- While the planet remains under your control, all RP generated there is multiplied by 1.25 (+25%)
+- Lost permanently if the planet is conquered or bombed to zero population
+- The Artifacts site is considered destroyed by orbital bombardment
+
+See `technology/research-formulas.md` §4 for the RP bonus formula.
+
+**Strategy**: Prioritize colonizing Artifacts worlds early — both the immediate tech unlock and the long-term RP bonus compound over time.
 
 ---
 

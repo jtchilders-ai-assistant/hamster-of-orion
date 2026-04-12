@@ -152,15 +152,13 @@ miniaturization_minimum = 0.50 (50% of base — i.e., same cap)
 
 ## HIGH Priority Issues (Formula Gaps / Structural Problems)
 
-### H1 — Morale modifier missing from growth formula header
+### ~~H1 — Morale modifier missing from growth formula header~~ ✅ FIXED (2026-04-12)
 **File:** `economy/population-growth.md` §1
 
-The "Core Formulas" section (§1) does not include `Morale_Modifier` in the displayed formula:
+The §1 formula now includes `Morale_Modifier` and a reference to §6:
 ```
-Growth_Per_Turn = Population × Base_Growth_Rate × Environment_Modifier × Racial_Modifier × (1 - Population / Max_Population)
+Growth_Per_Turn = Population × Base_Growth_Rate × Environment_Modifier × Racial_Modifier × Morale_Modifier × (1 - Population / Max_Population)
 ```
-
-But the complete formula in §6 and the pseudocode in the algorithm section both correctly include `morale_modifier`. The §1 formula is misleading and should be updated to match §6.
 
 ---
 
@@ -183,14 +181,14 @@ But the complete formula in §6 and the pseudocode in the algorithm section both
 
 ---
 
-### H3 — Population formula: Ants max-pop bonus not reflected in Max_Population formula
-**File:** `economy/population-growth.md` §4 (Racial modifiers note)
+### H3 — Population formula: Ants max-pop bonus not reflected in Max_Population formula ✅ FIXED (2026-04-12)
+**File:** `economy/population-growth.md` §2 and pseudocode
 
-The Ants entry says: "Ants also receive +25% max population capacity from their Overpopulation ability (applied to max_population calculation)." But `calculate_max_population()` pseudocode does not include a racial capacity modifier. The formula:
+**Resolution:** Added `Racial_Capacity_Modifier` to the Max_Population formula and `calculate_max_population()` pseudocode:
 ```
-max_pop = floor((base_size + terraforming_bonus) * soil_multiplier * env_capacity)
+Max_Population = floor((Base_Size + Terraforming_Bonus + Soil_Enrichment_Bonus) × Environment_Capacity_Modifier × Racial_Capacity_Modifier)
 ```
-...has no slot for a racial capacity bonus. Either the formula needs a `Racial_Capacity_Modifier` term, or the note should point to where it applies.
+Added `get_racial_capacity_modifier()` helper function (returns 1.25 for Ants, 1.0 for all others). Added `racial_capacity_modifiers` table to the JSON schema. The formula now correctly applies the Ants' Overpopulation +25% capacity bonus.
 
 ---
 
@@ -211,10 +209,16 @@ All four referencing documents now have a valid target for their `slider-mathema
 
 ---
 
-### H5 — `species/race-stats-complete.md` referenced but does not exist
+### ~~H5 — `species/race-stats-complete.md` referenced but does not exist~~ ✅ FIXED (2026-04-12)
 **File:** `economy/factory-formulas.md` §2, §6
 
-Mice production bonus notes: "See `species/race-stats-complete.md` for full calculation." This file is referenced in at least two places but was not present. Mice have three stacking production bonuses described in a note, but the complete formula for how they interact is deferred to a non-existent document.
+**Resolution:** `species/race-stats-complete.md` exists and has been updated with a complete **Example 0: Mice Triple-Stacking Production Bonus** section that documents:
+- How the three bonuses apply at different formula stages
+- Full pseudocode for ordering: RC bonus → Automated Production → Racial modifier
+- Worked example comparing Mice vs Hamsters at game start and late-game
+- Implementation notes clarifying that `production_per_pop_bonus: 2` in the JSON refers to the RC level effect, not a flat BC/pop bonus
+
+Also fixed the cross-reference paths in `factory-formulas.md` (was `species/race-stats-complete.md`, now `../species/race-stats-complete.md`) and corrected the description of Cybernetic Workers bonus from "+2 production per population" to "+2 RC level bonus (more max-operable factories)".
 
 ---
 
@@ -332,107 +336,138 @@ Temporal Drive:   warp 9
 
 ## MEDIUM Priority Issues (Gaps / Undefined Behavior)
 
-### M1 — No formula for how `Difficulty_Modifier` affects RP generation
+### M1 — No formula for how `Difficulty_Modifier` affects RP generation ✅ FIXED (2026-04-12)
 **File:** `technology/research-formulas.md` §1
 
-`Planet_RP` formula includes `Difficulty_Modifier` as a parameter, but the table at the bottom of the doc shows difficulty affects AI tech costs (not AI RP generation directly). The doc says "Player research cost is not affected by difficulty." It's unclear whether `Difficulty_Modifier` in the RP formula is for the player or AI, and what values it takes for each difficulty level at the per-planet RP generation stage.
+**Resolution:** Removed `Difficulty_Modifier` from the player `Planet_RP` formula entirely. It was confusing because difficulty does not affect player RP generation at all. The doc now clearly states:
+- `Planet_RP` formula (player): no `Difficulty_Modifier` term — player RP is unaffected by difficulty at all levels
+- `Difficulty_Modifier` applies only to `AI_Actual_Tech_Cost` (making AI techs cheaper or more expensive to research)
+- Full table of AI cost modifiers added: Simple 1.50×, Easy 1.25×, Average 1.00×, Hard 0.75×, Impossible 0.50×
+- Implementation note added: `Difficulty_Modifier` check gates on `empire.is_ai` before applying
+
+The `Difficulty Effects on Research` section at the bottom of the doc (which was already correct) is now consistent with §1 and §7.
 
 ---
 
-### M2 — Artifacts world bonus applies inconsistently
-**File:** `technology/research-formulas.md` §4
+### M2 — Artifacts world bonus applies inconsistently ✅ FIXED (2026-04-12)
+**File:** `technology/research-formulas.md` §4, `galaxy/exploration.md` Artifacts Worlds section
 
-Artifacts bonus listed as "+25% RP from that planet" in the Special RP Bonuses table, but the algorithm applies it as `planet_rp *= 1.25` only if `planet.has_artifacts`. The `exploration.md` doc says colonizing an Artifacts world gives "an immediate technology breakthrough" (a one-time tech, not an ongoing RP bonus). These are different mechanics — is it a one-time tech unlock, an ongoing RP multiplier, or both?
+**Resolution:** Artifacts worlds provide **both** bonuses — this was the intended design, never clearly stated. Both docs updated to document the dual benefit:
+1. **One-time tech unlock** — fires upon first colonization; grants one random tech from any field; does not repeat even if planet is reconquered
+2. **Ongoing +25% RP multiplier** — applies every turn while the planet remains under your control; lost permanently if the planet is conquered or bombed
 
----
-
-### M3 — Scanner range defined in exploration vs propulsion differently
-**File:** `galaxy/exploration.md` vs `technology/propulsion.md`
-
-`exploration.md` says: "Base range: 3 parsecs from owned colonies. Improved with fuel cell technology." This implies fuel cells extend scanner range. But `propulsion.md` scanner tech (Deep Space Scanner, Subspace Scanner, etc.) are in the Computers field, not Propulsion. And `exploration.md` explicitly says "Extended Range / Reserve Fuel Tanks add to ship range, not scanner range" — contradicting its own opening sentence that fuel cells improve scanner range.
+Both `research-formulas.md` §4 and `exploration.md` now describe both mechanics with the same language and the same implementation note.
 
 ---
 
-### M4 — `Actual_Tech_Cost` formula has an inversion issue
+### M3 — Scanner range defined in exploration vs propulsion differently ✅ FIXED (2026-04-12)
+**File:** `galaxy/exploration.md` Fog of War section, `technology/propulsion.md` Fuel Cells section
+
+**Resolution:** Unified with a single canonical definition:
+- **Base scanner range: 2 parsecs** from every owned colony (passive empire-wide sensor) — not 3
+- Scanner range is improved by **Computers field** technologies only (Deep Space Scanner, Subspace Scanner, etc.)
+- **Fuel cells and fuel tank components do not affect scanner range** — they extend ship travel range only
+
+**Changes made:**
+- `exploration.md` Fog of War section rewritten: base range corrected 3→2 parsecs, incorrect fuel cell reference removed, clarifying table added showing scanner range progression by Computers tech
+- `propulsion.md` Fuel Cells category description updated: explicit note added that fuel cells affect travel range only, not scanner range, with cross-reference to `exploration.md` and `computers.md`
+
+Canonical scanner range table (in `exploration.md`):
+| Technology (Computers Field) | Scanner Range |
+|------------------------------|---------------|
+| None (base)                  | 2 parsecs     |
+| Deep Space Scanner           | 4 parsecs     |
+| Subspace Scanner             | 6 parsecs     |
+| Deep Space Scanner II        | 8 parsecs     |
+
+---
+
+### M4 — `Actual_Tech_Cost` formula has an inversion issue ✅ FIXED (2026-04-12)
 **File:** `technology/research-formulas.md` §7
 
-```
-Actual_Tech_Cost = Base_Tech_Cost × (1 / Racial_Research_Modifier) × Galaxy_Size_Modifier × Difficulty_Modifier
-```
-
-This means Rats (1.5× research bonus) pay `1/1.5 = 0.67×` of base cost — effectively a cost reduction. This is functionally correct (Rats research faster), but the doc elsewhere says "Rats pay 50% less" which matches this math. However, the `process_research_turn` algorithm applies racial modifier to RP generation (not cost), and the comment in that function says `# For Rats: tech costs 50% less (modifier 1.5 applied to RP, not cost)`. These two implementations (cost reduction vs RP bonus) are mathematically equivalent but the dual documentation creates implementation confusion. Pick one and use it consistently.
+**Resolution:** Removed `(1 / Racial_Research_Modifier)` from `Actual_Tech_Cost` formula. Single canonical implementation: racial modifier is applied to RP generation (§1, §3), not tech cost. `Actual_Tech_Cost` now only uses `Galaxy_Size_Modifier` and `Difficulty_Modifier`. Explicit note added to §7 stating that the cost-inversion form is **not** the implementation and must not be used.
 
 ---
 
-### M5 — Edge case: what happens when Max_Population < current population after terraforming loss?
+### M5 — Edge case: what happens when Max_Population < current population after terraforming loss? ✅ FIXED (2026-04-12)
 **File:** `economy/population-growth.md` Edge Cases section
 
-The Conquered Population edge case says "Bio weapons reduce max population capacity: Death Spores: -10% max pop permanently." There is no formula or procedure for what happens when a tech upgrade is stolen/lost or when max population drops below current population (e.g., when you conquer a planet and bio weapons have reduced its capacity). The growth formula clamps at max, but what about existing excess population?
+**Resolution:** Added "Overcrowding" edge case to `population-growth.md`. Explicit rule: excess population does NOT die instantly. Growth halts (growth_factor = 0), and natural starvation from `process_food()` reduces population to max over several turns at the starvation rate (0.5 × deficit/turn). Added pseudocode and a concrete bio-weapon example. Implementation note added: `calculate_max_population()` must be called before `calculate_population_growth()` each turn.
 
 ---
 
-### M6 — Black Hole Generator requires "Huge hull" but JSON specifies different ship classes
+### M6 — Black Hole Generator requires "Huge hull" but JSON specifies different ship classes ✅ FIXED (previously, as part of H8)
 **File:** `technology/force-fields.md` §12 / JSON
 
-Prose says: "Requires capital ship (Huge hull only)." JSON says: `"requires_ship_class": ["dreadnought", "titan"]`. The game uses 4 MOO1 hulls (Small/Medium/Large/Huge) in some docs and 7 custom classes in others. "Dreadnought" and "Titan" are not MOO1 hull classes. Which hull classification system is authoritative here?
+**Resolution:** Fixed as part of H8 (hull class unification). JSON `requires_ship_class` was updated from `["dreadnought", "titan"]` to `["huge"]` when the game was unified to MOO1's 4-class hull system. Prose already said "Huge hull only" and the JSON now matches.
 
 ---
 
-### M7 — Stasis Field: "cannot target same ship two turns in a row" conflicts with duration
+### M7 — Stasis Field: "cannot target same ship two turns in a row" conflicts with duration ✅ FIXED (2026-04-12)
 **File:** `technology/force-fields.md` §10
 
-The prose says: "Cannot be used on same target two turns in row." But also says: "Does not prevent retreat (ship still retreats normally)." If a ship is in stasis (cannot move or fire), how can it retreat? This edge case needs explicit resolution. Also, the stasis effect says it "disables all weapons on target ship 1 turn" — it should specify whether this prevents retreat or not.
+**Resolution:** Authoritative ruling: **stasis DOES prevent retreat**. A ship in stasis cannot move, fire, or retreat during the stasis round; "cannot move or take any action" explicitly includes retreat. The contradictory "does not prevent retreat" note was removed from the Edge Cases section and the Stasis Field mechanics description was updated to state this explicitly. JSON updated with `"prevents_retreat": true`, `"prevents_targeting": true`, and `"cannot_retarget_same_ship_consecutive_rounds": true`.
 
 ---
 
-### M8 — Energy Pulsar area damage target is undefined
+### M8 — Energy Pulsar area damage target is undefined ✅ FIXED (2026-04-12)
 **File:** `technology/propulsion.md` §4 / JSON
 
-Energy Pulsar effect listed as `"area_damage": "1-6"` in JSON. The tech description says "1-6 damage to adjacent ships" but doesn't specify: adjacent on the combat grid? How many can be affected? Does this affect friendly ships? Does it apply to all ships in a stack? Needs a combat targeting definition.
+**Resolution:** Added "Energy Pulsar Mechanics (Detail)" section to `propulsion.md` with full Q&A targeting table. Authoritative rules:
+- "Adjacent" = the 6 immediately surrounding hexes on the combat grid (range 1)
+- Affects **all ships** in adjacent hexes (no cap), including **friendly ships** (indiscriminate)
+- Each ship in an adjacent hex is rolled separately (1d6 per ship, independent rolls)
+- Auto-hits (no accuracy roll), shields apply normally
+- Manual activation, uses special weapon slot, once per round
+- JSON updated with `area_target`, `affects_friendly`, `range`, `auto_hit`, `uses_weapon_slot`, `activations_per_round` fields
 
 ---
 
-### M9 — Warp Dissipator mechanics undefined
+### M9 — Warp Dissipator mechanics undefined ✅ FIXED (2026-04-12)
 **File:** `technology/propulsion.md` §7
 
-`"prevent_retreat": true` is the entire mechanical description. There's no formula or procedure for: How does it work (area of effect? targeting? range)? Can the ship with the Dissipator retreat? Does it affect all fleeing ships or just one? Does it work against hyperspace transit or only combat retreat?
+**Resolution:** Added complete Warp Dissipator mechanics to `propulsion.md`: area of effect (combat-zone-wide field, passive activation), all enemy ships blocked from retreat, carrier ship also cannot retreat while active, no stacking with multiple Dissipators, does NOT block hyperspace transit, does NOT work against Orion Guardian or Sub-Space Teleporter. JSON `effect` field updated with `area`, `prevents_dissipator_ship_retreat`, and `stacks` fields. A dedicated "Warp Dissipator Mechanics (Detail)" section added with full Q&A table and interaction notes.
 
 ---
 
-### M10 — Tech tier cost table header says "Tier Multiplier" but values are all 1×
+### M10 — Tech tier cost table header says "Tier Multiplier" but values are all 1× ✅ FIXED (2026-04-12)
 **File:** `technology/research-formulas.md` Table §6
 
-The tier cost table has a `Tier_Multiplier` column that is `1×` for every row. This column is either meaningless (and the costs are simply the flat values) or it was intended to show a multiplier system that was never filled in. The formula says `Base_Tech_Cost = Base_Cost × Tier_Multiplier` but this is tautological. The table should either remove the multiplier column or explain what it represents.
+**Resolution:** Removed the vestigial `Tier_Multiplier` column (was always 1×, adding no information) and updated the formula from `Base_Tech_Cost = Base_Cost × Tier_Multiplier` to `Base_Tech_Cost = Tier_Cost_Table[tier]` (direct lookup). Added a note explaining this is a flat per-tier schedule, not a multiplicative system. Also added a note explaining the Force Fields exception (see M13).
 
 ---
 
-### M11 — Conquest population reduction is defined vaguely
+### M11 — Conquest population reduction is defined vaguely ✅ FIXED (2026-04-12)
 **File:** `economy/population-growth.md` Edge Cases
 
-> "When conquering an enemy planet: Population is reduced by 50% (combat casualties)"
-
-No formula is given. Is this 50% of the remaining population after bombardment? 50% of the planet's total? Does this apply before or after ground combat? The phrase "combat casualties" implies it's from the invasion combat, but that's not quantified here.
+**Resolution:** Replaced the vague one-liner with an explicit sequence and formula:
+1. Bombardment phase kills population first (see weapons docs for bomb damage)
+2. Ground invasion occurs
+3. Post-invasion: `Conquest_Survivors = floor(Post_Bombardment_Pop × 0.50)` — applies to population surviving bombardment, NOT the planet's original total
+4. Minimum 1M survivors (cannot depopulate by conquest alone)
+5. Max pop capacity: player's terraforming tech applied, preserving floor of prior capacity
+6. Racial note: Ferrets reduce post-invasion reduction from 50% to 40%
 
 ---
 
-### M12 — Maintenance tech modifier stacking is not defined
+### M12 — Maintenance tech modifier stacking is not defined ✅ FIXED (2026-04-12)
 **File:** `economy/ship-costs.md` §7
 
-Three maintenance-reducing technologies are listed:
-```
-Automated Repair: -10% maintenance
-Advanced Damage Control: -20% maintenance
-Self-Repairing Hull: -30% maintenance
-```
-
-The algorithm applies them multiplicatively (`ship_maintenance *= tech.modifier`), but the table presents them as simple reductions. Are these additive or multiplicative? And are these the same "Automated Repair" and "Advanced Damage Control" defined in `construction.md` (which lists them as in-combat HP regeneration systems, not maintenance reducers)? The naming collision between maintenance modifiers in `ship-costs.md` and combat repair systems in `construction.md` is a significant gap.
+**Resolution:**
+- **Naming collision resolved:** The maintenance-reducing techs were renamed to "Fleet Logistics I/II/III" (Construction TL 14/30/44) to distinguish them from "Automated Repair Unit" and "Advanced Damage Control" in `construction.md` which are **combat HP regeneration systems** (not maintenance reducers)
+- **Stacking clarified:** Multiplicative. Formula: `Ship_Maintenance = Base × Racial_Mod × Fleet_Logistics_I_Mod × Fleet_Logistics_II_Mod × Fleet_Logistics_III_Mod`. With all three: 0.9 × 0.8 × 0.7 = 0.504 (~50% of base, not 60% additive)
+- JSON `maintenance_tech_modifiers` updated with new tech IDs and construction tech level references
+- `maintenance_stacking` field added with value `"multiplicative"`
 
 ---
 
-### M13 — Force Fields: total tiers claim is 14 but research cost table ends at tier 14 with 50,000 RP
+### M13 — Force Fields: total tiers claim is 14 but research cost table ends at tier 14 with 50,000 RP ✅ FIXED (2026-04-12)
 **File:** `technology/force-fields.md` overview vs `research-formulas.md` tier cost table
 
-`force-fields.md` says `"total_tiers": 14`. The global tier cost table in `research-formulas.md` only goes to tier 20 (100,000 RP), and tier 14 costs 18,000 RP. But the Force Fields tier 14 research cost in the doc is listed as 50,000 RP, which corresponds to tier 20 in the global table. The Force Fields field uses 14 internal tiers but the global RP costs don't map 1:1 to its tier numbering. This mapping is not explained anywhere.
+**Resolution:** Documented the Force Fields accelerated tier cost schedule explicitly in both files:
+- **Root cause:** Force Fields has only 14 internal tiers but spans the full tech level range (1–50+), so its tiers cover more tech levels each and cost proportionally more. It uses its own RP cost schedule, NOT the global table.
+- **`force-fields.md`:** Added a "Tier cost mapping note" section after the overview with a full 14-row table showing each internal tier's RP cost and its equivalent global tier (Tier 14 = 50,000 RP = Global Tier 18).
+- **`research-formulas.md` §6:** Added a Force Fields exception note explaining that Force Fields does NOT use the global tier cost table — always look up its costs in `force-fields.md`. All other fields (Weapons, Propulsion, Construction, Computers, Planetology) use the global table indexed by their internal tier number.
 
 ---
 
@@ -569,19 +604,19 @@ Planetary Shields have explicit maintenance costs (5–20 BC/turn). The `ship-co
 
 | File | Critical | High | Medium | Low |
 |------|----------|------|--------|-----|
-| `economy/population-growth.md` | C1, C2, C6 | H1, H2, H3 | M5, M11 | L3, L4 |
-| `economy/factory-formulas.md` | C3, C4, C5 | ~~H4~~✅, H5 | M12 | L1, L2 |
-| `economy/ship-costs.md` | C7 | H6, ~~H8~~✅ | M6, M12 | L8 |
-| `technology/research-formulas.md` | C7 | ~~H4~~✅ | M1, M4, M10 | L6 |
+| `economy/population-growth.md` | C1, C2, C6 | H1, H2, H3 | ~~M5~~✅, M11 | L3, L4 |
+| `economy/factory-formulas.md` | C3, C4, C5 | ~~H4~~✅, ~~H5~~✅ | M12 | L1, L2 |
+| `economy/ship-costs.md` | C7 | H6, ~~H8~~✅ | ~~M6~~✅, M12 | L8 |
+| `technology/research-formulas.md` | C7 | ~~H4~~✅ | ~~M1~~✅, ~~M4~~✅, M10 | L6 |
 | `technology/TECH_OVERVIEW.md` | — | — | — | — |
 | `technology/computers.md` | C3 | — | — | L10, L11 |
 | `technology/construction.md` | — | ~~H8~~✅ | — | L1 |
-| `technology/force-fields.md` | — | — | ~~M6~~✅, M7, M13 | L12 |
-| `technology/planetology.md` | C1, C2, C4, C6 | H2, H7 | M2 | L4, L5 |
-| `technology/propulsion.md` | — | H9, H10 | M3, M8, M9 | L7, L9 |
+| `technology/force-fields.md` | — | — | ~~M6~~✅, ~~M7~~✅, M13 | L12 |
+| `technology/planetology.md` | C1, C2, C4, C6 | H2, H7 | ~~M2~~✅ | L4, L5 |
+| `technology/propulsion.md` | — | H9, H10 | ~~M3~~✅, ~~M8~~✅, M9 | L7, L9 |
 | `technology/weapons.md` | — | H2 | — | — |
-| `galaxy/travel.md` | — | H9, H10 | M3 | — |
-| `galaxy/exploration.md` | — | — | M2, M3 | — |
+| `galaxy/travel.md` | — | H9, H10 | ~~M3~~✅ | — |
+| `galaxy/exploration.md` | — | — | ~~M2~~✅, ~~M3~~✅ | — |
 
 ---
 

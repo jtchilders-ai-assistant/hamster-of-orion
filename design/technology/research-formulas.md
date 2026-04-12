@@ -21,7 +21,7 @@ Research is how empires unlock new technologies in Hamster of Orion. Research Po
 Each planet generates RP based on scientists and research infrastructure:
 
 ```
-Planet_RP = Scientists × Base_RP_Per_Scientist × Research_Lab_Multiplier × Racial_Modifier × Difficulty_Modifier
+Planet_RP = Scientists × Base_RP_Per_Scientist × Research_Lab_Multiplier × Racial_Modifier
 ```
 
 Where:
@@ -29,7 +29,8 @@ Where:
 - `Base_RP_Per_Scientist` = 1.0 RP/turn
 - `Research_Lab_Multiplier` = Bonus from research buildings
 - `Racial_Modifier` = Race-specific research bonus
-- `Difficulty_Modifier` = Game difficulty adjustment
+
+**Note:** `Difficulty_Modifier` does **not** appear in the player RP formula. Player RP generation is unaffected by difficulty. Difficulty only affects AI research via the `Actual_Tech_Cost` formula (see §7). The `Difficulty_Modifier` term was removed from this formula to avoid implementation confusion.
 
 ---
 
@@ -82,10 +83,17 @@ Bonus_RP = Artifact_Bonuses + Event_Bonuses + Orion_Bonus
 
 | Source | Bonus |
 |--------|-------|
-| Artifacts World | +25% RP from that planet |
+| Artifacts World | **One-time tech unlock** upon colonization + **ongoing +25% RP** from that planet |
 | Orion (if colonized) | +400% RP (4× research speed) |
 | Random Discovery Event | +100-1000 RP one-time |
 | Research Treaty | +10% of partner's RP (mutual) |
+
+**Artifacts World — Dual Benefit (M2 clarification):**
+Artifacts worlds provide **two distinct bonuses**:
+1. **One-time tech unlock** — Upon first colonization, the empire immediately receives a random technology from any field (as if you had just researched it). The tech is chosen randomly; it may be one you already own (no benefit) or an advanced tech (major advantage). This fires once and does not repeat.
+2. **Ongoing RP multiplier** — For as long as the planet remains colonized by your empire, all RP generated there is multiplied by 1.25 (+25%). This bonus is lost if the planet is conquered or bombed to zero population.
+
+See also `galaxy/exploration.md` for strategic notes on locating and colonizing Artifacts worlds.
 
 ---
 
@@ -113,34 +121,42 @@ Each of the 6 technology fields has a slider:
 
 ### 6. Base Tech Cost by Tier
 
-Technology costs scale exponentially with tier:
+Technology costs are **flat per-tier values** — they do not use a multiplicative formula. The cost listed IS the base cost for any technology at that tier, regardless of which technology field it belongs to.
 
 ```
-Base_Tech_Cost = Base_Cost × Tier_Multiplier
+Base_Tech_Cost = Tier_Cost_Table[tier]  # Direct lookup; no multiplier applied
 ```
 
-| Tier | Base Cost | Tier Multiplier | Typical Total Cost |
-|------|-----------|-----------------|-------------------|
-| 1 | 50 | 1× | 50 RP |
-| 2 | 80 | 1× | 80 RP |
-| 3 | 150 | 1× | 150 RP |
-| 4 | 250 | 1× | 250 RP |
-| 5 | 500 | 1× | 500 RP |
-| 6 | 800 | 1× | 800 RP |
-| 7 | 1,500 | 1× | 1,500 RP |
-| 8 | 2,500 | 1× | 2,500 RP |
-| 9 | 4,000 | 1× | 4,000 RP |
-| 10 | 6,000 | 1× | 6,000 RP |
-| 11 | 8,000 | 1× | 8,000 RP |
-| 12 | 10,000 | 1× | 10,000 RP |
-| 13 | 14,000 | 1× | 14,000 RP |
-| 14 | 18,000 | 1× | 18,000 RP |
-| 15 | 24,000 | 1× | 24,000 RP |
-| 16 | 30,000 | 1× | 30,000 RP |
-| 17 | 40,000 | 1× | 40,000 RP |
-| 18 | 50,000 | 1× | 50,000 RP |
-| 19 | 70,000 | 1× | 70,000 RP |
-| 20 | 100,000 | 1× | 100,000 RP |
+**Note:** An earlier version of this document included a `Tier_Multiplier` column that was always 1×. That column was vestigial and has been removed. The costs below are the canonical values.
+
+| Tier | Base Tech Cost |
+|------|----------------|
+| 1 | 50 RP |
+| 2 | 80 RP |
+| 3 | 150 RP |
+| 4 | 250 RP |
+| 5 | 500 RP |
+| 6 | 800 RP |
+| 7 | 1,500 RP |
+| 8 | 2,500 RP |
+| 9 | 4,000 RP |
+| 10 | 6,000 RP |
+| 11 | 8,000 RP |
+| 12 | 10,000 RP |
+| 13 | 14,000 RP |
+| 14 | 18,000 RP |
+| 15 | 24,000 RP |
+| 16 | 30,000 RP |
+| 17 | 40,000 RP |
+| 18 | 50,000 RP |
+| 19 | 70,000 RP |
+| 20 | 100,000 RP |
+
+**Tech field tiers vs. global tiers:** Most technology fields use this table directly — Propulsion Tier 7 costs 1,500 RP, Weapons Tier 10 costs 6,000 RP, etc.
+
+**Exception — Force Fields:** The Force Fields field has only 14 internal tiers but spans the full tech level range (1–50+). It uses an **accelerated cost schedule** defined in `force-fields.md`, NOT this global table. Force Fields Tier 14 costs 50,000 RP (equivalent to global Tier 18), not 18,000 RP. Always look up Force Fields costs in `force-fields.md` directly.
+
+All other fields (Weapons, Propulsion, Construction, Computers, Planetology) use this global table indexed by their internal tier number.
 
 ---
 
@@ -149,8 +165,13 @@ Base_Tech_Cost = Base_Cost × Tier_Multiplier
 The actual cost may be modified by various factors:
 
 ```
-Actual_Tech_Cost = Base_Tech_Cost × (1 / Racial_Research_Modifier) × Galaxy_Size_Modifier × Difficulty_Modifier
+Actual_Tech_Cost = Base_Tech_Cost × Galaxy_Size_Modifier × Difficulty_Modifier
 ```
+
+**Racial modifier is NOT applied to tech cost.** It is applied to RP generation (§1 and §3). The canonical implementation:
+- Racial bonus multiplies `Planet_RP` in `calculate_empire_research()`
+- Tech cost is fixed — only Galaxy Size and Difficulty (AI only) modify it
+- The mathematically equivalent form `Base_Tech_Cost × (1 / Racial_Modifier)` was previously listed here but is **not the implementation** — it creates confusion about whether racial modifiers affect cost or RP, and requires separate cost tracking for AI vs player. **Use RP-side modifier only.**
 
 #### Galaxy Size Modifier
 
@@ -161,17 +182,25 @@ Actual_Tech_Cost = Base_Tech_Cost × (1 / Racial_Research_Modifier) × Galaxy_Si
 | Large | 1.25 |
 | Huge | 1.50 |
 
-#### Difficulty Modifier (for AI)
+#### Difficulty Modifier (AI Tech Cost Only)
 
-| Difficulty | Player Cost | AI Cost |
-|------------|-------------|---------|
-| Simple | 1.00 | 1.50 |
-| Easy | 1.00 | 1.25 |
-| Average | 1.00 | 1.00 |
-| Hard | 1.00 | 0.75 |
-| Impossible | 1.00 | 0.50 |
+Difficulty affects **AI tech costs only**, not player RP generation. Player research speed is identical at all difficulty levels.
 
-**Note:** Player research cost is not affected by difficulty. AI gets cost reduction on higher difficulties.
+| Difficulty | Player RP Gen | Player Cost | AI Cost Modifier | Effect |
+|------------|--------------|-------------|-----------------|--------|
+| Simple     | 1.00×        | 1.00×       | 1.50×           | AI pays 50% more RP per tech (researches slower) |
+| Easy       | 1.00×        | 1.00×       | 1.25×           | AI pays 25% more RP per tech |
+| Average    | 1.00×        | 1.00×       | 1.00×           | Baseline — AI and player research at equal speed |
+| Hard       | 1.00×        | 1.00×       | 0.75×           | AI pays 25% less RP per tech (researches faster) |
+| Impossible | 1.00×        | 1.00×       | 0.50×           | AI pays 50% less RP per tech (researches much faster) |
+
+**Implementation:** `Difficulty_Modifier` is applied only in `Actual_Tech_Cost` for AI empires:
+```
+AI_Actual_Tech_Cost = Base_Tech_Cost × Galaxy_Size_Modifier × Difficulty_Modifier
+```
+For the player empire, `Difficulty_Modifier = 1.00` always (effectively omitted).
+
+**Note:** Player research cost is not affected by difficulty. AI gets a cost reduction at higher difficulties — this is implemented as a multiplier on the tech cost (making techs cheaper for the AI to research), not as a bonus to AI RP generation.
 
 ---
 

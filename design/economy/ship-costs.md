@@ -177,11 +177,25 @@ Fleet_Maintenance = Σ(Ship_Maintenance) for all ships in empire
 
 #### Technology Modifiers
 
-| Technology | Effect |
-|------------|--------|
-| Automated Repair | -10% maintenance |
-| Advanced Damage Control | -20% maintenance |
-| Self-Repairing Hull | -30% maintenance |
+**Important naming note:** The Construction tech tree contains "Automated Repair Unit" and "Advanced Damage Control" as **in-combat HP regeneration systems** (ships recover % HP per combat round). These are NOT the same as the maintenance modifiers listed below. The maintenance-reducing technologies are separate planetary logistics and logistics automation techs, renamed here to avoid confusion:
+
+| Technology (Logistics) | Construction Tech Level | Effect on Maintenance | Stacking |
+|------------------------|------------------------|-----------------------|----------|
+| Fleet Logistics I | 14 | -10% fleet maintenance | Multiplicative |
+| Fleet Logistics II | 30 | -20% fleet maintenance | Multiplicative |
+| Fleet Logistics III | 44 | -30% fleet maintenance | Multiplicative |
+
+**Stacking rule:** These modifiers stack multiplicatively (each applied in sequence):
+```
+Ship_Maintenance = Base_Maintenance × Racial_Modifier × Fleet_Logistics_I_Mod × Fleet_Logistics_II_Mod × Fleet_Logistics_III_Mod
+
+# Example with all three:
+# 100 BC × 0.90 × 0.80 × 0.70 = 50.4 BC (approximately -50% total)
+```
+
+With all three Fleet Logistics techs at maximum, total maintenance is approximately **50% of base** (0.9 × 0.8 × 0.7 = 0.504). The modifiers are NOT additive (they do not simply sum to -60%).
+
+**Separate from combat repair:** Automated Repair Unit (+15% HP/turn, Construction TL 14) and Advanced Damage Control (+30% HP/turn, Construction TL 36) are combat-only in-battle recovery systems and have no effect on per-turn maintenance costs.
 
 ---
 
@@ -397,10 +411,11 @@ Military vessels used to carry soldiers for planetary invasion. Have limited sel
   },
 
   "maintenance_tech_modifiers": [
-    { "tech": "automated_repair", "modifier": 0.90 },
-    { "tech": "advanced_damage_control", "modifier": 0.80 },
-    { "tech": "self_repairing_hull", "modifier": 0.70 }
+    { "tech": "fleet_logistics_1", "construction_tech_level": 14, "modifier": 0.90, "note": "Logistics automation; NOT the same as Automated Repair Unit combat HP regen" },
+    { "tech": "fleet_logistics_2", "construction_tech_level": 30, "modifier": 0.80, "note": "Advanced logistics; NOT the same as Advanced Damage Control combat HP regen" },
+    { "tech": "fleet_logistics_3", "construction_tech_level": 44, "modifier": 0.70, "note": "Full logistics optimization" }
   ],
+  "maintenance_stacking": "multiplicative",
 
   "defensive_installations": [
     { "type": "missile_base", "cost": 150, "maintenance": 2 },

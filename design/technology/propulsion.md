@@ -36,7 +36,7 @@ In each game, players are offered **2-3 random technologies** at each tier. Not 
 Determine interstellar travel speed and combat maneuverability.
 
 ### Fuel Cells
-Determine maximum range from friendly colonies.
+Determine maximum **travel range** from friendly colonies (how far a ship can fly before needing to refuel at a colony or outpost). **Fuel cells do not affect scanner/sensor range** — that is governed by Computers field technologies (Deep Space Scanner, Subspace Scanner, etc.). See `galaxy/exploration.md` for the canonical scanner range table.
 
 ### Tactical Systems
 Special combat movement and defensive abilities.
@@ -89,7 +89,7 @@ Fleet-wide speed improvements.
 |-----------|------------|---------|--------|
 | Fusion Drives | 12 | Fusion Drive | Speed 3, Combat 3, Maneuver 2 |
 | Dotomite Crystals | 13 | Advanced Fuel | Range 7 parsecs |
-| Energy Pulsar | 12 | Energy Pulsar | Area damage (1-6 to adjacent) |
+| Energy Pulsar | 12 | Energy Pulsar | Area damage (1-6 to all adjacent ships; see §4 for targeting rules) |
 
 ---
 
@@ -238,9 +238,9 @@ Fleet-wide speed improvements.
 | System | Tech Level | Effect | Space | Cost |
 |--------|------------|--------|-------|------|
 | Inertial Stabilizer | 3 | +2 Defense, +2 Initiative | 15 | 25 BC |
-| Energy Pulsar | 12 | 1-6 damage to adjacent | 70 | 75 BC |
+| Energy Pulsar | 12 | 1-6 damage to adjacent ships (see §4) | 70 | 75 BC |
 | Inertial Nullifier | 20 | +4 Defense, +4 Initiative | 20 | 50 BC |
-| Warp Dissipator | 24 | Prevent retreat | 25 | 55 BC |
+| Warp Dissipator | 24 | Prevent all enemy fleet retreat (combat zone) | 25 | 55 BC |
 | Sub-Space Teleporter | 28 | Teleport any hex | 35 | 75 BC |
 | Displacement Device | 43 | 33% avoid hit | 40 | 110 BC |
 | High Energy Focus | 48 | +2 Init, +1 Attack | 30 | 80 BC |
@@ -467,7 +467,15 @@ At each tier, players choose from 2-3 randomly selected technologies:
             "category": "tactical",
             "unlocks": "energy_pulsar",
             "effect": {
-              "area_damage": "1-6"
+              "area_damage": "1-6",
+              "area_damage_roll": "1d6_per_adjacent_ship",
+              "area_target": "all_ships_in_adjacent_hexes",
+              "affects_friendly": true,
+              "range": 1,
+              "auto_hit": true,
+              "uses_weapon_slot": "special",
+              "activations_per_round": 1,
+              "description": "Deals 1d6 damage (separate roll per ship) to every ship in adjacent hexes. Indiscriminate: hits friendly ships too. Shields apply normally."
             }
           }
         ]
@@ -563,7 +571,10 @@ At each tier, players choose from 2-3 randomly selected technologies:
             "category": "tactical",
             "unlocks": "warp_dissipator",
             "effect": {
-              "prevent_retreat": true
+              "prevent_retreat": true,
+              "area": "combat_zone",
+              "prevents_dissipator_ship_retreat": true,
+              "stacks": false
             }
           }
         ]
@@ -821,10 +832,60 @@ At each tier, players choose from 2-3 randomly selected technologies:
 | Inertial Stabilizer | 3 | Early defense |
 | Energy Pulsar | 12 | Area damage |
 | Inertial Nullifier | 20 | Improved defense |
-| Warp Dissipator | 24 | Fleet trapping |
+| Warp Dissipator | 24 | Fleet trapping — prevent all enemy retreat |
 | Sub-Space Teleporter | 28 | Tactical mobility |
 | Displacement Device | 43 | Damage avoidance |
 | High Energy Focus | 48 | Initiative dominance |
+
+---
+
+## Energy Pulsar Mechanics (Detail)
+
+**Effect summary:** The Energy Pulsar discharges a burst of energy that deals 1-6 damage to all ships occupying hexes adjacent to the firing ship at the time of activation.
+
+| Question | Answer |
+|----------|--------|
+| What is "adjacent"? | All ships (enemy or friendly) in the 6 hexes immediately surrounding the firing ship on the combat grid |
+| How many ships can be affected? | All ships in adjacent hexes — no cap on count |
+| Does it affect friendly ships? | **Yes.** The Pulsar is indiscriminate; position your own ships to avoid adjacency |
+| Does it affect ships in a stack? | Yes — each ship in a stack in an adjacent hex is rolled separately |
+| How many times per round? | Once per combat round (not per shot) |
+| Is it automatic or manual? | Manual — player activates it like a weapon |
+| Does it consume a weapon slot? | Yes — uses a special weapon slot (same slot type as Stasis Field) |
+| Range? | Strictly adjacent hexes only (range 1); does not affect the firing ship's own hex |
+| Can it miss? | No — it automatically hits all adjacent targets; no accuracy roll |
+| Shields? | Normal shield absorption applies to the 1-6 roll per ship |
+| Is it targeted? | No — area of effect is automatic based on position; cannot be aimed at a specific ship |
+
+**Tactical use:** Best employed by fast ships (high maneuver) that can engage at range-1 distance and retreat quickly. Particularly effective vs. stacked fleets of many small ships — a single activation can damage the entire stack. **Avoid using on turns when friendly ships are adjacent or you may deal self-inflicted damage.**
+
+**JSON clarification:** The `"area_damage": "1-6"` field in the JSON means:
+- Roll 1d6 for each adjacent ship
+- Apply that damage to each ship independently (different roll per ship)
+- Damage is physical (not a field effect); shields reduce it normally
+
+---
+
+## Warp Dissipator Mechanics (Detail)
+
+**Effect summary:** The Warp Dissipator projects a warp-suppression field across the entire combat zone, preventing all enemy ships from initiating a combat retreat for that turn.
+
+| Question | Answer |
+|----------|--------|
+| Area of effect | Entire battle (combat-zone-wide field, not a targeted beam) |
+| Targeting | Passive — activates automatically each combat round |
+| Which enemies are blocked? | All enemy ships present in the battle |
+| Does the Dissipator ship retreat? | No — equipping ship cannot retreat while active |
+| Do multiple Dissipators stack? | No — one is sufficient; extras provide no added benefit |
+| Works vs. hyperspace transit? | No — only blocks **combat** retreat, not interstellar travel |
+| Works vs. Orion Guardian? | No — Guardian is immune to retreat prevention |
+| Works vs. Sub-Space Teleporter? | No — teleport is not classified as a retreat action |
+| Counter? | Destroy the Dissipator-equipped ship before retreat phase |
+
+**Interaction with stasis and combat retreat sequence:**
+1. At the start of each round, the Dissipator field is active if the carrier is alive and not disabled.
+2. During the retreat phase, any enemy ship attempting to flee receives "RETREAT BLOCKED" and must stay in combat.
+3. If the carrier is destroyed mid-round (before the retreat phase), the field drops and enemies may retreat freely that same round.
 
 ---
 

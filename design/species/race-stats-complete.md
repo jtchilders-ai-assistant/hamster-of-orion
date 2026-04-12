@@ -1415,6 +1415,78 @@ InitialRelationship = DIPLOMACY_UNFRIENDLY_START + (DiplomacyBonus / 3)
 
 ## Examples
 
+### Example 0: Mice (Meklar) Triple-Stacking Production Bonus
+
+Mice have **three** stacking production bonuses that interact in specific ways:
+
+1. **+25% base production modifier** (`bonuses.production: 25`) — applies to both factory output and population labor output
+2. **+2 Robotic Controls level bonus** (`cybernetic_workers` ability) — Mice effectively start at RC IV (4 factories/pop) instead of RC II. This increases maximum operable factories, which scales total production.
+3. **+50% factory efficiency** (`automated_production` ability, `factory_efficiency: 50`) — each factory produces 1.5 BC instead of 1.0 BC before racial modifier is applied
+
+#### How They Stack
+
+The bonuses apply at different stages of the production formula:
+
+```
+# Step 1: Robotic Controls bonus — more factories can operate
+Effective_RC_Level = Researched_RC_Level + 2  # Mice always get +2
+Max_Operable_Factories = Population × Effective_RC_Level
+
+# Step 2: Automated Production bonus — each factory output multiplied
+Factory_Base_Output = 1.0 × 1.50  # = 1.5 BC per factory (Automated Production)
+
+# Step 3: Racial production modifier — applied to both factory and pop output
+Racial_Modifier = 1.25  # +25% production bonus
+
+Factory_Production = Operating_Factories × Factory_Base_Output × Racial_Modifier
+                   = Operating_Factories × 1.50 × 1.25
+                   = Operating_Factories × 1.875 BC/factory
+
+Population_Production = Population × 0.5 × Racial_Modifier
+                      = Population × 0.5 × 1.25
+                      = Population × 0.625 BC/pop
+```
+
+#### Worked Example: Mice vs Hamsters at Game Start
+
+**Scenario:** Medium planet, 10 population, 20 factories, Robotic Controls II researched, no tech upgrades
+
+| Factor | Hamsters | Mice |
+|--------|----------|------|
+| RC Level | 2 | 2 + 2 = **4** |
+| Max Operable Factories | 10 × 2 = 20 | 10 × 4 = **40** |
+| Operating Factories | min(20, 20) = 20 | min(20, 40) = 20 |
+| Factory Output/Factory | 1.0 BC × 1.00 | 1.5 BC × 1.25 = **1.875 BC** |
+| Factory Production | 20 × 1.0 = 20 BC | 20 × 1.875 = **37.5 BC** |
+| Population Output/Pop | 0.5 × 1.00 = 0.5 BC | 0.5 × 1.25 = **0.625 BC** |
+| Population Production | 10 × 0.5 = 5 BC | 10 × 0.625 = **6.25 BC** |
+| Gross Production | **25 BC** | **43.75 BC** |
+| Mice advantage | — | **+75% more production** |
+
+Note: At game start, both races only have 20 factories, so the RC bonus doesn't yet increase factory count — it just means Mice can operate up to 40 factories without additional RC research. The RC bonus becomes decisive as the factory count grows. Once Mice build 40+ factories (vs Hamsters' max of 20 at RC II), the RC bonus compounds the already superior per-factory output.
+
+#### Late-Game Scaling (100 population, RC VII researched)
+
+| Factor | Hamsters (RC VII) | Mice (RC VII + 2 = RC IX*) |
+|--------|-------------------|----------------------------|
+| Effective RC Level | 7 | 7 + 2 = 9 |
+| Max Operable Factories | 100 × 7 = 700 | 100 × 9 = **900** |
+| Factory Output per Factory | 1.0 BC | 1.5 × 1.25 = **1.875 BC** |
+| Max Gross Factory Production | 700 BC | 900 × 1.875 = **1,687.5 BC** |
+| Relative advantage | 1.0× | **2.41×** |
+
+*RC IX does not exist as a distinct technology — it's implemented as an effective multiplier cap: Mice's RC level is capped at `max_researched_RC + 2`. The max planet factory count is `Max_Population × (Researched_RC_Level + 2)`.
+
+#### Implementation Notes
+
+- Apply RC bonus **before** calculating `Max_Operable_Factories`
+- Apply Automated Production bonus to `Factory_Base_Output` (makes it 1.5)
+- Apply Racial Production Modifier to both factory and population components
+- The `production_per_pop_bonus: 2` in the JSON (`cybernetic_workers` ability) refers to the RC level bonus effect (each pop controls 2 more factories), not a direct +2 BC/pop flat bonus
+- See `../economy/factory-formulas.md` §1–§3 for the authoritative production formulas
+
+---
+
 ### Example 1: Ant Production Calculation
 An Ant colony with 50 population and 100 factories:
 ```

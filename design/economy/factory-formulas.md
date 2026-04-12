@@ -54,7 +54,7 @@ Effective_Factory_Output = Operating_Factories × Base_Factory_Output × Racial_
 | Race | Modifier | Notes |
 |------|----------|-------|
 | Ants | 1.50 (+50%) | Hive efficiency |
-| Mice | 1.25 (+25%) | Base modifier. **Note:** Mice have THREE stacking production bonuses: (1) +25% base production modifier, (2) +2 production per population from Cybernetic Workers ability, (3) +50% factory efficiency from Automated Production ability. See `species/race-stats-complete.md` for full calculation. |
+| Mice | 1.25 (+25%) | Base modifier. **Note:** Mice have THREE stacking production bonuses: (1) +25% base production modifier, (2) +2 RC level bonus from Cybernetic Workers (more max-operable factories), (3) +50% factory efficiency from Automated Production ability (each factory outputs 1.5 BC base). See `../species/race-stats-complete.md` §Examples for full worked calculation. |
 | Guinea Pigs | 1.10 (+10%) | Strong workers |
 | Hamsters | 1.00 (baseline) | Balanced |
 | Rabbits | 1.00 (baseline) | Focus on growth |
@@ -159,7 +159,7 @@ With Terraforming, max population can increase significantly (see Population Gro
 
 **Racial Abilities:** Some races have abilities that affect maximum factories:
 - **Ants (Overpopulation):** +25% max population capacity, which also increases max factories
-- See `species/race-stats-complete.md` for full racial ability details
+- See `../species/race-stats-complete.md` for full racial ability details
 
 ---
 

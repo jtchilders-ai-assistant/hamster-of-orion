@@ -10,6 +10,27 @@ The Force Fields technology field provides defensive capabilities through ship-m
 
 **Technology Tiers:** 1-14 (50 RP to 50,000 RP)
 
+**Tier cost mapping note:** Force Fields has only 14 internal tiers but spans the full tech level range (1–50+). Its tiers cover a wider range of tech levels than fields with 18+ tiers, so the RP cost schedule is **accelerated** — each Force Fields tier costs proportionally more than a same-numbered global tier. Force Fields uses its own internal RP cost table (listed in the tier distribution below and in the JSON). Do not use the global tier cost table from `research-formulas.md` to look up Force Fields RP costs. The mapping is:
+
+| Force Fields Tier | Research Cost (Force Fields) | Global Tier Equivalent |
+|-------------------|------------------------------|------------------------|
+| 1 | 50 RP | Global Tier 1 |
+| 2 | 80 RP | Global Tier 2 |
+| 3 | 150 RP | Global Tier 3 |
+| 4 | 300 RP | ~Global Tier 4–5 |
+| 5 | 500 RP | Global Tier 5 |
+| 6 | 1,000 RP | ~Global Tier 6–7 |
+| 7 | 1,500 RP | Global Tier 7 |
+| 8 | 3,000 RP | ~Global Tier 8–9 |
+| 9 | 5,000 RP | ~Global Tier 9–10 |
+| 10 | 8,000 RP | Global Tier 11 |
+| 11 | 12,000 RP | ~Global Tier 11–12 |
+| 12 | 18,000 RP | Global Tier 14 |
+| 13 | 30,000 RP | Global Tier 16 |
+| 14 | 50,000 RP | Global Tier 18 |
+
+This means researching all 14 Force Fields tiers costs roughly the same total RP as researching 18 tiers in fields like Propulsion or Weapons.
+
 ---
 
 ## Tech Tree Structure
@@ -26,7 +47,7 @@ In each game, players are offered **2-3 random technologies** at each tier. Not 
 | 7-8 | 21-28 | Mid-Late | 1,500-3,000 RP |
 | 9-10 | 29-36 | Late | 4,000-8,000 RP |
 | 11-12 | 37-44 | End | 10,000-18,000 RP |
-| 13-14 | 45-50 | Ultimate | 24,000-50,000 RP |
+| 13-14 | 45-50 | Ultimate | 30,000-50,000 RP |
 
 ---
 
@@ -354,14 +375,21 @@ A ship with Zyro Shield and ECM V faces a 10-missile salvo:
 
 **Mechanics:**
 - Target ship cannot fire, move, or take any action for 1 combat round
-- Stasis target also cannot be targeted by friendly fire
+- Stasis target also cannot be targeted by friendly or enemy fire while in stasis
 - Single-target only (choose one ship in enemy stack)
 - 100% success rate (no save)
 - Uses special weapon slot
-- Cannot be used on same target two turns in row
+- Cannot be used on the same target two consecutive combat rounds
 - Does NOT work on Orion Guardian
 
-**Tactical Use:** Neutralize enemy capital ships while dealing with escorts.
+**Retreat and Stasis:**
+A ship in stasis **cannot retreat** during the turn it is in stasis — it is frozen in place. "Cannot move or take any action" explicitly includes retreat attempts. The note in the Edge Cases section ("does not prevent retreat") referred to a previous design; the authoritative rule is:
+- **In stasis:** Cannot move, fire, or retreat. Immune to all targeting.
+- **After stasis expires** (next round): Ship acts normally, including retreat if desired.
+
+This means Stasis Field effectively grants one free combat round against a priority target with zero risk of that ship escaping.
+
+**Tactical Use:** Neutralize enemy capital ships while dealing with escorts. The target cannot flee during the stasis turn.
 
 ---
 
@@ -900,7 +928,10 @@ If not in your tree, must acquire via:
             "unlocks": "stasis_field",
             "effect": {
               "disable_duration_turns": 1,
-              "description": "Completely disables target ship for 1 combat round"
+              "prevents_retreat": true,
+              "prevents_targeting": true,
+              "cannot_retarget_same_ship_consecutive_rounds": true,
+              "description": "Completely disables target ship for 1 combat round; ship cannot fire, move, or retreat. Immune to all targeting while frozen."
             },
             "component": {
               "space": 45,
@@ -1136,9 +1167,10 @@ If not in your tree, must acquire via:
 - Friendly fire possible if targeting own hex (do not do this)
 
 ### Stasis Field Edge Cases
-- Cannot target same ship two consecutive turns
-- Stasis target immune to friendly and enemy fire
-- Does not prevent retreat (ship still retreats normally)
+- Cannot target same ship two consecutive combat rounds
+- Stasis target immune to friendly and enemy fire while in stasis
+- **Stasis DOES prevent retreat** — a ship in stasis cannot move or retreat that round (contrary to a previous note which said otherwise; this is the authoritative ruling)
+- After stasis expires, ship can retreat normally on the next round
 - Does not work on Orion Guardian
 
 ---

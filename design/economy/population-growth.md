@@ -20,7 +20,7 @@ Population is the foundation of empire power in Hamster of Orion. More populatio
 Population growth follows a **logistic growth model** where growth slows as population approaches the carrying capacity:
 
 ```
-Growth_Per_Turn = Population × Base_Growth_Rate × Environment_Modifier × Racial_Modifier × (1 - Population / Max_Population)
+Growth_Per_Turn = Population × Base_Growth_Rate × Environment_Modifier × Racial_Modifier × Morale_Modifier × (1 - Population / Max_Population)
 ```
 
 Where:
@@ -28,6 +28,7 @@ Where:
 - `Base_Growth_Rate` = 0.10 (10% per turn)
 - `Environment_Modifier` = modifier based on planet type (0.0 to 1.0)
 - `Racial_Modifier` = race-specific growth bonus
+- `Morale_Modifier` = morale-based growth multiplier (see §6)
 - `Max_Population` = maximum population capacity of the planet
 
 **Note:** Growth is calculated as a floating point value but applied as an integer (fractional population is tracked separately).
@@ -36,11 +37,13 @@ Where:
 
 ### 2. Maximum Population Capacity
 
-Maximum population is determined by planet size, environment, and terraforming:
+Maximum population is determined by planet size, environment, terraforming, and racial capacity:
 
 ```
-Max_Population = (Base_Size + Terraforming_Bonus + Soil_Enrichment_Bonus) × Environment_Capacity_Modifier
+Max_Population = floor((Base_Size + Terraforming_Bonus + Soil_Enrichment_Bonus) × Environment_Capacity_Modifier × Racial_Capacity_Modifier)
 ```
+
+Where `Racial_Capacity_Modifier` is 1.0 for all races except Ants (1.25). This multiplier reflects the Ants' **Overpopulation** racial ability.
 
 #### Base Planet Sizes
 
@@ -432,6 +435,19 @@ To colonize hostile environments, specific technology is required:
     "hermit_crabs": null
   },
 
+  "racial_capacity_modifiers": {
+    "rabbits": 1.0,
+    "ants": 1.25,
+    "guinea_pigs": 1.0,
+    "hamsters": 1.0,
+    "rats": 1.0,
+    "ferrets": 1.0,
+    "budgies": 1.0,
+    "chameleons": 1.0,
+    "mice": 1.0,
+    "hermit_crabs": 1.0
+  },
+
   "racial_special_rules": {
     "hermit_crabs": {
       "ignore_environment_modifiers": true,
@@ -442,7 +458,8 @@ To colonize hostile environments, specific technology is required:
       "auto_transport_overflow": true
     },
     "ants": {
-      "immune_to_morale": true
+      "immune_to_morale": true,
+      "racial_capacity_modifier": 1.25
     },
     "mice": {
       "reduced_food_requirement": true
@@ -511,14 +528,24 @@ function calculate_max_population(planet, empire):
     terraforming_bonus = get_terraforming_bonus(empire)
     soil_bonus = get_soil_enrichment_bonus(planet)  # 0, 25, or 50 — per-planet, paid at upgrade time
     env_capacity = get_environment_capacity_modifier(planet.environment)
+    racial_capacity_modifier = get_racial_capacity_modifier(empire.race)  # 1.0 for most, 1.25 for Ants
     
     # Hermit Crabs ignore environment capacity penalty
     if empire.race == "hermit_crabs":
         env_capacity = 1.0
     
-    max_pop = floor((base_size + terraforming_bonus + soil_bonus) * env_capacity)
+    max_pop = floor((base_size + terraforming_bonus + soil_bonus) * env_capacity * racial_capacity_modifier)
     
     return max_pop
+
+function get_racial_capacity_modifier(race):
+    # Returns the racial max population capacity multiplier
+    # Most races: 1.0 (no bonus)
+    # Ants: 1.25 (+25% from Overpopulation ability)
+    modifiers = {
+        "ants": 1.25
+    }
+    return modifiers.get(race, 1.0)
 
 function calculate_morale_modifier(morale):
     # morale: 0-100
@@ -683,10 +710,55 @@ When population reaches max:
 - Consider alerting player to build transports (Rabbits: auto-queue)
 
 ### Conquered Population
-When conquering an enemy planet:
-- Population is reduced by 50% (combat casualties)
-- Survivors maintain their original max population capacity
-- Your terraforming tech applies, potentially increasing capacity
+
+When conquering an enemy planet, population is reduced by ground combat casualties. The sequence is:
+
+1. **Bombardment phase:** Planetary bombardment kills population before troops land (each bomb round reduces population; see `ships/weapons-complete.md` for bomb damage tables). Bombardment population losses are NOT the 50% figure below.
+2. **Ground invasion:** Troops land and fight the defending population.
+3. **Post-invasion reduction:** After your troops win, the **surviving post-bombardment population is reduced by 50%**. This represents the chaos, casualties, and resistance during the conquest.
+
+```
+Post_Bombardment_Pop = Planet_Population - Bombardment_Kills
+Conquest_Survivors = floor(Post_Bombardment_Pop × 0.50)
+Final_Population = Conquest_Survivors
+```
+
+**When does the 50% apply?**
+- After bombardment deaths, before the planet changes hands.
+- Applied to whatever population remains at the moment the invasion succeeds.
+- Minimum of 1 million surviving population (planet cannot be depopulated by conquest alone).
+
+**Max population capacity:** Survivors inherit the planet's existing max capacity. Your **terraforming tech level** determines the new max capacity (your tech replaces theirs if higher; their capacity floor is preserved otherwise):
+```
+New_Max_Pop = max(Old_Max_Pop, calculate_max_population(your_tech, planet_size, environment))
+```
+
+**Racial modifier:** Ferrets (aggressive warriors) reduce the post-invasion 50% to 40% (fewer wasted civilians — they're just ruthlessly efficient, not merciful). No other races modify the conquest reduction.
+
+### Overcrowding (Max Population Drops Below Current Population)
+
+When `Max_Population` is reduced below the current population (e.g., via bio weapon permanent max-pop reduction, or inheriting a planet whose max-pop was reduced by a prior owner), the following procedure applies:
+
+```
+if current_population > new_max_population:
+    excess = current_population - new_max_population
+    # Excess population does NOT die immediately
+    # Growth is suppressed to zero (growth_factor = 0 when pop >= max)
+    # Excess population starves at Starvation_Rate per turn until pop == max
+    # i.e., natural attrition reduces population to max over several turns
+    starvation_deaths = floor(excess * starvation_rate)  # applied each turn
+    planet.population -= starvation_deaths
+```
+
+**Rule:** Overcrowding does NOT instantly kill excess population. Instead:
+1. Growth halts (growth_factor clamps to 0)
+2. The `process_food()` function naturally causes starvation deaths each turn (excess pop requires food that wasn't planned for)
+3. Population converges to `Max_Population` over several turns at the starvation rate (0.5 × deficit/turn)
+4. No special overcrowding penalty beyond starvation — morale drops from starvation as normal
+
+**Bio weapon example:** A planet at 60 pop suffers a Death Spores attack reducing Max_Pop from 60 to 54. The 6 excess colonists do not die instantly — they survive but the planet is overcrowded. Starvation will remove them over the next few turns.
+
+**Implementation note:** `calculate_max_population()` should be called before `calculate_population_growth()` each turn. If the returned max is less than current population, skip growth calculation and let `process_food()` handle the reduction.
 
 ### Biological Weapon Damage
 Bio weapons (researched in the Planetology field) kill population each combat round and permanently reduce max population capacity:
