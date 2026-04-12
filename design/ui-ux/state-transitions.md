@@ -224,6 +224,19 @@ GALAXY_MAP_STATES:
 └── CONTEXT_MENU_OPEN (right-click menu visible)
 ```
 
+**Visual References — Galaxy Map States:**
+
+| State | Screenshot |
+|-------|------------|
+| IDLE | ![Galaxy Home](../moo_screens/moo_galaxy_home.png) — default idle view |
+| STAR_SELECTED (unexplored) | ![Unexplored Star](../moo_screens/moo_galaxy_unexplored.png) |
+| STAR_SELECTED (uncolonized planet) | ![Uncolonized Planet](../moo_screens/moo_galaxy_select_uncolonized_planet.png) |
+| FLEET_SELECTED | ![Ship Selected](../moo_screens/moo_galaxy_shipselect.png) — fleet info panel with range ring |
+| FLEET_SELECTED (in transit) | ![Moving Ship Selected](../moo_screens/moo_galaxy_movingshipselected.png) |
+| FLEET_SELECTED (deployment) | ![Fleet Deployment](../moo_screens/moo_galaxy_fleet_deployment.png) |
+| SETTING_DESTINATION | ![Destination Selected](../moo_screens/moo_galaxy_aftershipdestinationselected.png) — after destination chosen |
+| SETTING_DESTINATION (out of range) | ![Out of Range](../moo_screens/moo_galaxy_ship_select_destination_out_of_range.png) |
+
 #### Planet Management States
 ```
 PLANET_STATES:
@@ -234,6 +247,15 @@ PLANET_STATES:
 ├── TRANSFERRING_POP (population transfer modal)
 └── NAVIGATING (animating to next/prev planet)
 ```
+
+**Visual References — Planet Management States:**
+
+| State / Condition | Screenshot |
+|-------------------|------------|
+| IDLE — new colony | ![New Colony Planet](../moo_screens/moo_galaxy_planet_new.png) |
+| IDLE — post-terraformed | ![Post-Terraform Planet](../moo_screens/moo_galaxy_planet_post_tform.png) |
+| IDLE — planet at population cap | ![Planet Is Full](../moo_screens/moo_galaxy_planet_is_full.png) |
+| IDLE — max factories built | ![Max Factories](../moo_screens/moo_galaxy_max_factories.png) |
 
 #### Combat States
 ```
@@ -252,6 +274,17 @@ COMBAT_STATES:
 ---
 
 ## 3. Turn Flow State Machine
+
+> **Visual References — Turn Event Notifications:**
+>
+> | Event | Screenshot |
+> |-------|------------|
+> | Research complete | ![New Tech](../moo_screens/moo_new_tech.png) |
+> | Research complete + eco bonus | ![New Tech + Eco Increase](../moo_screens/moo_new_tech_eco_increase.png) |
+> | Eco reduction from tech | ![Tech Eco Reduction](../moo_screens/moo_tech_eco_reduction.png) |
+> | Research choice prompt (TECH_CHOICE) | ![Select New Research](../moo_screens/moo_start_of_turn_select_new_research.png) |
+> | New planet revealed | ![New Planet Reveal](../moo_screens/moo_start_of_turn_new_planet_reveal.png) |
+> | New ships completed | ![New Ships Built](../moo_screens/moo_start_of_turn_new_ships.png) |
 
 ### 3.1 Complete Turn Cycle
 
@@ -614,6 +647,19 @@ When multiple modals trigger simultaneously:
 ---
 
 ## 5. Screen Transition Specifications
+
+> **Visual References — Main Screens (transition targets):**
+>
+> | Screen | Screenshot |
+> |--------|------------|
+> | Galaxy Map (F1) | ![Galaxy Map](../moo_screens/moo_galaxy_home.png) |
+> | Planets (F2) | ![Planets Screen](../moo_screens/moo_planets.png) |
+> | Fleet Command (F3) | ![Fleet Screen](../moo_screens/moo_fleet_screen.png) |
+> | Research (F4) | ![Tech Screen](../moo_screens/moo_tech.png) |
+> | Ship Design (F6) | ![Ship Design](../moo_screens/moo_ship_design.png) |
+> | MAP Overlay — Colonies | ![Map Colonies](../moo_screens/moo_map_colonies_selected.png) |
+> | MAP Overlay — Environments | ![Map Environments](../moo_screens/moo_map_environments_selected.png) |
+> | MAP Overlay — Minerals | ![Map Minerals](../moo_screens/moo_map_minerals_selected.png) |
 
 ### 5.1 Transition Types
 
@@ -1033,7 +1079,26 @@ NEW GAME SETUP STATES:
    GAME_PLAYING
 ```
 
-### 8.3 Victory/Defeat Conditions
+**Visual References — New Game Setup Flow:**
+
+| State | Screenshot |
+|-------|------------|
+| GALAXY_CONFIG | ![New Game Menu](../moo_screens/moo_new_game_menu.png) |
+| RACE_SELECT — pick race | ![Race Selection](../moo_screens/moo_new_game_race_select.png) |
+| RACE_SELECT — banner/color | ![Banner Selection](../moo_screens/moo_new_game_banner_select.png) |
+| RACE_SELECT — emperor name | ![Emperor Name](../moo_screens/moo_new_game_emporer_name.png) |
+| RACE_SELECT — home world name | ![Home World Name](../moo_screens/moo_new_game_home_world_name.png) |
+
+### 8.3 Colony Ship Arrival Sub-Flow
+
+When a colony ship reaches an uncolonized planet, a sub-flow triggers during the MOVEMENT phase before returning to the player turn:
+
+| Step | Screenshot |
+|------|------------|
+| Colony ship arrives at candidate planet | ![Colony Ship Arrives](../moo_screens/moo_colony_ship_arrives_at_potential_planet.png) |
+| New colony founding screen | ![New Colony Screen](../moo_screens/moo_new_colony_screen.png) |
+
+### 8.4 Victory/Defeat Conditions
 
 ```json
 {

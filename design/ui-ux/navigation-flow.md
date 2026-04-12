@@ -49,6 +49,16 @@ flowchart TD
     Credits --> MainMenu
 ```
 
+### Reference Screenshots — Pre-Game Setup Flow
+
+| Step | Screenshot |
+|------|------------|
+| New Game menu | ![New Game Menu](../moo_screens/moo_new_game_menu.png) |
+| Race selection | ![Race Selection](../moo_screens/moo_new_game_race_select.png) |
+| Banner / color selection | ![Banner Selection](../moo_screens/moo_new_game_banner_select.png) |
+| Emperor name entry | ![Emperor Name](../moo_screens/moo_new_game_emporer_name.png) |
+| Homeworld name entry | ![Homeworld Name](../moo_screens/moo_new_game_home_world_name.png) |
+
 ---
 
 ## 2. Galaxy Map - Central Hub
@@ -102,6 +112,19 @@ flowchart TD
     Research -->|"Close/ESC"| GM
     TurnResolution -->|"Complete"| GM
 ```
+
+### Reference Screenshots — Galaxy Map Hub
+
+Galaxy Map with home colony selected (starting state):
+
+![Galaxy Map - Home Colony Selected](../moo_screens/moo_galaxy_home.png)
+
+| Screen | Screenshot |
+|--------|------------|
+| Ship Design | ![Ship Design](../moo_screens/moo_design.png) |
+| Fleet Screen | ![Fleet Screen](../moo_screens/moo_fleet_screen.png) |
+| Planets List | ![Planets List](../moo_screens/moo_planets.png) |
+| Tech / Research | ![Tech Screen](../moo_screens/moo_tech.png) |
 
 ---
 
@@ -159,6 +182,28 @@ stateDiagram-v2
     end note
 ```
 
+### Reference Screenshots — Selection States
+
+| Selection State | Screenshot |
+|----------------|------------|
+| Home colony selected | ![Home Colony](../moo_screens/moo_galaxy_home.png) |
+| Unexplored star selected | ![Unexplored Star](../moo_screens/moo_galaxy_unexplored.png) |
+| Fleet / ship selected | ![Ship Selected](../moo_screens/moo_galaxy_shipselect.png) |
+| After ship destination selected | ![Destination Selected](../moo_screens/moo_galaxy_aftershipdestinationselected.png) |
+| Ship in transit (moving) | ![Ship Moving](../moo_screens/moo_galaxy_movingshipselected.png) |
+| Fleet deployment panel | ![Fleet Deployment](../moo_screens/moo_galaxy_fleet_deployment.png) |
+| Uncolonized planet selected | ![Uncolonized Planet](../moo_screens/moo_galaxy_select_uncolonized_planet.png) |
+| Destination out of range | ![Out of Range](../moo_screens/moo_galaxy_ship_select_destination_out_of_range.png) |
+
+### Colony States
+
+| Colony State | Screenshot |
+|-------------|------------|
+| New colony | ![New Colony](../moo_screens/moo_galaxy_planet_new.png) |
+| Post-terraformed | ![Post-Terraform](../moo_screens/moo_galaxy_planet_post_tform.png) |
+| Colony at population cap | ![Colony Full](../moo_screens/moo_galaxy_planet_is_full.png) |
+| Max factories reached | ![Max Factories](../moo_screens/moo_galaxy_max_factories.png) |
+
 ---
 
 ## 4. Modal Screen Details
@@ -201,6 +246,13 @@ flowchart TD
     ScrapShips --> DesignList
 ```
 
+### Reference Screenshots — Ship Design
+
+| View | Screenshot |
+|------|------------|
+| Design screen overview | ![Ship Design Overview](../moo_screens/moo_design.png) |
+| Ship design detail | ![Ship Design Detail](../moo_screens/moo_ship_design.png) |
+
 ### 4.2 Research Screen Flow
 
 ```mermaid
@@ -222,6 +274,14 @@ flowchart TD
     
     Overview -->|"Close"| Exit[Return to Galaxy Map]
 ```
+
+### Reference Screenshots — Research
+
+| View | Screenshot |
+|------|------------|
+| Tech / Research screen | ![Tech Screen](../moo_screens/moo_tech.png) |
+| New tech available | ![New Tech](../moo_screens/moo_new_tech.png) |
+| Select new research (start of turn) | ![Select Research](../moo_screens/moo_start_of_turn_select_new_research.png) |
 
 ### 4.3 Diplomacy Screen Flow
 
@@ -289,6 +349,24 @@ flowchart TD
     FleetList -->|"Close"| Exit[Return to Galaxy Map]
 ```
 
+### Reference Screenshots — Fleet Screen
+
+![Fleet Screen](../moo_screens/moo_fleet_screen.png)
+
+Fleet deployment panel (accessed from Galaxy Map fleet selection):
+
+![Fleet Deployment Panel](../moo_screens/moo_galaxy_fleet_deployment.png)
+
+### 4.5 MAP Overlay Modes
+
+The MAP button cycles through galaxy overview modes showing different data layers:
+
+| Overlay Mode | Screenshot |
+|-------------|------------|
+| Colonies overlay | ![Colonies Map](../moo_screens/moo_map_colonies_selected.png) |
+| Environments overlay | ![Environments Map](../moo_screens/moo_map_environments_selected.png) |
+| Minerals overlay | ![Minerals Map](../moo_screens/moo_map_minerals_selected.png) |
+
 ---
 
 ## 5. Turn Resolution Flow
@@ -335,6 +413,17 @@ flowchart TD
     
     TurnComplete[Turn Complete] --> GalaxyMap[Return to Galaxy Map]
 ```
+
+### Reference Screenshots — Turn Resolution Events
+
+| Event | Screenshot |
+|-------|------------|
+| New tech breakthrough | ![New Tech](../moo_screens/moo_new_tech.png) |
+| Select new research direction | ![Select Research](../moo_screens/moo_start_of_turn_select_new_research.png) |
+| New planet revealed | ![Planet Reveal](../moo_screens/moo_start_of_turn_new_planet_reveal.png) |
+| New ships built notification | ![New Ships](../moo_screens/moo_start_of_turn_new_ships.png) |
+| Colony ship arrives at candidate planet | ![Colony Ship Arrival](../moo_screens/moo_colony_ship_arrives_at_potential_planet.png) |
+| New colony established | ![New Colony](../moo_screens/moo_new_colony_screen.png) |
 
 ---
 
@@ -493,6 +582,46 @@ VICTORY/DEFEAT
 | `ESC` | - | Close modal |
 | `1-4` | - | Select hull (Design) |
 | `Space` | Center on selection | - |
+
+---
+
+## 10. Screenshot Index
+
+All reference screenshots are in `../moo_screens/`. Quick reference:
+
+| Filename | What It Shows |
+|----------|--------------|
+| `moo_new_game_menu.png` | New Game menu |
+| `moo_new_game_race_select.png` | Race selection |
+| `moo_new_game_banner_select.png` | Banner / color selection |
+| `moo_new_game_emporer_name.png` | Emperor name entry |
+| `moo_new_game_home_world_name.png` | Homeworld name entry |
+| `moo_galaxy_home.png` | Galaxy Map with home colony selected |
+| `moo_galaxy_unexplored.png` | Unexplored star selected |
+| `moo_galaxy_shipselect.png` | Fleet / ship selected |
+| `moo_galaxy_aftershipdestinationselected.png` | After ship destination set |
+| `moo_galaxy_movingshipselected.png` | Ship in transit |
+| `moo_galaxy_fleet_deployment.png` | Fleet deployment panel |
+| `moo_galaxy_select_uncolonized_planet.png` | Uncolonized planet selected |
+| `moo_galaxy_ship_select_destination_out_of_range.png` | Destination out of range |
+| `moo_galaxy_planet_new.png` | New colony state |
+| `moo_galaxy_planet_post_tform.png` | Post-terraformed colony |
+| `moo_galaxy_planet_is_full.png` | Colony at population cap |
+| `moo_galaxy_max_factories.png` | Colony at max factories |
+| `moo_map_colonies_selected.png` | MAP overlay — colonies |
+| `moo_map_environments_selected.png` | MAP overlay — environments |
+| `moo_map_minerals_selected.png` | MAP overlay — minerals |
+| `moo_design.png` | Ship design overview |
+| `moo_ship_design.png` | Ship design detail |
+| `moo_fleet_screen.png` | Fleet screen |
+| `moo_planets.png` | Planets list |
+| `moo_tech.png` | Tech / research screen |
+| `moo_new_tech.png` | New tech breakthrough |
+| `moo_start_of_turn_select_new_research.png` | Select new research |
+| `moo_colony_ship_arrives_at_potential_planet.png` | Colony ship arrival |
+| `moo_new_colony_screen.png` | New colony established |
+| `moo_start_of_turn_new_planet_reveal.png` | Planet reveal (start of turn) |
+| `moo_start_of_turn_new_ships.png` | New ships built notification |
 
 ---
 

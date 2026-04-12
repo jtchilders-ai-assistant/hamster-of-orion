@@ -12,6 +12,48 @@ This document provides a comprehensive inventory of ALL screens and interfaces f
 
 ---
 
+## Screenshot Reference Index
+
+Screenshots are located in `../moo_screens/`. The following screenshots are available as visual references:
+
+| Category | Screenshot | Description |
+|----------|------------|-------------|
+| New Game | [moo_new_game_menu.png](../moo_screens/moo_new_game_menu.png) | New game / main menu |
+| New Game | [moo_new_game_race_select.png](../moo_screens/moo_new_game_race_select.png) | Race selection screen |
+| New Game | [moo_new_game_banner_select.png](../moo_screens/moo_new_game_banner_select.png) | Banner/flag selection |
+| New Game | [moo_new_game_emporer_name.png](../moo_screens/moo_new_game_emporer_name.png) | Emperor name entry |
+| New Game | [moo_new_game_home_world_name.png](../moo_screens/moo_new_game_home_world_name.png) | Home world naming |
+| Galaxy Map | [moo_galaxy_home.png](../moo_screens/moo_galaxy_home.png) | Galaxy map - home view |
+| Galaxy Map | [moo_galaxy_unexplored.png](../moo_screens/moo_galaxy_unexplored.png) | Galaxy map - unexplored fog |
+| Galaxy Map | [moo_galaxy_shipselect.png](../moo_screens/moo_galaxy_shipselect.png) | Galaxy map - ship selected |
+| Galaxy Map | [moo_galaxy_aftershipdestinationselected.png](../moo_screens/moo_galaxy_aftershipdestinationselected.png) | After destination selected |
+| Galaxy Map | [moo_galaxy_movingshipselected.png](../moo_screens/moo_galaxy_movingshipselected.png) | Moving ship selected |
+| Galaxy Map | [moo_galaxy_fleet_deployment.png](../moo_screens/moo_galaxy_fleet_deployment.png) | Fleet deployment |
+| Galaxy Map | [moo_galaxy_select_uncolonized_planet.png](../moo_screens/moo_galaxy_select_uncolonized_planet.png) | Selecting uncolonized planet |
+| Galaxy Map | [moo_galaxy_ship_select_destination_out_of_range.png](../moo_screens/moo_galaxy_ship_select_destination_out_of_range.png) | Destination out of range |
+| Colony States | [moo_galaxy_planet_new.png](../moo_screens/moo_galaxy_planet_new.png) | New colony planet |
+| Colony States | [moo_galaxy_planet_post_tform.png](../moo_screens/moo_galaxy_planet_post_tform.png) | Post-terraforming planet |
+| Colony States | [moo_galaxy_planet_is_full.png](../moo_screens/moo_galaxy_planet_is_full.png) | Planet at max population |
+| Colony States | [moo_galaxy_max_factories.png](../moo_screens/moo_galaxy_max_factories.png) | Planet at max factories |
+| MAP Overlay | [moo_map_colonies_selected.png](../moo_screens/moo_map_colonies_selected.png) | MAP overlay - colonies |
+| MAP Overlay | [moo_map_environments_selected.png](../moo_screens/moo_map_environments_selected.png) | MAP overlay - environments |
+| MAP Overlay | [moo_map_minerals_selected.png](../moo_screens/moo_map_minerals_selected.png) | MAP overlay - minerals |
+| Command Menu | [moo_design.png](../moo_screens/moo_design.png) | Design screen |
+| Command Menu | [moo_ship_design.png](../moo_screens/moo_ship_design.png) | Ship design screen |
+| Command Menu | [moo_fleet_screen.png](../moo_screens/moo_fleet_screen.png) | Fleet command screen |
+| Command Menu | [moo_planets.png](../moo_screens/moo_planets.png) | Planets / colony list |
+| Command Menu | [moo_tech.png](../moo_screens/moo_tech.png) | Technology / research screen |
+| Turn Notifications | [moo_new_tech.png](../moo_screens/moo_new_tech.png) | New technology discovered |
+| Turn Notifications | [moo_new_tech_eco_increase.png](../moo_screens/moo_new_tech_eco_increase.png) | New tech - eco increase |
+| Turn Notifications | [moo_tech_eco_reduction.png](../moo_screens/moo_tech_eco_reduction.png) | Tech eco cost reduction |
+| Turn Notifications | [moo_start_of_turn_select_new_research.png](../moo_screens/moo_start_of_turn_select_new_research.png) | Start of turn - pick research |
+| Turn Notifications | [moo_start_of_turn_new_planet_reveal.png](../moo_screens/moo_start_of_turn_new_planet_reveal.png) | Start of turn - planet revealed |
+| Turn Notifications | [moo_start_of_turn_new_ships.png](../moo_screens/moo_start_of_turn_new_ships.png) | Start of turn - new ships |
+| Colony Events | [moo_colony_ship_arrives_at_potential_planet.png](../moo_screens/moo_colony_ship_arrives_at_potential_planet.png) | Colony ship arrives at planet |
+| Colony Events | [moo_new_colony_screen.png](../moo_screens/moo_new_colony_screen.png) | New colony established |
+
+---
+
 ## Screen Inventory Summary
 
 | Category | MOO1 Screens | HoO Documented | HoO Wireframes | Status |
@@ -30,17 +72,19 @@ This document provides a comprehensive inventory of ALL screens and interfaces f
 ## 1. Pre-Game Screens
 
 ### 1.1 Main Menu
-| Aspect | MOO1 | HoO Status | Notes |
-|--------|------|------------|-------|
-| Title Screen | ✓ | ✅ Documented | In `main-screens.md` |
-| New Game Button | ✓ | ✅ Documented | |
-| Load Game Button | ✓ | ✅ Documented | |
-| Settings/Options | ✓ | ⚠️ Basic | Needs detailed spec |
-| Credits | ✓ | ✅ Documented | |
-| Exit/Quit | ✓ | ✅ Documented | |
-| Version Display | ✓ | ❌ Missing | Show build version |
+| Aspect | MOO1 | HoO Status | Screenshot | Notes |
+|--------|------|------------|------------|-------|
+| Title Screen | ✓ | ✅ Documented | [📷](../moo_screens/moo_new_game_menu.png) | In `main-screens.md` |
+| New Game Button | ✓ | ✅ Documented | [📷](../moo_screens/moo_new_game_menu.png) | |
+| Load Game Button | ✓ | ✅ Documented | | |
+| Settings/Options | ✓ | ⚠️ Basic | | Needs detailed spec |
+| Credits | ✓ | ✅ Documented | | |
+| Exit/Quit | ✓ | ✅ Documented | | |
+| Version Display | ✓ | ❌ Missing | | Show build version |
 
 **HoO Location:** `main-screens.md` Section 1
+
+**Screenshot:** [moo_new_game_menu.png](../moo_screens/moo_new_game_menu.png)
 
 **Gap Actions:**
 - [ ] Add version display requirement
@@ -66,18 +110,23 @@ This document provides a comprehensive inventory of ALL screens and interfaces f
 ---
 
 ### 1.3 Race Selection Screen
-| Aspect | MOO1 | HoO Status | Notes |
-|--------|------|------------|-------|
-| Race Portrait | ✓ | ✅ Documented | |
-| Race Name | ✓ | ✅ Documented | |
-| Race Bonuses Display | ✓ | ✅ Documented | |
-| Recommended Victory Type | N/A in MOO1 | ✅ Added | |
-| Difficulty Rating | N/A in MOO1 | ✅ Added | |
-| Flavor Text/Quote | ✓ | ✅ Documented | |
-| Scroll/Navigate Races | Arrow navigation | ✅ Documented | |
-| Start Game Button | ✓ | ✅ Documented | |
+| Aspect | MOO1 | HoO Status | Screenshot | Notes |
+|--------|------|------------|------------|-------|
+| Race Portrait | ✓ | ✅ Documented | [📷](../moo_screens/moo_new_game_race_select.png) | |
+| Race Name | ✓ | ✅ Documented | [📷](../moo_screens/moo_new_game_race_select.png) | |
+| Race Bonuses Display | ✓ | ✅ Documented | [📷](../moo_screens/moo_new_game_race_select.png) | |
+| Recommended Victory Type | N/A in MOO1 | ✅ Added | | |
+| Difficulty Rating | N/A in MOO1 | ✅ Added | | |
+| Flavor Text/Quote | ✓ | ✅ Documented | | |
+| Scroll/Navigate Races | Arrow navigation | ✅ Documented | | |
+| Start Game Button | ✓ | ✅ Documented | | |
+| Banner Selection | ✓ | ✅ Documented | [📷](../moo_screens/moo_new_game_banner_select.png) | |
+| Emperor Name | ✓ | ✅ Documented | [📷](../moo_screens/moo_new_game_emporer_name.png) | |
+| Home World Name | ✓ | ✅ Documented | [📷](../moo_screens/moo_new_game_home_world_name.png) | |
 
 **HoO Location:** `main-screens.md` Section 1 - Step 2: Race Selection
+
+**Screenshots:** [Race Select](../moo_screens/moo_new_game_race_select.png) | [Banner](../moo_screens/moo_new_game_banner_select.png) | [Emperor Name](../moo_screens/moo_new_game_emporer_name.png) | [Home World](../moo_screens/moo_new_game_home_world_name.png)
 
 **Status:** ✅ Complete - Well documented with enhancements
 
@@ -127,28 +176,33 @@ This document provides a comprehensive inventory of ALL screens and interfaces f
 ## 2. Core Gameplay Screens
 
 ### 2.1 Galaxy Map (Main Hub - F1)
-| Aspect | MOO1 | HoO Status | Notes |
-|--------|------|------------|-------|
-| Star Display | Color-coded stars | ✅ Documented | |
-| Fleet Icons | Ship stack indicators | ✅ Documented | |
-| Colony Indicators | Planet ownership | ✅ Documented | |
-| Fog of War | Unexplored areas | ⚠️ Basic | Need exploration mechanics |
-| Range Circles | Ship range display | ⚠️ Basic | When fleet selected |
-| Selection Highlighting | ✓ | ✅ Documented | |
-| Zoom In/Out | Mouse wheel | ✅ Documented | |
-| Pan/Scroll | Edge scroll/drag | ✅ Documented | |
-| Mini-Map | N/A in MOO1 | ❌ Consider | Web enhancement |
-| Year/Turn Display | ✓ | ✅ Documented | Top bar |
-| Treasury Display | ✓ | ✅ Documented | |
-| Navigation Buttons | F1-F7 equivalents | ✅ Documented | |
-| End Turn Button | ✓ | ✅ Documented | |
-| System Info Panel | Right-click star | ✅ Documented | System Detail Overlay |
-| Fleet Movement Orders | Click destination | ⚠️ Basic | Need movement confirmation |
-| ETA Display | ✓ | ❌ Missing | Turns to destination |
-| Nebula Display | Purple haze effect | ❌ Missing | Visual representation |
-| Wormhole Display | N/A in MOO1 | ❌ N/A | Not in MOO1 |
+| Aspect | MOO1 | HoO Status | Screenshot | Notes |
+|--------|------|------------|------------|-------|
+| Star Display | Color-coded stars | ✅ Documented | [📷](../moo_screens/moo_galaxy_home.png) | |
+| Fleet Icons | Ship stack indicators | ✅ Documented | [📷](../moo_screens/moo_galaxy_shipselect.png) | |
+| Colony Indicators | Planet ownership | ✅ Documented | [📷](../moo_screens/moo_galaxy_home.png) | |
+| Fog of War | Unexplored areas | ⚠️ Basic | [📷](../moo_screens/moo_galaxy_unexplored.png) | Need exploration mechanics |
+| Range Circles | Ship range display | ⚠️ Basic | [📷](../moo_screens/moo_galaxy_ship_select_destination_out_of_range.png) | When fleet selected |
+| Selection Highlighting | ✓ | ✅ Documented | [📷](../moo_screens/moo_galaxy_shipselect.png) | |
+| Zoom In/Out | Mouse wheel | ✅ Documented | | |
+| Pan/Scroll | Edge scroll/drag | ✅ Documented | | |
+| Mini-Map | N/A in MOO1 | ❌ Consider | | Web enhancement |
+| Year/Turn Display | ✓ | ✅ Documented | [📷](../moo_screens/moo_galaxy_home.png) | Top bar |
+| Treasury Display | ✓ | ✅ Documented | [📷](../moo_screens/moo_galaxy_home.png) | |
+| Navigation Buttons | F1-F7 equivalents | ✅ Documented | [📷](../moo_screens/moo_galaxy_home.png) | |
+| End Turn Button | ✓ | ✅ Documented | [📷](../moo_screens/moo_galaxy_home.png) | |
+| System Info Panel | Right-click star | ✅ Documented | | System Detail Overlay |
+| Fleet Movement Orders | Click destination | ⚠️ Basic | [📷](../moo_screens/moo_galaxy_aftershipdestinationselected.png) | Need movement confirmation |
+| Moving Ship Display | ✓ | ✅ Documented | [📷](../moo_screens/moo_galaxy_movingshipselected.png) | |
+| Fleet Deployment | ✓ | ✅ Documented | [📷](../moo_screens/moo_galaxy_fleet_deployment.png) | |
+| Uncolonized Planet | ✓ | ✅ Documented | [📷](../moo_screens/moo_galaxy_select_uncolonized_planet.png) | |
+| ETA Display | ✓ | ❌ Missing | | Turns to destination |
+| Nebula Display | Purple haze effect | ❌ Missing | | Visual representation |
+| Wormhole Display | N/A in MOO1 | ❌ N/A | | Not in MOO1 |
 
 **HoO Location:** `main-screens.md` Section 2
+
+**Screenshots:** [Home](../moo_screens/moo_galaxy_home.png) | [Unexplored](../moo_screens/moo_galaxy_unexplored.png) | [Ship Select](../moo_screens/moo_galaxy_shipselect.png) | [After Destination](../moo_screens/moo_galaxy_aftershipdestinationselected.png) | [Moving Ship](../moo_screens/moo_galaxy_movingshipselected.png) | [Fleet Deploy](../moo_screens/moo_galaxy_fleet_deployment.png) | [Uncolonized](../moo_screens/moo_galaxy_select_uncolonized_planet.png) | [Out of Range](../moo_screens/moo_galaxy_ship_select_destination_out_of_range.png)
 
 **Gap Actions:**
 - [ ] Add ETA display when plotting movement
@@ -158,35 +212,60 @@ This document provides a comprehensive inventory of ALL screens and interfaces f
 
 ---
 
+### 2.1a MAP Overlays
+| Overlay | MOO1 | HoO Status | Screenshot | Notes |
+|---------|------|------------|------------|-------|
+| Colonies Overlay | ✓ | ✅ Documented | [📷](../moo_screens/moo_map_colonies_selected.png) | Shows colony ownership |
+| Environments Overlay | ✓ | ✅ Documented | [📷](../moo_screens/moo_map_environments_selected.png) | Planet habitability |
+| Minerals Overlay | ✓ | ✅ Documented | [📷](../moo_screens/moo_map_minerals_selected.png) | Resource richness |
+
+**Screenshots:** [Colonies](../moo_screens/moo_map_colonies_selected.png) | [Environments](../moo_screens/moo_map_environments_selected.png) | [Minerals](../moo_screens/moo_map_minerals_selected.png)
+
+---
+
+### 2.1b Colony Planet States (Galaxy Map)
+| State | Screenshot | Notes |
+|-------|------------|-------|
+| New Colony | [📷](../moo_screens/moo_galaxy_planet_new.png) | Freshly colonized |
+| Post-Terraforming | [📷](../moo_screens/moo_galaxy_planet_post_tform.png) | After terraform completes |
+| Population Full | [📷](../moo_screens/moo_galaxy_planet_is_full.png) | Max population reached |
+| Max Factories | [📷](../moo_screens/moo_galaxy_max_factories.png) | Factory cap reached |
+
+**Screenshots:** [New](../moo_screens/moo_galaxy_planet_new.png) | [Post-Terraform](../moo_screens/moo_galaxy_planet_post_tform.png) | [Full](../moo_screens/moo_galaxy_planet_is_full.png) | [Max Factories](../moo_screens/moo_galaxy_max_factories.png)
+
+---
+
 ### 2.2 Planet Management Screen (F2)
-| Aspect | MOO1 | HoO Status | Notes |
-|--------|------|------------|-------|
-| Planet Portrait/Image | ✓ | ✅ Documented | |
-| Planet Type Display | ✓ | ✅ Documented | |
-| Population Count | Current/Max | ✅ Documented | |
-| Population Growth Rate | ✓ | ✅ Documented | |
-| Factory Count | Current/Max | ✅ Documented | |
-| Factory Production Rate | ✓ | ⚠️ Basic | Need formula display |
-| **Production Sliders (5):** | | | |
-| - Ship Construction | ✓ | ✅ Documented | |
-| - Defense (Bases) | ✓ | ✅ Documented | |
-| - Industry (Factories) | ✓ | ✅ Documented | |
-| - Ecology (Cleanup/Terra) | ✓ | ✅ Documented | |
-| - Research | ✓ | ✅ Documented | |
-| Slider Lock Buttons | ✓ | ✅ Documented | |
-| Building List | Available structures | ✅ Documented | |
-| Ship Being Built | Name and progress | ✅ Documented | |
-| Missile Base Count | ✓ | ✅ Documented | |
-| Shield Level | ✓ | ⚠️ Implicit | Part of buildings |
-| Waste Level | ✓ | ✅ Documented | |
-| Terraforming Progress | ✓ | ⚠️ Basic | Need progress display |
-| Planet Special (Rich/Poor) | ✓ | ❌ Missing | Visual indicator |
-| Morale Indicator | ✓ | ✅ Documented | Emoji in HoO |
-| Transfer Population | ✓ | ❌ Missing | Transport screen |
-| Previous/Next Planet | ✓ | ✅ Documented | |
-| Return to Map | ✓ | ✅ Documented | |
+| Aspect | MOO1 | HoO Status | Screenshot | Notes |
+|--------|------|------------|------------|-------|
+| Planet Portrait/Image | ✓ | ✅ Documented | [📷](../moo_screens/moo_planets.png) | |
+| Planet Type Display | ✓ | ✅ Documented | [📷](../moo_screens/moo_planets.png) | |
+| Population Count | Current/Max | ✅ Documented | | |
+| Population Growth Rate | ✓ | ✅ Documented | | |
+| Factory Count | Current/Max | ✅ Documented | | |
+| Factory Production Rate | ✓ | ⚠️ Basic | | Need formula display |
+| **Production Sliders (5):** | | | | |
+| - Ship Construction | ✓ | ✅ Documented | | |
+| - Defense (Bases) | ✓ | ✅ Documented | | |
+| - Industry (Factories) | ✓ | ✅ Documented | | |
+| - Ecology (Cleanup/Terra) | ✓ | ✅ Documented | | |
+| - Research | ✓ | ✅ Documented | | |
+| Slider Lock Buttons | ✓ | ✅ Documented | | |
+| Building List | Available structures | ✅ Documented | | |
+| Ship Being Built | Name and progress | ✅ Documented | | |
+| Missile Base Count | ✓ | ✅ Documented | | |
+| Shield Level | ✓ | ⚠️ Implicit | | Part of buildings |
+| Waste Level | ✓ | ✅ Documented | | |
+| Terraforming Progress | ✓ | ⚠️ Basic | [📷](../moo_screens/moo_galaxy_planet_post_tform.png) | Need progress display |
+| Planet Special (Rich/Poor) | ✓ | ❌ Missing | | Visual indicator |
+| Morale Indicator | ✓ | ✅ Documented | | Emoji in HoO |
+| Transfer Population | ✓ | ❌ Missing | | Transport screen |
+| Previous/Next Planet | ✓ | ✅ Documented | | |
+| Return to Map | ✓ | ✅ Documented | | |
 
 **HoO Location:** `main-screens.md` Section 3
+
+**Screenshot:** [moo_planets.png](../moo_screens/moo_planets.png)
 
 **Gap Actions:**
 - [ ] Add planet special indicator (Rich/Poor/Artifacts)
@@ -197,40 +276,44 @@ This document provides a comprehensive inventory of ALL screens and interfaces f
 ---
 
 ### 2.3 Planet List Screen (Alternative View)
-| Aspect | MOO1 | HoO Status | Notes |
-|--------|------|------------|-------|
-| Sortable Colony List | ✓ | ✅ Documented | |
-| Column Headers | ✓ | ✅ Documented | |
-| Quick Stats per Planet | ✓ | ✅ Documented | |
-| Go to Planet | ✓ | ✅ Documented | |
-| Build Queue Summary | ✓ | ✅ Documented | |
+| Aspect | MOO1 | HoO Status | Screenshot | Notes |
+|--------|------|------------|------------|-------|
+| Sortable Colony List | ✓ | ✅ Documented | [📷](../moo_screens/moo_planets.png) | |
+| Column Headers | ✓ | ✅ Documented | [📷](../moo_screens/moo_planets.png) | |
+| Quick Stats per Planet | ✓ | ✅ Documented | | |
+| Go to Planet | ✓ | ✅ Documented | | |
+| Build Queue Summary | ✓ | ✅ Documented | | |
 
 **HoO Location:** `main-screens.md` Section 3 - Planet List View
+
+**Screenshot:** [moo_planets.png](../moo_screens/moo_planets.png)
 
 **Status:** ✅ Complete
 
 ---
 
 ### 2.4 Fleet Command Screen (F3)
-| Aspect | MOO1 | HoO Status | Notes |
-|--------|------|------------|-------|
-| Fleet List | ✓ | ✅ Documented | |
-| Fleet Location | ✓ | ✅ Documented | |
-| Fleet Composition | Ship types & counts | ✅ Documented | |
-| Fleet Strength Rating | ✓ | ✅ Documented | Star rating |
-| Fleet Speed | ✓ | ✅ Documented | |
-| Fleet Range | ✓ | ✅ Documented | |
-| Set Destination | ✓ | ✅ Documented | |
-| Split Fleet | ✓ | ✅ Documented | |
-| Merge Fleets | ✓ | ✅ Documented | |
-| Auto-Explore | N/A in MOO1 | ✅ Added | HoO enhancement |
-| Rally Points | ✓ | ⚠️ Basic | Need detailed spec |
-| Transport Selection | ✓ | ❌ Missing | Separate transport UI |
-| Ship Detail View | ✓ | ✅ Documented | |
-| Scrap Ships | ✓ | ✅ Documented | |
-| Rename Ship | ✓ | ✅ Documented | |
+| Aspect | MOO1 | HoO Status | Screenshot | Notes |
+|--------|------|------------|------------|-------|
+| Fleet List | ✓ | ✅ Documented | [📷](../moo_screens/moo_fleet_screen.png) | |
+| Fleet Location | ✓ | ✅ Documented | [📷](../moo_screens/moo_fleet_screen.png) | |
+| Fleet Composition | Ship types & counts | ✅ Documented | [📷](../moo_screens/moo_fleet_screen.png) | |
+| Fleet Strength Rating | ✓ | ✅ Documented | | Star rating |
+| Fleet Speed | ✓ | ✅ Documented | | |
+| Fleet Range | ✓ | ✅ Documented | | |
+| Set Destination | ✓ | ✅ Documented | | |
+| Split Fleet | ✓ | ✅ Documented | | |
+| Merge Fleets | ✓ | ✅ Documented | | |
+| Auto-Explore | N/A in MOO1 | ✅ Added | | HoO enhancement |
+| Rally Points | ✓ | ⚠️ Basic | | Need detailed spec |
+| Transport Selection | ✓ | ❌ Missing | | Separate transport UI |
+| Ship Detail View | ✓ | ✅ Documented | | |
+| Scrap Ships | ✓ | ✅ Documented | | |
+| Rename Ship | ✓ | ✅ Documented | | |
 
 **HoO Location:** `main-screens.md` Section 4
+
+**Screenshot:** [moo_fleet_screen.png](../moo_screens/moo_fleet_screen.png)
 
 **Gap Actions:**
 - [ ] Document transport ship selection UI
@@ -240,24 +323,28 @@ This document provides a comprehensive inventory of ALL screens and interfaces f
 ---
 
 ### 2.5 Research Screen (F4)
-| Aspect | MOO1 | HoO Status | Notes |
-|--------|------|------------|-------|
-| 6 Tech Field Display | ✓ | ✅ Documented | |
-| Current Research | ✓ | ✅ Documented | |
-| Progress Bar | ✓ | ✅ Documented | |
-| RP/Turn Display | ✓ | ✅ Documented | |
-| Estimated Completion | ✓ | ✅ Documented | |
-| Tech Tree View | ✓ | ✅ Documented | |
-| Researched Techs | ✓ | ✅ Documented | |
-| Available Techs | ✓ | ✅ Documented | |
-| Locked Techs | ✓ | ⚠️ Implicit | Need visual indicator |
-| Tech Selection | ✓ | ✅ Documented | |
-| Tech Details Panel | ✓ | ✅ Documented | |
-| Miniaturization Info | ✓ | ⚠️ Basic | Need tooltip detail |
-| Research Allocation | N/A (single research) | N/A | MOO1 = 1 research at a time |
-| Field Progress Bars | ✓ | ⚠️ Added | HoO shows tier progress |
+| Aspect | MOO1 | HoO Status | Screenshot | Notes |
+|--------|------|------------|------------|-------|
+| 6 Tech Field Display | ✓ | ✅ Documented | [📷](../moo_screens/moo_tech.png) | |
+| Current Research | ✓ | ✅ Documented | [📷](../moo_screens/moo_tech.png) | |
+| Progress Bar | ✓ | ✅ Documented | | |
+| RP/Turn Display | ✓ | ✅ Documented | | |
+| Estimated Completion | ✓ | ✅ Documented | | |
+| Tech Tree View | ✓ | ✅ Documented | | |
+| Researched Techs | ✓ | ✅ Documented | | |
+| Available Techs | ✓ | ✅ Documented | | |
+| Locked Techs | ✓ | ⚠️ Implicit | | Need visual indicator |
+| Tech Selection | ✓ | ✅ Documented | | |
+| Tech Details Panel | ✓ | ✅ Documented | | |
+| Miniaturization Info | ✓ | ⚠️ Basic | | Need tooltip detail |
+| Research Allocation | N/A (single research) | N/A | | MOO1 = 1 research at a time |
+| Field Progress Bars | ✓ | ⚠️ Added | | HoO shows tier progress |
+| New Tech Notification | ✓ | ✅ Documented | [📷](../moo_screens/moo_new_tech.png) | |
+| Select New Research | ✓ | ✅ Documented | [📷](../moo_screens/moo_start_of_turn_select_new_research.png) | |
 
 **HoO Location:** `main-screens.md` Section 5
+
+**Screenshots:** [Research Screen](../moo_screens/moo_tech.png) | [New Tech](../moo_screens/moo_new_tech.png) | [New Tech Eco](../moo_screens/moo_new_tech_eco_increase.png) | [Eco Reduction](../moo_screens/moo_tech_eco_reduction.png) | [Select Research](../moo_screens/moo_start_of_turn_select_new_research.png)
 
 **Gap Actions:**
 - [ ] Add locked tech visual indicator
@@ -267,29 +354,32 @@ This document provides a comprehensive inventory of ALL screens and interfaces f
 ---
 
 ### 2.6 Ship Design Screen (F6)
-| Aspect | MOO1 | HoO Status | Notes |
-|--------|------|------------|-------|
-| Hull Class Selection | 6 classes | ✅ Documented | Scout to Titan |
-| Hull Space Display | ✓ | ✅ Documented | |
-| Component List | Available tech | ✅ Documented | |
-| Weapon Slots | ✓ | ✅ Documented | |
-| Defense Selection | ✓ | ✅ Documented | |
-| Computer Selection | ✓ | ✅ Documented | |
-| Shield Selection | ✓ | ✅ Documented | |
-| Engine Selection | ✓ | ✅ Documented | |
-| Maneuver Selection | ✓ | ⚠️ Implicit | Part of engine |
-| Special Device Slots | ✓ | ✅ Documented | |
-| Space Remaining | ✓ | ✅ Documented | |
-| Cost Display | ✓ | ✅ Documented | |
-| Ship Stats Summary | ✓ | ✅ Documented | |
-| Design Name Input | ✓ | ✅ Documented | |
-| Save Design | ✓ | ✅ Documented | |
-| Clear Design | ✓ | ⚠️ Missing | Reset button |
-| Design Limit | 6 designs | ❌ Missing | MOO1 limit |
-| Auto-Best Equipment | ✓ | ❌ Missing | Auto-fill button |
-| Miniaturization Effects | ✓ | ⚠️ Basic | Show size reduction |
+| Aspect | MOO1 | HoO Status | Screenshot | Notes |
+|--------|------|------------|------------|-------|
+| Hull Class Selection | 6 classes | ✅ Documented | [📷](../moo_screens/moo_ship_design.png) | Scout to Titan |
+| Hull Space Display | ✓ | ✅ Documented | [📷](../moo_screens/moo_ship_design.png) | |
+| Component List | Available tech | ✅ Documented | | |
+| Weapon Slots | ✓ | ✅ Documented | | |
+| Defense Selection | ✓ | ✅ Documented | | |
+| Computer Selection | ✓ | ✅ Documented | | |
+| Shield Selection | ✓ | ✅ Documented | | |
+| Engine Selection | ✓ | ✅ Documented | | |
+| Maneuver Selection | ✓ | ⚠️ Implicit | | Part of engine |
+| Special Device Slots | ✓ | ✅ Documented | | |
+| Space Remaining | ✓ | ✅ Documented | | |
+| Cost Display | ✓ | ✅ Documented | | |
+| Ship Stats Summary | ✓ | ✅ Documented | | |
+| Design Name Input | ✓ | ✅ Documented | | |
+| Save Design | ✓ | ✅ Documented | | |
+| Clear Design | ✓ | ⚠️ Missing | | Reset button |
+| Design Limit | 6 designs | ❌ Missing | | MOO1 limit |
+| Auto-Best Equipment | ✓ | ❌ Missing | | Auto-fill button |
+| Miniaturization Effects | ✓ | ⚠️ Basic | | Show size reduction |
+| Design Overview | ✓ | ✅ Documented | [📷](../moo_screens/moo_design.png) | |
 
 **HoO Location:** `main-screens.md` Section 6
+
+**Screenshots:** [Ship Design](../moo_screens/moo_ship_design.png) | [Design Overview](../moo_screens/moo_design.png)
 
 **Gap Actions:**
 - [ ] Document 6-design limit
@@ -692,36 +782,55 @@ This document provides a comprehensive inventory of ALL screens and interfaces f
 ## 8. Notification/Event Screens
 
 ### 8.1 Turn Summary Screen
-| Aspect | MOO1 | HoO Status | Notes |
-|--------|------|------------|-------|
-| Events List | ✓ | ✅ Documented | |
-| Continue Button | ✓ | ✅ Documented | |
-| Event Categories | ✓ | ✅ Documented | |
+| Aspect | MOO1 | HoO Status | Screenshot | Notes |
+|--------|------|------------|------------|-------|
+| Events List | ✓ | ✅ Documented | | |
+| Continue Button | ✓ | ✅ Documented | | |
+| Event Categories | ✓ | ✅ Documented | | |
+| New Planet Revealed | ✓ | ✅ Documented | [📷](../moo_screens/moo_start_of_turn_new_planet_reveal.png) | |
+| New Ships Completed | ✓ | ✅ Documented | [📷](../moo_screens/moo_start_of_turn_new_ships.png) | |
 
 **HoO Location:** `information-displays.md` - Turn Summary
+
+**Screenshots:** [Planet Reveal](../moo_screens/moo_start_of_turn_new_planet_reveal.png) | [New Ships](../moo_screens/moo_start_of_turn_new_ships.png)
 
 **Status:** ✅ Complete
 
 ---
 
 ### 8.2 Notification Pop-ups
-| Aspect | MOO1 | HoO Status | Notes |
-|--------|------|------------|-------|
-| Research Complete | ✓ | ✅ Documented | |
-| Building Complete | ✓ | ✅ Documented | |
-| War Declared | ✓ | ✅ Documented | |
-| Treaty Offered | ✓ | ✅ Documented | |
-| Colony Attacked | ✓ | ✅ Documented | |
-| Fleet Arrived | ✓ | ✅ Documented | |
-| Council Called | ✓ | ⚠️ Implicit | |
+| Aspect | MOO1 | HoO Status | Screenshot | Notes |
+|--------|------|------------|------------|-------|
+| Research Complete | ✓ | ✅ Documented | [📷](../moo_screens/moo_new_tech.png) | |
+| Research - Eco Increase | ✓ | ✅ Documented | [📷](../moo_screens/moo_new_tech_eco_increase.png) | |
+| Eco Cost Reduction | ✓ | ✅ Documented | [📷](../moo_screens/moo_tech_eco_reduction.png) | |
+| Select New Research | ✓ | ✅ Documented | [📷](../moo_screens/moo_start_of_turn_select_new_research.png) | |
+| Building Complete | ✓ | ✅ Documented | | |
+| War Declared | ✓ | ✅ Documented | | |
+| Treaty Offered | ✓ | ✅ Documented | | |
+| Colony Attacked | ✓ | ✅ Documented | | |
+| Fleet Arrived | ✓ | ✅ Documented | | |
+| Council Called | ✓ | ⚠️ Implicit | | |
 
 **HoO Location:** `UI_OVERVIEW.md` - Notification System
+
+**Screenshots:** [New Tech](../moo_screens/moo_new_tech.png) | [Eco Increase](../moo_screens/moo_new_tech_eco_increase.png) | [Eco Reduction](../moo_screens/moo_tech_eco_reduction.png) | [Select Research](../moo_screens/moo_start_of_turn_select_new_research.png)
 
 **Status:** ✅ Good Coverage
 
 ---
 
-### 8.3 Random Event Screens
+### 8.3 Colony Events
+| Event | MOO1 | HoO Status | Screenshot | Notes |
+|-------|------|------------|------------|-------|
+| Colony Ship Arrives | ✓ | ✅ Documented | [📷](../moo_screens/moo_colony_ship_arrives_at_potential_planet.png) | At uncolonized world |
+| New Colony Established | ✓ | ✅ Documented | [📷](../moo_screens/moo_new_colony_screen.png) | Colony founding screen |
+
+**Screenshots:** [Colony Ship Arrives](../moo_screens/moo_colony_ship_arrives_at_potential_planet.png) | [New Colony](../moo_screens/moo_new_colony_screen.png)
+
+---
+
+### 8.4 Random Event Screens
 | Aspect | MOO1 | HoO Status | Notes |
 |--------|------|------------|-------|
 | Space Monster Appears | ✓ | ❌ Missing | Guardian, Amoeba, Crystal |
@@ -813,6 +922,7 @@ Hamster of Orion has **good foundational UI documentation** covering most core s
 - MOO1 Screens Identified: 34
 - HoO Screens Documented: 26 (76%)
 - Wireframes Created: 0 (0%)
+- Screenshots Available: 33 (covering new game flow, galaxy map, colony states, MAP overlays, command screens, turn notifications, colony events)
 - Critical Gaps: 7
 - Important Gaps: 7
 - Nice-to-Have: 4
@@ -826,4 +936,5 @@ Hamster of Orion has **good foundational UI documentation** covering most core s
 ---
 
 *Document created: 2026-03-22*
-*Source: MOO1 Official Strategy Guide, existing HoO design documents*
+*Screenshots added: 2026-04-12*
+*Source: MOO1 Official Strategy Guide, existing HoO design documents, MOO1 gameplay screenshots*

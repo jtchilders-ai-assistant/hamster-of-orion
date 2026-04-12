@@ -29,7 +29,11 @@ Reference: `design/moo_screens/` and `design/ui-ux/wireframes/moo1-reference-wir
 ```
 
 ### New Game Setup Flow
+
 **Step 1: Galaxy Generation**
+
+![New Game Menu](../moo_screens/moo_new_game_menu.png)
+
 ```
 ┌─────────────────────────────────────────────────────┐
 │ GALAXY SETUP                                        │
@@ -52,6 +56,9 @@ Reference: `design/moo_screens/` and `design/ui-ux/wireframes/moo1-reference-wir
 ```
 
 **Step 2: Race Selection**
+
+![Race Selection](../moo_screens/moo_new_game_race_select.png)
+
 ```
 ┌─────────────────────────────────────────────────────┐
 │ CHOOSE YOUR SPECIES                                 │
@@ -73,11 +80,25 @@ Reference: `design/moo_screens/` and `design/ui-ux/wireframes/moo1-reference-wir
 └─────────────────────────────────────────────────────┘
 ```
 
+**Step 3: Banner Selection**
+
+![Banner Select](../moo_screens/moo_new_game_banner_select.png)
+
+**Step 4: Emperor Name**
+
+![Emperor Name](../moo_screens/moo_new_game_emporer_name.png)
+
+**Step 5: Home World Name**
+
+![Home World Name](../moo_screens/moo_new_game_home_world_name.png)
+
 ---
 
 ## 2. Galaxy Map (F1 - Hub Screen)
 
 **NOTE: This is the primary game screen. Layout matches MOO1 exactly.**
+
+![Galaxy Map - Home View](../moo_screens/moo_galaxy_home.png)
 
 ### Screen Structure
 ```
@@ -138,6 +159,9 @@ When your own colony is selected, shows full colony details with production slid
 ```
 
 ### Info Panel State: Unexplored Star
+
+![Unexplored Star](../moo_screens/moo_galaxy_unexplored.png)
+
 ```
 ┌─────────────────────┐
 │  ALTAIR             │
@@ -164,9 +188,23 @@ When your own colony is selected, shows full colony details with production slid
 └─────────────────────┘
 ```
 
+### Info Panel State: Ship Selection
+
+![Ship Select](../moo_screens/moo_galaxy_shipselect.png)
+
+After selecting a destination:
+
+![After Ship Destination Selected](../moo_screens/moo_galaxy_aftershipdestinationselected.png)
+
+While a ship is moving:
+
+![Moving Ship Selected](../moo_screens/moo_galaxy_movingshipselected.png)
+
 ### Info Panel State: Fleet Deployment (Fleet at Colony Selected)
 
 When you click a fleet orbiting a system, the **Fleet Deployment** panel appears. This panel has 5 ship slots and deployment controls.
+
+![Fleet Deployment](../moo_screens/moo_galaxy_fleet_deployment.png)
 
 ```
 ┌─────────────────────────┐
@@ -220,6 +258,10 @@ When you click a fleet orbiting a system, the **Fleet Deployment** panel appears
 - If ships remain, original icon stays **RIGHT** of system
 - Selection moves to the **origin system** (not departing fleet)
 
+### Info Panel State: Destination Out of Range
+
+![Ship Destination Out of Range](../moo_screens/moo_galaxy_ship_select_destination_out_of_range.png)
+
 ### Info Panel State: Fleet In Transit
 ```
 ┌─────────────────────┐
@@ -246,6 +288,28 @@ When you click a fleet orbiting a system, the **Fleet Deployment** panel appears
 └─────────────────────┘
 ```
 
+### Colony States
+
+**New Colony:**
+
+![New Colony Planet](../moo_screens/moo_galaxy_planet_new.png)
+
+**Post-Terraformed Colony:**
+
+![Post-Terraformed Planet](../moo_screens/moo_galaxy_planet_post_tform.png)
+
+**Colony at Population Cap:**
+
+![Colony Is Full](../moo_screens/moo_galaxy_planet_is_full.png)
+
+**Colony at Max Factories:**
+
+![Max Factories](../moo_screens/moo_galaxy_max_factories.png)
+
+### Uncolonized Planet
+
+![Uncolonized Planet Selected](../moo_screens/moo_galaxy_select_uncolonized_planet.png)
+
 ### Selection Behavior
 **Something is always selected.** When the game starts, your homeworld is automatically selected. Clicking empty space does NOT deselect - you must click another star or fleet to change selection.
 
@@ -269,6 +333,22 @@ Always present on Galaxy Map screen:
 | PLANETS | Colony list | F2 |
 | TECH | Technology/Research | F4 |
 | NEXT TURN | End turn, process AI | ENTER or SPACE |
+
+### MAP Overlay Views
+
+The MAP button cycles through overlay modes:
+
+**Colonies Overlay:**
+
+![Map - Colonies Selected](../moo_screens/moo_map_colonies_selected.png)
+
+**Environments Overlay:**
+
+![Map - Environments Selected](../moo_screens/moo_map_environments_selected.png)
+
+**Minerals Overlay:**
+
+![Map - Minerals Selected](../moo_screens/moo_map_minerals_selected.png)
 
 ### Star Map Symbols
 ```
@@ -295,6 +375,9 @@ Fleet Indicators:
 ## 3. Planet Management (F2)
 
 ### Planets List View
+
+![Planets Screen](../moo_screens/moo_planets.png)
+
 Shows all your colonies. Click any to manage.
 
 ```
@@ -380,6 +463,18 @@ Based on `moo_tech.png` screenshot.
 
 **This is a full-screen modal with NO bottom command bar.** Click OK to return to Galaxy Map.
 
+![Technology Screen](../moo_screens/moo_tech.png)
+
+### Researching New Technology
+
+When a new research topic becomes available:
+
+![Select New Research](../moo_screens/moo_start_of_turn_select_new_research.png)
+
+When a technology is fully researched:
+
+![New Technology Discovered](../moo_screens/moo_new_tech.png)
+
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
 │                                                                                 │
@@ -453,7 +548,11 @@ Based on `moo_tech.png` screenshot.
 
 ## 5. Ship Design Screen (F6)
 
-Based on `moo_design.png` screenshot.
+Based on `moo_design.png` and `moo_ship_design.png` screenshots.
+
+![Ship Design Overview](../moo_screens/moo_design.png)
+
+![Ship Design Detail](../moo_screens/moo_ship_design.png)
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
@@ -518,6 +617,8 @@ Based on `moo_design.png` screenshot.
 **Full-screen modal with NO bottom command bar.** Click OK to return to Galaxy Map.
 
 Based on `moo_fleet_screen.png` screenshot.
+
+![Fleet Screen](../moo_screens/moo_fleet_screen.png)
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
@@ -639,6 +740,26 @@ Based on `moo_fleet_screen.png` screenshot.
 │                                                                                 │
 └─────────────────────────────────────────────────────────────────────────────────┘
 ```
+
+---
+
+## 9. End-of-Turn Events
+
+### Colony Ship Arrives at Potential Planet
+
+![Colony Ship Arrives](../moo_screens/moo_colony_ship_arrives_at_potential_planet.png)
+
+### New Colony Screen
+
+![New Colony Screen](../moo_screens/moo_new_colony_screen.png)
+
+### New Planet Revealed
+
+![New Planet Reveal](../moo_screens/moo_start_of_turn_new_planet_reveal.png)
+
+### New Ships Produced
+
+![New Ships This Turn](../moo_screens/moo_start_of_turn_new_ships.png)
 
 ---
 
