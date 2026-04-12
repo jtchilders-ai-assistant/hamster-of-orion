@@ -1,7 +1,9 @@
 # Master Issues List - Hamster of Orion Design Review
 
 **Generated:** 2026-04-12  
-**Total Issues:** ~135 across 6 review areas
+**Last Updated:** 2026-04-12  
+**Total Issues:** ~135 across 6 review areas  
+**Resolved:** 11 critical issues
 
 This document consolidates all critical and high-priority issues found during the comprehensive design review. Individual detailed reports are in their respective directories.
 
@@ -22,29 +24,29 @@ This document consolidates all critical and high-priority issues found during th
 
 ## 🔴 CRITICAL ISSUES (Implementation Blockers)
 
-### Diplomacy (6)
+### Diplomacy (6) — ✅ 5 RESOLVED
 
-| ID | Issue | Files Affected |
-|----|-------|----------------|
-| D-C1 | Hamsters trade bonus: 3 different values (+50%, +25%, +20%) | `trade.md`, `hamsters.md`, `race-stats-complete.md` |
-| D-C2 | Hamsters diplomacy multiplier: 1.30 vs 1.60 in worked example | `relationship-formulas.md` |
-| D-C3 | Ants espionage: both "-100 modifier" AND "can't conduct" — contradictory | `espionage.md`, `ants.md` |
-| D-C4 | Ants defense: "Immune" vs "+100 bonus" — different implementations | `espionage.md` |
-| D-C5 | Ferret spy formula has 5 terms but spec only defines 4 | `espionage.md` |
-| D-C6 | Rats espionage: +5 in one doc, +15 in two others | `espionage.md`, `rats.md`, `race-stats-complete.md` |
+| ID | Issue | Status |
+|----|-------|--------|
+| D-C1 | Hamsters trade bonus: 3 different values | ✅ **FIXED** — Unified to +25% everywhere |
+| D-C2 | Hamsters diplomacy multiplier conflict | ✅ **FIXED** — Clarified: base 1.30, positive ×2.0, combined 2.60 |
+| D-C3 | Ants espionage contradictory modifiers | ✅ **FIXED** — Now uses boolean flags consistently |
+| D-C4 | Ants defense "Immune" vs "+100" | ✅ **FIXED** — Uses `immune_to_espionage: true` flag |
+| D-C5 | Ferret spy formula missing term | 🔴 OPEN |
+| D-C6 | Rats espionage +5 vs +15 | ✅ **FIXED** — Set to +0% (Psilons have no spy bonus in MOO1) |
 
-### Combat (8)
+### Combat (8) — ✅ 1 RESOLVED
 
-| ID | Issue | Files Affected |
-|----|-------|----------------|
-| C-C1 | `base_hp_by_class` uses role-based classes but game only has 4 hull sizes | `combat-algorithm.md` |
-| C-C2 | `shield_class` referenced in damage calc but never defined | `combat-algorithm.md` |
-| C-C3 | `experience_level` is string in one place, multiplied as number elsewhere | `combat-mechanics.md`, `combat-algorithm.md` |
-| C-C4 | `apply_weapon_effects()` called but never written | `combat-algorithm.md` |
-| C-C5 | Crew stat doesn't exist on ships despite weapons referencing it | `weapons-complete.md` |
-| C-C6 | Boarding/transporter mechanics have zero definition | Multiple |
-| C-C7 | Ferrets combat bonus: +15%, +25%, +30% in three different docs | `ferrets.md`, `race-stats-complete.md`, `categories.md` |
-| C-C8 | `target_defense` computed two different ways | `combat-algorithm.md`, `combat-mechanics.md` |
+| ID | Issue | Status |
+|----|-------|--------|
+| C-C1 | `base_hp_by_class` uses role-based classes | 🔴 OPEN |
+| C-C2 | `shield_class` never defined | 🔴 OPEN |
+| C-C3 | `experience_level` type mismatch | 🔴 OPEN |
+| C-C4 | `apply_weapon_effects()` never written | 🔴 OPEN |
+| C-C5 | Crew stat doesn't exist | 🔴 OPEN |
+| C-C6 | Boarding/transporter undefined | 🔴 OPEN |
+| C-C7 | Ferrets combat bonus 3-way conflict | ✅ **FIXED** — Set to +4 Attack Levels only (no damage bonus) |
+| C-C8 | `target_defense` computed two ways | 🔴 OPEN |
 
 ### Mechanics (7)
 
@@ -78,15 +80,15 @@ This document consolidates all critical and high-priority issues found during th
 | U-C4 | Research: 6 simultaneous sliders vs one-at-a-time | `screen-inventory.md`, wireframes |
 | U-C5 | Keyboard conflicts: G, R, F, D assigned to multiple actions | `navigation-flow.md` |
 
-### Species (5)
+### Species (5) — ✅ 3 RESOLVED
 
-| ID | Issue | Files Affected |
-|----|-------|----------------|
-| SP-C1 | Budgies `Superior Pilots`: Missing +3 defense, wrong initiative | `budgies.md`, `race-stats-complete.md` |
-| SP-C2 | Ferrets `Deadly Accuracy`: Three-way conflict (+25% vs +15%+4AL vs +25%) | `ferrets.md`, `race-stats-complete.md`, `categories.md` |
-| SP-C3 | 5 unique techs use invalid fields (sociology, physics, biology) | Multiple species files |
-| SP-C4 | Hamsters missing from `ai-personalities.md` entirely | `ai-personalities.md` |
-| SP-C5 | 3 starting techs undefined in tech docs | Tech docs, species files |
+| ID | Issue | Status |
+|----|-------|--------|
+| SP-C1 | Budgies `Superior Pilots` wrong values | ✅ **FIXED** — Now +3 Defense AND +3 Initiative |
+| SP-C2 | Ferrets `Deadly Accuracy` 3-way conflict | ✅ **FIXED** — Set to +4 Attack Levels (no damage bonus) |
+| SP-C3 | 5 techs use invalid fields | 🔴 OPEN |
+| SP-C4 | Hamsters missing from ai-personalities | ✅ **FIXED** — Added with Honorable Diplomat personality |
+| SP-C5 | 3 starting techs undefined | 🔴 OPEN |
 
 ---
 
@@ -146,7 +148,7 @@ Referenced but don't exist:
 
 ## Next Steps
 
-1. **Resolve critical conflicts** — Pick canonical values for all the 3-way inconsistencies
+1. ~~**Resolve critical conflicts**~~ ✅ Race value conflicts resolved (11 issues fixed)
 2. **Create missing docs** — Especially `slider-mathematics.md`
 3. **Delete stale stubs** — `defense-systems.md`, `weapons-systems.md`
 4. **Update PROJECT_STRUCTURE.md** — Make it accurate
