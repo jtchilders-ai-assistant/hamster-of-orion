@@ -30,7 +30,7 @@ The galaxy is procedurally generated at game start. Each game creates a unique s
 ### Step 1: Place Stars
 - Stars placed with minimum distance between them
 - Total count based on galaxy size
-- Assign star color: Yellow, Orange, Red, Blue, White
+- Assign star color: Yellow, Green, Red, Blue, White, Purple
 
 ### Step 2: Assign Planets
 - Each star gets exactly one planet

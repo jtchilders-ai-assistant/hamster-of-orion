@@ -2,6 +2,7 @@
 
 **Reviewer:** Wesley (subagent)  
 **Date:** 2026-04-12  
+**Second-pass fixes:** 2026-04-12 (all remaining 🔴 issues resolved)  
 **Files Reviewed:**
 - `design/LORE.md`
 - `design/species/_TEMPLATE.md`
@@ -75,7 +76,7 @@ Fixed: `budgies.md` updated to match `race-stats-complete.md` (MOO1 Alkari: +3 D
 
 Fixed: MOO1 Mrrshan get **only +4 Attack Levels** — no damage bonus. All three documents corrected. The `damage_bonus_percent` field removed from `race-stats-complete.md` JSON.
 
-### 🟡 ANTS — Espionage stat representation
+### ✅ ANTS — Espionage stat representation — FIXED 2026-04-12
 
 | Source | Value |
 |--------|-------|
@@ -85,14 +86,14 @@ Fixed: MOO1 Mrrshan get **only +4 Attack Levels** — no damage bonus. All three
 
 Functionally these are equivalent — the immunity comes from the `hive_mind` special ability rather than the stat. However, `ants.md` says "Immune" under the Racial Bonuses section where the template expects a numeric value. Consider changing the individual file's bonus to `0` with a note pointing to the Hive Mind ability, matching the approach in `race-stats-complete.md`.
 
-### 🟡 ANTS — Expendable Units ability (vague in individual file)
+### ✅ ANTS — Expendable Units ability — FIXED 2026-04-12
 
 `ants.md` says: "Ships and troops cost less to produce"  
 `race-stats-complete.md` specifies: **10% cost reduction**
 
 Individual file omits the specific value. Not a contradiction but should be updated for consistency.
 
-### 🔵 HAMSTERS — Female leader names (count mismatch)
+### ✅ HAMSTERS — Female leader names — FIXED 2026-04-12
 
 | Source | Female Names |
 |--------|-------------|
@@ -101,7 +102,7 @@ Individual file omits the specific value. Not a contradiction but should be upda
 
 `hamsters.md` is missing "Biscuit."
 
-### 🔵 BUDGIES — Female leader names (count mismatch)
+### ✅ BUDGIES — Female leader names — FIXED 2026-04-12
 
 | Source | Female Names |
 |--------|-------------|
@@ -119,57 +120,41 @@ These names are unlikely to cause implementation bugs but could confuse players 
 
 ---
 
-## 4. Invalid Technology Field Names
+## 4. Invalid Technology Field Names — ✅ FIXED 2026-04-12
 
-`race-stats-complete.md` references three technology fields that don't exist in the 6-field tech system defined in `technology/categories.md` (Weapons, Propulsion, Construction, Computers, Force Fields, Planetology):
+`race-stats-complete.md` previously referenced three technology fields that don't exist in the 6-field tech system. All corrected:
 
-| Race | Unique Technology | Invalid Field | Suggested Field |
-|------|------------------|---------------|-----------------|
-| Hamsters | Cultural Exchange Program | `sociology` | Planetology (social/colony tech) |
-| Ants | Pheromone Control | `sociology` | Planetology (population control) |
-| Rats | Unified Field Theory | `physics` | Force Fields or Weapons (energy physics) |
-| Rabbits | Genetic Vitality | `biology` | Planetology (population/ecology) |
-| Guinea Pigs | Battle Frenzy | `biology` | Weapons (combat enhancement) |
-
-🔴 **These fields are unimplementable as-is.** Each unique technology must be assigned to one of the 6 valid tech categories before tech tree implementation can proceed.
+| Race | Unique Technology | Old Field (Invalid) | New Field (Valid) |
+|------|------------------|---------------------|-------------------|
+| Hamsters | Cultural Exchange Program | ~~`sociology`~~ | `planetology` |
+| Ants | Pheromone Control | ~~`sociology`~~ | `planetology` |
+| Rats | Unified Field Theory | ~~`physics`~~ | `force_fields` |
+| Rabbits | Genetic Vitality | ~~`biology`~~ | `planetology` |
+| Guinea Pigs | Battle Frenzy | ~~`biology`~~ | `weapons` |
 
 ---
 
-## 5. Starting Technologies — Cross-document Conflicts
+## 5. Starting Technologies — Cross-document Conflicts — ✅ FIXED 2026-04-12
 
-Multiple tech docs claim universal starting techs that contradict the per-race starting tech lists in `race-stats-complete.md`:
+**Resolution applied:** Tech docs now clarify that "universal" starting techs are the *baseline* available to all races, not the race-specific starting loadout. Race-specific starting tech lists in `race-stats-complete.md` represent equipped loadouts which may include superior versions of universal techs.
 
-| Tech Doc | Claims as Universal Start |
-|----------|--------------------------|
-| `weapons.md` | Laser + Nuclear Missile |
-| `propulsion.md` | Retro Engines + Standard Fuel Cells |
-| `construction.md` | Titanium Armor + Standard Construction |
-| `computers.md` | Battle Computer I + Robotic Controls II |
-| `force-fields.md` | Class I Deflector Shield |
+| Tech Doc | Universal Baseline | Fix Applied |
+|----------|-------------------|-------------|
+| `weapons.md` | Laser + Nuclear Missile | ✅ Clarified: baseline only; race loadouts may differ |
+| `propulsion.md` | Retro Engines + Standard Fuel Cells | ✅ Clarified: baseline only |
+| `construction.md` | Titanium Armor + Standard Construction | ✅ Clarified: listing it highlights an asset, not exclusivity |
+| `computers.md` | Battle Computer I + **Robotic Controls I** | ✅ Fixed: universal baseline RC-II → RC-I; Mice start at RC-III via Cybernetic Workers |
+| `force-fields.md` | Class I Deflector Shield | ✅ Clarified: universal baseline; listing it doesn't claim exclusivity |
 
-But `race-stats-complete.md` gives each race a distinct 4-tech starting set — and many races have *better* versions (Nuclear Engines instead of Retro Engines, Ion Drives for Budgies, etc.). Some races don't list these "universal" techs at all.
+### ✅ Undefined starting techs — resolved:
 
-**Resolution needed:** Are the "universal start" claims in tech docs referring to techs that all races have access to at game start (regardless of the race-specific list), or are they outdated? If universal techs exist alongside the 4 race-specific ones, the race-stats doc should document this explicitly.
+| Tech ID | Used By | Resolution |
+|---------|---------|------------|
+| ~~`standard_missiles`~~ | Hamsters | ✅ Renamed to `nuclear_missile` (matches weapons.md ID) |
+| ~~`standard_colony_base`~~ | Rats | ✅ Renamed to `colony_base` |
+| ~~`stealth_suit`~~ | Chameleons | ✅ Renamed to `cloaking_device` (matches force-fields.md) |
 
-### 🔴 Specific conflicts:
-
-- **`computers.md`** says all races start with **Robotic Controls II**, but `race-stats-complete.md` gives Mice **`robotic_controls_1`** (Mark I) as their race-specific starting tech. If all races start at RC-II, Mice should list RC-III (their +2 bonus over baseline) — or the universal start should be RC-I and Mice begin at RC-III.
-
-- **Hamsters** list `titanium_armor` as a special starting tech, but `construction.md` says all races start with it. If it's universal, it wastes one of Hamsters' 4 race-specific slots.
-
-- **Budgies** and **Ferrets** list `class_1_shield` as a starting tech, but `force-fields.md` says all races start with it.
-
-### 🟡 Undefined/missing starting techs:
-
-The following techs appear in `race-stats-complete.md` starting lists but have no entry in any tech doc:
-
-| Tech ID | Used By | Status |
-|---------|---------|--------|
-| `standard_missiles` | Hamsters | ❌ Not found in tech docs (only "Nuclear Missile" exists in weapons.md) |
-| `standard_colony_base` | Rats | ❌ Not found in tech docs |
-| `stealth_suit` | Chameleons | ❌ Not found in any tech doc (only in species files) |
-
-- `laser_cannon` (Ferrets) — weapons.md only defines `"id": "laser"`, not `laser_cannon`. Naming inconsistency.
+- `laser_cannon` (Ferrets) — naming inconsistency with `laser` in weapons.md; deferred to Issue #14 (ID standardization pass).
 
 ### 🟡 Chameleons' starting `hyper_x_rockets` appears unbalanced
 
@@ -233,23 +218,13 @@ No mechanic, unique event, or AI dialog is defined for this. This is probably in
 
 ## 8. Cross-Document Inconsistencies (Non-Stats)
 
-### 🔴 Hamsters missing from `diplomacy/ai-personalities.md`
+### ✅ Hamsters in `diplomacy/ai-personalities.md` — Already Present (Review Error 2026-04-12)
 
-Nine of the ten races have dedicated sections in `diplomacy/ai-personalities.md`:
-Budgies, Guinea Pigs, Chameleons, Ants, Mice, Ferrets, Rats, Rabbits, Hermit Crabs.
+Hamsters **are present** in `diplomacy/ai-personalities.md` as the first entry ("The Honorable Diplomats"). The original review incorrectly stated they were absent. No change needed.
 
-**Hamsters are entirely absent.** This is the most diplomatically complex race and arguably the most important for the AI personality doc. This needs to be added.
+### ✅ Budgies: +1 movement range — FIXED 2026-04-12
 
-### 🟡 Budgies: +1 movement range in `categories.md` not in species files
-
-`technology/categories.md` under Propulsion race specializations states:
-> "Budgies: +1 movement range on all ships"
-
-This ability does **not appear** in `budgies.md` or `race-stats-complete.md`. Either:
-- It's a real ability that was accidentally omitted from the species docs, or
-- `categories.md` is outdated (maybe this was replaced by the evasion/initiative bonuses).
-
-Needs resolution — if real, add it to `budgies.md` and `race-stats-complete.md`.
+The +1 movement range from `categories.md` has been added to `budgies.md` (as "Extended Range" special ability) and `race-stats-complete.md` (as `propulsion_bonus` field).
 
 ### ✅ Ferrets: damage bonus inconsistency — **FIXED 2026-04-12**
 
@@ -300,21 +275,21 @@ These are not bugs but may warrant design review:
 |---|-------|----------|---------|
 | 1 | ~~Budgies `Superior Pilots` ability understated in individual file~~ | ✅ FIXED | `budgies.md` |
 | 2 | ~~Ferrets `Deadly Accuracy` 3-way inconsistency~~ | ✅ FIXED | `ferrets.md`, `categories.md`, `race-stats-complete.md` |
-| 3 | 5 unique technologies use invalid tech field names (`sociology`, `physics`, `biology`) | 🔴 | `race-stats-complete.md` |
-| 4 | Hamsters missing from `ai-personalities.md` | 🔴 | `diplomacy/ai-personalities.md` |
-| 5 | `standard_missiles`, `standard_colony_base`, `stealth_suit` not defined in any tech doc | 🔴 | `race-stats-complete.md` + tech docs |
-| 6 | Universal starting tech claims in tech docs conflict with race-specific lists | 🔴 | All tech docs + `race-stats-complete.md` |
-| 7 | Mice Robotic Controls starting level inconsistency (RC-I vs RC-II universal baseline) | 🔴 | `computers.md`, `race-stats-complete.md` |
-| 8 | Budgies +1 movement range in `categories.md` absent from species docs | 🟡 | `categories.md`, `budgies.md`, `race-stats-complete.md` |
-| 9 | Homeworld `special` field values not defined in `star-systems.md` | 🟡 | `star-systems.md`, `race-stats-complete.md` |
-| 10 | Rabbits' hyperspace intuition (LORE) has no mechanical definition | 🟡 | `LORE.md`, `rabbits.md` |
-| 11 | Mice homeworld lore ("Ecumenopolis") contradicts `type: terran` | 🟡 | `mice.md`, `race-stats-complete.md` |
-| 12 | `climate` field in homeworld spec not defined anywhere | 🟡 | `race-stats-complete.md`, `star-systems.md` |
-| 13 | Ants espionage represented as `Immune` vs numeric 0 in individual file | 🟡 | `ants.md` |
-| 14 | Weapon ID naming inconsistency (`laser_cannon` vs `laser`, etc.) | 🟡 | `race-stats-complete.md`, tech docs |
-| 15 | Duplicate leader names: Daisy (Hamsters/Rabbits), Shadow (Ferrets/Chameleons) | 🔵 | `race-stats-complete.md` |
-| 16 | Hamsters/Budgies missing 1 female leader name each vs `race-stats-complete.md` | 🔵 | `hamsters.md`, `budgies.md` |
-| 17 | Ants `Expendable Units` lacks specific value in individual file | 🔵 | `ants.md` |
+| 3 | ~~5 unique technologies use invalid tech field names (`sociology`, `physics`, `biology`)~~ | ✅ FIXED 2026-04-12 | `race-stats-complete.md` |
+| 4 | ~~Hamsters missing from `ai-personalities.md`~~ | ✅ FIXED (was already present — review error) | `diplomacy/ai-personalities.md` |
+| 5 | ~~`standard_missiles`, `standard_colony_base`, `stealth_suit` not defined in any tech doc~~ | ✅ FIXED 2026-04-12 | `race-stats-complete.md` |
+| 6 | ~~Universal starting tech claims in tech docs conflict with race-specific lists~~ | ✅ FIXED 2026-04-12 | All tech docs + `race-stats-complete.md` |
+| 7 | ~~Mice Robotic Controls starting level inconsistency (RC-I vs RC-II universal baseline)~~ | ✅ FIXED 2026-04-12 | `computers.md`, `race-stats-complete.md` |
+| 8 | ~~Budgies +1 movement range in `categories.md` absent from species docs~~ | ✅ FIXED 2026-04-12 | `budgies.md`, `race-stats-complete.md` |
+| 9 | Homeworld `special` field values not defined in `star-systems.md` | 🟡 DEFERRED — needs `star-systems.md` expansion; not a blocker | `star-systems.md`, `race-stats-complete.md` |
+| 10 | Rabbits' hyperspace intuition (LORE) has no mechanical definition | 🟡 DEFERRED — lore/design decision needed | `LORE.md`, `rabbits.md` |
+| 11 | Mice homeworld lore ("Ecumenopolis") contradicts `type: terran` | 🟡 DEFERRED — lore/design decision needed | `mice.md`, `race-stats-complete.md` |
+| 12 | `climate` field in homeworld spec not defined anywhere | 🟡 DEFERRED — needs spec doc; not a blocker | `race-stats-complete.md`, `star-systems.md` |
+| 13 | ~~Ants espionage represented as `Immune` vs numeric 0 in individual file~~ | ✅ FIXED 2026-04-12 | `ants.md` |
+| 14 | Weapon ID naming inconsistency (`laser_cannon` vs `laser`, etc.) | 🟡 DEFERRED — needs ID standardization pass across all tech docs | `race-stats-complete.md`, tech docs |
+| 15 | Duplicate leader names: Daisy (Hamsters/Rabbits), Shadow (Ferrets/Chameleons) | 🔵 Noted in `race-stats-complete.md` with `_note` fields — design decision deferred | `race-stats-complete.md` |
+| 16 | ~~Hamsters/Budgies missing 1 female leader name each vs `race-stats-complete.md`~~ | ✅ FIXED 2026-04-12 | `hamsters.md`, `budgies.md` |
+| 17 | ~~Ants `Expendable Units` lacks specific value in individual file~~ | ✅ FIXED 2026-04-12 | `ants.md` |
 
 ---
 

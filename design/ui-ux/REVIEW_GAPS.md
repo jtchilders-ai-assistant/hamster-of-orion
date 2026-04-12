@@ -31,13 +31,15 @@ The documentation is thorough for core gameplay screens and well-grounded in MOO
 
 ## 1. Screens Mentioned But Not Wireframed
 
-### 1.1 Pre-Game Flow — No Wireframes
+### 1.1 Pre-Game Flow — No Wireframes ✅ FIXED
+- **Resolution (2026-04-12):** Created `wireframes/new-game-setup.md` (stub). Covers all 5 steps with skeleton layouts. Full ASCII wireframe detail still needed.
 - **Issue:** `main-screens.md` and `navigation-flow.md` fully describe a 5-step new game setup (Galaxy Setup → Race Select → Banner → Emperor Name → Home World Name), but `wireframes/` has zero pre-game wireframes.
 - **Files:** `main-screens.md` §1, `navigation-flow.md` §1, `screen-inventory.md` §1
 - **Screenshots available:** All 5 steps have screenshots in `moo_screens/` (see item 7 below)
 - **Suggested fix:** Create `wireframes/new-game-setup.md` covering all 5 steps. Use existing screenshots as reference.
 
-### 1.2 Diplomacy / RACES Screen — No Wireframe
+### 1.2 Diplomacy / RACES Screen — No Wireframe ✅ FIXED
+- **Resolution (2026-04-12):** Created `wireframes/diplomacy-screen.md` (stub). Covers race list, race detail panel, audience sub-flow, tech trade UI, treaty negotiation panel, and AI-initiated popup. Full detail still needed.
 - **Issue:** `main-screens.md` §7 contains a detailed ASCII layout for the Diplomacy screen, but no corresponding wireframe file exists in `wireframes/`. The `command_menu/command_menu_races.md` file exists but appears to cover only the command-bar button, not the full screen.
 - **Files:** `main-screens.md` §7, `screen-inventory.md` §5
 - **Suggested fix:** Create `wireframes/diplomacy-screen.md` with: race list, race detail panel, audience/negotiation sub-flow, tech trade UI, treaty negotiation panel.
@@ -50,7 +52,8 @@ The documentation is thorough for core gameplay screens and well-grounded in MOO
 - **Issue:** The Game Menu modal (Save/Load/Options/Retire/Quit) is described in `main-screens.md` §8 but has no wireframe.
 - **Suggested fix:** Add to `wireframes/` or append to `moo1-reference-wireframes.md`.
 
-### 1.5 Victory / Defeat Screens — No Wireframe
+### 1.5 Victory / Defeat Screens — No Wireframe ✅ FIXED
+- **Resolution (2026-04-12):** Created `wireframes/end-game-screens.md` (stub). Covers all 5 victory conditions, 2 defeat conditions, and Final Score screen. Full visual design still needed.
 - **Issue:** `state-transitions.md` §8.4 defines 5 victory conditions and 2 defeat conditions with screen names (`VICTORY_DOMINATION`, `DEFEAT_CONQUEST`, etc.), but no wireframe or layout spec exists for any of them.
 - **Files:** `state-transitions.md` §8.4, `screen-inventory.md` §6
 - **Suggested fix:** Create `wireframes/end-game-screens.md`.
@@ -123,16 +126,19 @@ The documentation is thorough for core gameplay screens and well-grounded in MOO
 
 ## 3. Inconsistent Terminology
 
-### 3.1 "Research Screen" vs "Technology Screen"
+### 3.1 "Research Screen" vs "Technology Screen" ✅ FIXED
+- **Resolution (2026-04-12):** Updated `navigation-flow.md` §4.2 and §4.3 section headers and Mermaid labels to "Technology Screen". Updated `interaction-spec.md` §1.1, §2.4, §2.5 headers to "Technology Screen (F4)". `state-transitions.md` and `UI_OVERVIEW.md` were already using correct terminology. Canonical name: **Technology Screen (F4)**.
 - **Conflict:** `UI_OVERVIEW.md` and `main-screens.md` consistently call it the **Technology Screen** (F4). `navigation-flow.md` §4.2 calls it **Research Screen** and the Mermaid flowchart node is labeled `Research`. `state-transitions.md` §1.2 navigation matrix column header is "Research (F4)". `interaction-spec.md` §2.5 header is "Research Tree (F4)". `wireframes/research-tree.md` title uses "Technology Screen."
 - **Files:** All documents
 - **Suggested fix:** Standardize on **"Technology Screen (F4)"** everywhere, matching the in-game button label (TECH).
 
-### 3.2 "Fleet Command" vs "Fleet Screen"
+### 3.2 "Fleet Command" vs "Fleet Screen" ✅ FIXED
+- **Resolution (2026-04-12):** Updated `interaction-spec.md` section headers (§1.1, §2.4, context menu headers) to "Fleet Screen (F3)". `navigation-flow.md` and `main-screens.md` were already using "Fleet Screen." Canonical name: **Fleet Screen (F3)**.
 - **Conflict:** The F3 screen is called "Fleet Command" in `interaction-spec.md` §2.4, "Fleet Screen" in `navigation-flow.md` §4.4 and `main-screens.md` §6, and "Fleet Overview" in the `wireframes/fleet-screen.md` title header. The command bar button is labeled "FLEET."
 - **Suggested fix:** Standardize on **"Fleet Screen (F3)"** to match button label.
 
-### 3.3 "Diplomacy Screen" vs "Races Screen"
+### 3.3 "Diplomacy Screen" vs "Races Screen" ✅ FIXED
+- **Resolution (2026-04-12):** Updated `navigation-flow.md` §4.3 header and Mermaid labels to "Races Screen (F5)". Diplomatic audience sub-flow retains "Diplomacy" as a process name. Canonical screen name: **Races Screen (F5)**. "Diplomacy" acceptable as a verb/process noun only.
 - **Conflict:** The F5 screen is the **RACES** button in the command bar, but the screen is called "Diplomacy Screen" in `main-screens.md` §7 and `navigation-flow.md` §4.3, and "Diplomatic Relations" in `information-displays.md`. `screen-inventory.md` §2.7 uses "Diplomacy Screen (F5)."
 - **Suggested fix:** Standardize on **"Races Screen (F5)"** to match button label, or add a note that "Races" and "Diplomacy" are the same screen.
 
@@ -149,7 +155,8 @@ The documentation is thorough for core gameplay screens and well-grounded in MOO
 - **Files:** `main-screens.md` §5, `interaction-spec.md` §2.6
 - **Suggested fix:** Clarify that the size labels (Small/Medium/Large/Huge) are internal groupings, not hull class names. Update the shortcut spec — either map all 6 keys (`1`–`6`) or explain the shortcut covers the 4 base sizes and Scout/Dreadnought are auto-assigned.
 
-### 3.7 "Biotechnology" vs "Planetology"
+### 3.7 "Biotechnology" vs "Planetology" ✅ FIXED
+- **Resolution (2026-04-12):** Updated `information-displays.md` to replace all occurrences of "Biotechnology" with "Planetology". Canonical name: **Planetology** (matches MOO1 and all other docs).
 - **Conflict:** The 6th tech field is called **Planetology** in `UI_OVERVIEW.md` (tech field tabs: COMP/CONST/FORCE/PLAN/PROP/WEAP), `main-screens.md` §4 (field tabs), and `interaction-spec.md` §2.5. But `information-displays.md` (Research Progress section) calls it **Biotechnology**, and `screen-inventory.md` §2.5 (Research Screen) also uses Biotechnology in examples. MOO1 uses **Planetology**.
 - **Suggested fix:** Standardize on **"Planetology"** to match MOO1 and the command-bar tab labels.
 
@@ -157,25 +164,30 @@ The documentation is thorough for core gameplay screens and well-grounded in MOO
 
 ## 4. Missing Keyboard Shortcuts / Hotkeys
 
-### 4.1 Conflict: F10 vs G for Game Menu
+### 4.1 Conflict: F10 vs G for Game Menu ✅ FIXED
+- **Resolution (2026-04-12):** `navigation-flow.md` §9 rewritten. Canonical binding: **ESC** = Game Menu (only). F10 removed. G removed from "Game menu" entry — G now correctly maps to "Toggle Grid" on Galaxy Map only (matching `interaction-spec.md` §2.2). See §9 Conflict Resolutions table.
 - **Issue:** `UI_OVERVIEW.md` navigation table lists the GAME button hotkey as **F10/ESC**. `navigation-flow.md` §9 keyboard shortcuts table lists **G** for GAME menu (not F10). `interaction-spec.md` §2.1 global shortcuts does not list F10 or G for Game Menu at all — it lists only ESC for "Open Menu / Cancel."
 - **Files:** `UI_OVERVIEW.md` nav table, `navigation-flow.md` §9, `interaction-spec.md` §2.1
 - **Suggested fix:** Resolve to one canonical hotkey. MOO1 used no F10 (ESC was the main escape). Recommend: **ESC** = Game Menu, **F10** = optional alias. Remove `G` from navigation-flow §9 (it conflicts with "Toggle Grid" in `interaction-spec.md` §2.2).
 
-### 4.2 G Key Conflict
+### 4.2 G Key Conflict ✅ FIXED
+- **Resolution (2026-04-12):** `navigation-flow.md` §9 no longer assigns G to Game Menu. G = Toggle Grid (Galaxy Map only) per `interaction-spec.md` §2.2. Conflict eliminated.
 - **Issue:** `navigation-flow.md` §9 assigns `G` to "GAME menu." `interaction-spec.md` §2.2 assigns `G` to "Toggle Grid" on the Galaxy Map. Both cannot be true.
 - **Suggested fix:** Remove `G` from navigation-flow §9 game menu entry. Galaxy Map `G` = Toggle Grid is the more useful binding.
 
-### 4.3 D Key Conflict
+### 4.3 D Key Conflict ✅ FIXED
+- **Resolution (2026-04-12):** `navigation-flow.md` §9 updated to explicitly state letter shortcuts (G/D/F/M/R/P/T) are only active on the Galaxy Map, not globally. D removed from Galaxy Map shortcuts table — D is a Planet Management screen-local key (Defense Slider) per `interaction-spec.md` §2.3. No actual conflict: DESIGN is opened via F6, not D.
 - **Issue:** `navigation-flow.md` §9 assigns `D` to "DESIGN screen." `interaction-spec.md` §2.3 assigns `D` to "Focus Defense Slider" on Planet Management. These are on different screens so they don't technically conflict, but since navigation shortcuts are described as "Galaxy Map Actions" vs "In Modals" — the navigation-flow §9 description says D is a global shortcut.
 - **Files:** `navigation-flow.md` §9, `interaction-spec.md` §2.3
 - **Suggested fix:** Clarify in `navigation-flow.md` §9 that letter shortcuts (G/D/F/M/R/P/T) are only active on the Galaxy Map, not globally. This matches `interaction-spec.md`'s screen-specific sections.
 
-### 4.4 R Key Triple Conflict
+### 4.4 R Key Triple Conflict ✅ FIXED
+- **Resolution (2026-04-12):** `navigation-flow.md` §9 no longer assigns R to RACES/Diplomacy. Canonical bindings: R = Range Circles (Galaxy Map only), R = Focus Research Slider (Planet Mgmt only), R = Retreat Ship (Tactical Combat only). These are screen-local bindings — no actual conflict as only one screen is active at a time. Use F5 to open Races Screen.
 - **Issue:** `navigation-flow.md` §9 assigns `R` to "RACES/Diplomacy." `interaction-spec.md` §2.2 assigns `R` to "Range Circles" (Galaxy Map), §2.3 assigns `R` to "Focus Research Slider" (Planet Management), and §2.8 assigns `R` to "Retreat Ship" (Tactical Combat).
 - **Suggested fix:** Galaxy Map shortcuts should be mutually exclusive. Choose one use of R on Galaxy Map (Range Circles makes sense; R = RACES is a stretch). Document clearly that R means different things in different screen contexts.
 
-### 4.5 F Key Conflict
+### 4.5 F Key Conflict ✅ FIXED
+- **Resolution (2026-04-12):** `navigation-flow.md` §9 updated. F (letter) = "Next Fleet" cycle on Galaxy Map. F3 = open Fleet Screen. These are unambiguous and non-conflicting. Galaxy Map letter shortcuts are explicitly scoped to Galaxy Map only.
 - **Issue:** `navigation-flow.md` §9 assigns `F` to "FLEET screen." `interaction-spec.md` §2.2 assigns `F` to "Select Next Fleet" (Galaxy Map). The intended behavior on Galaxy Map is ambiguous: does pressing F open the Fleet Screen modal, or cycle to the next fleet selection?
 - **Suggested fix:** Assign `F3` to open Fleet Screen modal; assign `F` (letter) to cycle fleet selection on Galaxy Map. Document this explicitly.
 
@@ -346,56 +358,63 @@ The `screen-inventory.md` was last updated before all screenshots were added. Th
 
 ## Priority Summary
 
+> **Last updated:** 2026-04-12 (pass 2 — subagent fix run)
+
 ### 🔴 Critical — Blocks Implementation
 
-| # | Issue | Location |
-|---|-------|----------|
-| C1 | MAP button behavior undefined (cycle vs modal vs screen) | §2.8 |
-| C2 | F7 Reports: does this screen exist? | §6.1 |
-| C3 | Tech/Fleet screens: modal (no F-key nav) or screen (F-keys work)? | §6.4–6.5 |
-| C4 | Research allocation: 6 sliders simultaneously or 1 at a time? | §8.3 |
-| C5 | Keyboard shortcut conflicts (G, R, F, D keys) | §4.1–4.5 |
+| # | Issue | Status | Location |
+|---|-------|--------|----------|
+| C1 | MAP button behavior undefined (cycle vs modal vs screen) | 🔴 OPEN — requires design decision | §2.8 |
+| C2 | F7 Reports: does this screen exist? | 🔴 OPEN — requires design decision | §6.1 |
+| C3 | Tech/Fleet screens: modal (no F-key nav) or screen (F-keys work)? | 🔴 OPEN — requires design decision | §6.4–6.5 |
+| C4 | Research allocation: 6 sliders simultaneously or 1 at a time? | 🔴 OPEN — requires design decision | §8.3 |
+| C5 | Keyboard shortcut conflicts (G, R, F, D keys) | ✅ FIXED — see §4.1–4.5 resolutions | §4.1–4.5 |
 
 ### 🟡 Important — Gaps That Will Cause Confusion
 
-| # | Issue | Location |
-|---|-------|----------|
-| I1 | No wireframes for pre-game, diplomacy, planet management, victory/defeat | §1.1–1.6 |
-| I2 | Terminology inconsistencies across all documents | §3 |
-| I3 | Ground combat, spy UI, save/load, random events — never specced | §1.7–1.10 |
-| I4 | Population transfer UI undefined | §2.1 |
-| I5 | Fleet split/merge interaction unspecced | §2.2 |
-| I6 | Enemy colony info panel undefined | §5.1 |
-| I7 | Bombardment missing from combat state machine | §5.8 |
-| I8 | screen-inventory.md wireframe counts all wrong (shows 0, many exist) | §8.6 |
+| # | Issue | Status | Location |
+|---|-------|--------|----------|
+| I1 | No wireframes for pre-game, diplomacy, victory/defeat | ✅ FIXED (stubs) — see §1.1, §1.2, §1.5 | §1.1–1.5 |
+| I1b | No wireframes for planet management, game menu, high council | 🟡 ACKNOWLEDGED — needs full wireframe dev | §1.3, §1.4, §1.6 |
+| I2 | Terminology inconsistencies across all documents | ✅ FIXED (key terms) — §3.1, §3.2, §3.3, §3.7 resolved; §3.4, §3.5, §3.6 ACKNOWLEDGED | §3 |
+| I3 | Ground combat, spy UI, save/load, random events — never specced | 🟡 ACKNOWLEDGED — needs full spec | §1.7–1.10 |
+| I4 | Population transfer UI undefined | 🟡 ACKNOWLEDGED | §2.1 |
+| I5 | Fleet split/merge interaction unspecced | 🟡 ACKNOWLEDGED | §2.2 |
+| I6 | Enemy colony info panel undefined | 🟡 ACKNOWLEDGED | §5.1 |
+| I7 | Bombardment missing from combat state machine | 🟡 ACKNOWLEDGED | §5.8 |
+| I8 | screen-inventory.md wireframe counts all wrong (shows 0, many exist) | 🟡 ACKNOWLEDGED | §8.6 |
 
 ### 🟢 Minor — Clean-Up Items
 
-| # | Issue | Location |
-|---|-------|----------|
-| M1 | Screen inventory screenshot index missing 3 screenshots | §7, §8.7 |
-| M2 | Slider lock all-locked warning not designed | §5.4 |
-| M3 | Auto-explore behavior undefined | §2.6 |
-| M4 | Build queue cancel mid-progress behavior | §2.7 |
-| M5 | Tech screen: no active research state | §5.7 |
-| M6 | Fleet deployment: ACCEPT with 0 ships | §5.6 |
-| M7 | Turn bypass path missing from navigation flow | §6.6 |
-| M8 | Hull shortcut keys `1-4` only covers 4 of 6 classes | §4.6, §8.2 |
+| # | Issue | Status | Location |
+|---|-------|--------|----------|
+| M1 | Screen inventory screenshot index missing 3 screenshots | 🟢 ACKNOWLEDGED | §7, §8.7 |
+| M2 | Slider lock all-locked warning not designed | 🟢 ACKNOWLEDGED | §5.4 |
+| M3 | Auto-explore behavior undefined | 🟢 ACKNOWLEDGED | §2.6 |
+| M4 | Build queue cancel mid-progress behavior | 🟢 ACKNOWLEDGED | §2.7 |
+| M5 | Tech screen: no active research state | 🟢 ACKNOWLEDGED | §5.7 |
+| M6 | Fleet deployment: ACCEPT with 0 ships | 🟢 ACKNOWLEDGED | §5.6 |
+| M7 | Turn bypass path missing from navigation flow | 🟢 ACKNOWLEDGED | §6.6 |
+| M8 | Hull shortcut keys `1-4` only covers 4 of 6 classes | 🟢 ACKNOWLEDGED | §4.6, §8.2 |
 
 ---
 
 ## Suggested Next Actions (Ordered)
 
-1. **Resolve the 5 critical design decisions** (C1–C5 above) — these require a human decision, not just documentation.
-2. **Update `screen-inventory.md`** wireframe counts and screenshot index.
-3. **Standardize terminology** — pick one name per screen and do a find/replace pass across all docs.
-4. **Create `wireframes/diplomacy-screen.md`** — highest-value missing wireframe for a complex screen.
-5. **Create `wireframes/new-game-setup.md`** — all screenshots exist, just needs ASCII wireframes.
-6. **Resolve keyboard conflicts** — create a single canonical `keybindings-reference.md` that all other docs link to.
-7. **Create `ground-combat-ui.md`** and **`espionage-ui.md`** — critical missing specs.
-8. **Add bombardment phase** to `state-transitions.md` §9 combat state machine.
-9. **Update `navigation-flow.md`** to fix modal vs. screen classification for PLANETS and DIPLOMACY.
+1. **Resolve the 4 remaining critical design decisions** (C1–C4 above) — these require a human decision, not just documentation.
+2. ~~**Resolve keyboard conflicts**~~ — ✅ Done. `navigation-flow.md` §9 rewritten with canonical bindings.
+3. ~~**Standardize terminology**~~ — ✅ Done for key terms. §3.1, §3.2, §3.3, §3.7 resolved in docs.
+4. ~~**Create `wireframes/diplomacy-screen.md`**~~ — ✅ Done (stub).
+5. ~~**Create `wireframes/new-game-setup.md`**~~ — ✅ Done (stub).
+6. ~~**Create `wireframes/end-game-screens.md`**~~ — ✅ Done (stub).
+7. **Expand stub wireframes** — `new-game-setup.md`, `diplomacy-screen.md`, `end-game-screens.md` need full ASCII wireframes with exact sizing.
+8. **Standardize remaining terminology** — §3.4 (Game Menu), §3.5 (Production Sliders), §3.6 (Hull sizes) still need find/replace passes in all docs.
+9. **Update `screen-inventory.md`** wireframe counts and screenshot index.
+10. **Create `ground-combat-ui.md`** and **`espionage-ui.md`** — critical missing specs.
+11. **Add bombardment phase** to `state-transitions.md` §9 combat state machine.
+12. **Update `navigation-flow.md`** to fix modal vs. screen classification for PLANETS and DIPLOMACY.
 
 ---
 
-*Generated by Wesley (subagent) — 2026-04-12*
+*Original review: Wesley (subagent) — 2026-04-12*  
+*Pass 2 fixes: Wesley (subagent) — 2026-04-12*

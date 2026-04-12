@@ -496,7 +496,7 @@ Reports, statistics, graphs, and data visualization screens. Essential for strat
 ║ │   Current: (queued - PRIORITY!)                        │
 ║ │   Next: Class III Shield or Repulsor Beam              │
 ║ │                                                         │
-║ │ Biotechnology:  Tier 4 → Tier 5  [█████░░░] 50%        │
+║ │ Planetology:  Tier 4 → Tier 5  [█████░░░] 50%        │
 ║ │   Last: Cloning Centers                                │
 ║ │   Current: (queued)                                    │
 ║ │   Next: Terraforming +30 or Subterranean Farms         │

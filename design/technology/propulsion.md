@@ -57,7 +57,7 @@ Fleet-wide speed improvements.
 | Standard Fuel Cells | 1 | Standard Fuel | Range 4 parsecs |
 | Inertial Stabilizer | 3 | Inertial Stabilizer | +2 Defense, +2 Initiative |
 
-**Starting Tech:** All races begin with Retro Engines and Standard Fuel Cells.
+**Starting Tech:** Retro Engines and Standard Fuel Cells are the universal Tier 1 propulsion baseline. Individual races may have superior engines in their race-specific starting tech list (e.g., Hamsters start with Nuclear Engines, Budgies with Ion Drives) — those represent race advantages over the baseline, not replacements. See `race-stats-complete.md` for per-race starting tech details.
 
 ---
 

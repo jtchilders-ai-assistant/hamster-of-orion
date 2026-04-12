@@ -4,7 +4,7 @@
 Soft organic bodies protected by crystalline shells of breathtaking beauty. Shells grow naturally, forming geometric patterns that refract light into rainbows. Each individual's shell is unique - their identity, their armor, their art. Patient, methodical movements. Eyes on stalks survey surroundings with alien calm.
 
 ## Biology & Habitat
-- **Homeworld**: Crystalia (Harsh radiation-blasted world with silicon-based mineral life)
+- **Homeworld (Lore)**: Crystalia — a harsh radiation-blasted world with silicon-based mineral life. This is where the species *evolved*, but in-game their starting planet is Terran (see Gameplay Note below).
 - **Environment Preference**: Any - shells provide complete environmental protection
 - **Lifespan**: 50+ years (very long-lived)
 - **Reproduction**: Asexual crystalline budding - extremely slow
@@ -134,3 +134,9 @@ The Ancient Ones did not disappear - they simply slowed down until they achieved
 
 ## Unique Gameplay Note
 Hermit Crabs don't experience food as a resource. Instead, their "food" slider adjusts mineral absorption efficiency. This makes their resource management unique - they can min-max production and research without agricultural concerns.
+
+## Homeworld Lore vs. Gameplay
+**Lore:** Crystalia is a radiation-blasted world — the harsh birthplace of the Hermit Crab species.
+**Gameplay:** The in-game starting planet is always Terran (equal starting conditions for all species). Treat Crystalia as ancient backstory — the original homeworld from which they expanded long before the events of the game. Their Universal Adaptation ability still applies to all hostile worlds they subsequently colonize.
+
+See `design/galaxy/generation-algorithm.md` — `ConfigureAsHomeworld()` for the balance rationale.

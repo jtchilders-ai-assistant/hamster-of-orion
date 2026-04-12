@@ -54,56 +54,52 @@ Constants table updated with `HAMSTER_DIPLOMACY_BASE`, `HAMSTER_POSITIVE_MULTIPL
 
 ### C3: Ants Espionage Bonus Listed as -100 (Impossible to Infiltrate Others) vs. Immunity
 
-- `espionage.md` Section 2.1 lists Ants' offensive bonus as `-100` (SpyEffectiveness of 30 + (-100) = -70, which clamps to 5% minimum success)
-- But `can_conduct_espionage: false` in the JSON (Section 13.2) and the text both say "Ants **cannot** conduct espionage operations."
-- The -100 modifier is misleading — if they literally cannot attempt missions, the modifier is never applied. These two specifications contradict each other.
+**STATUS: RESOLVED (2026-04-12)**
 
-**Resolution needed:** Either remove the -100 modifier and just use `can_conduct_espionage: false`, or explain why both exist.
+Removed the -100 numeric modifier entirely. `espionage.md` Section 2.1 now lists Ants as `N/A` with `can_conduct_espionage: false`. The algorithm (Section 11) short-circuits before any formula runs when the flag is false. Section 13.2 JSON uses `"offensive_bonus": null` and `"can_conduct_espionage": false`. No numeric modifier — just the flag. The design note in Section 13.2 explicitly documents why.
 
 ---
 
 ### C4: Ants Defensive Bonus Is Undefined in Two Places
 
-- `espionage.md` Section 2.2 says Ants have `Defense Bonus: Immune` (hive-mind detects all infiltration)
-- The JSON racial stats (Section 13.2) lists `"defensive_bonus": 100`
-- The `DetectionChance` formula (Section 4.2) adds `RacialDefenseBonus` as a flat number; +100 would make detection = 10 + 0 + 100 = 110%, capped at 99%
-- But "Immune" implies a hard block, not 99% detection
+**STATUS: RESOLVED (2026-04-12)**
 
-**Resolution needed:** Decide if "Immune" means 100% detection (and cap handles it), or a pre-roll hard block. Document which mechanism applies.
+"Immune" is implemented as a pre-roll hard block via `immune_to_espionage: true`. The algorithm (Section 11) short-circuits before detection is even rolled — all missions auto-fail silently. No numeric `defensive_bonus` is used for Ants; Section 13.2 JSON uses `"defensive_bonus": null` and `"immune_to_espionage": true`. Section 14.1 Edge Cases documents the exact outcome: no success, no detection, no death, no BC refund, no diplomatic penalty.
 
 ---
 
 ### C5: Ferret `SpyEffectiveness` Worked Example Has Extra Undefined Term
 
-In `espionage.md` Section 5.3, Example 3:
-```
-SpyEffectiveness = 30 + 10 + 6 - 10 - 5 = 31
-                   (Rabbits have -5 defense)
-```
-The formula in Section 1.2 is:
-```
-SpyEffectiveness = BaseEffectiveness + RacialBonus + TechBonus - TargetSecurity
-```
-That's only 4 terms. The example uses 5 (subtracting both `TargetSecurity` and `RacialDefenseBonus` separately), but the formula doesn't include a separate `RacialDefenseBonus` term. The formula and the example are inconsistent.
+**STATUS: RESOLVED (2026-04-12)**
 
-**Resolution needed:** Update formula in 1.2 to:
+Fixed `espionage.md` Section 5.3 Example 3. The `RacialDefenseBonus` does NOT belong in `SpyEffectiveness` — it belongs in `DetectionChance` (Section 4.2), which already correctly includes `RacialDefenseBonus` as a term. The example was wrong to subtract it from `SpyEffectiveness`.
+
+Corrected example:
 ```
-SpyEffectiveness = BaseEffectiveness + RacialBonus + TechBonus - TargetSecurity - TargetRacialDefenseBonus
+SpyEffectiveness = 30 + 10 + 6 - 10 = 36
+  (base + Ferret racial + tech − security; no defense term here)
+DetectionChance = 10 + (1×10) + (-5) + 0 = 15%
+  (Rabbits’ -5 RacialDefenseBonus applies here, reducing detection)
 ```
-Or roll `RacialDefenseBonus` into `TargetSecurity`. Also update `DetectionChance` formula accordingly to avoid double-counting.
+
+The formula in Section 1.2 (which already included `SpyRollBonus` from the v1.1 update) is correct and consistent with the example. `TargetRacialDefenseBonus` is captured exclusively in `DetectionChance` — no double-counting.
 
 ---
 
 ### C6: Rats' Espionage Bonus Inconsistency
 
-| Document | Value |
-|----------|-------|
-| `espionage.md` Section 2.1 (table) | +5 offensive bonus |
-| `espionage.md` Section 13.2 (JSON) | `"offensive_bonus": 5` |
-| `race-stats-complete.md` JSON | `"espionage": 15` |
-| `species/rats.md` bonuses | `"espionage": 15` |
+**STATUS: RESOLVED (2026-04-12)**
 
-The individual species files and `race-stats-complete.md` say +15, but `espionage.md` says +5. These must be reconciled.
+All documents now use **+0** for Rats' offensive espionage bonus. Psilons (the MOO1 analog) have no espionage bonus — they win through research speed, not spying. The old +5/+15 values were errors.
+
+| Document | Old Value | Fixed Value |
+|----------|-----------|-------------|
+| `espionage.md` Section 2.1 | +5 | **+0** |
+| `espionage.md` Section 13.2 JSON | `5` | **`0`** |
+| `race-stats-complete.md` JSON | `15` | **`0`** |
+| `species/rats.md` | `15` | **`0`** |
+
+The moo1_note in espionage.md Section 13.2 documents the rationale.
 
 ---
 
@@ -486,7 +482,7 @@ This is ambiguous — does 0.50 mean "costs 50% of normal" (correct, half price)
 | Check | Status |
 |-------|--------|
 | AI behaviors referenced but not defined | ⚠️ Production allocation, expansion logic, spy target selection missing (H4) |
-| Relationship modifiers that don't add up | ⚠️ Hamster trade bonus (C1), Ants diplomacy (M8), NAP break penalty (M1) |
+| Relationship modifiers that don't add up | ⚠️ Ants diplomacy (M8), NAP break penalty (M1) — Hamster trade bonus (C1) ✅ resolved |
 | Species traits conflicting with diplomacy rules | ⚠️ Guinea Pig honor vs reliability (M6), Rabbit "never betray" vs 0.85 (M5), Hermit Crabs food (M7) |
 | Espionage mechanics without success/failure rates | ✅ Mostly complete — gaps in frame detection timing (H6), Spy Hunt target selection (m7) |
 | Council voting rules incomplete | ⚠️ 2-race no-decision loop (m1), Refused Mandate penalty value (m8) |
@@ -497,4 +493,5 @@ This is ambiguous — does 0.50 mean "costs 50% of normal" (correct, half price)
 ---
 
 *Report generated: 2026-04-12*
-*Issue counts: 6 Critical, 8 High, 12 Medium, 10 Minor — 36 total*
+*Last updated: 2026-04-12 (v2)*
+*Issue counts: 6 Critical (✅ all resolved), 8 High, 12 Medium, 10 Minor — 36 total (6 resolved)*

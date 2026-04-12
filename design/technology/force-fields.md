@@ -76,7 +76,7 @@ Special devices: Repulsor Beams, Cloaking Devices, Stasis Fields, and ultimate w
 |-----------|------------|---------|--------|
 | Class I Deflector Shield | 1 | Class I Deflector | -1 damage per hit |
 
-**Starting Tech:** All races begin with Class I Deflector Shield.
+**Starting Tech:** Class I Deflector Shield is the universal Tier 1 force fields baseline available to all races. Races that list `class_1_shield` in their race-specific starting tech (e.g., Ferrets, Budgies) have it as a notable starting asset, but it is not exclusive to them — all races have access to it from game start. See `race-stats-complete.md` for per-race starting tech details.
 
 ---
 

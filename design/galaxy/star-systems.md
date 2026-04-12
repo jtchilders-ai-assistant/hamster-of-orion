@@ -15,7 +15,7 @@ In MOO1, star color affects the probability of planet types:
 - Standard mineral distribution
 - Ideal colonization targets
 
-### Orange Stars  
+### Green Stars  
 - **Good habitability** - Slightly below yellow
 - Good chance for: Steppe, Desert, Minimal
 - Normal mineral distribution

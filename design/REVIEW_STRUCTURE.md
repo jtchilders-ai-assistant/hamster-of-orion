@@ -16,11 +16,11 @@ The design documents are in excellent overall shape — the core game systems ar
 
 | # | Severity | Category | Description |
 |---|----------|----------|-------------|
-| 1 | 🔴 Critical | Structure | PROJECT_STRUCTURE.md is stale — large gap between proposed and actual layout |
-| 2 | 🔴 Critical | Galaxy Gen | `dark_sectors` region is defined but never assigned in DetermineRegion() |
-| 3 | 🔴 Critical | Galaxy Gen | Hermit Crabs homeworld forced to Terran despite being `radiated` type |
-| 4 | 🔴 Critical | Victory | PROJECT_STRUCTURE.md claims "Five paths to victory" — game only has two |
-| 5 | 🟠 Major | Naming | Star color mismatch: `star-systems.md` uses Orange, gen-algorithm uses Green |
+| 1 | ✅ FIXED | Structure | PROJECT_STRUCTURE.md is stale — large gap between proposed and actual layout |
+| 2 | ✅ FIXED | Galaxy Gen | `dark_sectors` region is defined but never assigned in DetermineRegion() |
+| 3 | ✅ FIXED | Galaxy Gen | Hermit Crabs homeworld forced to Terran despite being `radiated` type |
+| 4 | ✅ FIXED | Victory | PROJECT_STRUCTURE.md claims "Five paths to victory" — game only has two |
+| 5 | ✅ FIXED | Naming | Star color mismatch: `star-systems.md` uses Orange, gen-algorithm uses Green |
 | 6 | 🟠 Major | Cross-ref | Multiple cross-referenced files don't exist (11 missing) |
 | 7 | 🟠 Major | Cross-ref | Several files in PROJECT_STRUCTURE don't exist (15 missing) |
 | 8 | 🟠 Major | Cross-ref | Large number of files not listed in PROJECT_STRUCTURE (27 unlisted) |
@@ -39,7 +39,13 @@ The design documents are in excellent overall shape — the core game systems ar
 
 ---
 
-### ISSUE-001 🔴 PROJECT_STRUCTURE.md Is Significantly Stale
+### ISSUE-001 ✅ FIXED (2026-04-12) — PROJECT_STRUCTURE.md Is Significantly Stale
+
+**Resolution:** Rewrote PROJECT_STRUCTURE.md to reflect the actual file layout as of 2026-04-12. All 27 unlisted files added, all 15 phantom entries removed or marked ❌. "Five paths to victory" corrected to "Two paths to victory." Narrative folder marked as planned-but-not-created. `information-displays.md` name corrected (plural). Old "Key Questions" section replaced with current notes.
+
+---
+
+### ISSUE-001 (archived) 🔴 PROJECT_STRUCTURE.md Is Significantly Stale (original text below)
 
 **File:** `design/PROJECT_STRUCTURE.md`
 
@@ -80,7 +86,13 @@ PROJECT_STRUCTURE.md shows an early proposed layout that diverged substantially 
 
 ---
 
-### ISSUE-002 🔴 `dark_sectors` Region Never Assigned in DetermineRegion()
+### ISSUE-002 ✅ FIXED (2026-04-12) — `dark_sectors` Region Never Assigned in DetermineRegion()
+
+**Resolution:** Updated `DetermineRegion()` in `design/galaxy/generation-algorithm.md` Section 3.3 to assign `dark_sectors` to all nebula stars (`if star.in_nebula: return "dark_sectors"`). Added explicit `AssignRegions()` wrapper function that iterates all stars. Added region distribution table. The nebula check correctly runs after the `omega_sector` check (so Orion's star isn't accidentally flagged dark even if in a nebula).
+
+---
+
+### ISSUE-002 (archived) 🔴 `dark_sectors` Region Never Assigned in DetermineRegion() (original text below)
 
 **File:** `design/galaxy/generation-algorithm.md` — Section 3.3
 
@@ -105,7 +117,13 @@ This logic should run AFTER nebula placement (Step 3) in the main galaxy generat
 
 ---
 
-### ISSUE-003 🔴 Hermit Crabs Homeworld Type Conflict with Galaxy Generation
+### ISSUE-003 ✅ FIXED (2026-04-12) — Hermit Crabs Homeworld Type Conflict with Galaxy Generation
+
+**Resolution:** Chose Option 1 (balance-first). All homeworlds are Terran for equal starts. Updated `ConfigureAsHomeworld()` in `generation-algorithm.md` with an explicit comment explaining the design decision. Updated `hermit-crabs.md` and `ants.md` to add a "Homeworld Lore vs. Gameplay" section clarifying Crystalia/Formicae are origin-planet backstory, not in-game starting planets. The `race-stats-complete.md` entries (`type: "radiated"` for Hermit Crabs, `type: "arid"` for Ants) remain as lore references but are superseded by the generation algorithm at game start.
+
+---
+
+### ISSUE-003 (archived) 🔴 Hermit Crabs Homeworld Type Conflict with Galaxy Generation (original text below)
 
 **Files:** `design/species/hermit-crabs.md`, `design/species/race-stats-complete.md`, `design/galaxy/generation-algorithm.md`
 
@@ -128,7 +146,13 @@ This means the Hermit Crabs start on a Terran planet, which contradicts their sp
 
 ---
 
-### ISSUE-004 🔴 PROJECT_STRUCTURE.md Claims "Five Paths to Victory"
+### ISSUE-004 ✅ FIXED (2026-04-12) — PROJECT_STRUCTURE.md Claims "Five Paths to Victory"
+
+**Resolution:** Fixed as part of the PROJECT_STRUCTURE.md rewrite (ISSUE-001). The new entry reads: `victory-conditions.md  # Two paths to victory: Council Election and Military Conquest`.
+
+---
+
+### ISSUE-004 (archived) 🔴 PROJECT_STRUCTURE.md Claims "Five Paths to Victory" (original text below)
 
 **File:** `design/PROJECT_STRUCTURE.md` line 65
 
@@ -142,7 +166,13 @@ This is a factual error in PROJECT_STRUCTURE.md. Should be: "Two paths to victor
 
 ---
 
-### ISSUE-005 🟠 Star Color Naming Mismatch: Orange vs Green
+### ISSUE-005 ✅ FIXED (2026-04-12) — Star Color Naming Mismatch: Orange vs Green
+
+**Resolution:** Standardized on **Green** (used by the more implementation-complete documents: `generation-algorithm.md` and `generation-tables.md`). Updated `star-systems.md` ("Orange Stars" → "Green Stars") and `map-generation.md` (added Green and Purple to the color list, removed Orange). Canonical star colors are now: Yellow, Green, Red, Blue, White, Purple — consistent across all four files.
+
+---
+
+### ISSUE-005 (archived) 🟠 Star Color Naming Mismatch: Orange vs Green (original text below)
 
 **Files:** `design/galaxy/star-systems.md`, `design/galaxy/map-generation.md`, `design/galaxy/generation-algorithm.md`, `design/planets/generation-tables.md`
 

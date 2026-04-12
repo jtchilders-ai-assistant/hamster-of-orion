@@ -4,7 +4,7 @@
 Six-legged insectoid forms. Segmented bodies in black, red, or brown chitin. Powerful mandibles. Antennae constantly twitching, receiving chemical signals. Individual ants are unremarkable; the Collective is everything.
 
 ## Biology & Habitat
-- **Homeworld**: Formicae (Arid world with massive underground tunnel networks)
+- **Homeworld (Lore)**: Formicae — an arid world with massive underground tunnel networks. This is where the Collective *evolved*, but in-game their starting planet is Terran (see Gameplay Note below).
 - **Environment Preference**: Any - the Collective adapts
 - **Lifespan**: Individual irrelevant; Collective is immortal
 - **Reproduction**: Queens produce thousands. Population = industrial capacity.
@@ -31,15 +31,15 @@ Fascinating but inefficient. Individuality appears to cause 43.7% productivity l
 - **Growth**: +25% (rapid reproduction)
 - **Ground Combat**: +20% (overwhelming numbers)
 - **Ship Combat**: +0% (adequate but not exceptional)
-- **Espionage (Offensive)**: None (hive mind cannot conduct individual infiltration)
-- **Espionage (Defensive)**: Immune (hive mind cannot be infiltrated)
+- **Espionage (Offensive)**: 0 — the Hive Mind cannot conduct individual infiltration (cannot be assigned to espionage slider; see `Hive Mind` special ability)
+- **Espionage (Defensive)**: 0 + Immune — `Hive Mind` special ability grants full immunity; all enemy spy missions auto-fail. Do **not** model as a numeric modifier; use the boolean flag `immune_to_espionage: true`.
 - **Diplomacy**: -30% (alien mindset disturbs others)
 
 ### Special Abilities
 - **Perfect Efficiency**: No population unrest, ever. Maximum production always.
 - **Hive Mind**: Immune to espionage, sabotage, and diplomatic manipulation
 - **Rapid Industrialization**: New colonies reach full production 50% faster
-- **Expendable Units**: Ships and troops cost less to produce
+- **Expendable Units**: Ships and troops cost **10% less** to produce
 - **Overpopulation**: Can support more population per planet
 
 ### Starting Technologies
@@ -124,6 +124,12 @@ Key weakness: Predictable. Cannot adapt to unexpected strategies. Complete espio
 **Design deviation from MOO1:** In the original Master of Orion, Klackons had no special espionage traits — they were merely xenophobic industrialists. The Ants' two-way espionage isolation (cannot spy / immune to spying) is a deliberate design choice to reinforce the hive-mind theme. This makes them mechanically distinct from Klackons in a way that fits their flavor.
 
 ---
+
+## Homeworld Lore vs. Gameplay
+**Lore:** Formicae is an arid world — the ancient birthplace of the Collective, carved into vast tunnel networks by the first colonies.
+**Gameplay:** The in-game starting planet is always Terran (equal starting conditions for all species). Formicae is treated as the Collective's original homeworld, long since integrated into the broader empire before the events of the game.
+
+See `design/galaxy/generation-algorithm.md` — `ConfigureAsHomeworld()` for the balance rationale.
 
 ## Repurposed Ancient Technology
 The Collective has analyzed Ancient facilities with 99.7% efficiency. Conclusion: Ancient Ones were proto-Collective entities who achieved partial unification before transcendence. Evidence: all facilities designed for optimal resource distribution.

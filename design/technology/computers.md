@@ -57,11 +57,12 @@ Unique targeting and combat abilities.
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
 | Battle Computer I | 1 | BC Mark I | +1 Attack Rating |
-| Robotic Controls II | 1 | RC II | 2 factories per pop |
+| Robotic Controls I | 1 | RC I | 1 factory per pop (baseline) |
+| Robotic Controls II | 2 | RC II | 2 factories per pop |
 | Battle Scanner | 1 | Battle Scanner | +3 Initiative, +1 Targeting |
 | Deep Space Scanner | 4 | DSS | Colony detect: 5, Ship detect: 1 |
 
-**Starting Tech:** All races begin with Battle Computer I and Robotic Controls II.
+**Starting Tech:** All races begin with Battle Computer I and Robotic Controls I (baseline, 1 factory/pop). Mice are an exception: their Cybernetic Workers ability grants +2 RC levels, so they effectively start at Robotic Controls III (3 factories/pop). RC II is an early research upgrade available to all races.
 
 ---
 

@@ -36,6 +36,7 @@ Respect those who prove themselves in battle. Contemptuous of ground-dwellers wh
 
 ### Special Abilities
 - **Superior Pilots**: All ships gain +3 combat initiative, +3 Defense Levels (maneuverability/dodge), and +20% evasion
+- **Extended Range**: All ships gain +1 movement range (Propulsion specialization)
 - **Three-Dimensional Tactics**: Enemy missile accuracy reduced by 30%
 - **Dogfighter**: Small ships get additional combat bonuses
 - **Flight School**: New ships enter combat with veteran crew status
@@ -77,7 +78,7 @@ Highly aggressive in space combat. Seeks out enemy fleets for direct engagement.
 ### Leader Names
 *Aeronautical and wind-themed*
 - Males: Skydancer, Cloudstriker, Windcaller, Galeforce, Stormwing
-- Females: Breezewhisper, Draftrider, Updraft, Skyweaver
+- Females: Breezewhisper, Draftrider, Updraft, Skyweaver, Zephyr
 - Titles: Wing Commander, Sky Marshal, Fleet Ace
 
 ### Ship Names

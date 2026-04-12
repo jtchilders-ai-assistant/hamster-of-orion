@@ -5,7 +5,7 @@
 The Weapons technology field provides offensive capabilities for ships and ground forces. It is one of six technology fields and contains beam weapons, missiles, torpedoes, bombs, biological weapons, and personal combat gear.
 
 **Key Races:**
-- Ferrets: +25% weapon damage
+- Ferrets: +4 Attack Levels (hit chance bonus only — no damage bonus; see race-stats-complete.md)
 - Guinea Pigs: +50% ground combat
 
 **Technology Tiers:** 1-20 (50 RP to 100,000 RP)
@@ -41,7 +41,7 @@ In each game, players are offered **2-3 random technologies** at each tier. Not 
 | Nuclear Missile | 1 | Nuclear Missile | 4 damage, speed 2 |
 | Nuclear Bomb | 3 | Nuclear Bomb | 3-12 bombardment damage |
 
-**Starting Tech:** All races begin with Laser and Nuclear Missile.
+**Starting Tech:** Laser and Nuclear Missile are the universal Tier 1 weapons available from game start. Individual races may list different starting weapons in their race-specific starting tech lists (e.g., Hamsters start with Nuclear Missile, Rabbits with Hyper-V Rockets) — those lists represent their equipped loadouts, not replacements for this universal access. See `race-stats-complete.md` for per-race starting tech details.
 
 ---
 

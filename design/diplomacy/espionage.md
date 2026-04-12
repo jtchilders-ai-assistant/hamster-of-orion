@@ -259,10 +259,15 @@ SuccessChance = min(95, max(5, 30 + (-20))) = 10%
 **Example 3: Ferret Sabotage vs Rabbits (Security Level 1)**
 ```
 BaseMissionSuccess = 40%
-SpyEffectiveness = 30 + 10 + 6 - 10 - 5 = 31
-                   (Rabbits have -5 defense)
+SpyEffectiveness = 30 + 10 + 6 - 10 = 36
+  BaseEffectiveness=30, FerretRacialBonus=+10, TechBonus=+6 (assume Ferrets 3 levels ahead),
+  TargetSecurity = 1 × 10 = 10
+  Note: Rabbits' -5 DefenseBonus applies to DetectionChance (Section 4.2), NOT SpyEffectiveness.
 
-SuccessChance = min(95, max(5, 40 + 31)) = 71%
+SuccessChance = min(95, max(5, 40 + 36)) = 76%
+
+DetectionChance = 10 + (1 × 10) + (-5) + 0 = 15%
+  (Rabbits have -5 RacialDefenseBonus — they are poor at catching spies)
 ```
 
 ---
@@ -1228,10 +1233,11 @@ Result: Almost certainly fails, probably detected, spy likely dies.
 
 ---
 
-*Document Version: 1.1*
+*Document Version: 1.2*
 *Last Updated: 2026-04-12*
 *Specification: spec-017 - Espionage Success Formulas*
 *Status: Complete*
 
 ### Changelog
+- **v1.2 (2026-04-12):** Fixed Section 5.3 Example 3 (Ferret sabotage). `RacialDefenseBonus` is not subtracted from `SpyEffectiveness` — it belongs in `DetectionChance` (Section 4.2). Corrected calculation: SpyEffectiveness = 36 (not 31), SuccessChance = 76% (not 71%). Added explicit DetectionChance line to the example showing where the Rabbit -5 defense bonus is applied.
 - **v1.1 (2026-04-12):** Corrected Rats (Psilons) offensive espionage bonus: +5 → +0. Psilons have no espionage bonus in MOO1. Added Chameleon (Darlok) flat +30 spy roll bonus to formula, pseudocode, JSON, and worked examples. Updated Chameleon vs Chameleon edge case to reflect flat bonus stacking.

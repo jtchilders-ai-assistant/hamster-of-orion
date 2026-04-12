@@ -178,7 +178,7 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
       "starting_technologies": [
         "nuclear_engines",
         "controlled_environment",
-        "standard_missiles",
+        "nuclear_missile",
         "titanium_armor"
       ],
       "unique_content": {
@@ -204,7 +204,7 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
           "id": "cultural_exchange",
           "name": "Cultural Exchange Program",
           "description": "Further boosts diplomatic relations",
-          "field": "sociology",
+          "field": "planetology",
           "tier": 15,
           "effect": {
             "diplomacy_bonus": 20
@@ -225,7 +225,8 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
       },
       "leader_names": {
         "male": ["Whiskers", "Nibbles", "Pip", "Chester", "Fuzzy", "Buttons"],
-        "female": ["Daisy", "Peanut", "Cinnamon", "Honey", "Marble", "Biscuit"]
+        "female": ["Daisy", "Peanut", "Cinnamon", "Honey", "Marble", "Biscuit"],
+        "_note": "'Daisy' also appears in Rabbits female list — replace one instance if duplicate leader names are a concern"
       },
       "ship_prefix": "HSS"
     },
@@ -328,7 +329,7 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
           "id": "pheromone_control",
           "name": "Pheromone Control",
           "description": "Conquered populations integrate instantly into Collective",
-          "field": "sociology",
+          "field": "planetology",
           "tier": 20,
           "effect": {
             "assimilation_time": 0
@@ -388,13 +389,13 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
         {
           "id": "cybernetic_workers",
           "name": "Cybernetic Workers",
-          "description": "Start with Robotic Controls III (+2 levels from base), population operates at enhanced efficiency",
+          "description": "Start with Robotic Controls III (+2 levels above baseline RC I), population operates at enhanced efficiency",
           "effect": {
             "type": "starting_robotic_controls_bonus",
             "value": 2,
             "production_per_pop_bonus": 2
           },
-          "moo1_note": "Matches Meklars +2 Robotic Controls starting bonus"
+          "moo1_note": "Matches Meklars +2 Robotic Controls starting bonus. Universal baseline is RC I (1 factory/pop); Mice begin at effective RC III (3 factories/pop). Starting tech list reflects this with robotic_controls_3."
         },
         {
           "id": "robotic_labor",
@@ -428,8 +429,9 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
         "nuclear_engines",
         "automated_repair",
         "battle_computer_1",
-        "robotic_controls_1"
+        "robotic_controls_3"
       ],
+      "_starting_tech_note": "RC III reflects Mice starting at baseline RC I + 2 bonus levels from Cybernetic Workers. Universal baseline is RC I (all races); Mice effectively begin the game with RC III capability.",
       "unique_content": {
         "building": {
           "id": "drone_factory",
@@ -553,8 +555,8 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
       "starting_technologies": [
         "nuclear_engines",
         "deep_space_scanner",
-        "research_lab_1",
-        "standard_colony_base"
+        "research_lab",
+        "colony_base"
       ],
       "unique_content": {
         "building": {
@@ -580,7 +582,7 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
           "id": "unified_field_theory",
           "name": "Unified Field Theory",
           "description": "Unlocks all remaining tech tree branches",
-          "field": "physics",
+          "field": "force_fields",
           "tier": 50,
           "effect": {
             "unlock_all_tech": true
@@ -703,7 +705,7 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
           "id": "genetic_vitality",
           "name": "Genetic Vitality",
           "description": "Population growth accelerates even further (+50% growth)",
-          "field": "biology",
+          "field": "planetology",
           "tier": 20,
           "effect": {
             "growth_bonus": 50
@@ -954,7 +956,7 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
           "id": "battle_frenzy",
           "name": "Battle Frenzy",
           "description": "Ground troops gain +20% damage per turn of combat",
-          "field": "biology",
+          "field": "weapons",
           "tier": 25,
           "effect": {
             "escalating_damage": 20,
@@ -1118,6 +1120,10 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
         "espionage": -10,
         "diplomacy": 0
       },
+      "propulsion_bonus": {
+        "movement_range_bonus": 1,
+        "description": "All Budgie ships gain +1 movement range (defined in technology/categories.md Propulsion specializations)"
+      },
       "special_abilities": [
         {
           "id": "superior_pilots",
@@ -1210,7 +1216,8 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
       },
       "leader_names": {
         "male": ["Skydancer", "Cloudstriker", "Windcaller", "Galeforce", "Stormwing"],
-        "female": ["Breezewhisper", "Draftrider", "Updraft", "Skyweaver", "Zephyr"]
+        "female": ["Breezewhisper", "Draftrider", "Updraft", "Skyweaver", "Zephyr"],
+        "_note": "'Shadow' also appears in Ferrets female list — replace one instance if duplicate leader names are a concern"
       },
       "ship_prefix": "FAS"
     },
@@ -1292,7 +1299,7 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
       "starting_technologies": [
         "hyper_x_rockets",
         "ecm_jammer_1",
-        "stealth_suit",
+        "cloaking_device",
         "battle_scanner"
       ],
       "unique_content": {

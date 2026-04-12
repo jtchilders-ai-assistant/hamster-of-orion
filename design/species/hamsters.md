@@ -49,7 +49,7 @@ Optimistic but not naive. Believe all races can coexist if they find common grou
 ### Starting Technologies
 - Nuclear Engines (better than standard retro rockets)
 - Controlled Environment (can colonize wider range)
-- Standard Missiles
+- Nuclear Missile (standard Tier 1 weapon)
 - Titanium Armor
 
 ### Unique Units/Buildings/Technologies
@@ -83,7 +83,7 @@ Purely defensive. Builds strong fortifications and fleets but only attacks if di
 ### Leader Names
 *Friendly, approachable names*
 - Males: Whiskers, Nibbles, Pip, Chester, Fuzzy, Buttons
-- Females: Daisy, Peanut, Cinnamon, Honey, Marble
+- Females: Daisy, Peanut, Cinnamon, Honey, Marble, Biscuit
 - Dynasty Numbers: I, II, III, etc.
 
 ### Ship Names

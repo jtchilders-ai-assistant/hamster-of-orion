@@ -60,7 +60,7 @@ Single left-click is the primary selection and activation input.
 - Remaining ships icon stays RIGHT of system (if any)
 - Selection moves to origin system
 
-#### Fleet Command (F3)
+#### Fleet Screen (F3)
 | Target | Action | Result |
 |--------|--------|--------|
 | Fleet in list | Select | Show fleet details in right panel |
@@ -69,7 +69,7 @@ Single left-click is the primary selection and activation input.
 | Star on mini-map | Set destination | Confirm fleet movement order |
 | [SPLIT FLEET] button | Open dialog | Show fleet split interface |
 
-#### Research Tree (F4)
+#### Technology Screen (F4)
 | Target | Action | Result |
 |--------|--------|--------|
 | Tech field header | Expand/collapse | Toggle tech tree visibility |
@@ -226,7 +226,7 @@ Right-click opens context-sensitive menus with additional options.
 └─────────────────────────┘
 ```
 
-#### Fleet Command Context Menus
+#### Fleet Screen Context Menus
 
 **On Ship:**
 ```
@@ -352,7 +352,7 @@ Middle mouse button enables map panning on scrollable views.
 | `A` | Auto-Balance | Trigger auto-balance sliders |
 | `Ctrl+A` | Auto All | Apply auto settings to all colonies |
 
-### 2.4 Fleet Command (F3) Shortcuts
+### 2.4 Fleet Screen (F3) Shortcuts
 
 | Key | Action | Description |
 |-----|--------|-------------|
@@ -368,7 +368,7 @@ Middle mouse button enables map panning on scrollable views.
 | `R` | Rename | Rename selected fleet/ship |
 | `Space` | Toggle Ship | Include/exclude ship in selection |
 
-### 2.5 Research Tree (F4) Shortcuts
+### 2.5 Technology Screen (F4) Shortcuts
 
 | Key | Action | Description |
 |-----|--------|-------------|
@@ -1214,7 +1214,7 @@ Ship Name: [This name is too long!!! ×]
     "global": {
       "galaxyMap": { "key": "F1", "description": "Open Galaxy Map" },
       "planets": { "key": "F2", "description": "Open Planet Management" },
-      "fleets": { "key": "F3", "description": "Open Fleet Command" },
+      "fleets": { "key": "F3", "description": "Open Fleet Screen" },
       "research": { "key": "F4", "description": "Open Research Tree" },
       "diplomacy": { "key": "F5", "description": "Open Diplomacy" },
       "shipDesign": { "key": "F6", "description": "Open Ship Design" },

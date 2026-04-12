@@ -64,7 +64,7 @@ Armor and equipment for planetary invasions.
 | Standard Construction | 1 | — | Factory cost: 10 BC |
 | Industrial Tech 9 | 3 | — | Factory cost: 9 BC |
 
-**Starting Tech:** All races begin with Titanium Armor and Standard Construction.
+**Starting Tech:** Titanium Armor and Standard Construction are the universal Tier 1 construction baseline. Races that list `titanium_armor` in their race-specific starting tech (e.g., Hamsters) are highlighting it as a notable asset, but it is not exclusive — all races have access to it from game start. See `race-stats-complete.md` for per-race starting tech details.
 
 ---
 

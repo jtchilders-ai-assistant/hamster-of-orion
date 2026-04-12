@@ -87,9 +87,9 @@ flowchart TD
         ShipDesign[Ship Design Screen]
         FleetScreen[Fleet Screen]
         MapView[Galaxy Overview]
-        Diplomacy[Diplomacy/Races]
+        Diplomacy[Races Screen (F5)]
         PlanetList[Planets List]
-        Research[Research Screen]
+        Research[Technology Screen]
     end
 
     GM --- CommandBar
@@ -253,11 +253,11 @@ flowchart TD
 | Design screen overview | ![Ship Design Overview](../moo_screens/moo_design.png) |
 | Ship design detail | ![Ship Design Detail](../moo_screens/moo_ship_design.png) |
 
-### 4.2 Research Screen Flow
+### 4.2 Technology Screen Flow
 
 ```mermaid
 flowchart TD
-    subgraph ResearchScreen["Research Screen (Modal)"]
+    subgraph ResearchScreen["Technology Screen (Modal)"]
         Overview[6 Tech Fields Overview]
         FieldDetail[Field Detail View]
         TechSelect[Technology Selection<br/>2-3 choices per field]
@@ -283,11 +283,11 @@ flowchart TD
 | New tech available | ![New Tech](../moo_screens/moo_new_tech.png) |
 | Select new research (start of turn) | ![Select Research](../moo_screens/moo_start_of_turn_select_new_research.png) |
 
-### 4.3 Diplomacy Screen Flow
+### 4.3 Races Screen (F5) Flow
 
 ```mermaid
 flowchart TD
-    subgraph DiplomacyScreen["Diplomacy/Races Screen (Modal)"]
+    subgraph DiplomacyScreen["Races Screen / Diplomacy (F5)"]
         RaceList[Known Races List]
         RaceDetail[Race Detail View]
         Audience[Audience with Leader]
@@ -569,19 +569,66 @@ VICTORY/DEFEAT
 
 ## 9. Keyboard Shortcuts
 
-| Key | Galaxy Map Action | In Modals |
-|-----|------------------|-----------|
-| `G` | GAME menu | - |
-| `D` | DESIGN screen | - |
-| `F` | FLEET screen | - |
-| `M` | MAP overview | - |
-| `R` | RACES/Diplomacy | - |
-| `P` | PLANETS list | - |
-| `T` | TECH/Research | - |
-| `Enter` | NEXT TURN | Confirm |
-| `ESC` | - | Close modal |
-| `1-4` | - | Select hull (Design) |
-| `Space` | Center on selection | - |
+> **Authoritative reference:** `interaction-spec.md` §2 is the canonical keyboard specification. The table below covers navigation-layer shortcuts only. Screen-specific shortcuts (sliders, fleet controls, etc.) are defined per-screen in `interaction-spec.md`.
+
+### F-Key Navigation (Global — All Screens)
+
+F-keys are available from the Galaxy Map and all full navigation screens (those with a command bar). They are **blocked** from true modal screens that have no command bar (Tech Screen F4, Fleet Screen F3 when opened as modal, Game Menu).
+
+| Key | Screen |
+|-----|--------|
+| `F1` | Galaxy Map |
+| `F2` | Planets (Planet Management) |
+| `F3` | Fleet Screen |
+| `F4` | Technology Screen |
+| `F5` | Races Screen (Diplomacy) |
+| `F6` | Ship Design |
+| `F8` | High Council (only when Council is in session; otherwise no-op) |
+
+### Galaxy Map Letter Shortcuts
+
+These letter shortcuts are **only active on the Galaxy Map** (F1). They do NOT function as global shortcuts. When inside any modal or sub-screen, letter keys follow that screen's own shortcut table.
+
+| Key | Galaxy Map Action | Notes |
+|-----|-----------------|-------|
+| `N` | Next Colony (cycle) | See `interaction-spec.md` §2.2 |
+| `F` | Next Fleet (cycle) | **Not** "open Fleet screen" — use F3 for that |
+| `G` | Toggle Grid overlay | **Not** "Game menu" — use ESC for Game Menu |
+| `R` | Toggle Range Circles | **Not** "RACES screen" — use F5 for that |
+| `T` | Toggle Trade Routes | **Not** "Tech screen" — use F4 for that |
+| `E` | Highlight Enemy Fleets | |
+| `M` | _(no Galaxy Map binding)_ | `M` = Mute Audio globally; avoid reassigning |
+| `P` | _(no Galaxy Map binding)_ | `P` = Patrol in Fleet Command |
+| `D` | _(no Galaxy Map binding)_ | `D` = Defense Slider in Planet Mgmt |
+| `Enter` | Open End Turn confirmation | |
+| `Space` | Center view on selection | |
+| `+` / `=` | Zoom In | |
+| `-` | Zoom Out | |
+| `0` | Reset Zoom | |
+| `ESC` | Open Game Menu | Primary and only binding for Game Menu |
+
+### Conflict Resolutions (2026-04-12)
+
+The following conflicts existed in earlier drafts of this section and are now resolved:
+
+| Key | Old (this table, pre-fix) | Canonical (interaction-spec.md) | Reason |
+|-----|---------------------------|---------------------------------|--------|
+| `G` | GAME menu | Toggle Grid (Galaxy Map only) | ESC opens Game Menu; G = grid is more useful |
+| `R` | RACES/Diplomacy | Range Circles (Galaxy Map only) | R = RACES was a stretch; use F5 |
+| `F` | FLEET screen | Next Fleet cycle (Galaxy Map only) | F3 opens Fleet screen; `F` cycles fleet selection |
+| `D` | DESIGN screen (listed as global) | Defense Slider in Planet Mgmt only | D is screen-local, not global; use F6 for Design |
+| `T` | TECH/Research | Trade Routes toggle (Galaxy Map only) | T = Tech was a stretch; use F4 |
+| `P` | PLANETS list | No Galaxy Map binding | P = Patrol in Fleet Cmd; use F2 for Planets |
+| `M` | MAP overview | No Galaxy Map letter binding | M = Mute Audio globally; MAP button cycles overlays |
+| `F10` | Game Menu (UI_OVERVIEW) | Removed — not used | ESC is the sole Game Menu trigger |
+
+### In Modals
+
+| Key | Action |
+|-----|--------|
+| `ESC` | Close modal / cancel current action |
+| `Enter` | Confirm (context-dependent; suppressed in Fleet Deployment panel — see §4.4) |
+| `1-4` | Select hull size (Ship Design only) |
 
 ---
 

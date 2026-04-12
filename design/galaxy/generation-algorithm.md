@@ -285,7 +285,7 @@ function IdentifyClusters(stars, cluster_radius=60):
 
 ### 3.3 Region Assignment
 
-Stars are assigned to lore-based regions (see `space-regions.md`):
+Stars are assigned to lore-based regions (see `space-regions.md`). **Note:** `DetermineRegion()` is called per-star during `AssignRegions()` (Step 9), which runs after nebula placement (Step 3) — so `star.in_nebula` is always set when this function executes.
 
 ```pseudocode
 function DetermineRegion(star, map_center, map_size):
@@ -295,15 +295,35 @@ function DetermineRegion(star, map_center, map_size):
     dist_from_center = sqrt(dx^2 + dy^2)
     
     if dist_from_center < 0.15:
-        return "omega_sector"       // 5% - Orion's domain
-    if dist_from_center < 0.40:
-        return "wild_pellet_fields" // 50% - Contested space
-    if dist_from_center > 0.75:
-        return "safe_zones"         // 30% - Starting areas
+        return "omega_sector"       // ~5% - Orion's domain
     
-    // Remaining 15% - check for nebula assignment
+    // Nebula stars become dark_sectors regardless of distance
+    // (Checked before other rings so nebulae create dark pockets anywhere)
+    if star.in_nebula:
+        return "dark_sectors"       // ~varies - Nebula regions
+    
+    if dist_from_center < 0.40:
+        return "wild_pellet_fields" // ~50% - Contested space
+    if dist_from_center > 0.75:
+        return "safe_zones"         // ~30% - Starting areas
+    
+    // Middle ring (0.40–0.75), not in nebula
     return "wild_pellet_fields"
+
+function AssignRegions(stars, map_center, config):
+    map_size = {width: config.width, height: config.height}
+    for star in stars:
+        star.region = DetermineRegion(star, map_center, map_size)
 ```
+
+**Region Distribution (approximate, Medium galaxy):**
+
+| Region | Condition | Approx % of Stars |
+|--------|-----------|-------------------|
+| `omega_sector` | dist < 0.15 | ~5% |
+| `dark_sectors` | `in_nebula == true` | ~8–15% (varies) |
+| `wild_pellet_fields` | 0.15 ≤ dist ≤ 0.75, not nebula | ~50% |
+| `safe_zones` | dist > 0.75 | ~30% |
 
 ---
 
@@ -873,7 +893,13 @@ function ConfigureAsHomeworld(star):
     star.is_homeworld = true
     star.special = "homeworld"
     
-    // Force homeworld quality
+    // Force homeworld quality — ALL species start on a Terran planet.
+    // This is a balance decision: equal starting conditions regardless of species.
+    // Lore homeworld descriptions (e.g. Crystalia as radiated, Formicae as arid)
+    // are treated as origin-planet backstory — the place the species evolved from
+    // before their civilization reached their current homeworld.
+    // Hermit Crabs' Universal Adaptation and Ants' Hive Mind make Terran starts
+    // equally valid gameplay-wise. See species files for lore context.
     star.planet.environment = "terran"
     star.planet.size = {
         type: random_choice(["large", "huge"]),
