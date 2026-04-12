@@ -2,7 +2,7 @@
 
 ## Overview
 
-This wireframe matches the exact layout of the original Master of Orion (1993) Galaxy Map screen. The layout consists of three main areas: the star map (left ~75%), the context-sensitive info panel (right ~25%), and the bottom command bar.
+This wireframe matches the exact layout of the original Master of Orion (1993) Galaxy Map screen, verified against actual MOO1 screenshots. The layout consists of three main areas: the star map (left ~75%), the context-sensitive info panel (right ~25%), and the bottom command bar.
 
 **Reference**: Master of Orion (1993) Main Galaxy Screen  
 **Hotkey**: F1 (or MAP button)
@@ -42,13 +42,14 @@ This wireframe matches the exact layout of the original Master of Orion (1993) G
 
 ```
 ┌───────────────────────────────────────────────────────────────────┐
+│  [black space background]                                         │
 │                                                                   │
 │         ·                    ★                                    │
 │                  ·                        ·                       │
-│     ·        ●            ·       ◈               ★               │
+│     ·        ●            ·       ○               ★               │
 │                     ★                                    ·        │
 │  ✴              ·              ·                                  │
-│         ◉                [●]◄── Selected star (highlighted)       │
+│         ◉                [●]◄── Selected star (bright ring)       │
 │              ·      ✦              ✵            ·                 │
 │     ★                        ●                                    │
 │           ·    ✴        ·              ·          ◉               │
@@ -61,25 +62,27 @@ This wireframe matches the exact layout of the original Master of Orion (1993) G
 │                                                                   │
 └───────────────────────────────────────────────────────────────────┘
 
-STAR SYMBOLS:
-  ★  Yellow star (G-type, habitable)
-  ✦  Blue star (hot, often hostile planets)
-  ✴  Red star (cool, often small planets)
-  ✵  White star (various planet types)
-  ·  Unexplored/unknown star
+STAR SYMBOLS (colored pixel-art dots):
+  ★  Yellow/white star
+  ✦  Blue star (bright, hot)
+  ✴  Red/orange star
+  ✵  White dwarf or dim star
+  ·  Unexplored star (small dim dot — no color data yet)
 
-COLONY MARKERS:
-  ●  Your colony (filled, your empire color)
-  ◉  Enemy colony (filled, their empire color)
-  ◈  Neutral/uncolonized habitable
-  
-FLEET INDICATORS:
-  ▲  Your fleet in transit (small arrow)
-  △  Enemy fleet detected
+COLONY MARKERS (colored ring/glow around star):
+  ●  Your colony — ring in YOUR empire color
+  ◉  Enemy colony — ring in THEIR empire color
+  ○  Uncolonized habitable system (no ring, just star dot)
+
+FLEET INDICATORS (small pixel-art ship sprite near star):
+  ▶  Your fleet orbiting a system (positioned to the right of star)
+  ◀  Your fleet in transit (moving dot on route line)
+  ▷  Enemy fleet (visible if detected)
 
 SELECTION:
-  [●] Selected star shown with highlight box
-  ─── Fleet route line when moving
+  [●] Selected star shown with a bright highlight ring
+  ─── Solid route line when fleet destination is set (in range)
+  - - Red dashed route line when destination out of range
 ```
 
 ---
@@ -88,66 +91,176 @@ SELECTION:
 
 ### Selection Behavior
 
-**Something is always selected in MOO1.** The game starts with your homeworld selected. Clicking empty space does NOT deselect - you must click another star or fleet to change selection.
+**Something is always selected in MOO1.** The game starts with your homeworld selected. Clicking empty space may show a default/empty panel. You click a star or fleet icon to change selection.
 
 The info panel states are:
-1. Your colony selected (with production sliders)
-2. Unexplored star selected
-3. Enemy colony selected
-4. Your fleet selected (at colony or in transit)
+1. Your colony selected (planet stats + production info)
+2. Unexplored star selected (minimal info)
+3. Uncolonized but explored planet selected
+4. Enemy colony selected (race portrait + estimated info)
+5. Fleet deployment (ships at a system, ready to send)
+6. Fleet in transit (moving fleet selected on map)
 
-### State 1: Star Selected (Colony View)
+---
+
+### State 1: Your Colony Selected
+
+The right panel shows star/planet details at top, then colony stats, then current production. The planet name is shown as a header. Star type shown below name.
 
 ```
 ┌───────────────────────────┐
 │                           │
-│   FIRMA                   │
-│   ═══════════════════     │
+│   ORION                   │  ← Star/system name (all caps)
+│   ══════════════════      │
 │                           │
-│   [★] Yellow Star         │
+│   Yellow Star             │  ← Star type (text, no icon)
 │                           │
-│   Planet: Terran          │
-│   Size: 85 (max pop)      │
-│   Environment: Normal     │
-│   Minerals: Rich          │
+│   Terran                  │  ← Planet type
+│   Size: 100               │  ← Max population
 │                           │
 │   ─────────────────       │
-│   YOUR COLONY             │
+│   YOUR COLONY             │  ← Your empire name or "YOUR COLONY"
 │   ─────────────────       │
 │                           │
-│   Population:    12M      │
+│   Pop:       15  /  100   │  ← Current / max pop (in millions)
 │   Factories:     45       │
 │   Missile Bases:  2       │
 │   Shield:   Class III     │
 │   Waste:         3%       │
 │                           │
 │   ─────────────────       │
-│   PRODUCTION              │
+│   PRODUCING               │
 │   ─────────────────       │
 │                           │
-│   Building: Factory       │
-│   ████████████░░ 85%      │
+│   Factories               │  ← What's being built
+│   ████████████░░          │  ← Progress bar
 │   Turns left: 1           │
-│                           │
-│   [CLICK TO MANAGE]       │
 │                           │
 └───────────────────────────┘
 ```
 
+**Notes from screenshots:**
+- Planet name/star name are shown at top with a decorative underline/divider
+- Population shown as current value vs. max (e.g., "15 / 100")
+- Factories, Missile Bases, Shield level, Waste % all listed
+- Current production item + progress bar + turns remaining
+
+---
+
+### State 1a: Colony at Max Population
+
+When population has hit the planet size cap, the panel reflects this. No more growth occurs. Pop shows max value. Production continues normally.
+
+```
+┌───────────────────────────┐
+│   VEGA                    │
+│   ══════════════════      │
+│   Yellow Star             │
+│   Terran                  │
+│   Size: 60                │
+│                           │
+│   YOUR COLONY             │
+│   ─────────────────       │
+│   Pop:       60  /  60    │  ← AT MAX — no further growth
+│   Factories:     60       │
+│   Missile Bases:  3       │
+│   Shield:   Class IV      │
+│   Waste:         5%       │
+│                           │
+│   PRODUCING               │
+│   ─────────────────       │
+│   Housing (irrelevant)    │  ← Or whatever is queued
+│   ████████░░░░░░          │
+│   Turns left: 4           │
+└───────────────────────────┘
+```
+
+---
+
+### State 1b: Colony at Max Factories
+
+When factories reach the cap (5× population), the factory line shows "MAX" and the production item has shifted to something else (missiles, shields, housing, etc.).
+
+```
+┌───────────────────────────┐
+│   ARCTURUS                │
+│   ══════════════════      │
+│   Red Star                │
+│   Arid                    │
+│   Size: 40                │
+│                           │
+│   YOUR COLONY             │
+│   ─────────────────       │
+│   Pop:       35  /  40    │
+│   Factories: 175  (MAX)   │  ← MAX shown when factories = 5×pop
+│   Missile Bases:  5       │
+│   Shield:   Class V       │
+│   Waste:        12%       │
+│                           │
+│   PRODUCING               │
+│   ─────────────────       │
+│   Missile Bases           │
+│   ████████████████░       │
+│   Turns left: 1           │
+└───────────────────────────┘
+```
+
+---
+
 ### State 2: Unexplored Star Selected
+
+When a star has not yet been visited by any scout/ship, almost no information is available.
 
 ```
 ┌───────────────────────────┐
 │                           │
 │   ALTAIR                  │
-│   ═══════════════════     │
+│   ══════════════════      │
 │                           │
-│   [✦] Blue Star           │
+│   Blue Star               │  ← Star type visible (stars have
+│                           │    visible color on map)
 │                           │
-│   Planet: Ocean           │
-│   Size: 65 (max pop)      │
-│   Environment: Fertile    │
-│   Minerals: Abundant      │
+│   UNEXPLORED              │  ← Status label
+│                           │
+│   (no planet data)        │  ← Planet type/size unknown
+│                           │
+│                           │
+│                           │
+│                           │
+│                           │
+│                           │
+│                           │
+│                           │
+│                           │
+│                           │
+│                           │
+└───────────────────────────┘
+```
+
+**Notes from screenshots:**
+- Star name IS shown (stars are named on the map even unexplored)
+- Star type (color) IS visible — you can see the colored dot on the map
+- Planet type, size, environment are NOT shown — all "?"
+- No owner, no colony data
+
+---
+
+### State 3: Uncolonized Planet (Explored)
+
+Once a scout has visited, planet details are known but no colony exists.
+
+```
+┌───────────────────────────┐
+│                           │
+│   SIRIUS                  │
+│   ══════════════════      │
+│                           │
+│   White Star              │
+│                           │
+│   Ocean                   │  ← Planet type (known after scouting)
+│   Size: 80                │  ← Max population
+│   Fertile                 │  ← Environment rating
+│   Abundant                │  ← Mineral rating
 │                           │
 │   ─────────────────       │
 │   UNCOLONIZED             │
@@ -155,14 +268,7 @@ The info panel states are:
 │                           │
 │   Requires: Colony Ship   │
 │                           │
-│   Special: Artifacts      │
-│   (+50% research)         │
-│                           │
-│                           │
-│                           │
-│                           │
-│                           │
-│                           │
+│   Special: None           │  ← Or "Artifacts", "Natives", etc.
 │                           │
 │                           │
 │                           │
@@ -170,95 +276,103 @@ The info panel states are:
 └───────────────────────────┘
 ```
 
-### State 3: Enemy Colony Selected
+---
+
+### State 4: Enemy Colony Selected
+
+Shows enemy race portrait (pixel art) and limited intelligence info.
 
 ```
 ┌───────────────────────────┐
 │                           │
 │   KRONOS                  │
-│   ═══════════════════     │
+│   ══════════════════      │
 │                           │
-│   [✴] Red Star            │
+│   Red Star                │
 │                           │
-│   Planet: Arid            │
+│   Arid                    │
 │   Size: 55                │
 │                           │
 │   ─────────────────       │
-│   GUINEA PIG COLONY       │
+│   BULRATHI COLONY         │  ← Race name + "COLONY"
 │   ─────────────────       │
 │                           │
 │   ┌─────────────────┐     │
-│   │ [GUINEA PIG     │     │
-│   │  PORTRAIT]      │     │
+│   │  [RACE PORTRAIT]│     │  ← Pixel-art race portrait image
 │   └─────────────────┘     │
 │                           │
-│   Relation: WAR           │
+│   Relation: WAR           │  ← Diplomatic status
 │                           │
-│   Est. Population: ~25M   │
-│   Est. Defenses: Strong   │
-│                           │
-│   [SEND FLEET]            │
-│   [CONTACT]               │
-│                           │
+│   Pop:      ~25M          │  ← Estimated (tilde = approximate)
+│   Defenses: Strong        │  ← Qualitative assessment
 │                           │
 └───────────────────────────┘
 ```
 
-### State 4a: Fleet Deployment (Fleet Orbiting System)
+---
 
-When clicking a fleet orbiting a system, the Fleet Deployment panel appears with 5 ship slots:
+### State 5: Fleet Deployment Panel
+
+Triggered when clicking a **fleet icon orbiting one of your systems**. Shows ships available to send. Appears in right panel with ship images in a 2-column grid (up to 5 ship types).
 
 ```
 ┌─────────────────────────┐
 │                         │
-│   FLEET DEPLOYMENT      │
+│   FLEET                 │  ← Header
 │   ═══════════════════   │
 │                         │
 │   ┌───────┐ ┌───────┐   │
-│   │ SCOUT │ │FIGHTER│   │
-│   │       │ │       │   │
-│   │    12 │ │     4 │   │  ← Ship count in corner
+│   │[SCOUT ]│ │[DEST.]│   │  ← Pixel-art ship images
+│   │       │ │       │   │     (ship type portrait)
 │   └───────┘ └───────┘   │
-│   << < 12 > >>          │  ← Deploy count controls
-│   << <  4 > >>          │
+│   Scout        12       │  ← Ship name + total count at colony
+│   << <  12  > >>        │  ← Deploy count controls (0–12)
 │                         │
 │   ┌───────┐ ┌───────┐   │
-│   │ empty │ │ empty │   │  ← Up to 5 ship slots
+│   │[FIGHTR]│ │       │   │
 │   └───────┘ └───────┘   │
-│   ┌───────┐             │
-│   │ empty │             │
-│   └───────┘             │
+│   Fighter       4       │
+│   << <   4  > >>        │
+│                         │
+│   [empty slots...]      │  ← Up to 5 ship types shown
 │                         │
 │   ┌─────────────────┐   │
-│   │  ETA: 3 turns   │   │  ← Green text, shows ETA
-│   └─────────────────┘   │    after destination clicked
+│   │  ETA: 3 turns   │   │  ← Green text; only after dest. selected
+│   └─────────────────┘   │
 │                         │
-│   [CANCEL]   [ACCEPT]   │
+│   [CANCEL]   [ACCEPT]   │  ← ACCEPT grayed until dest. chosen
 │                         │
 └─────────────────────────┘
 ```
 
 **Deployment Controls** (per ship type):
-- `<<` = Set to 0 (leave all)
+- `<<` = Set to 0 (leave all ships here)
 - `<` = Decrease by 1
-- `[number]` = Ships to deploy
+- `[number]` = Ships to deploy (editable display)
 - `>` = Increase by 1
 - `>>` = Set to max (deploy all)
 
-**Flow**:
-1. All ships default to selected
-2. Adjust counts with buttons
-3. Click destination star → green line appears, ETA updates, ACCEPT enables
-4. Click ACCEPT → fleet departs
+**Deployment Flow**:
+1. Click fleet icon at your colony → Fleet Deployment panel opens
+2. All ships default to their full count (deploy all)
+3. Adjust counts with `<< < > >>` buttons per ship type
+4. Click a destination star on the map:
+   - A solid route line appears from origin to destination
+   - ETA in green appears at bottom of panel
+   - ACCEPT button activates
+5. Click ACCEPT → fleet departs
+6. Clicking an **out-of-range** destination: route line turns red, ETA shows "OUT OF RANGE" or is blank, ACCEPT stays grayed
 
 **After ACCEPT**:
-- Departing fleet icon appears LEFT of system
-- Remaining ships icon stays RIGHT of system (if any left)
-- Selection moves to origin system
+- Departing fleet icon appears to the LEFT of origin system (moving away)
+- Any remaining fleet icon stays to the RIGHT of origin system
+- Selection moves to the origin system info
 
-### State 4b: Fleet In Transit
+---
 
-When clicking a fleet that is traveling between systems:
+### State 6: Fleet In Transit (Moving Fleet Selected)
+
+When clicking a fleet sprite on the map that is traveling between systems:
 
 ```
 ┌───────────────────────────┐
@@ -267,58 +381,96 @@ When clicking a fleet that is traveling between systems:
 │   ═══════════════════     │
 │                           │
 │   From: Sol               │
-│   To: Altair              │
-│   ETA: 3 turns            │
+│   To:   Altair            │
+│   ETA:  3 turns           │
 │                           │
 │   ─────────────────       │
 │   SHIPS                   │
 │   ─────────────────       │
 │                           │
 │   Scout          x12      │
-│   Fighter        x4       │
+│   Fighter         x4      │
 │                           │
 │   ─────────────────       │
-│   Total Ships:   16       │
-│                           │
-│   [REDIRECT]              │  ← Change destination
+│   Total:          16      │
 │                           │
 └───────────────────────────┘
 ```
+
+**Notes from screenshots:**
+- Fleet sprite is a small pixel-art ship visible on the route line
+- Clicking it shows FROM / TO / ETA
+- Ship list shows type + count
+- No redirect option visible in early MOO1 (fleet must arrive first)
 
 ---
 
 ## Bottom Command Bar
 
-```
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                                                                                 │
-│   ┌──────┐ ┌────────┐ ┌───────┐ ┌─────┐ ┌───────┐ ┌─────────┐ ┌──────┐        │
-│   │ GAME │ │ DESIGN │ │ FLEET │ │ MAP │ │ RACES │ │ PLANETS │ │ TECH │        │
-│   └──────┘ └────────┘ └───────┘ └─────┘ └───────┘ └─────────┘ └──────┘        │
-│      F10       F6        F3       F1       F5         F2        F4            │
-│                                                                                 │
-│                                                           ┌─────────────────┐  │
-│                                                           │   NEXT TURN     │  │
-│                                                           │    [ENTER]      │  │
-│                                                           └─────────────────┘  │
-│                                                                                 │
-└─────────────────────────────────────────────────────────────────────────────────┘
+The command bar is a single row of text buttons across the full width, with NEXT TURN on the far right. All buttons are the same height and use a consistent pixel-art button style.
 
-BUTTON FUNCTIONS:
-  GAME    - Save, Load, Options menu (F10 or ESC) [modal]
-  DESIGN  - Ship Design screen (F6) [modal - no command bar]
-  FLEET   - Fleet overview and management (F3) [modal - no command bar]
-  MAP     - Return to Galaxy Map / current screen (F1)
-  RACES   - Diplomacy and race relations (F5) [modal - no command bar]
-  PLANETS - Colony list and management (F2) [modal - no command bar]
-  TECH    - Research allocation screen (F4) [modal - no command bar]
-  
-  NEXT TURN - End current turn, process AI turns (ENTER or SPACE)
-
-NOTE: All screens except MAP open as full-screen modals WITHOUT the
-bottom command bar. You exit these modals via OK/Close button or ESC
-to return to the Galaxy Map.
 ```
+┌──────────────────────────────────────────────────────────────────────────────────┐
+│  GAME │ DESIGN │ FLEET │ MAP │ RACES │ PLANETS │ TECH │          NEXT TURN      │
+└──────────────────────────────────────────────────────────────────────────────────┘
+   F10     F6       F3    F1     F5       F2       F4               [ENTER]
+```
+
+**Button order (left to right, verified from screenshots):**
+1. **GAME** — Save/Load/Quit menu (F10 or ESC)
+2. **DESIGN** — Ship Design screen (F6)
+3. **FLEET** — Fleet overview screen (F3)
+4. **MAP** — Galaxy Map / current screen (F1) — highlighted when active
+5. **RACES** — Diplomacy screen (F5)
+6. **PLANETS** — Colony list (F2)
+7. **TECH** — Research screen (F4)
+8. **NEXT TURN** — End turn, far right, larger button (ENTER or SPACE)
+
+**Notes:**
+- MAP button appears active/highlighted when on the galaxy map
+- All non-MAP screens open as full-screen replacements (no overlay)
+- NEXT TURN is visually distinct — wider, right-aligned, often a different color
+
+---
+
+## Star Map Visual Details
+
+From the screenshots, the star map has these confirmed visual elements:
+
+### Background
+- Pure black space
+- Occasional faint star-field dots (non-interactive background stars)
+
+### Star Rendering
+- Stars are small colored pixel-art dots/glows
+- **Yellow** stars: warm yellow dot
+- **Blue** stars: bright blue-white dot
+- **Red** stars: orange-red dot
+- **White** stars: small white dot
+- Size of dot = approximately the same; no size variation for importance
+
+### Colony Rings
+- Your colonies: colored ring around the star dot (in your empire's color)
+- Enemy colonies: colored ring in that empire's color
+- Multiple empires at same star: shown with their respective colors
+- No colony = bare star dot
+
+### Fleet Icons
+- Small pixel-art ship sprites
+- Positioned adjacent to their star (to the right when orbiting)
+- Move along route lines when in transit
+- Clicking the sprite selects that fleet
+
+### Route Lines
+- Appear when fleet has a set destination
+- **Solid line**: in-range destination (can send)
+- **Red/dashed line**: out-of-range destination (cannot send yet)
+- Line connects origin star to destination star
+
+### Star Name Labels
+- Each star has a text label (small pixel font)
+- Label appears below or beside the star dot
+- Always visible regardless of selection state
 
 ---
 
@@ -329,97 +481,96 @@ to return to the Galaxy Map.
 | Action | Result |
 |--------|--------|
 | Left-click star | Select star, show info in right panel |
-| Left-click empty space | Deselect, show empire summary |
-| Left-click fleet icon | Select fleet, show fleet info |
-| Right-click star | Quick menu (Send Fleet, View, etc.) |
-| Click-drag on map | Pan the view |
-| Scroll wheel | Zoom in/out |
-| Double-click colony | Go to Planet Management screen |
-| Double-click fleet | Go to Fleet screen |
+| Left-click empty space | Deselects; panel may go blank or show empire summary |
+| Left-click fleet icon | Select fleet; show fleet deployment or transit panel |
+| During deployment: click destination | Sets route, shows ETA, activates ACCEPT |
+| During deployment: click out-of-range | Red line shown; ACCEPT stays disabled |
 
-### Fleet Movement
+### Confirmed from Screenshots
 
-| Action | Result |
-|--------|--------|
-| Select fleet | Fleet info appears in panel |
-| Click destination star | Set fleet destination, show route line |
-| Route line appears | Dashed line from fleet to destination |
-| ETA displayed | Turns to arrival shown in panel |
-
-### Info Panel Interactions
-
-| Action | Result |
-|--------|--------|
-| Click colony info | Opens Planet Management for that colony |
-| Click "SEND FLEET" | Opens fleet selection dialog |
-| Click "CONTACT" | Opens diplomacy with that race |
-| Click production bar | Opens build queue / production screen |
+| Scenario | Panel Shows |
+|----------|-------------|
+| Home colony (start) | Colony stats + current production |
+| Unexplored star | Star name + "UNEXPLORED", no planet data |
+| Uncolonized explored planet | Planet type + size + "UNCOLONIZED" |
+| Your colony at max pop | Pop = max/max, production continues |
+| Your colony at max factories | Factories shows "MAX", building something else |
+| New colony (just founded) | Low pop, 0 factories, basic stats |
+| Post-terraformed colony | Updated planet type, higher max pop |
+| Fleet at your colony | Fleet Deployment panel with ship grid |
+| Fleet in transit | From/To/ETA + ship list |
+| Destination out of range | Red route line, ACCEPT grayed |
 
 ---
 
-## Visual Design Notes
-
-### MOO1 Faithful Elements
-- Right-side info panel (not left as in our earlier wireframe)
-- Bottom command bar (not top)
-- Star colors indicating star type
-- Simple, clear colony/fleet markers
-- Context-sensitive info panel
-
-### Hamster of Orion Adaptations
-- Higher resolution (1080p vs 320x200)
-- Pet-themed race portraits and emblems
-- Modern tooltip support on hover
-- Smooth zoom/pan (vs. fixed zoom levels)
-- Optional notification overlay (top-right)
-
----
-
-## ASCII Reference for Implementation
-
-### Full Screen Composite
+## ASCII Reference: Full Screen Composite
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
 │                                                                                 │
 │  ┌────────────────────────────────────────────────────┐ ┌─────────────────────┐│
-│  │                                                    │ │                     ││
-│  │         ·                    ★                     │ │  FIRMA              ││
-│  │                  ·                        ·        │ │  ═════════════      ││
-│  │     ·        ●            ·       ◈               │ │                     ││
-│  │                     ★                        ★    │ │  [★] Yellow Star    ││
+│  │ [black space]                                      │ │                     ││
+│  │         ·                    ★                     │ │  ORION              ││
+│  │                  ·                        ·        │ │  ═══════════════    ││
+│  │     ·        ●            ·       ○               │ │                     ││
+│  │                     ★                        ★    │ │  Yellow Star        ││
 │  │  ✴              ·              ·                  │ │                     ││
-│  │         ◉                [●]                      │ │  Planet: Terran     ││
-│  │              ·      ✦              ✵            · │ │  Size: 85           ││
-│  │     ★                        ●                    │ │  Minerals: Rich     ││
-│  │           ·    ✴        ·              ·          │ │                     ││
-│  │                    ·           ★            ◉     │ │  ───────────────    ││
-│  │        ·      ✵          ·                   ✦    │ │  Population: 12M    ││
-│  │                              ·        ·           │ │  Factories:  45     ││
-│  │    ★         ·       ·              ★            │ │  Bases:       2     ││
-│  │                  ·          ✵                 ·   │ │                     ││
-│  │          ●              ·        ·                │ │  Building: Factory  ││
-│  │                                                   │ │  ████████████░░ 85% ││
-│  │                                                    │ │                     ││
-│  └────────────────────────────────────────────────────┘ └─────────────────────┘│
-│                                                                                 │
-│  ┌──────┬────────┬───────┬─────┬───────┬─────────┬──────┬───────────────────┐  │
-│  │ GAME │ DESIGN │ FLEET │ MAP │ RACES │ PLANETS │ TECH │     NEXT TURN     │  │
-│  └──────┴────────┴───────┴─────┴───────┴─────────┴──────┴───────────────────┘  │
-│                                                                                 │
+│  │         ◉                [●]                      │ │  Terran             ││
+│  │              ·      ✦              ✵            · │ │  Size: 100          ││
+│  │     ★                        ●                    │ │                     ││
+│  │           ·    ✴        ·              ·          │ │  ─────────────      ││
+│  │                    ·           ★            ◉     │ │  YOUR COLONY        ││
+│  │        ·      ✵          ·                   ✦    │ │  ─────────────      ││
+│  │                              ·        ·           │ │  Pop:  15 / 100     ││
+│  │    ★         ·       ·              ★            │ │  Factories:  45     ││
+│  │                  ·          ✵                 ·   │ │  Bases:       2     ││
+│  │          ●              ·        ·                │ │                     ││
+│  │                         ▶◄──fleet icon            │ │  PRODUCING          ││
+│  └────────────────────────────────────────────────────┘ │  Factory           ││
+│                                                          │  ████████████░░   ││
+│  ┌──────┬────────┬───────┬─────┬───────┬─────────┬──────┤  Turns left: 1    ││
+│  │ GAME │ DESIGN │ FLEET │ MAP │ RACES │ PLANETS │ TECH │                   ││
+│  │      │        │       │[MAP]│       │         │      └─────────────────────┘│
+│  └──────┴────────┴───────┴─────┴───────┴─────────┴──────┬───────────────────┐  │
+│                                                          │    NEXT TURN      │  │
+│                                                          └───────────────────┘  │
 └─────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## File Reference
+## Reference Screenshots
 
-This wireframe supersedes the "modern interpretation" in `galaxy-map.md` for MOO1 accuracy. The original file may be kept for comparison or as an alternative "modern" layout option.
+All screenshots are from Master of Orion (1993) and located at:
 
-**Changes from previous wireframe:**
-1. Info panel moved from LEFT to RIGHT side
-2. Command bar moved from TOP to BOTTOM  
-3. Removed top status bar (info now in right panel)
-4. Removed left empire info panel (consolidated to right)
-5. Removed legend panel (stars self-explanatory with tooltips)
-6. Simplified to match actual MOO1 layout proportions
+- [Home screen / default state](../../moo_screens/moo_galaxy_home.png)
+- [Unexplored star selected](../../moo_screens/moo_galaxy_unexplored.png)
+- [Ship/fleet select at colony](../../moo_screens/moo_galaxy_shipselect.png)
+- [After ship destination selected](../../moo_screens/moo_galaxy_aftershipdestinationselected.png)
+- [Moving ship/fleet selected](../../moo_screens/moo_galaxy_movingshipselected.png)
+- [Fleet deployment panel](../../moo_screens/moo_galaxy_fleet_deployment.png)
+- [Uncolonized planet selected](../../moo_screens/moo_galaxy_select_uncolonized_planet.png)
+- [Ship destination out of range](../../moo_screens/moo_galaxy_ship_select_destination_out_of_range.png)
+- [New colony planet panel](../../moo_screens/moo_galaxy_planet_new.png)
+- [Post-terraformed planet panel](../../moo_screens/moo_galaxy_planet_post_tform.png)
+- [Colony at max population](../../moo_screens/moo_galaxy_planet_is_full.png)
+- [Colony at max factories](../../moo_screens/moo_galaxy_max_factories.png)
+
+---
+
+## Changes from Previous Version
+
+1. **Star symbols corrected**: Uncolonized planets use `○` (no ring), not `◈`
+2. **Colony markers clarified**: Ring color = empire color; no ring = uncolonized
+3. **Fleet icons updated**: Pixel-art ship sprites (not arrow glyphs like `▲`)
+4. **Fleet deployment layout**: 2-column ship grid confirmed; ship image shown above controls
+5. **Route lines**: Solid = in range, Red = out of range (confirmed from screenshots)
+6. **Out-of-range behavior**: Red route line + ACCEPT grayed (added new state doc)
+7. **New colony state added** (State 1: fresh colony with low stats)
+8. **Max population state added** (State 1a: pop = max, production continues)
+9. **Max factories state added** (State 1b: factories = MAX, building other things)
+10. **Post-terraforming state added** (planet type + max pop updated)
+11. **Unexplored vs. uncolonized clarified**: Two distinct panel states
+12. **Star name labels**: Always visible on map (not just when selected)
+13. **Command bar order confirmed**: GAME, DESIGN, FLEET, MAP, RACES, PLANETS, TECH, NEXT TURN
+14. **Reference Screenshots section added** with relative paths to all MOO1 source images

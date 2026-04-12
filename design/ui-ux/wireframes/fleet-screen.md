@@ -4,8 +4,14 @@
 
 The Fleet screen is a **full-screen modal** opened by clicking FLEET on the Galaxy Map's bottom command bar. It displays all fleets in the empire organized by location. **No bottom command bar** - exit via OK button.
 
-**Reference**: `design/moo_screens/moo_fleet_screen.png`  
+**Reference**: `../../moo_screens/moo_fleet_screen.png`  
 **Hotkey**: F3
+
+---
+
+## Visual Description (from MOO1 screenshot)
+
+The screen has a **solid black background** with no decorative border frame. At the top, "FLEET OVERVIEW" is centered in white/amber text with a **horizontal golden/amber decorative line** spanning the full width beneath the title. The grid occupies the bulk of the screen. At the bottom, a left-aligned bordered text box shows fleet maintenance cost, with three pixel-art raised buttons (SPECS, SCRAP, OK) in the bottom-right corner.
 
 ---
 
@@ -67,17 +73,17 @@ The Fleet screen is a **full-screen modal** opened by clicking FLEET on the Gala
 | 2-7 - SHIP DESIGNS | One column per ship design (max 6 designs in game) |
 
 ### System Column
-- Shows system name
+- Shows system name in white text, left-aligned
 - If orbiting: just the name (e.g., "FIRMA")
 - If in transit: arrow + destination + ETA (e.g., "→ ALTAIR, ETA: 3")
-- May show "(colony)" or "(uncolonized)" indicator
+- May show a colony/status indicator below the name
 
 ### Ship Design Columns
 - Column header shows ship design name
 - Each cell shows:
-  - Ship image (if ships of that type present)
-  - Ship count in bottom-right corner of image
-  - Empty if no ships of that type at that location
+  - Pixel-art ship sprite (if ships of that type are present)
+  - Ship count in **bottom-right corner** of the image box
+  - Cell is solid black if no ships of that type at that location
 
 ```
 ┌─────────┐
@@ -110,15 +116,19 @@ Each row represents a **fleet at a specific location**:
 │                                             │
 └─────────────────────────────────────────────┘
 ```
-Shows total maintenance cost for all ships in the empire.
+Shows total maintenance cost for all ships in the empire. Displayed in a bordered rectangle with light text on dark background.
 
 ### Buttons (Bottom-Right)
+
+Three **raised pixel-art style buttons**, right-aligned, displayed in a row:
 
 | Button | Action |
 |--------|--------|
 | **SPECS** | View ship design specifications |
 | **SCRAP** | Scrap selected ships (opens scrap dialog) |
 | **OK** | Close Fleet screen, return to Galaxy Map |
+
+Buttons use the standard MOO1 raised-border style (lighter top/left edges, darker bottom/right edges on a medium-gray background).
 
 ---
 
@@ -138,8 +148,9 @@ Shows total maintenance cost for all ships in the empire.
 
 - **Maximum 6 ship designs**: The game only allows 6 active ship designs at a time
 - **Column headers**: Show design names (e.g., "Scout", "Fighter", "Destroyer")
-- **Empty cells**: If no ships of a type exist at a location, cell is empty
+- **Empty cells**: If no ships of a type exist at a location, cell is solid black
 - **Scrolling**: If many fleets exist, list scrolls vertically
+- **No decorative border**: The screen has a plain black background; the title + rule provide the only top decoration
 
 ---
 
@@ -153,3 +164,9 @@ Shows total maintenance cost for all ships in the empire.
 | SOL | - | - | - | 1 | - | - |
 
 *Fleet Maintenance: 45 BC/turn*
+
+---
+
+## Reference Screenshots
+
+![MOO1 Fleet Screen](../../moo_screens/moo_fleet_screen.png)

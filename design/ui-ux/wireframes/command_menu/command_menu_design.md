@@ -1,26 +1,16 @@
-# Ship Design Screen (F6) - MOO1-Accurate Wireframe
+# Command Menu: DESIGN (F6) - MOO1-Accurate Wireframe
 
 ## Overview
 
-The Ship Design screen is a **full-screen modal** opened by clicking DESIGN on the Galaxy Map's bottom command bar. Players create ship designs by selecting size, weapons, and special equipment. **Ship systems are automatically set to the best available technology** - no manual selection required.
+The DESIGN command button opens the Ship Design screen. This is a **full-screen modal**.
 
 **Hotkey**: F6
 
 ---
 
-## Key Design Principle
-
-**Automatic Systems**: Computer, Shield, ECM, Armor, Engine, and Maneuver are **automatically equipped with your best available tech**. The player does NOT select these - they're determined by your current research level.
-
-**Player Choices**:
-1. Ship Size (determines space available) — chosen at the **top** of the screen
-2. Ship Appearance (visual style)
-3. Weapons (type and count for 4 slots)
-4. Special Equipment (3 slots)
-
----
-
 ## Screen Layout
+
+This screen is a **full-screen modal** and does **NOT** display the bottom command bar.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────────┐
@@ -61,8 +51,7 @@ The Ship Design screen is a **full-screen modal** opened by clicking DESIGN on t
 │  │  Examples:                               │  │     └──────────────────┘       │ │
 │  │  • Reserve Fuel Tanks (extended range)   │  │                                │ │
 │  │  • Colony Module (colonize planets)      │  │   (space backdrop w/ planet)  │ │
-│  │  • Battle Scanner                        │  │                                │ │
-│  │  • Extended Fuel Tanks                   │  │   [STYLE ◄ ►] (appearance)    │ │
+│  │  • Battle Scanner                        │  │   [STYLE ◄ ►] (appearance)    │ │
 │  └──────────────────────────────────────────┘  └────────────────────────────────┘ │
 │                                                                                     │
 │  ┌─────────────────────────────────────────────────────────────────────────────┐   │
@@ -81,145 +70,21 @@ The Ship Design screen is a **full-screen modal** opened by clicking DESIGN on t
 
 ---
 
-## Panel Details
+## Details
 
-### Ship Size Selector — TOP OF SCREEN
-
-The **Ship Size selector appears at the very top** of the Ship Design screen, above all other panels. It is a radio-button row:
-
-```
-(•) Frigate   ( ) Destroyer   ( ) Cruiser   ( ) Battleship   ( ) Titan
-```
-
-Selecting a size immediately updates **Total Space** and resets weapons/specials if they no longer fit.
-
----
-
-### Top Panel — Ship Systems (AUTO-ASSIGNED)
-
-These are **read-only displays** showing what systems will be equipped automatically based on your current technology level:
-
-**Left Column:**
-| System | Example Display |
-|--------|----------------|
-| **Computer** | `Class I  Attack +1` |
-| **Shield** | `(none)` or `Class I Shields` |
-| **ECM** | `Missile Def: 3` |
-
-**Right Column:**
-| System | Example Display |
-|--------|----------------|
-| **Armor** | `Titanium   3 Hit Pts` |
-| **Engine** | `Nuclear Engines  Warp 2` |
-| **Maneuver** | `Class I  Combat Spd 2` |
-
-**Important**: Player cannot change these. They upgrade automatically when you research better technology.
-
----
-
-### Middle Panel — Weapons (PLAYER SELECTS)
-
-A **table with 4 weapon slots**. Columns are:
-
-| Column | Description |
-|--------|-------------|
-| **Count** | Number of this weapon to equip (uses space) |
-| **Ship Weapons** | Weapon type selected from available tech |
-| **Damage** | Damage dealt per weapon |
-| **Arc** | Firing angle/arc |
-
-**Player actions**:
-- Click a row to select weapon type from available weapons
-- Adjust count (more weapons = more space used)
-- Leave empty if not needed
-
----
-
-### Special Equipment (PLAYER SELECTS)
-
-**Three slots** for special equipment:
-
-| Example Equipment | Effect |
-|-------------------|--------|
-| Reserve Fuel Tanks | +3 parsec range |
-| Colony Module | Allows colonizing planets |
-| Battle Scanner | See enemy ship details in combat |
-
-**Common special equipment**:
-- **Colony Module** - Required for colony ships
-- **Reserve Fuel Tanks** - Extended travel range
-- **Extended Fuel Tanks** - Even more range
-- **Battle Scanner** - Intel on enemy ships
-- **Anti-Missile Rockets** - Point defense
-
----
-
-### Ship Preview
-
-- **3D rendered ship image** against space backdrop
-- **Style selector** (◄ ►) to choose ship appearance/visual style
-- Appearance is cosmetic only - does not affect stats
-
----
-
-### Bottom Bar — Summary
-
-**Design Name**: Editable text field (e.g. `GUNBOAT`)
-
-**Ship Icon**: Pixel sprite showing galaxy map appearance
-
-**Stats:**
-| Stat | Description |
-|------|-------------|
-| **Ship Cost** | BC to build one ship |
-| **Total Space** | Maximum space for this hull size |
-| **Available** | Space remaining after weapons/specials |
-
-**Buttons (right side):**
-| Button | Function |
-|--------|----------|
-| **CANCEL** | Exit without saving |
-| **CLEAR** | Remove all weapons/specials |
-| **BUILD** | Save design |
-
----
-
-## What Uses Space
-
-Only these player-selected items consume space:
-- **Weapons** (count × weapon size)
-- **Special Equipment**
-
-Ship systems (Computer, Shield, ECM, Armor, Engine, Maneuver) do **NOT** consume space - they are automatically included.
-
----
-
-## Interactions
-
-| Action | Result |
-|--------|--------|
-| Click hull size (top) | Changes available space |
-| Click weapon slot | Opens weapon selection popup |
-| Adjust weapon count | Changes space used |
-| Click special slot | Opens special equipment selection |
-| Click style arrows | Changes ship appearance (cosmetic) |
-| Edit name | Changes design name |
-| Click CLEAR | Removes all weapons/specials |
-| Click CANCEL | Exits without saving |
-| Click BUILD | Saves design |
-
----
-
-## Design Workflow
-
-1. **Select hull size** at the top of screen (determines total space)
-2. **Choose ship appearance** (cosmetic style)
-3. **Add weapons** to up to 4 slots with desired counts
-4. **Add special equipment** if needed (colony module, fuel tanks, etc.)
-5. **Name the design**
-6. **Click BUILD** to save
-
-Ship systems are handled automatically - no selection needed!
+* **Ship Size Selector**: Appears at the **top of the screen** as a radio-button row — NOT in the bottom bar.
+* **Auto-assigned Systems**: Computer, Shield, ECM, Armor, Engine, and Maneuver are automatically set to the best available technology.
+  - Left column: Computer, Shield, ECM
+  - Right column: Armor, Engine, Maneuver
+  - Example values: `Nuclear Engines Warp 2`, `Class I Combat Spd 2`
+* **Player Choices**:
+    * **Ship Size**: Selects the hull class (at top of screen).
+    * **Weapons**: Configure up to 4 weapon slots. Columns: Count | Ship Weapons | Damage | Arc.
+    * **Special Equipment**: Select up to 3 special devices.
+    * **Appearance**: Visual style (cosmetic only).
+* **Space Usage**: Only weapons and special equipment consume space.
+* **Bottom Bar**: Shows ship name, Ship Cost, Total Space, Available space, and action buttons.
+* **Controls**: `CANCEL` to exit, `CLEAR` to reset weapons/specials, `BUILD` to save the design.
 
 ---
 
@@ -227,5 +92,5 @@ Ship systems are handled automatically - no selection needed!
 
 | File | Description |
 |------|-------------|
-| [`../../moo_screens/moo_ship_design.png`](../../moo_screens/moo_ship_design.png) | MOO1 Ship Design screen — primary reference |
-| [`../../moo_screens/moo_design.png`](../../moo_screens/moo_design.png) | MOO1 Ship Design screen (same image, alternate filename) |
+| [`../../../moo_screens/moo_ship_design.png`](../../../moo_screens/moo_ship_design.png) | MOO1 Ship Design screen — primary reference |
+| [`../../../moo_screens/moo_design.png`](../../../moo_screens/moo_design.png) | MOO1 Ship Design screen (same image, alternate filename) |
