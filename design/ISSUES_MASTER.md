@@ -3,7 +3,7 @@
 **Generated:** 2026-04-12  
 **Last Updated:** 2026-04-12  
 **Total Issues:** ~135 across 6 review areas  
-**Resolved:** 11 critical issues
+**Resolved:** 17 critical issues
 
 This document consolidates all critical and high-priority issues found during the comprehensive design review. Individual detailed reports are in their respective directories.
 
@@ -48,17 +48,17 @@ This document consolidates all critical and high-priority issues found during th
 | C-C7 | Ferrets combat bonus 3-way conflict | ✅ **FIXED** — Set to +4 Attack Levels only (no damage bonus) |
 | C-C8 | `target_defense` computed two ways | 🔴 OPEN |
 
-### Mechanics (7)
+### Mechanics (7) — ✅ 6 RESOLVED
 
-| ID | Issue | Files Affected |
-|----|-------|----------------|
-| M-C1 | Cloning: Two different mechanics — flat pop/turn vs BC-per-million | `population-growth.md`, `planetology.md` |
-| M-C2 | Soil Enrichment: Multiplier vs size+growth, different tech levels | `population-growth.md`, `planetology.md` |
-| M-C3 | Robotic Controls: Tech levels totally different (starting vs level-10) | `factory-formulas.md`, `computers.md` |
-| M-C4 | Eco Restoration: Two incompatible formulas | `factory-formulas.md`, `planetology.md` |
-| M-C5 | Terraforming: Only +10 matches; +20 through +120 all differ | `population-growth.md`, `planetology.md` |
-| M-C6 | Miniaturization cap: 80% vs 50% (MOO1 used 50%) | `ship-costs.md`, `research-formulas.md` |
-| M-C7 | `slider-mathematics.md` referenced everywhere but **doesn't exist** | Multiple |
+| ID | Issue | Status |
+|----|-------|--------|
+| M-C1 | Cloning: Two different mechanics | ✅ **FIXED** — Unified to flat +2/+5 pop/turn, tech levels 11/22 |
+| M-C2 | Soil Enrichment: Multiplier vs flat bonus | ✅ **FIXED** — Unified to flat +25/+50 bonus, tech levels 14/26 |
+| M-C3 | Robotic Controls: Tech levels conflict | ✅ **FIXED** — MOO1 levels: RC II@1, III@8, IV@18, V@28, VI@38, VII@48 |
+| M-C4 | Eco Restoration: Two incompatible formulas | ✅ **FIXED** — Unified cleanup_modifier, tech levels 1/4/11/22/29 |
+| M-C5 | Terraforming: Tech levels differ | ✅ **FIXED** — MOO1 levels: +10@2, +20@6, +30@10, etc. through +120@46 |
+| M-C6 | Miniaturization cap: 80% vs 50% | ✅ **FIXED** — Changed to 50% (MOO1 value) |
+| M-C7 | `slider-mathematics.md` doesn't exist | 🔴 OPEN — Still needs to be created |
 
 ### Structure (4)
 
