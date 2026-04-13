@@ -94,22 +94,27 @@ This document specifies all UI screen transitions, modal behaviors, popup trigge
 
 ### 1.2 Navigation Matrix
 
+> **All main screens (F1–F7) support direct F-key navigation to each other.** ESC from any main screen returns to Galaxy Map (F1). True modals (Combat, Council Vote, Game Menu, start-of-turn popups) block F-key navigation. *(Modernization: QoL improvement over strict MOO1 — players can jump between screens without closing each one first.)*
+
 | From Screen | F1 | F2 | F3 | F4 | F5 | F6 | F7 | Esc | Enter |
 |-------------|----|----|----|----|----|----|----|----|-------|
 | Galaxy Map (F1) | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | Menu | Turn |
-| Design (F2) | ✓ | — | ✓ | ✓ | ✓ | ✓ | ✓ | F1 | Turn |
+| Planets (F2) | ✓ | — | ✓ | ✓ | ✓ | ✓ | ✓ | F1 | Turn |
 | Fleet (F3) | ✓ | ✓ | — | ✓ | ✓ | ✓ | ✓ | F1 | Turn |
-| MAP (F4) | ✓ | ✓ | ✓ | — | ✓ | ✓ | ✓ | F1 | Turn |
+| Technology (F4) | ✓ | ✓ | ✓ | — | ✓ | ✓ | ✓ | F1 | Turn |
 | Races (F5) | ✓ | ✓ | ✓ | ✓ | — | ✓ | ✓ | F1 | Turn |
-| Planets (F6) | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | F1 | Turn |
+| Ship Design (F6) | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | F1 | Turn |
 | Tech (F7) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | F1 | Turn |
+| Game Menu (ESC) | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | Close | ✗ |
 | Council | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | Vote |
 | Combat | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗** | ✗ |
 
 **Legend:**
 - ✓ = Direct navigation allowed
-- ✗ = Navigation blocked (modal state)
+- ✗ = Navigation blocked (true modal — must be resolved first)
+- True modals: Combat, Council Vote, Game Menu, start-of-turn popups
 - Council only accessible when in session (event-triggered)
+- Game Menu is a true modal opened by ESC; blocks all F-key navigation
 - ✗** = Escape opens combat menu, not game menu
 
 ---
@@ -188,7 +193,7 @@ This document specifies all UI screen transitions, modal behaviors, popup trigge
       "onTimeout": "ERROR"
     },
     "MODAL_OPEN": {
-      "description": "Modal dialog is displayed",
+      "description": "True modal dialog is displayed (Combat, Council, Game Menu, start-of-turn popups). Main screens (F1-F7) are NOT modal_open state — they are IDLE with full F-key navigation.",
       "allowsInput": true,
       "inputScope": "modal_only",
       "allowsNavigation": false,
@@ -745,8 +750,10 @@ When multiple modals trigger simultaneously:
 | Combat | Galaxy Map | COMBAT_EXIT | 400ms | Combat resolved |
 | Planet N | Planet N+1 | SLIDE_LEFT | 250ms | Next Planet |
 | Planet N | Planet N-1 | SLIDE_RIGHT | 250ms | Prev Planet |
-| Any | Modal | MODAL_OPEN | 200ms | Modal trigger |
-| Modal | Any | MODAL_CLOSE | 150ms | Modal dismiss |
+| Any | True Modal* | MODAL_OPEN | 200ms | Modal trigger |
+| True Modal* | Any | MODAL_CLOSE | 150ms | Modal dismiss |
+
+*True modals: Combat, Council Vote, Game Menu, start-of-turn popups (tech selection, events, diplomacy). These block F-key navigation. Main screens (F1–F7) are NOT true modals.
 | Main Menu | Game | FADE | 300ms | Start Game |
 | Game | Victory | FADE | 500ms | Victory achieved |
 
@@ -1846,17 +1853,20 @@ ERROR RECOVERY STATE MACHINE:
 
 ### A. Screen Navigation Shortcuts
 
+> F-keys work from **any main screen** (F1–F7). True modals (Combat, Council, Game Menu, start-of-turn popups) block F-key navigation. *(Modernization: QoL improvement over MOO1.)*
+
 | Current Screen | Key | Target Screen | Transition |
 |----------------|-----|---------------|------------|
-| Any | F1 | Galaxy Map | FADE |
-| Any | F2 | Planets | FADE |
-| Any | F3 | Fleet Command | FADE |
-| Any | F4 | Research | FADE |
-| Any | F5 | Diplomacy | FADE |
-| Any | F6 | Ship Design | FADE |
-| Any | F7 | Tech | FADE |
-| Any | Esc | Game Menu | MODAL_OPEN |
-| Any (not combat) | Enter | Turn Confirm | MODAL_OPEN |
+| Any main screen | F1 | Galaxy Map | FADE |
+| Any main screen | F2 | Planets Screen | FADE |
+| Any main screen | F3 | Fleet Screen | FADE |
+| Any main screen | F4 | Technology Screen | FADE |
+| Any main screen | F5 | Races Screen | FADE |
+| Any main screen | F6 | Ship Design | FADE |
+| Any main screen | F7 | Tech | FADE |
+| Any main screen | Esc | Galaxy Map (F1) | FADE |
+| Galaxy Map (F1) | Esc | Game Menu | MODAL_OPEN |
+| Any (not in true modal, not combat) | Enter | Turn Confirm | MODAL_OPEN |
 
 ### B. Modal Lifecycle
 

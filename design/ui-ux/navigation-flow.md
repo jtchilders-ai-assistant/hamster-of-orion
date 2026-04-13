@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document defines the complete screen navigation flow for Hamster of Orion, based on MOO1's interface structure. The game uses a **hub-and-spoke model** where the Galaxy Map is the central hub, with all other screens accessible as modal overlays or sub-screens.
+This document defines the complete screen navigation flow for Hamster of Orion, based on MOO1's interface structure with quality-of-life modernizations. The game uses a **hub-and-spoke model** where the Galaxy Map is the central hub, with all other main screens (F1–F7) directly accessible and switchable at any time. True modals (Combat, Council Vote, Game Menu, start-of-turn popups) block navigation until resolved.
 
 ---
 
@@ -65,9 +65,11 @@ flowchart TD
 
 The Galaxy Map is the primary gameplay screen. All other screens are accessed from here via the **bottom command bar** or by clicking on game elements.
 
+> **Modernization note:** Unlike strict MOO1, all F1–F7 main screens are directly switchable via F-keys from anywhere. Players never need to "close" a screen before opening another — pressing any F-key immediately navigates to that screen. ESC from any main screen returns to the Galaxy Map (F1). True modals (Combat, Council Vote, Game Menu, start-of-turn popups) still block navigation. This is a quality-of-life improvement over MOO1.
+
 ```mermaid
 flowchart TD
-    subgraph GalaxyHub["Galaxy Map (Always Visible Behind Modals)"]
+    subgraph GalaxyHub["Galaxy Map (F1 — Central Hub)"]
         GM[Galaxy Map]
     end
 
@@ -82,7 +84,7 @@ flowchart TD
         TURN[NEXT TURN]
     end
 
-    subgraph Modals["Full-Screen Screens"]
+    subgraph MainScreens["Main Screens (F1–F7, all switchable)"]
         GameMenu[Game Menu<br/>Save/Load/Options/Quit]
         ShipDesign[Ship Design Screen]
         FleetScreen[Fleet Screen]
@@ -104,12 +106,12 @@ flowchart TD
     TURN -->|"Process"| TurnResolution[Turn Resolution]
     
     GameMenu -->|"Close/ESC"| GM
-    ShipDesign -->|"Close/ESC"| GM
-    FleetScreen -->|"Close/ESC"| GM
-    MapView -->|"MAP again / ESC"| GM
-    Diplomacy -->|"Close/ESC"| GM
-    PlanetList -->|"Close/ESC"| GM
-    Research -->|"Close/ESC"| GM
+    ShipDesign -->|"ESC or F-key"| GM
+    FleetScreen -->|"ESC or F-key"| GM
+    MapView -->|"MAP again / ESC or F-key"| GM
+    Diplomacy -->|"ESC or F-key"| GM
+    PlanetList -->|"ESC or F-key"| GM
+    Research -->|"ESC or F-key"| GM
     TurnResolution -->|"Complete"| GM
 ```
 
@@ -206,13 +208,13 @@ stateDiagram-v2
 
 ---
 
-## 4. Modal Screen Details
+## 4. Main Screen Details
 
-### 4.1 Ship Design Screen Flow
+### 4.1 Ship Design Screen Flow (F6)
 
 ```mermaid
 flowchart TD
-    subgraph ShipDesignScreen["Ship Design Screen (Modal)"]
+    subgraph ShipDesignScreen["Ship Design Screen (F6)"]
         DesignList[Design List<br/>6 slots]
         NewDesign[New Design Mode]
         EditDesign[Edit Existing]
@@ -227,11 +229,11 @@ flowchart TD
         ScrapShips[Scrap Existing Ships]
     end
 
-    Entry[From Galaxy Map<br/>DESIGN button] --> DesignList
+    Entry["From any screen<br/>F6 / DESIGN button"] --> DesignList
     
     DesignList -->|"Empty Slot"| NewDesign
     DesignList -->|"Existing Design"| EditDesign
-    DesignList -->|"Close"| Exit[Return to Galaxy Map]
+    DesignList -->|"ESC"| Exit["Return to Galaxy Map (F1)"]
     
     NewDesign --> HullSelect
     EditDesign --> HullSelect
@@ -253,18 +255,18 @@ flowchart TD
 | Design screen overview | ![Ship Design Overview](../moo_screens/moo_design.png) |
 | Ship design detail | ![Ship Design Detail](../moo_screens/moo_ship_design.png) |
 
-### 4.2 Technology Screen Flow
+### 4.2 Technology Screen Flow (F4)
 
 ```mermaid
 flowchart TD
-    subgraph ResearchScreen["Technology Screen (Modal)"]
+    subgraph ResearchScreen["Technology Screen (F4)"]
         Overview[6 Tech Fields Overview]
         FieldDetail[Field Detail View]
         TechSelect[Technology Selection<br/>2-3 choices per field]
         Confirm[Confirm Selection]
     end
 
-    Entry[From Galaxy Map<br/>TECH button] --> Overview
+    Entry["From any screen<br/>F4 / TECH button"] --> Overview
     
     Overview -->|"Click Field"| FieldDetail
     FieldDetail -->|"Back"| Overview
@@ -272,7 +274,7 @@ flowchart TD
     TechSelect -->|"Choose"| Confirm
     Confirm --> Overview
     
-    Overview -->|"Close"| Exit[Return to Galaxy Map]
+    Overview -->|"ESC"| Exit["Return to Galaxy Map (F1)"]
 ```
 
 ### Reference Screenshots — Research
@@ -284,6 +286,8 @@ flowchart TD
 | Select new research (start of turn) | ![Select Research](../moo_screens/moo_start_of_turn_select_new_research.png) |
 
 ### 4.3 Races Screen (F5) Flow
+
+> F5 is directly navigable from any main screen via F-key.
 
 ```mermaid
 flowchart TD
@@ -299,7 +303,7 @@ flowchart TD
         MessageReceive[Incoming Message]
     end
 
-    Entry[From Galaxy Map<br/>RACES button] --> RaceList
+    Entry["From any screen<br/>F5 / RACES button"] --> RaceList
     
     RaceList -->|"Select Race"| RaceDetail
     RaceDetail -->|"Request Audience"| Audience
@@ -313,16 +317,16 @@ flowchart TD
     TreatyMenu -->|"Complete"| Audience
     DeclareWar -->|"Confirm"| RaceDetail
     
-    RaceList -->|"Close"| Exit[Return to Galaxy Map]
+    RaceList -->|"ESC"| Exit["Return to Galaxy Map (F1)"]
     
     MessageReceive -.->|"During Turn"| Audience
 ```
 
-### 4.4 Fleet Screen Flow
+### 4.4 Fleet Screen Flow (F3)
 
 ```mermaid
 flowchart TD
-    subgraph FleetScreen["Fleet Screen (Modal)"]
+    subgraph FleetScreen["Fleet Screen (F3)"]
         FleetList[All Fleets by System]
         SystemDetail[System Fleet Detail]
         ShipDetail[Individual Ship Info]
@@ -332,7 +336,7 @@ flowchart TD
         ScrapFleet[Scrap Ships]
     end
 
-    Entry[From Galaxy Map<br/>FLEET button] --> FleetList
+    Entry["From any screen<br/>F3 / FLEET button"] --> FleetList
     
     FleetList -->|"Select System"| SystemDetail
     SystemDetail -->|"Select Ship Type"| ShipDetail
@@ -346,7 +350,7 @@ flowchart TD
     
     ShipDetail -->|"Back"| SystemDetail
     SystemDetail -->|"Back"| FleetList
-    FleetList -->|"Close"| Exit[Return to Galaxy Map]
+    FleetList -->|"ESC"| Exit["Return to Galaxy Map (F1)"]
 ```
 
 ### Reference Screenshots — Fleet Screen
@@ -508,19 +512,19 @@ GALAXY MAP (Central Hub)
 ├── [Click Fleet] → Right Panel: Fleet View + Deploy
 ├── [Click Star] → Right Panel: Star Info
 │
-├── GAME → Game Menu Modal
+├── GAME / ESC → Game Menu (True Modal)
 │   ├── Save Game
 │   ├── Load Game
 │   ├── Options
 │   └── Quit to Menu
 │
-├── DESIGN → Ship Design Modal
+├── DESIGN (F6) → Ship Design Screen
 │   ├── View 6 Design Slots
 │   ├── Create New Design
 │   ├── Edit Design
 │   └── Delete Design
 │
-├── FLEET → Fleet Screen Modal
+├── FLEET (F3) → Fleet Screen
 │   ├── All Fleets List
 │   ├── System Details
 │   └── Deployment Panel
@@ -532,16 +536,16 @@ GALAXY MAP (Central Hub)
 │   ├── [MINERALS] mode button — show resource indicators
 │   └── Click MAP again or ESC → return to Galaxy View
 │
-├── RACES → Diplomacy Modal
+├── RACES (F5) → Races Screen
 │   ├── Race List
 │   ├── Race Details
 │   └── Audience/Negotiations
 │
-├── PLANETS → Planets List Modal
+├── PLANETS (F2) → Planets Screen
 │   ├── All Colonies
 │   └── Colony Quick-Edit
 │
-├── TECH → Research Modal
+├── TECH (F4) → Technology Screen
 │   ├── 6 Field Overview
 │   └── Tech Selection
 │
@@ -561,15 +565,16 @@ VICTORY/DEFEAT
 
 ---
 
-## 8. Key Navigation Principles (MOO1-Faithful)
+## 8. Key Navigation Principles
 
-1. **Galaxy Map is always "home"** - All modals return to it
+1. **Galaxy Map is always "home"** - ESC from any main screen returns to Galaxy Map (F1)
 2. **Something is always selected** - No empty/null selection state
-3. **Bottom command bar only on Galaxy Map** - Modals have their own close buttons
-4. **ESC closes current modal** - Returns to Galaxy Map
-5. **Right-click = context menu** (optional enhancement over MOO1)
-6. **Turn resolution is sequential** - Events processed in order with player input as needed
-7. **No nested modals** - One modal at a time over Galaxy Map
+3. **F-keys work from anywhere** - All F1–F7 main screens are directly switchable; no need to close a screen before opening another *(Modernization: QoL improvement over MOO1)*
+4. **ESC = back to Galaxy Map** - From any main screen, ESC returns to F1
+5. **True modals block navigation** - Combat, Council Vote, Game Menu, and start-of-turn popups (tech selection, events) block F-key navigation until resolved
+6. **Right-click = context menu** (optional enhancement over MOO1)
+7. **Turn resolution is sequential** - Events processed in order with player input as needed
+8. **No nested true modals** - One blocking modal at a time
 
 ---
 
@@ -579,7 +584,13 @@ VICTORY/DEFEAT
 
 ### F-Key Navigation (Global — All Screens)
 
-F-keys are available from the Galaxy Map and all full navigation screens (those with a command bar). They are **blocked** from true modal screens that have no command bar (Tech Screen F4, Fleet Screen F3 when opened as modal, Game Menu).
+F-keys are available from **all main screens** (F1–F7). Pressing any F-key from any main screen immediately navigates to the target screen — no need to close the current one first.
+
+**True modals that block F-key navigation:**
+- Combat screen
+- High Council Vote
+- Game Menu (ESC)
+- Start-of-turn popups (tech selection, random events, diplomatic messages)
 
 | Key | Screen |
 |-----|--------|
@@ -593,7 +604,7 @@ F-keys are available from the Galaxy Map and all full navigation screens (those 
 
 ### Galaxy Map Letter Shortcuts
 
-These letter shortcuts are **only active on the Galaxy Map** (F1). They do NOT function as global shortcuts. When inside any modal or sub-screen, letter keys follow that screen's own shortcut table.
+These letter shortcuts are **only active on the Galaxy Map** (F1). They do NOT function as global shortcuts. When inside a true modal or sub-screen, letter keys follow that screen's own shortcut table.
 
 | Key | Galaxy Map Action | Notes |
 |-----|-----------------|-------|
@@ -628,13 +639,21 @@ The following conflicts existed in earlier drafts of this section and are now re
 | `M` | MAP overview | No Galaxy Map letter binding | M = Mute Audio globally; MAP button opens the MAP screen (separate view) |
 | `F10` | Game Menu (UI_OVERVIEW) | Removed — not used | ESC is the sole Game Menu trigger |
 
-### In Modals
+### In Main Screens
 
 | Key | Action |
 |-----|--------|
-| `ESC` | Close modal / cancel current action |
-| `Enter` | Confirm (context-dependent; suppressed in Fleet Deployment panel — see §4.4) |
+| `ESC` | Return to Galaxy Map (F1) |
+| `Enter` | Confirm / End Turn (context-dependent; suppressed in Fleet Deployment panel — see §4.4) |
+| `F1`–`F7` | Navigate directly to any other main screen |
 | `1-4` | Select hull size (Ship Design only) |
+
+### In True Modals (Combat, Council Vote, Game Menu, Start-of-Turn Popups)
+
+| Key | Action |
+|-----|--------|
+| `ESC` | Close modal / cancel current action (where applicable) |
+| `Enter` | Confirm (context-dependent) |
 
 ---
 

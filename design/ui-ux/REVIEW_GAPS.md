@@ -278,19 +278,19 @@ The documentation is thorough for core gameplay screens and well-grounded in MOO
 - **Files:** `navigation-flow.md` §7, `state-transitions.md` §1.2, `interaction-spec.md` §2.1
 - **Suggested fix:** Clarify that F8 is only enabled during a Council session (triggered by turn events). Outside of Council sessions, F8 should have no effect or be visually disabled in the command bar. Document this state in `UI_OVERVIEW.md`.
 
-### 6.3 Modal vs. In-Place Panel for PLANETS (F2)
-- **Conflict:** `navigation-flow.md` §2 groups PLANETS under "Full-Screen Modal Overlays." `main-screens.md` §3 shows PLANETS as a full-screen layout with the command bar present at the bottom — identical to the Galaxy Map layout, not a modal. `state-transitions.md` §1.2 allows F1-F7 cross-navigation from the Planets screen, consistent with it being a screen, not a modal.
-- **Files:** `navigation-flow.md` §2, `main-screens.md` §3
-- **Suggested fix:** Correct `navigation-flow.md` §2 to not classify PLANETS as a modal. It is a full navigation screen. Only TECH (no command bar, OK to exit) and FLEET (OK to exit) appear to be true modals. GAME MENU, by contrast, is an overlay modal.
+### 6.3 Modal vs. In-Place Panel for PLANETS (F2) ✅ RESOLVED
+- **Resolution (2026-04-12):** PLANETS is a full navigation screen, not a modal. `navigation-flow.md` §2 updated — PLANETS removed from "modal overlays" grouping. All main screens are full screens with F-key nav.
+- ~~**Conflict:** `navigation-flow.md` §2 groups PLANETS under "Full-Screen Modal Overlays." `main-screens.md` §3 shows PLANETS as a full-screen layout with the command bar present at the bottom.~~
 
-### 6.4 Technology Screen: Modal or Full Screen?
-- **Conflict:** `main-screens.md` §4 explicitly states "This is a full-screen modal with NO bottom command bar." `state-transitions.md` §1.2 shows F1-F6 navigation available from Research (F4), implying you can navigate away from it using F-keys — which contradicts the "no command bar" description. If there's no command bar, the F-keys should not work.
-- **Files:** `main-screens.md` §4, `state-transitions.md` §1.2
-- **Suggested fix:** Resolve: If Tech is a full-screen modal (like MOO1), F-key navigation should be blocked from it. Update `state-transitions.md` navigation matrix to show `✗` for Tech → other screens. The OK button is the only exit.
+### 6.4 Technology Screen: Modal or Full Screen? ✅ RESOLVED
+- **Resolution (2026-04-12):** **Option B — Technology Screen is a full main screen, not a modal.** F-keys work from anywhere. Players can jump from Tech to any other screen without closing it first. This is a modernization / QoL improvement over MOO1 (which had no command bar on Tech). `navigation-flow.md` §2, §4.2, §7, §8 and `state-transitions.md` §1.2, §5.2, Appendix A updated to reflect this. True modals are: Combat, Council Vote, Game Menu, and start-of-turn popups (tech selection, events).
+- ~~**Conflict:** `main-screens.md` §4 explicitly states "This is a full-screen modal with NO bottom command bar." `state-transitions.md` §1.2 shows F1-F6 navigation available from Research (F4).~~
+- **Note:** `main-screens.md` §4 still contains old "full-screen modal" language — needs a follow-up update pass.
 
-### 6.5 Fleet Screen: Modal or Full Screen?
-- **Same issue as 6.4.** `main-screens.md` §6 says Fleet Screen is "Full-screen modal with NO bottom command bar." `state-transitions.md` §1.2 shows F-key navigation available from Fleet (F3). Same contradiction.
-- **Suggested fix:** Same resolution — if Fleet has no command bar, block F-key navigation. Update navigation matrix.
+### 6.5 Fleet Screen: Modal or Full Screen? ✅ RESOLVED
+- **Resolution (2026-04-12):** Same as 6.4 — **Fleet Screen is a full main screen, not a modal.** F-keys work from anywhere. `navigation-flow.md` §4.4 updated to remove "Modal" label. True modals are: Combat, Council Vote, Game Menu, and start-of-turn popups.
+- ~~**Same issue as 6.4.** `main-screens.md` §6 says Fleet Screen is "Full-screen modal with NO bottom command bar."~~
+- **Note:** `main-screens.md` §6 still contains old "full-screen modal" language — needs a follow-up update pass.
 
 ### 6.6 Turn End Confirmation: Optional vs Always
 - **Conflict:** `state-transitions.md` §3.3 shows the End Turn confirmation dialog with a "Don't show warnings in future" checkbox. `interaction-spec.md` §8.5 shows the same dialog. But `state-transitions.md` §6.3 JSON lists `confirmationSettings.bypassable` including `END_TURN` → `skipTurnConfirmation`. If the confirmation is bypassed, the game goes directly to turn processing — but `navigation-flow.md` §5 turn flow shows no bypass path.
@@ -369,7 +369,7 @@ The `screen-inventory.md` was last updated before all screenshots were added. Th
 
 ## Priority Summary
 
-> **Last updated:** 2026-04-12 (pass 2 — subagent fix run)
+> **Last updated:** 2026-04-12 (pass 3 — C3 resolved: Tech/Fleet modal vs. screen decision — Option B, all main screens switchable via F-keys, true modals clarified)
 
 ### 🔴 Critical — Blocks Implementation
 
@@ -377,7 +377,7 @@ The `screen-inventory.md` was last updated before all screenshots were added. Th
 |---|-------|--------|----------|
 | C1 | MAP button behavior undefined (cycle vs modal vs screen) | ✅ RESOLVED — MAP opens separate MAP screen; see §2.8 | §2.8 |
 | C2 | F7 Reports: does this screen exist? | ✅ RESOLVED — REMOVED (not in MOO1, F7=Tech) | §6.1 |
-| C3 | Tech/Fleet screens: modal (no F-key nav) or screen (F-keys work)? | 🔴 OPEN — requires design decision | §6.4–6.5 |
+| C3 | Tech/Fleet screens: modal (no F-key nav) or screen (F-keys work)? | ✅ RESOLVED (2026-04-12) — Option B: all main screens (F1–F7) are full screens with F-key nav. True modals: Combat, Council Vote, Game Menu, start-of-turn popups. QoL modernization over MOO1. See §6.3–6.5. | §6.4–6.5 |
 | C4 | Research allocation: 6 sliders simultaneously or 1 at a time? | ✅ RESOLVED (2026-04-12) — MOO1-style: 6 sliders (anytime RP reallocation) + start-of-turn tech selection popup. See §8.3. | §8.3 |
 | C5 | Keyboard shortcut conflicts (G, R, F, D keys) | ✅ FIXED — see §4.1–4.5 resolutions | §4.1–4.5 |
 
@@ -412,7 +412,7 @@ The `screen-inventory.md` was last updated before all screenshots were added. Th
 
 ## Suggested Next Actions (Ordered)
 
-1. **Resolve the 4 remaining critical design decisions** (C1–C4 above) — these require a human decision, not just documentation.
+1. ~~**Resolve the 4 remaining critical design decisions** (C1–C4 above)~~ — ✅ All critical decisions now resolved (C1–C5).
 2. ~~**Resolve keyboard conflicts**~~ — ✅ Done. `navigation-flow.md` §9 rewritten with canonical bindings.
 3. ~~**Standardize terminology**~~ — ✅ Done for key terms. §3.1, §3.2, §3.3, §3.7 resolved in docs.
 4. ~~**Create `wireframes/diplomacy-screen.md`**~~ — ✅ Done (stub).
@@ -423,7 +423,8 @@ The `screen-inventory.md` was last updated before all screenshots were added. Th
 9. **Update `screen-inventory.md`** wireframe counts and screenshot index.
 10. **Create `ground-combat-ui.md`** and **`espionage-ui.md`** — critical missing specs.
 11. **Add bombardment phase** to `state-transitions.md` §9 combat state machine.
-12. **Update `navigation-flow.md`** to fix modal vs. screen classification for PLANETS and DIPLOMACY.
+12. ~~**Update `navigation-flow.md`** to fix modal vs. screen classification for PLANETS and DIPLOMACY.~~ ✅ Done — all F1–F7 screens are now classified as full main screens. True modals documented.
+13. **Update `main-screens.md`** §4 (Technology Screen) and §6 (Fleet Screen) to remove old "full-screen modal" language — follow-up pass needed.
 
 ---
 
