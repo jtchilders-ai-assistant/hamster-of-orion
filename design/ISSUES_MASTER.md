@@ -3,8 +3,8 @@
 **Generated:** 2026-04-12  
 **Last Updated:** 2026-04-12  
 **Total Issues:** ~135 across 6 review areas  
-**Resolved:** 70+ issues (All Critical/High/Medium resolved)
-**Status:** ✅ COMPLETE — Only design decisions and minor items remain
+**Resolved:** 75+ issues (All Critical/High/Medium + all design decisions)
+**Status:** ✅ COMPLETE — All design review issues resolved
 
 This document consolidates all critical and high-priority issues found during the comprehensive design review. Individual detailed reports are in their respective directories.
 
@@ -160,3 +160,17 @@ Referenced but don't exist:
 ---
 
 *Individual detailed reports contain full context and suggested fixes for each issue.*
+
+---
+
+## UI Design Decisions (2026-04-12)
+
+All 4 critical UI design decisions resolved:
+
+| Decision | Resolution |
+|----------|------------|
+| MAP button behavior | Opens separate MAP Screen (not overlay cycle) |
+| Research allocation | MOO1-style: 6 sliders for allocation + tech selection popup at start-of-turn only |
+| F7 Reports | REMOVED — not in MOO1, F7 = Tech Screen |
+| Tech/Fleet modals | **Modernization:** All main screens (F1-F7) switchable via F-keys; true modals only for Combat, Council, Game Menu, start-of-turn popups |
+
