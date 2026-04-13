@@ -70,6 +70,11 @@ The screen is divided into **two main halves** (left and right) plus a **bottom 
 
 ## Left Half: Field List with RP Allocation
 
+> **MOO1 Mechanic — Two Distinct UI Moments:**
+> - **Tech Screen (F4)** = 6 RP allocation sliders, one per field. Adjustable **at any time** from this screen. This is the main tech screen.
+> - **Tech Selection Popup** = appears at the **start of turn only**, when a field completes a tech. Player picks the next tech from 2–3 options. This is a *separate UI moment*, not part of the main screen.
+> Do not conflate these two interactions.
+
 Six **stacked field rows** (not tabs) run the full height of the left panel. Each row shows:
 
 ```
@@ -104,8 +109,10 @@ Six **stacked field rows** (not tabs) run the full height of the left panel. Eac
 - Clicking a field row **selects** that field and updates the right-half tech tree and bottom description panel
 - The selected field row is visually highlighted
 - RP percentages across all six fields sum to 100%
-- RP allocation is adjusted by dragging the percentage value or via sliders (exact MOO1 mechanic: clicking/dragging on the % column)
+- RP allocation is adjusted by dragging the percentage value or via sliders (exact MOO1 mechanic: clicking/dragging on the % column) — **adjustable at any time**
+- Each field researches exactly **one tech at a time**; the current tech name is shown in the row
 - If a field has 0% RP, its ETA shows "Never" or is blank
+- **Players do NOT pick tech from this screen.** Tech selection happens via the start-of-turn popup (see below)
 
 **Field names (exact MOO1 labels)**:
 | Label | Full Name |
@@ -206,9 +213,11 @@ Displays details of the tech **clicked in the right-half tech tree**:
 
 ---
 
-## Research Selection Screen (Start of Turn)
+## Tech Selection Popup (Start of Turn Only)
 
-When a technology finishes researching **and** the player needs to choose their next research target, a **full-screen selection modal** appears at the start of the next turn (before the main tech screen). This is distinct from the main tech screen.
+> **Important:** This popup is the **only** way tech selection happens. Players cannot pick their next tech mid-turn from the main Tech Screen. Tech selection occurs exclusively at the **start of the following turn** after a field completes its research.
+
+When a technology finishes researching, a **full-screen selection modal** appears at the **start of the next turn** (before normal gameplay resumes). This is entirely distinct from the main Tech Screen.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -237,16 +246,18 @@ When a technology finishes researching **and** the player needs to choose their 
 ```
 
 **Behavior**:
+- Appears **only at start of turn** — never mid-turn
 - Player **must select** one option before proceeding — there is no "skip" or "later" button
 - Each option is a large clickable row with tech name and description
-- Number of options varies (typically 2–4); MOO1 randomizes which techs from the next level are offered
-- After selecting, the game returns to normal turn resolution
+- Number of options varies (typically 2–3); MOO1 randomizes which techs from the next level are offered
+- If multiple fields completed last turn, a separate popup appears for each field in sequence
+- After selecting, the game returns to normal turn start processing
 
 ---
 
 ## New Technology Notification (Research Complete)
 
-When a technology completes mid-game, a **popup dialog** appears announcing the discovery and prompting selection of next research:
+When a technology completes, a **popup dialog** appears at the **start of the next turn** announcing the discovery. Tech selection is bundled into this notification — there is no mid-turn interruption:
 
 ```
 ┌─────────────────────────────────────────────────────────┐

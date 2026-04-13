@@ -94,22 +94,22 @@ This document specifies all UI screen transitions, modal behaviors, popup trigge
 
 ### 1.2 Navigation Matrix
 
-| From Screen | F1 | F2 | F3 | F4 | F5 | F6 | F7 | F8 | Esc | Enter |
-|-------------|----|----|----|----|----|----|----|----|-----|-------|
-| Galaxy Map (F1) | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓* | Menu | Turn |
-| Planets (F2) | ✓ | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓* | F1 | Turn |
-| Fleet (F3) | ✓ | ✓ | — | ✓ | ✓ | ✓ | ✓ | ✓* | F1 | Turn |
-| Research (F4) | ✓ | ✓ | ✓ | — | ✓ | ✓ | ✓ | ✓* | F1 | Turn |
-| Diplomacy (F5) | ✓ | ✓ | ✓ | ✓ | — | ✓ | ✓ | ✓* | F1 | Turn |
-| Ship Design (F6) | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | ✓* | F1 | Turn |
-| Reports (F7) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓* | F1 | Turn |
-| Council (F8) | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | — | ✗ | Vote |
-| Combat | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗** | ✗ |
+| From Screen | F1 | F2 | F3 | F4 | F5 | F6 | F7 | Esc | Enter |
+|-------------|----|----|----|----|----|----|----|----|-------|
+| Galaxy Map (F1) | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | Menu | Turn |
+| Design (F2) | ✓ | — | ✓ | ✓ | ✓ | ✓ | ✓ | F1 | Turn |
+| Fleet (F3) | ✓ | ✓ | — | ✓ | ✓ | ✓ | ✓ | F1 | Turn |
+| MAP (F4) | ✓ | ✓ | ✓ | — | ✓ | ✓ | ✓ | F1 | Turn |
+| Races (F5) | ✓ | ✓ | ✓ | ✓ | — | ✓ | ✓ | F1 | Turn |
+| Planets (F6) | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | F1 | Turn |
+| Tech (F7) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | F1 | Turn |
+| Council | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | Vote |
+| Combat | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗** | ✗ |
 
 **Legend:**
 - ✓ = Direct navigation allowed
 - ✗ = Navigation blocked (modal state)
-- ✓* = Only when Council is in session
+- Council only accessible when in session (event-triggered)
 - ✗** = Escape opens combat menu, not game menu
 
 ---
@@ -275,6 +275,10 @@ COMBAT_STATES:
 
 ## 3. Turn Flow State Machine
 
+> **Research — Two UI Moments (MOO1-Accurate):**
+> - **Tech Screen (F4):** Player adjusts RP allocation sliders at any time during their turn. This is the main research screen.
+> - **Tech Selection Popup (TECH_CHOICE):** Appears at **start of turn only**, after turn processing resolves research. When a field completes a tech, a full-screen popup offers 2–3 options for the next tech. No mid-turn tech picking.
+
 > **Visual References — Turn Event Notifications:**
 >
 > | Event | Screenshot |
@@ -302,7 +306,7 @@ COMBAT_STATES:
               │  │  • Adjust research (F4)             │    │
               │  │  • Conduct diplomacy (F5)           │    │
               │  │  • Design ships (F6)                │    │
-              │  │  • Review reports (F7)              │    │
+              │  │  • Review tech progress (F7)        │    │
               │  └─────────────────────────────────────┘    │
               │                                             │
               └───────────────────┬─────────────────────────┘
@@ -406,9 +410,10 @@ COMBAT_STATES:
     {
       "id": "RESEARCH",
       "order": 4,
-      "description": "Apply research points, check breakthroughs",
+      "description": "Apply research points, check breakthroughs. If a field completes, triggers start-of-turn TECH_CHOICE popup.",
       "canTrigger": ["TECH_COMPLETE", "TECH_CHOICE"],
-      "isInteractive": true
+      "isInteractive": true,
+      "notes": "TECH_CHOICE popup appears at START OF TURN only. Players pick next tech from 2-3 options. No mid-turn tech picking. Multiple fields completing triggers sequential popups."
     },
     {
       "id": "RANDOM_EVENTS",
@@ -597,7 +602,7 @@ COMBAT_STATES:
 | Press Enter (End Turn) | CONFIRMATION | Always (unless disabled) |
 | Combat Encounter | BLOCKING | Fleets meet enemy fleets/bases |
 | Research Complete | INFORMATION | Tech finishes researching |
-| Technology Choice | SELECTION | New tech tier available |
+| Technology Choice | SELECTION | Start of turn only — when a field completes its research. Player picks next tech from 2–3 options. Never mid-turn. |
 | War Declared (by AI) | INFORMATION | AI declares war on player |
 | War Declared (by player) | CONFIRMATION | Player clicks Declare War |
 | Treaty Offered | SELECTION | AI proposes treaty |
@@ -657,9 +662,9 @@ When multiple modals trigger simultaneously:
 > | Fleet Command (F3) | ![Fleet Screen](../moo_screens/moo_fleet_screen.png) |
 > | Research (F4) | ![Tech Screen](../moo_screens/moo_tech.png) |
 > | Ship Design (F6) | ![Ship Design](../moo_screens/moo_ship_design.png) |
-> | MAP Overlay — Colonies | ![Map Colonies](../moo_screens/moo_map_colonies_selected.png) |
-> | MAP Overlay — Environments | ![Map Environments](../moo_screens/moo_map_environments_selected.png) |
-> | MAP Overlay — Minerals | ![Map Minerals](../moo_screens/moo_map_minerals_selected.png) |
+> | MAP Screen — Colonies mode | ![Map Colonies](../moo_screens/moo_map_colonies_selected.png) |
+> | MAP Screen — Environment mode | ![Map Environments](../moo_screens/moo_map_environments_selected.png) |
+> | MAP Screen — Minerals mode | ![Map Minerals](../moo_screens/moo_map_minerals_selected.png) |
 
 ### 5.1 Transition Types
 
@@ -675,7 +680,7 @@ When multiple modals trigger simultaneously:
       "duration": 200,
       "easing": "ease-in-out",
       "description": "Crossfade between screens",
-      "useCase": "Standard screen navigation (F1-F7)"
+      "useCase": "Standard screen navigation (F1-F7: GAME/DESIGN/FLEET/MAP/RACES/PLANETS/TECH)"
     },
     "SLIDE_LEFT": {
       "duration": 250,
@@ -733,7 +738,7 @@ When multiple modals trigger simultaneously:
 
 | From | To | Transition | Duration | Trigger |
 |------|-----|------------|----------|---------|
-| Any Main | Any Main | FADE | 200ms | F1-F7 keys |
+| Any Main | Any Main | FADE | 200ms | F1-F7 keys (7 main screens) |
 | Galaxy Map | System Detail | ZOOM_IN | 300ms | Click star |
 | System Detail | Galaxy Map | ZOOM_OUT | 300ms | Close/F1 |
 | Galaxy Map | Combat | COMBAT_ENTER | 500ms | Combat trigger |
@@ -1849,8 +1854,7 @@ ERROR RECOVERY STATE MACHINE:
 | Any | F4 | Research | FADE |
 | Any | F5 | Diplomacy | FADE |
 | Any | F6 | Ship Design | FADE |
-| Any | F7 | Reports | FADE |
-| Any (when active) | F8 | Council | FADE |
+| Any | F7 | Tech | FADE |
 | Any | Esc | Game Menu | MODAL_OPEN |
 | Any (not combat) | Enter | Turn Confirm | MODAL_OPEN |
 

@@ -61,6 +61,19 @@ This screen is a **full-screen modal** and does **NOT** display the bottom comma
 
 ---
 
+## Key Design Decision: Two Distinct Research UI Moments
+
+> **Tech Screen (F4)** and **Tech Selection** are two completely separate interactions:
+>
+> | Moment | When | What it does |
+> |--------|------|--------------|
+> | **Tech Screen (F4)** | Anytime (player opens it) | 6 RP allocation sliders — redistribute research points across the 6 fields |
+> | **Tech Selection Popup** | Start of turn only (when a field completes) | Player picks next tech from 2–3 options for that field |
+>
+> Players **cannot** select their next tech from the main Tech Screen. Tech picking is deferred to the next turn start.
+
+---
+
 ## Detailed Sections
 
 ### Left Half: Field List with RP Allocation
@@ -76,6 +89,8 @@ Clicking a field row **selects** it, which updates:
 - The bottom description panel
 
 RP percentages for all six fields always sum to 100%. Adjusting one field's percentage affects ETAs in real time.
+
+Each field researches exactly **one tech at a time**. The active tech is shown in the row. **Tech selection does not happen here** — it happens via the start-of-turn popup.
 
 **Field labels (exact MOO1 names)**:
 - `COMPUTERS`
@@ -119,16 +134,18 @@ Discovered (already researched) technologies appear brighter/fully colored. Undi
 ## Design Notes
 
 - **Layout is two-panel, not single-panel**: Left = field overview with RP allocation; Right = tech tree detail for selected field. The original wireframe incorrectly showed a single stacked layout.
-- **No checkboxes for selecting research**: Players do not click a checkbox to set a research target. The active research per field is set via the start-of-turn selection screen (see below) or the new-tech popup. The main tech screen is primarily informational + RP allocation.
+- **No mid-turn tech picking**: Players cannot select or change their active research target from the main Tech Screen. The active research per field is set exclusively via the **start-of-turn Tech Selection Popup** (when a field completes). The main Tech Screen is for viewing the tech tree and adjusting RP allocation only.
 - **RP sliders vs. percentages**: MOO1 uses percentage values per field row, not a separate slider panel. Dragging or clicking the percentage column adjusts allocation.
 - **Tech tree is hierarchical but not prerequisite-gated in the wireframe display**: All levels are visible. Locked techs are simply dimmer, not hidden.
 - **Title is "RESEARCH"**, not "TECHNOLOGY TREE".
 
 ---
 
-## Start-of-Turn Research Selection
+## Start-of-Turn Tech Selection Popup
 
-When a field's research completes, the player is prompted to choose the next research target for that field. This appears as a **full-screen overlay** at the start of the following turn:
+> This is a **separate UI moment** from the main Tech Screen. It is triggered automatically at the start of turn when a field completes its research. The player cannot initiate this from the Tech Screen.
+
+When a field's research completes, the player is prompted to choose the next research target for that field. This appears as a **full-screen overlay** at the **start of the following turn** — before normal gameplay resumes:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -152,15 +169,17 @@ When a field's research completes, the player is prompted to choose the next res
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
+- Appears at **start of turn only** — never mid-turn
 - Player **must choose** one option — no skip/later button
 - Options are large clickable rows (name + description)
-- MOO1 randomizes which techs from the next level are offered (typically 2–4 options)
+- MOO1 randomizes which techs from the next level are offered (typically 2–3 options)
+- If multiple fields completed last turn, popups appear in sequence (one per field)
 
 ---
 
 ## New Technology Notification
 
-When research completes, a popup announces the discovery before prompting next research selection:
+When research completes, a popup announces the discovery at the **start of the next turn**. Tech selection is bundled into this popup — there is no mid-turn interruption:
 
 ```
 ┌──────────────────────────────────────────────────────────────┐

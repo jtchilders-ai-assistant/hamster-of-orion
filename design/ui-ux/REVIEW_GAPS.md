@@ -117,10 +117,14 @@ The documentation is thorough for core gameplay screens and well-grounded in MOO
 - **Issue:** `interaction-spec.md` §6.2 describes dragging to reorder the production queue, but the queue itself is only vaguely shown as "Ship queue item → Select → Highlight for removal" in §1.1. There's no wireframe for the queue, no spec for what happens when a build is cancelled mid-progress, or how the queue interacts with production sliders.
 - **Suggested fix:** Add build queue wireframe to planet management spec.
 
-### 2.8 MAP Button Cycling Behavior
-- **Issue:** `main-screens.md` §2 says "The MAP button cycles through overlay modes" (Colonies → Environments → Minerals → back to normal?). But `navigation-flow.md` §2 shows MAP as opening a `MapView` modal, and `state-transitions.md` §1.2 shows MAP navigating to a separate "Galaxy Overview" screen. These are three different behaviors.
-- **Files:** `main-screens.md` §2, `navigation-flow.md` §2, `state-transitions.md` §1.2, `wireframes/command_menu/command_menu_map.md`
-- **Suggested fix:** Decide and document: Does MAP cycle overlays in-place on the galaxy map, or open a separate screen? Update all three docs to match.
+### 2.8 MAP Button Behavior ✅ RESOLVED
+- **Decision (2026-04-12):** MAP button opens a **separate full-screen MAP screen** — not an overlay, not a cycle.
+  - MAP screen is a completely different rendering mode: zoomed out, all stars visible at once.
+  - Within the MAP screen, the three mode buttons (COLONIES / ENVIRONMENT / MINERALS) filter what data is displayed.
+  - Clicking MAP again in the command bar, or pressing ESC, returns to the normal Galaxy View.
+  - There is no "cycling" behavior. MAP = screen transition.
+- **Files updated:** `navigation-flow.md` §2, §4.5, §7, §9 and §10 screenshot index; `state-transitions.md` §5 screenshot references; `wireframes/command_menu/command_menu_map.md` was already correct.
+- ~~**Suggested fix:** Decide and document: Does MAP cycle overlays in-place on the galaxy map, or open a separate screen? Update all three docs to match.~~
 
 ---
 
@@ -260,9 +264,14 @@ The documentation is thorough for core gameplay screens and well-grounded in MOO
 ## 6. Conflicts Between navigation-flow.md and state-transitions.md
 
 ### 6.1 F7 Reports Screen
-- **Conflict:** `navigation-flow.md` §2 Mermaid diagram (Galaxy Map hub) does not show a Reports screen. The Command Bar section in §2 mentions only 7 screens (GAME, DESIGN, FLEET, MAP, RACES, PLANETS, TECH). `state-transitions.md` §1.2 navigation matrix includes **F7 (Reports)** as a navigable screen from all other screens. `UI_OVERVIEW.md` command bar table lists only 8 buttons with no Reports — MAP is F1 (a separate button from the overlay).
-- **Files:** `navigation-flow.md` §2, `state-transitions.md` §1.2, `UI_OVERVIEW.md`
-- **Suggested fix:** Decide: does the game have a separate Reports screen (F7)? If yes, add the REPORTS button to the command bar in `UI_OVERVIEW.md` and all wireframes. If no, remove F7 from `state-transitions.md` and `interaction-spec.md`. Note: MOO1 did not have a separate F7 Reports screen. All information was integrated in the main screens.
+
+> **✅ RESOLVED (2026-04-12):** F7 Reports REMOVED.
+>
+> **Decision:** F7 Reports was not in MOO1 and was never properly defined. Removed from all docs.
+>
+> **MOO1 Command Bar:** GAME / DESIGN / FLEET / MAP / RACES / PLANETS / TECH (+ NEXT TURN)
+>
+> **Files updated:** `state-transitions.md` (navigation matrix), `screen-inventory.md` (section removed)
 
 ### 6.2 F8 High Council Screen
 - **Conflict:** `navigation-flow.md` §7 Screen Hierarchy shows Council at the GALAXY MAP level under "NEXT TURN → Turn Resolution → Council." It does not list F8 as a direct navigation option. `state-transitions.md` §1.2 lists F8 as navigable with `✓*` (only when Council is in session). `interaction-spec.md` §2.1 lists `F8` as a global shortcut to "Council."
@@ -326,10 +335,12 @@ The `screen-inventory.md` was last updated before all screenshots were added. Th
 - **Conflict (detailed above in 4.6):** `interaction-spec.md` §2.6 maps keys `1-4` to hull sizes (Small/Medium/Large/Huge), but `main-screens.md` §5 defines 6 hull classes (Scout, Fighter, Destroyer, Cruiser, Battleship, Dreadnought). The shortcut spec only covers 4, leaving Battleship and Dreadnought without hotkeys.
 - **Suggested fix:** Map `1-6` to all hull classes, or explicitly state that `1-4` covers the base 4 sizes and Scout/Dreadnought require click.
 
-### 8.3 Research Allocation: Single Field vs. Multi-Slider
-- **Conflict:** `UI_OVERVIEW.md` shows 6 research allocation sliders (one per field). `main-screens.md` §4 shows 6 allocation sliders. But `screen-inventory.md` §2.5 notes "Research Allocation: N/A (single research) - MOO1 = 1 research at a time" with status N/A. This is contradictory — either HoO has multi-field allocation (6 sliders) or it researches one thing at a time.
-- **Files:** `UI_OVERVIEW.md`, `main-screens.md` §4, `screen-inventory.md` §2.5
-- **Suggested fix:** Make a design decision and document it clearly. If HoO uses 6 simultaneous research sliders (deviation from MOO1), state that explicitly. The wireframes show 6 sliders, so presumably this is intentional.
+### 8.3 Research Allocation: Single Field vs. Multi-Slider — ✅ RESOLVED (2026-04-12)
+- **Decision:** HoO uses **MOO1-accurate** research mechanics with two distinct UI moments:
+  1. **Tech Screen (F4)** — 6 RP allocation sliders (one per field), adjustable **at any time**. This reallocates research points across fields. Players do NOT pick techs from this screen.
+  2. **Tech Selection Popup** — appears at **start of turn only**, when a field completes its current research. Player picks the next tech from 2–3 randomized options. This is a blocking start-of-turn modal.
+  Each field researches exactly **one tech at a time**. Multiple fields can be active simultaneously (each with their own allocated RP%).
+- **Files updated:** `wireframes/research-tree.md`, `wireframes/command_menu/command_menu_tech.md`, `screen-inventory.md` §2.5, `state-transitions.md` §3 and §4.3
 
 ### 8.4 Max Opponents: 1-5 (MOO1) vs 1-9 (HoO)
 - **Conflict:** `screen-inventory.md` §1.2 notes "MOO1: 1-5 opponents, HoO: 1-9 opponents" but `main-screens.md` §1 New Game Setup shows `[  5  ] (1-9)` — which shows the value 5 but range 1-9. MOO1 had 5 AI races max (6 total). HoO has 10 races total, so 9 opponents is plausible but needs the races list to support it.
@@ -364,10 +375,10 @@ The `screen-inventory.md` was last updated before all screenshots were added. Th
 
 | # | Issue | Status | Location |
 |---|-------|--------|----------|
-| C1 | MAP button behavior undefined (cycle vs modal vs screen) | 🔴 OPEN — requires design decision | §2.8 |
-| C2 | F7 Reports: does this screen exist? | 🔴 OPEN — requires design decision | §6.1 |
+| C1 | MAP button behavior undefined (cycle vs modal vs screen) | ✅ RESOLVED — MAP opens separate MAP screen; see §2.8 | §2.8 |
+| C2 | F7 Reports: does this screen exist? | ✅ RESOLVED — REMOVED (not in MOO1, F7=Tech) | §6.1 |
 | C3 | Tech/Fleet screens: modal (no F-key nav) or screen (F-keys work)? | 🔴 OPEN — requires design decision | §6.4–6.5 |
-| C4 | Research allocation: 6 sliders simultaneously or 1 at a time? | 🔴 OPEN — requires design decision | §8.3 |
+| C4 | Research allocation: 6 sliders simultaneously or 1 at a time? | ✅ RESOLVED (2026-04-12) — MOO1-style: 6 sliders (anytime RP reallocation) + start-of-turn tech selection popup. See §8.3. | §8.3 |
 | C5 | Keyboard shortcut conflicts (G, R, F, D keys) | ✅ FIXED — see §4.1–4.5 resolutions | §4.1–4.5 |
 
 ### 🟡 Important — Gaps That Will Cause Confusion

@@ -82,11 +82,11 @@ flowchart TD
         TURN[NEXT TURN]
     end
 
-    subgraph Modals["Full-Screen Modal Overlays"]
+    subgraph Modals["Full-Screen Screens"]
         GameMenu[Game Menu<br/>Save/Load/Options/Quit]
         ShipDesign[Ship Design Screen]
         FleetScreen[Fleet Screen]
-        MapView[Galaxy Overview]
+        MapView[MAP Screen<br/>Full Galaxy View]
         Diplomacy[Races Screen (F5)]
         PlanetList[Planets List]
         Research[Technology Screen]
@@ -97,7 +97,7 @@ flowchart TD
     GAME -->|"Opens"| GameMenu
     DESIGN -->|"Opens"| ShipDesign
     FLEET -->|"Opens"| FleetScreen
-    MAP -->|"Opens"| MapView
+    MAP -->|"Opens MAP Screen"| MapView
     RACES -->|"Opens"| Diplomacy
     PLANETS -->|"Opens"| PlanetList
     TECH -->|"Opens"| Research
@@ -106,7 +106,7 @@ flowchart TD
     GameMenu -->|"Close/ESC"| GM
     ShipDesign -->|"Close/ESC"| GM
     FleetScreen -->|"Close/ESC"| GM
-    MapView -->|"Close/ESC"| GM
+    MapView -->|"MAP again / ESC"| GM
     Diplomacy -->|"Close/ESC"| GM
     PlanetList -->|"Close/ESC"| GM
     Research -->|"Close/ESC"| GM
@@ -357,15 +357,17 @@ Fleet deployment panel (accessed from Galaxy Map fleet selection):
 
 ![Fleet Deployment Panel](../moo_screens/moo_galaxy_fleet_deployment.png)
 
-### 4.5 MAP Overlay Modes
+### 4.5 MAP Screen
 
-The MAP button cycles through galaxy overview modes showing different data layers:
+The MAP button opens a **separate full-screen MAP view** — a completely different rendering mode from the normal Galaxy View. The entire main view is replaced with a zoomed-out display showing all stars in the galaxy at once. Within the MAP screen, three mode buttons on the right panel filter what data is displayed.
 
-| Overlay Mode | Screenshot |
-|-------------|------------|
-| Colonies overlay | ![Colonies Map](../moo_screens/moo_map_colonies_selected.png) |
-| Environments overlay | ![Environments Map](../moo_screens/moo_map_environments_selected.png) |
-| Minerals overlay | ![Minerals Map](../moo_screens/moo_map_minerals_selected.png) |
+**Exit:** Click MAP again in the command bar, or press ESC, to return to the normal Galaxy View.
+
+| MAP Screen Mode | Screenshot |
+|----------------|------------|
+| Colonies mode | ![Colonies Map](../moo_screens/moo_map_colonies_selected.png) |
+| Environment mode | ![Environments Map](../moo_screens/moo_map_environments_selected.png) |
+| Minerals mode | ![Minerals Map](../moo_screens/moo_map_minerals_selected.png) |
 
 ---
 
@@ -523,8 +525,12 @@ GALAXY MAP (Central Hub)
 │   ├── System Details
 │   └── Deployment Panel
 │
-├── MAP → Galaxy Overview Modal
-│   └── Zoomed out view
+├── MAP → MAP Screen (separate full-screen view)
+│   ├── Zoomed out, all stars visible
+│   ├── [COLONIES] mode button — show ownership flags
+│   ├── [ENVIRONMENT] mode button — show planet type codes
+│   ├── [MINERALS] mode button — show resource indicators
+│   └── Click MAP again or ESC → return to Galaxy View
 │
 ├── RACES → Diplomacy Modal
 │   ├── Race List
@@ -597,7 +603,7 @@ These letter shortcuts are **only active on the Galaxy Map** (F1). They do NOT f
 | `R` | Toggle Range Circles | **Not** "RACES screen" — use F5 for that |
 | `T` | Toggle Trade Routes | **Not** "Tech screen" — use F4 for that |
 | `E` | Highlight Enemy Fleets | |
-| `M` | _(no Galaxy Map binding)_ | `M` = Mute Audio globally; avoid reassigning |
+| `M` | _(no Galaxy Map binding)_ | `M` = Mute Audio globally; MAP is opened via the MAP button or has no letter binding |
 | `P` | _(no Galaxy Map binding)_ | `P` = Patrol in Fleet Command |
 | `D` | _(no Galaxy Map binding)_ | `D` = Defense Slider in Planet Mgmt |
 | `Enter` | Open End Turn confirmation | |
@@ -619,7 +625,7 @@ The following conflicts existed in earlier drafts of this section and are now re
 | `D` | DESIGN screen (listed as global) | Defense Slider in Planet Mgmt only | D is screen-local, not global; use F6 for Design |
 | `T` | TECH/Research | Trade Routes toggle (Galaxy Map only) | T = Tech was a stretch; use F4 |
 | `P` | PLANETS list | No Galaxy Map binding | P = Patrol in Fleet Cmd; use F2 for Planets |
-| `M` | MAP overview | No Galaxy Map letter binding | M = Mute Audio globally; MAP button cycles overlays |
+| `M` | MAP overview | No Galaxy Map letter binding | M = Mute Audio globally; MAP button opens the MAP screen (separate view) |
 | `F10` | Game Menu (UI_OVERVIEW) | Removed — not used | ESC is the sole Game Menu trigger |
 
 ### In Modals
@@ -655,9 +661,9 @@ All reference screenshots are in `../moo_screens/`. Quick reference:
 | `moo_galaxy_planet_post_tform.png` | Post-terraformed colony |
 | `moo_galaxy_planet_is_full.png` | Colony at population cap |
 | `moo_galaxy_max_factories.png` | Colony at max factories |
-| `moo_map_colonies_selected.png` | MAP overlay — colonies |
-| `moo_map_environments_selected.png` | MAP overlay — environments |
-| `moo_map_minerals_selected.png` | MAP overlay — minerals |
+| `moo_map_colonies_selected.png` | MAP screen — Colonies mode |
+| `moo_map_environments_selected.png` | MAP screen — Environment mode |
+| `moo_map_minerals_selected.png` | MAP screen — Minerals mode |
 | `moo_design.png` | Ship design overview |
 | `moo_ship_design.png` | Ship design detail |
 | `moo_fleet_screen.png` | Fleet screen |

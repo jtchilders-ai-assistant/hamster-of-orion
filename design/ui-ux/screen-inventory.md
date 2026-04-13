@@ -334,22 +334,27 @@ Screenshots are located in `../moo_screens/`. The following screenshots are avai
 | Researched Techs | ✓ | ✅ Documented | | |
 | Available Techs | ✓ | ✅ Documented | | |
 | Locked Techs | ✓ | ⚠️ Implicit | | Need visual indicator |
-| Tech Selection | ✓ | ✅ Documented | | |
+| Tech Selection | ✓ | ✅ Documented | [📷](../moo_screens/moo_start_of_turn_select_new_research.png) | Start-of-turn popup ONLY |
 | Tech Details Panel | ✓ | ✅ Documented | | |
 | Miniaturization Info | ✓ | ⚠️ Basic | | Need tooltip detail |
-| Research Allocation | N/A (single research) | N/A | | MOO1 = 1 research at a time |
-| Field Progress Bars | ✓ | ⚠️ Added | | HoO shows tier progress |
-| New Tech Notification | ✓ | ✅ Documented | [📷](../moo_screens/moo_new_tech.png) | |
-| Select New Research | ✓ | ✅ Documented | [📷](../moo_screens/moo_start_of_turn_select_new_research.png) | |
+| RP Allocation Sliders | ✓ | ✅ Documented | [📷](../moo_screens/moo_tech.png) | 6 sliders, anytime (main Tech Screen) |
+| Field Progress Bars | ✓ | ✅ Documented | | One tech per field at a time |
+| New Tech Notification | ✓ | ✅ Documented | [📷](../moo_screens/moo_new_tech.png) | Appears start-of-next-turn |
+| Select New Research | ✓ | ✅ Documented | [📷](../moo_screens/moo_start_of_turn_select_new_research.png) | Start-of-turn popup, 2–3 options |
 
-**HoO Location:** `main-screens.md` Section 5
+**HoO Location:** `main-screens.md` Section 5, `wireframes/research-tree.md`, `wireframes/command_menu/command_menu_tech.md`
 
 **Screenshots:** [Research Screen](../moo_screens/moo_tech.png) | [New Tech](../moo_screens/moo_new_tech.png) | [New Tech Eco](../moo_screens/moo_new_tech_eco_increase.png) | [Eco Reduction](../moo_screens/moo_tech_eco_reduction.png) | [Select Research](../moo_screens/moo_start_of_turn_select_new_research.png)
+
+**MOO1-Accurate Research Mechanic — RESOLVED (2026-04-12):**
+HoO uses MOO1-style research with **two distinct UI moments**:
+1. **Tech Screen (F4)** — 6 RP allocation sliders (one per field), adjustable at any time. Players redistribute research points. Does NOT allow tech picking.
+2. **Tech Selection Popup** — appears at start of turn only, when a field completes. Player picks next tech from 2–3 offered options. No mid-turn tech picking allowed.
+Each field researches exactly one tech at a time. See `wireframes/research-tree.md` for full wireframe.
 
 **Gap Actions:**
 - [ ] Add locked tech visual indicator
 - [ ] Expand miniaturization tooltip spec
-- [ ] Clarify single-research-at-a-time per field (MOO1 mechanic)
 
 ---
 
@@ -410,7 +415,13 @@ Screenshots are located in `../moo_screens/`. The following screenshots are avai
 
 ---
 
-### 2.8 Reports Screen (F7)
+### 2.8 ~~Reports Screen~~ (REMOVED)
+
+> **REMOVED (2026-04-12):** F7 Reports was not in MOO1 and was never properly defined. 
+> The command bar follows MOO1: GAME/DESIGN/FLEET/MAP/RACES/PLANETS/TECH.
+> F7 = Tech Screen.
+
+<!--
 | Aspect | MOO1 | HoO Status | Notes |
 |--------|------|------------|-------|
 | Empire Summary | ✓ | ✅ Documented | |
@@ -424,10 +435,9 @@ Screenshots are located in `../moo_screens/`. The following screenshots are avai
 | Empire Rankings | ✓ | ✅ Documented | |
 | Victory Progress | N/A in MOO1 | ✅ Added | HoO enhancement |
 | Score Display | ✓ | ✅ Documented | |
+-->
 
-**HoO Location:** `main-screens.md` Section 8, `information-displays.md`
-
-**Status:** ✅ Excellent - Well documented with enhancements
+**Status:** REMOVED — Not in MOO1. Info integrated into other screens.
 
 ---
 
