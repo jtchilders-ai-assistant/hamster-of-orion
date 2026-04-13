@@ -3,8 +3,8 @@
 **Generated:** 2026-04-12  
 **Last Updated:** 2026-04-12  
 **Total Issues:** ~135 across 6 review areas  
-**Resolved:** 75+ issues (All Critical/High/Medium + all design decisions)
-**Status:** ✅ COMPLETE — All design review issues resolved
+**Resolved:** 135+ issues (All Critical/High/Medium + MOO1 fidelity fixes)
+**Status:** ✅ COMPLETE — Full MOO1 comparison review completed and all critical discrepancies fixed
 
 This document consolidates all critical and high-priority issues found during the comprehensive design review. Individual detailed reports are in their respective directories.
 
@@ -173,4 +173,43 @@ All 4 critical UI design decisions resolved:
 | Research allocation | MOO1-style: 6 sliders for allocation + tech selection popup at start-of-turn only |
 | F7 Reports | REMOVED — not in MOO1, F7 = Tech Screen |
 | Tech/Fleet modals | **Modernization:** All main screens (F1-F7) switchable via F-keys; true modals only for Combat, Council, Game Menu, start-of-turn popups |
+
+
+---
+
+## MOO1 Fidelity Fixes (2026-04-13)
+
+Final review against MOO1 reference identified and fixed 60+ critical discrepancies:
+
+### Combat (8 fixes)
+- Hit formula → MOO1 differential system
+- Damage mapped to hit roll
+- Armor Piercing halves shields
+- Torpedoes follow missile rules
+- Missile fuel 2 turns
+- Graviton/Tachyon overflow damage
+
+### Technology (16 fixes)
+- Damage values corrected (Proton/Plasma torpedoes, Stellar Converter, Scatter Packs)
+- 10 missing techs added
+- Bio weapon tech levels synced
+
+### Species (17 fixes)
+- All field research bonuses implemented
+- AI archetypes corrected
+- Hermit Crabs: no_pollution + cannot_terraform
+
+### Economy (5 fixes)
+- Manual labor scales with Planetology tech
+- Mineral richness applied to production
+
+### Diplomacy (7 fixes)
+- Trade ramp-up mechanic
+- Population dominance coalition
+- Spy system documented as HoO original
+
+### UI/UX (7 fixes)
+- Tactical combat enhanced
+- Ground combat UI created
+- Spy network UI created
 
