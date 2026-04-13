@@ -47,13 +47,15 @@ Where `Racial_Capacity_Modifier` is 1.0 for all races except Ants (1.25). This m
 
 #### Base Planet Sizes
 
-| Planet Size | Base Max Population |
-|-------------|---------------------|
-| Tiny | 20 |
-| Small | 40 |
-| Medium | 60 |
-| Large | 80 |
-| Huge | 100 |
+The following are **representative midpoint values** for each size category. Actual `base_population` is generated per-planet within a range during galaxy generation (see `planets/generation-tables.md` §4). Economy formulas must use the planet's generated `base_population` field, not these hardcoded numbers.
+
+| Planet Size | Typical Base Pop | Generated Range |
+|-------------|------------------|-----------------|
+| Tiny | 15 | 10–20 |
+| Small | 32 | 25–40 |
+| Medium | 55 | 45–70 |
+| Large | 85 | 75–100 |
+| Huge | 120 | 100–150 |
 
 #### Terraforming Bonus (Cumulative)
 
@@ -350,12 +352,13 @@ To colonize hostile environments, specific technology is required:
   },
 
   "planet_base_sizes": [
-    { "size": "tiny", "max_population": 20 },
-    { "size": "small", "max_population": 40 },
-    { "size": "medium", "max_population": 60 },
-    { "size": "large", "max_population": 80 },
-    { "size": "huge", "max_population": 100 }
+    { "size": "tiny",   "typical_max_population": 15,  "range": [10, 20]  },
+    { "size": "small",  "typical_max_population": 32,  "range": [25, 40]  },
+    { "size": "medium", "typical_max_population": 55,  "range": [45, 70]  },
+    { "size": "large",  "typical_max_population": 85,  "range": [75, 100] },
+    { "size": "huge",   "typical_max_population": 120, "range": [100, 150]}
   ],
+  "_note_base_sizes": "Use planet.base_population (generated per-planet) in formulas, not hardcoded per-size values. See planets/generation-tables.md §4.",
 
   "terraforming": [
     { "tech_level": 0, "name": "None", "bonus": 0 },

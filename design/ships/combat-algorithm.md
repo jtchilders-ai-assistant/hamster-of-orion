@@ -191,14 +191,25 @@ function resolve_beam_attack(attacker, weapon, target, combat):
     roll = random(1, 100)
     
     if roll <= hit_chance:
-        # Calculate damage
-        base_damage = roll_damage(weapon.damage_min, weapon.damage_max)
+        # MOO1: Damage is MAPPED across the success range of the hit roll.
+        # A roll exactly at the hit threshold = minimum damage.
+        # A roll of 100 = maximum damage.
+        # This means barely-hitting shots deal min damage; high rolls deal high damage.
+        #
+        # hit_threshold = 101 - hit_chance  (the lowest roll that still hits)
+        # success_range = 100 - hit_threshold  (= hit_chance - 1, or 0 if hit_chance == 100)
+        # damage_fraction = (roll - hit_threshold) / max(success_range, 1)
+        # base_damage = weapon.damage_min + floor(damage_fraction × (weapon.damage_max - weapon.damage_min))
+        hit_threshold = 101 - hit_chance
+        success_range = max(hit_chance - 1, 1)
+        damage_fraction = (roll - hit_threshold) / success_range
+        base_damage = weapon.damage_min + floor(damage_fraction * (weapon.damage_max - weapon.damage_min))
         
         # Apply range penalty
         distance = hex_distance(attacker.position, target.position)
         if not weapon.has_special("no_range_penalty"):
             range_penalty = max(0, (distance - weapon.optimal_range) * 0.10)
-            base_damage = base_damage * (1 - range_penalty)
+            base_damage = floor(base_damage * (1 - range_penalty))
         
         # Apply racial damage bonus (Ferrets: +25%)
         racial_modifier = get_racial_damage_modifier(attacker.race)
@@ -212,43 +223,73 @@ function resolve_beam_attack(attacker, weapon, target, combat):
         return {hit: false, damage: 0}
 ```
 
-### 9. Hit Chance Formula
+### 9. Hit Chance Formula (MOO1 Differential System)
 
 ```
-Hit_Chance = Base_Accuracy + Attack_Modifiers - Defense_Modifiers
+# MOO1 canonical formula: each level of attacker advantage = +10%, each defender level = -10%
+# Base 50% when both levels are equal.
+
+Hit_Chance = 50 + (Effective_Attacker_Level - Effective_Defender_Level) × 10
 
 Where:
-  Base_Accuracy = 50%
+  Effective_Attacker_Level = Battle_Computer_Mark
+                           + Battle_Scanner_Bonus   (+1 if equipped)
+                           + Racial_Attack_Bonus    (Ferrets: +4)
+                           + Wide_Beam_Bonus        (wide-beam weapons like Megabolt: +3)
   
-  Attack_Modifiers:
-    + (Battle_Computer_Rating × 5%)
-    + Experience_Bonus (Rookie: -5%, Regular: 0%, Veteran: +5%, Elite: +10%)
-    + Point_Blank_Bonus (1 hex: +10%)
-    + Size_Target_Bonus (per size class above Small: +5%)
-  
-  Defense_Modifiers:
-    + (Target_Maneuver × 3%)
-    + (Inertial_Stabilizer_Bonus: +2 or +4)
-    + (Displacement_Device: +10%)
-    + (Cloaking_Bonus: +5)
-    + Range_Penalty (Medium: +5%, Long: +10%, Very Long: +20%)
+  Effective_Defender_Level = Target_Maneuver_Class
+                           + Inertial_Stabilizer    (+2 if equipped)
+                           + Inertial_Nullifier     (+4 if equipped; replaces Stabilizer)
+                           + Cloaking_Device        (+5 if cloaked)
+                           + Racial_Defense_Bonus   (Alkari/Budgies: +3)
+
+Floor: 5% (always some chance to miss)
+Ceiling: 95% (always some chance to hit)
+
+NOTE: Experience bonuses, size modifiers, point-blank bonuses, and range penalties
+are intentional design enhancements beyond MOO1. They are applied AFTER the
+differential calculation and are clearly documented as such.
+
+Enhancement modifiers (applied after base differential, documented as non-MOO1):
+  + Experience_Bonus (Rookie: -5%, Regular: 0%, Veteran: +5%, Elite: +10%)
+  + Point_Blank_Bonus (1 hex: +10%)
+  + Size_Target_Bonus (per size class above Small: +5%)
+  - Range_Penalty (Medium: -5%, Long: -10%, Very Long: -20%)
 ```
 
 ### 10. Hit Chance Calculation
 
 ```pseudocode
 function calculate_hit_chance(attacker, weapon, target):
-    # Base accuracy
-    hit_chance = 50
+    # --- MOO1 Differential Formula ---
+    # Attacker effective level = Battle Computer Mark + bonuses
+    attacker_level = attacker.battle_computer_mark  # Mark I=1, II=2, ... Mark V=5
+    if attacker.has_system("battle_scanner"):
+        attacker_level += 1
+    attacker_level += get_racial_attack_level_bonus(attacker.race)  # Ferrets: +4
+    if weapon.has_special("wide_beam"):
+        attacker_level += 3  # Wide-beam weapons (e.g. Megabolt Cannon)
     
-    # Attack modifiers
-    hit_chance += attacker.battle_computer_rating * 5
+    # Defender effective level = Maneuver Class + bonuses
+    defender_level = target.maneuver_class  # Engine maneuver class (1–6+)
+    if target.has_system("inertial_stabilizer"):
+        defender_level += 2
+    if target.has_system("inertial_nullifier"):
+        defender_level += 4  # Replaces Stabilizer; do not double-count
+    if target.cloaked:
+        defender_level += 5  # Cloaking Device: +5 to effective defender level
+    defender_level += get_racial_defense_level_bonus(target.race)  # Budgies: +3
+    
+    # Base differential hit chance
+    hit_chance = 50 + (attacker_level - defender_level) * 10
+    
+    # --- Enhancement modifiers (non-MOO1, documented additions) ---
     hit_chance += get_experience_accuracy_bonus(attacker.experience_level)
     
     # Range modifiers
     distance = hex_distance(attacker.position, target.position)
     if distance == 1:
-        hit_chance += 10  # Point blank
+        hit_chance += 10  # Point blank (enhancement)
     elif distance >= 5 and distance <= 8:
         hit_chance -= 5   # Medium range
     elif distance >= 9 and distance <= 15:
@@ -256,17 +297,12 @@ function calculate_hit_chance(attacker, weapon, target):
     elif distance > 15:
         hit_chance -= 20  # Very long range
     
-    # Size modifier (larger targets easier to hit)
+    # Size modifier — larger targets easier to hit (enhancement, no MOO1 basis)
     size_diff = target.size_class - 1  # Small = 1, Medium = 2, Large = 3, Huge = 4
     hit_chance += size_diff * 5
     
-    # Defense modifiers
-    hit_chance -= target.maneuver_rating * 3
-    hit_chance -= target.defense_bonus  # From specials
-    
-    # Cloaking
-    if target.cloaked:
-        hit_chance -= 20
+    # Displacement Device: separate 33% miss reroll (handled in check_displacement())
+    # Do NOT subtract from hit_chance here — it's resolved after the hit roll.
     
     # Mauler Device always hits
     if weapon.has_special("always_hits"):
@@ -292,52 +328,30 @@ function apply_damage(target, damage, weapon):
     remaining_damage = damage
     
     # Step 1: Compute effective shield absorption for this hit
-    if target.shields_current > 0:
+    if target.shield_class > 0:
         effective_shield_class = target.shield_class
         
-        # halves_shields (Ion Cannon): shield absorbs only half its class rating
-        if weapon.has_special("halves_shields"):
+        # armor_piercing: MOO1 mechanic — halves the defender's shield class (round down)
+        # for this hit only. Applies to: Neutron Pellet Gun, Mass Driver, Hard Beam,
+        # Gauss Autocannon, Particle Beam (and any weapon with Oracle Interface).
+        # The reduced shield still absorbs up to its halved class value; remainder hits hull.
+        if weapon.has_special("armor_piercing"):
             effective_shield_class = floor(target.shield_class / 2)
         
-        # ignores_half_shields (Mass Driver): split damage into two halves
-        #   - Half bypasses shields entirely
-        #   - Half is absorbed by shields normally
-        if weapon.has_special("ignores_half_shields"):
-            bypass_damage = floor(remaining_damage / 2)
-            shielded_damage = remaining_damage - bypass_damage
-            shield_absorb = min(effective_shield_class, shielded_damage)
-            target.shields_current -= shield_absorb
-            target.shields_current = max(0, target.shields_current)
-            remaining_damage = bypass_damage + (shielded_damage - shield_absorb)
+        # Standard shield absorption
+        shield_absorb = min(effective_shield_class, remaining_damage)
+        remaining_damage -= shield_absorb
+        
+        # Some weapons do extra shield damage (non-MOO1 enhancement)
+        if weapon.has_special("double_shield_damage"):
+            target.shields_current -= shield_absorb * 2
         else:
-            # Normal (or halves_shields) shield absorption path
-            shield_absorb = min(effective_shield_class, remaining_damage)
-            remaining_damage -= shield_absorb
-            
-            # bonus_vs_shields (Hellfire Torpedo): deals +10 bonus damage
-            # directly to shields_current, on top of normal absorption.
-            # This does NOT increase damage to hull.
-            if weapon.has_special("bonus_vs_shields") and target.shields_current > 0:
-                extra_shield_damage = min(10, target.shields_current)
-                target.shields_current -= extra_shield_damage
-            
-            # Some weapons do extra shield damage
-            if weapon.has_special("double_shield_damage"):
-                target.shields_current -= shield_absorb * 2
-            else:
-                target.shields_current -= shield_absorb
-            
-            target.shields_current = max(0, target.shields_current)
+            target.shields_current -= shield_absorb
+        
+        target.shields_current = max(0, target.shields_current)
     
     # Step 2: Armor/Hull damage
     if remaining_damage > 0:
-        # armor_piercing (Neutron Pellet Gun): multiplies hull damage by 1.5×.
-        # Applies ONLY to damage that has already passed through shields —
-        # it does NOT bypass or reduce shield absorption. The ×1.5 amplifies
-        # whatever reaches the hull, making it effective against armored targets.
-        if weapon.has_special("armor_piercing"):
-            remaining_damage = floor(remaining_damage * 1.5)
-        
         target.current_hp -= remaining_damage
     
     # Step 3: Check for destruction
@@ -366,23 +380,34 @@ function apply_weapon_effects(target, weapon, damage, combat):
         target.crew_current = max(0, target.crew_current - crew_killed)
         apply_crew_loss_penalties(target)
     
-    # --- stream ---
-    # Beam locks onto target — damage repeats each End Phase until target breaks free
-    # or the holding ship stops maintaining the beam.
-    # Used by: Graviton Beam, Neutron Stream Projector.
-    if "stream" in effects:
-        if not has_status(target, "stream"):
-            target.status_effects.append({
-                type: "stream",
-                source_ship_id: weapon.attacker_id,
-                weapon_id: weapon.id,
-                damage_per_turn: floor(damage * 0.5),  # Ongoing tick = 50% of initial hit
-                duration: 99  # Persists until source ship stops or is destroyed
-            })
-        # Break-free check (resolved in process_status_effects each End Phase):
-        #   roll = random(1, 100)
-        #   break_chance = target.maneuver_rating * 10  # 10% per maneuver point
-        #   if roll <= break_chance: remove "stream" status
+    # --- overflow_damage ---
+    # MOO1 mechanic for Graviton Beam and Tachyon Beam:
+    # Damage that exceeds what is needed to destroy a ship "overflows" to the
+    # next ship of the same design in the target's stack.
+    # The overflow amount = overkill damage (damage beyond 0 HP on the primary).
+    # Each successive ship in the stack has shields applied normally.
+    # Used by: Graviton Beam, Tachyon Beam.
+    if "overflow_damage" in effects:
+        overflow = max(0, -target.current_hp)  # Overkill amount (target.current_hp already negative)
+        if overflow > 0:
+            stack_mates = get_stack_mates(target, combat)  # Ships of same design in same hex
+            for next_ship in stack_mates:
+                if next_ship.current_hp > 0:
+                    apply_damage(next_ship, overflow, weapon)
+                    break  # Only overflow to one ship at a time
+    
+    # --- hellfire_multi_hit ---
+    # MOO1: Hellfire Torpedo deals 4 SEPARATE 25-damage attacks per hit, totaling 100 damage.
+    # Each of the 4 attacks is resolved independently through the shield absorption
+    # sequence (shields absorb their class value from each of the 4 hits).
+    # The damage field on the hellfire_torpedo JSON represents 25 (one sub-attack);
+    # the multi-hit is fired here N=4 times rather than once.
+    # NOTE: apply_damage() is called with the torpedo's base 25-damage from
+    # resolve_torpedo_impact(); this effect fires 3 MORE hits (total = 4).
+    if "hellfire_multi_hit" in effects:
+        for i in range(3):  # 3 additional hits (first hit already applied)
+            if target.current_hp > 0:
+                apply_damage(target, 25, weapon)
     
     # --- chain_lightning ---
     # After hitting the primary, arcs to up to N additional adjacent enemies at 50% damage.
@@ -411,7 +436,9 @@ function apply_weapon_effects(target, weapon, damage, combat):
     
     # --- disable_engines ---
     # Reduces target's combat_speed to 1 for N turns. Refreshes if already applied.
-    # Used by: Ion Stream Projector.
+    # Used by: Ion Stream Projector. NOTE: Ion Stream Projector in MOO1 is actually an
+    # HP%-damage weapon (20% current HP + 1%/firing ship). The disable_engines effect
+    # is a design choice; see FINAL_REVIEW_COMBAT.md D23 for the full MOO1 description.
     if "disable_engines" in effects:
         duration = weapon.disable_duration  # Default: 2 turns
         existing = get_status(target, "engines_disabled")
@@ -586,7 +613,7 @@ function launch_missile(attacker, weapon, target, combat):
         position: attacker.position,
         speed: weapon.missile_speed,
         damage: weapon.damage,
-        remaining_fuel: 20  # Turns before missile expires
+        remaining_fuel: 2  # MOO1: ship-launched missiles self-destruct after 2 turns
     }
     
     combat.missiles_in_flight.append(missile)
@@ -674,11 +701,8 @@ function resolve_missile_impact(missile, combat):
 
 ### 20. Torpedo Mechanics
 
-Torpedoes are special:
-- Cannot be intercepted by point defense
-- Cannot be affected by ECM
-- Fire every 2 turns (cooldown)
-- Always hit (100% accuracy after tracking)
+Torpedoes follow the same targeting rules as missiles (including ECM) but
+fire every 2 turns. They are heavier warheads — not auto-hit weapons.
 
 ```pseudocode
 function fire_torpedo(attacker, weapon, target, combat):
@@ -686,14 +710,14 @@ function fire_torpedo(attacker, weapon, target, combat):
     if attacker.weapon_cooldowns[weapon.id] > 0:
         return false
     
-    # Torpedoes auto-hit but travel slowly
     torpedo = {
         source: attacker,
         target: target,
         weapon: weapon,
         position: attacker.position,
         speed: weapon.torpedo_speed,
-        damage: weapon.damage
+        damage: weapon.damage,
+        remaining_fuel: 2  # Same fuel rule as missiles (MOO1: torpedoes follow missile rules)
     }
     
     combat.missiles_in_flight.append(torpedo)
@@ -704,8 +728,35 @@ function fire_torpedo(attacker, weapon, target, combat):
     return true
 
 function resolve_torpedo_impact(torpedo, combat):
-    # Torpedoes always hit - no intercept, no ECM
-    apply_damage(torpedo.target, torpedo.damage, torpedo.weapon)
+    # MOO1: Torpedoes follow the same rules as missiles.
+    # They ARE subject to ECM and point defense. They are NOT auto-hit.
+    target = torpedo.target
+    
+    if target.current_hp <= 0:
+        return
+    
+    # Attempt point defense intercept (same as missiles)
+    if attempt_point_defense(target, torpedo, combat):
+        log_combat("Torpedo intercepted by point defense")
+        return
+    
+    # Hit chance follows missile formula (ECM applies)
+    hit_chance = 80 - (target.ecm_rating * 5) - (target.maneuver_rating * 2)
+    hit_chance = clamp(hit_chance, 10, 95)
+    
+    # MOO1 damage-mapped-to-roll mechanic applies to torpedoes too
+    roll = random(1, 100)
+    if roll <= hit_chance:
+        hit_threshold = 101 - hit_chance
+        success_range = max(hit_chance - 1, 1)
+        damage_fraction = (roll - hit_threshold) / success_range
+        final_damage = torpedo.weapon.damage_min + floor(
+            damage_fraction * (torpedo.weapon.damage_max - torpedo.weapon.damage_min)
+        )
+        apply_damage(target, final_damage, torpedo.weapon)
+        log_combat("Torpedo hit for " + final_damage + " damage")
+    else:
+        log_combat("Torpedo missed")
 ```
 
 ---
@@ -717,15 +768,12 @@ function resolve_torpedo_impact(torpedo, combat):
 | Effect | Implementation |
 |--------|----------------|
 | `multi_attack` | Fire N times, each attack resolved separately |
-| `armor_piercing` | Damage that passes shields is multiplied ×1.5 before hitting hull. Does **not** bypass or reduce shield absorption. |
-| `halves_shields` | Target's effective shield class is halved (floor) for this hit only. Remaining damage is still applied to hull. |
-| `ignores_half_shields` | Damage is split: half bypasses shields entirely; other half absorbed normally. Both halves combine for hull damage calculation. |
-| `bonus_vs_shields` | Deals +10 bonus damage directly to `shields_current` (capped at remaining shield HP). Does not increase hull damage. |
+| `armor_piercing` | **MOO1**: Halves the defender's shield class (round down) for this hit only. Remaining damage still hits hull at face value. Applies to: Neutron Pellet Gun, Mass Driver, Hard Beam, Gauss Autocannon, Particle Beam. |
+| `overflow_damage` | **MOO1**: Excess damage beyond what destroys a ship carries over to the next ship of the same design in the stack. Used by Graviton Beam, Tachyon Beam. |
 | `kills_crew` | Each hit kills 1% of crew (reduces combat effectiveness) |
-| `stream` | Damage continues each round while target is held |
 | `no_range_penalty` | No damage reduction at range |
 | `chain_lightning` | After hitting primary, hits up to 4 adjacent enemies |
-| `double_shield_damage` | Shield takes 2× damage |
+| `double_shield_damage` | Shield takes 2× damage (non-MOO1 enhancement) |
 | `instant_kill_small` | 100% kill vs Small hull ships |
 | `always_hits` | 100% accuracy, ignores all defense |
 | `destroys_planets` | Can be used in bombardment phase |

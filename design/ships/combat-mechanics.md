@@ -86,50 +86,44 @@ Combat triggers when:
 **Canonical Formula** (see `combat-algorithm.md` Section 9-10):
 
 ```
-hit_chance = 50
-  + (battle_computer_rating × 5)    # Attack: Battle Computer
-  + experience_modifier              # Attack: crew skill
-  + point_blank_bonus                # Attack: +10 at 1 hex
-  + size_modifier                    # Attack: larger targets easier to hit
-  - (maneuver_rating × 3)           # Defense: ship agility vs beams
-  - defense_bonus                    # Defense: special systems (cloaking, Inertial Stabilizer, etc.)
-  - range_penalty                    # Defense: range degradation
+hit_chance = 50 + (Effective_Attacker_Level - Effective_Defender_Level) × 10
 ```
 
-Where:
-- **battle_computer_rating** = Battle Computer Mark (I=1, II=2, etc.)
-- **maneuver_rating** = target's engine maneuver class; applied at ×3% per level (beam weapons only)
-- **defense_bonus** = sum of passive defense bonuses from special systems (Inertial Stabilizer, Displacement Device, etc.); NOT ECM
-- **size_modifier** = (target_size_class - 1) × 5 (Small = class 1, Medium = 2, Large = 3, Huge = 4)
-- **range_penalty** = {point_blank: -10 (bonus), close: 0, medium: +5, long: +10, very_long: +20}
-- **experience_modifier** = {rookie: -5, regular: 0, veteran: +5, elite: +10}
+Each **level of attacker advantage** adds **+10%**. Each **level of defender advantage** subtracts **10%**.
+Base 50% when both levels are equal.
+
+**Effective_Attacker_Level** = Battle Computer Mark + Battle Scanner (+1) + Racial Bonus (Ferrets: +4) + Wide Beam (+3)
+
+**Effective_Defender_Level** = Target Maneuver Class + Inertial Stabilizer (+2) or Nullifier (+4) + Cloaking (+5) + Racial Bonus (Budgies: +3)
+
+**Minimum**: 5% | **Maximum**: 95%
 
 > **ECM and beams:** ECM jamming does **not** affect beam weapons. ECM only reduces missile hit chance
 > (see `combat-algorithm.md` Section 19: `hit_chance = 80 - (ecm_rating × 5) - (maneuver_rating × 2)` for missiles).
-> Do not include `ecm_rating` in the beam hit formula.
 
-**Minimum**: 5% (always some chance to hit)
-**Maximum**: 95% (always some chance to miss)
-
-**Range Brackets**:
+**Enhancement modifiers** (non-MOO1 additions, documented as such):
 - Point Blank (1 hex): +10% bonus to attacker
 - Close (2-4 hexes): +0%
 - Medium (5-8 hexes): -5% penalty
 - Long (9-15 hexes): -10% penalty
 - Very Long (16+ hexes): -20% penalty
+- Experience: {rookie: -5%, regular: 0%, veteran: +5%, elite: +10%}
+- Size modifier: (target_size_class - 1) × 5% (Small=class1, Medium=2, Large=3, Huge=4)
 
 **Racial Combat Bonuses**:
-- Ferrets: +4 Attack Level (Deadly Accuracy ability — hit chance bonus only, no damage bonus)
-- Budgies: +3 Defense Level (+30%), +3 Initiative, +20% Evasion (Superior Pilots)
+- Ferrets: +4 Attack Level (Deadly Accuracy — adds to attacker's effective level, not a flat % bonus)
+- Budgies: +3 Defense Level (adds to defender's effective level), +3 Initiative, +20% Evasion
 
-**Example**:
-- Ion Cannon at long range vs Medium ship with ECM III, Maneuver 2
-- Attacker: Battle Computer Mark V (+5 × 5% = +25%), Size (Medium = class 2, so +1 × 5% = +5%)
-- Defender: Maneuver 2 (2 × 3% = 6%), Long Range (-10%)
-- Note: ECM III does NOT apply to beam attacks
-- Hit Chance: 50% + 25% + 5% - 6% - 10% = **64%**
+**Example** (MOO1-faithful, no enhancement modifiers):
+- Attacker: Battle Computer Mark V (attacker_level = 5)
+- Defender: Maneuver Class 3 (defender_level = 3)
+- Hit Chance: 50 + (5 - 3) × 10 = **70%**
 
-See `combat-algorithm.md` Section 9 for the full pseudocode implementation.
+**Example with Budgies (Alkari equivalent)**:
+- Attacker: BC Mark III (level 3), vs Budgie Maneuver 2 + Racial +3 = defender_level 5
+- Hit Chance: 50 + (3 - 5) × 10 = **30%**
+
+See `combat-algorithm.md` Section 9-10 for full pseudocode implementation.
 See `components-complete.md` for shield absorption values.
 
 ---

@@ -244,11 +244,11 @@ All modernizations are **clearly distinguished** from MOO1-faithful elements in 
 
 ### 6.1 Critical Gaps (Block Implementation)
 
-1. **Tactical Combat UI** — `tactical-combat-ui.md` has the overall structure (pre-battle screen, hex grid, combat log) but is missing: per-ship health bars, movement point display, initiative/turn order UI, damage pop-up numbers, missile tracking visual, combat speed control, wait/done button, bombard phase integration.
+1. **Tactical Combat UI** — `tactical-combat-ui.md` has the overall structure (pre-battle screen, hex grid, combat log) but is missing: per-ship health bars, movement point display, initiative/turn order UI, damage pop-up numbers, missile tracking visual, combat speed control, wait/done button, bombard phase integration. **[FIXED 2026-04-13: Added HP bars on grid tokens, MP display, initiative strip, missile tracking section with in-flight tokens, WAIT/DONE buttons in ship panel, combat speed bar, and bombardment phase trigger documentation]**
 
-2. **Ground Combat Screen** — Not documented anywhere. MOO1 had a simple troop-vs-population screen with animated rolls and casualty display. Needs: attacker/defender troop counts, combat animation, casualty display, victory/defeat result, conquest options.
+2. **Ground Combat Screen** — Not documented anywhere. MOO1 had a simple troop-vs-population screen with animated rolls and casualty display. Needs: attacker/defender troop counts, combat animation, casualty display, victory/defeat result, conquest options. **[FIXED 2026-04-13: Created `ground-combat-ui.md` with full troop display, round animation, casualty display, victory/defeat/pyrrhic screens, conquest options, and transport ship notes]**
 
-3. **Spy Network UI** — Not documented. MOO1 had spy count, security/espionage sliders, target empire selection, and spy mission result logs. `espionage-ui.md` needs to be created.
+3. **Spy Network UI** — Not documented. MOO1 had spy count, security/espionage sliders, target empire selection, and spy mission result logs. `espionage-ui.md` needs to be created. **[FIXED 2026-04-13: Created `spy-network-ui.md` with spy assignment screen, mission selection, all result notification types (success/caught/foiled/killed), spy log, RACES screen integration, and budget display]**
 
 ### 6.2 Important Gaps (Will Cause Confusion)
 
@@ -260,15 +260,15 @@ All modernizations are **clearly distinguished** from MOO1-faithful elements in 
 
 7. **Enemy Colony Info Panel** — The right panel state when clicking an enemy colony on the galaxy map is referenced but not wireframed. Unclear what action buttons appear.
 
-8. **`main-screens.md` stale language** — §4 (Technology Screen) and §6 (Fleet Screen) still say "full-screen modal with NO bottom command bar" — contradicts the resolved C3/C4 decisions. Needs a cleanup pass.
+8. **`main-screens.md` stale language** — §4 (Technology Screen) and §6 (Fleet Screen) still say "full-screen modal with NO bottom command bar" — contradicts the resolved C3/C4 decisions. Needs a cleanup pass. **[FIXED 2026-04-13: Removed 'full-screen modal with NO bottom command bar' from §4 and §6; both now correctly say 'full navigation screen with the bottom command bar']**
 
-9. **`command_menu_planets.md` hotkey error** — Lists PLANETS as F6, should be F2.
+9. **`command_menu_planets.md` hotkey error** — Lists PLANETS as F6, should be F2. **[FIXED 2026-04-13: Hotkey corrected from F6 to F2 in title, Overview section, and removed 'does NOT display the bottom command bar' per C4 resolution]**
 
-10. **`screen-inventory.md` wireframe counts** — Still shows 0 wireframes in summary table; many wireframes now exist.
+10. **`screen-inventory.md` wireframe counts** — Still shows 0 wireframes in summary table; many wireframes now exist. **[FIXED 2026-04-13: Summary table updated — wireframe counts corrected from 0 to actual numbers (10 wireframe files), documented files list, HoO documented count updated to 28]**
 
 ### 6.3 Minor Issues
 
-11. **Bombardment phase** — Missing from `state-transitions.md` combat state machine. `tactical-combat-ui.md` documents the bombardment UI but `state-transitions.md` §9 jumps from `COMBAT_RESULT` to "Return to Galaxy Map" without mentioning bombardment.
+11. **Bombardment phase** — Missing from `state-transitions.md` combat state machine. `tactical-combat-ui.md` documents the bombardment UI but `state-transitions.md` §9 jumps from `COMBAT_RESULT` to "Return to Galaxy Map" without mentioning bombardment. **[PARTIALLY FIXED 2026-04-13: `tactical-combat-ui.md` now documents the bombardment phase trigger with full state flow (COMBAT_RESULT → BOMBARDMENT_PHASE → RETURN_TO_MAP); `state-transitions.md` still needs update]**
 
 12. **Auto-explore behavior** — Referenced in interaction spec and wireframes but behavior is undefined (what happens when it encounters an enemy, does it stop or report?).
 

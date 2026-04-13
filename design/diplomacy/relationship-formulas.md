@@ -299,11 +299,25 @@ Initial relationship modifiers between specific race pairs:
 | Guinea Pigs | Chameleons | -20 | Dishonorable cowards |
 | Ferrets | Rabbits | -25 | Predator/prey instinct |
 | Ferrets | Chameleons | -15 | Dishonorable tactics |
-| Chameleons | Everyone | -10 | No one trusts them |
+| Chameleons | Everyone | -10 | No one trusts them (outgoing) |
+| **Everyone** | **Chameleons** | **-10** | **Incoming distrust (mirrors MOO1 Darlok universal Unease). All races start -10 toward Chameleons, independently of Chameleons' own outgoing -10.** |
 | Budgies | Guinea Pigs | +10 | Mutual warrior respect |
 | Budgies | Ferrets | +10 | Fellow combat masters |
 | Rats | Mice | +15 | Fellow researchers |
 | Hamsters | Everyone | +10 | Universal diplomat bonus |
+
+**Chameleon net starting modifier:**
+Between any race X and Chameleons:
+```
+InitialRelation(X → Chameleons) = (X outgoing) + (-10 incoming)
+InitialRelation(Chameleons → X) = (-10 outgoing) + (X incoming toward Chameleons: 0)
+```
+Example: Guinea Pigs ↔ Chameleons
+```
+GP → Chameleons: -20 (GP outgoing hatred) + (-10 incoming) = -30
+Chameleons → GP: -10 (outgoing) + (-20 GP's own outgoing hatred of Chameleons counts from GP side, not here) = -10
+```
+Net: asymmetric — GP deeply distrust Chameleons more than Chameleons distrust GP.
 
 **Calculating Starting Relations:**
 
@@ -385,9 +399,111 @@ Applied as negative modifier each turn (maximum -25).
 
 ---
 
-## 7. Reputation System
+## 7. Population Dominance Coalition
 
-### 7.1 Reputation Tracks
+**MOO1 mechanic retained in HoO.**
+
+When any single empire controls an overwhelming fraction of the galaxy's total population, all other races feel existential dread and unite against them — regardless of treaties, alliances, or existing relations. This is one of the few mechanics that can override normal diplomatic relationships.
+
+> *"One of the few times you'll consistently find the entire galaxy allied against you."*
+> — StrategyWiki, MOO1 Diplomacy page
+
+### 7.1 Dominance Thresholds
+
+```
+DOMINANCE_WARNING_THRESHOLD  = 0.33  // 33% of total galactic population
+DOMINANCE_COALITION_THRESHOLD = 0.40  // 40% triggers coalition penalty
+```
+
+### 7.2 Dominance Warning
+
+When any empire crosses `DOMINANCE_WARNING_THRESHOLD` (33% of galactic population):
+
+- All other races **send a diplomatic message** warning the dominant empire to stop expanding
+- Warning fires once per empire crossing the threshold
+- No mechanical penalty yet — this is flavor/player notification only
+- AI races may reduce trade agreement willingness by -10% acceptance chance
+
+### 7.3 Coalition Penalty Formula
+
+When any empire controls ≥40% of total galactic population, every turn:
+
+```
+DominantEmpirePop / TotalGalacticPop >= DOMINANCE_COALITION_THRESHOLD
+
+for each OtherEmpire where OtherEmpire != DominantEmpire:
+    DominancePenalty = -DOMINANCE_PENALTY_PER_TURN
+    ApplyRelationChange(OtherEmpire, DominantEmpire, DominancePenalty)
+```
+
+**Constants:**
+```
+DOMINANCE_PENALTY_PER_TURN = 2   // -2 relations per turn toward dominant empire
+DOMINANCE_PENALTY_MAX = -30      // floor: penalty stops once relation reaches -30 from this mechanic alone
+```
+
+This penalty:
+- **Applies to ALL other empires** — including formal allies
+- **Ignores existing treaties** — even allies grow nervous
+- **Stacks with border friction and other modifiers**
+- **Does NOT directly cancel treaties** — but relations will drift negative over time
+
+### 7.4 Coalition AI Behavior Trigger
+
+When a dominant empire exists (>40% pop), all AI races receive a coalition behavior boost:
+
+```
+if DominantEmpireExists:
+    for each AI_Race:
+        AI_Race.war_tendency_vs_dominant += COALITION_WAR_BOOST
+        AI_Race.alliance_acceptance_among_non_dominant += COALITION_ALLIANCE_BOOST
+```
+
+**Constants:**
+```
+COALITION_WAR_BOOST      = +20  // Added to WarChance formula (Section 8.3) vs the dominant empire
+COALITION_ALLIANCE_BOOST = +30  // Added to acceptance chance when non-dominant AIs propose to each other
+```
+
+This creates emergent "stop the leader" coalition behavior: races that would normally never ally suddenly find common cause.
+
+### 7.5 Dominance Tracking Algorithm
+
+```pseudocode
+function CheckPopulationDominance(game_state):
+    total_pop = sum(race.total_population for race in game_state.living_races)
+    
+    for each race in game_state.living_races:
+        fraction = race.total_population / total_pop
+        
+        if fraction >= DOMINANCE_WARNING_THRESHOLD and not race.dominance_warned:
+            SendDominanceWarning(race)
+            race.dominance_warned = true
+        
+        if fraction >= DOMINANCE_COALITION_THRESHOLD:
+            race.is_dominant = true
+            // Apply per-turn relation penalties
+            for each other_race in game_state.living_races:
+                if other_race != race:
+                    current = GetRelation(other_race, race)
+                    if current > -30:  // Don't push below -30 from dominance alone
+                        delta = max(-DOMINANCE_PENALTY_PER_TURN, -30 - current)
+                        ApplyRelationChange(other_race, race, delta)
+        else:
+            race.is_dominant = false
+            if race.dominance_warned and fraction < DOMINANCE_WARNING_THRESHOLD - 0.03:
+                race.dominance_warned = false  // Reset warning if they shrink back
+```
+
+### 7.6 Interaction with Council
+
+If the dominant empire (>40% pop) is a Council candidate, all AI races receive an **additional -20 Vote Score** toward them in `CalculateVoteScore()` (Section 4.1 of council.md). This makes diplomatic victory harder when you've dominated the galaxy militarily.
+
+---
+
+## 8. Reputation System
+
+### 8.1 Reputation Tracks
 
 Four separate reputation tracks affect diplomatic calculations:
 
@@ -398,7 +514,7 @@ Four separate reputation tracks affect diplomatic calculations:
 | Fairness | Fair | Exploiter | -100 to +100 |
 | Mercy | Merciful | Genocidal | -100 to +100 |
 
-### 7.2 Reputation Change Events
+### 8.2 Reputation Change Events
 
 **Honor Track:**
 
@@ -437,7 +553,7 @@ Four separate reputation tracks affect diplomatic calculations:
 | Use biological weapons | -50 |
 | Exterminate population | -75 |
 
-### 7.3 Reputation Effects on Relations
+### 8.3 Reputation Effects on Relations
 
 ```
 ReputationModifier = (Honor + Peace + Fairness + Mercy) / 400
@@ -455,9 +571,9 @@ Range: 0.5 to 1.5
 
 ---
 
-## 8. AI Diplomatic Behavior
+## 9. AI Diplomatic Behavior
 
-### 8.1 AI Acceptance Formula
+### 9.1 AI Acceptance Formula
 
 When AI evaluates diplomatic proposals:
 
@@ -487,7 +603,7 @@ OfferBonus = 0% (no gift)
 AcceptanceChance = 30 + 35 + 0 + 6 + 0 = 71%
 ```
 
-### 8.2 AI Peace Acceptance
+### 9.2 AI Peace Acceptance
 
 ```
 PeaceChance = BaseChance + WarWeariness + MilitaryDisparity + OfferBonus
@@ -503,7 +619,7 @@ MilitaryDisparity = (EnemyMilitary - OurMilitary) / OurMilitary × 50
 OfferBonus = TributeOffered / 100 (max +30%)
 ```
 
-### 8.3 AI Declaration of War
+### 9.3 AI Declaration of War
 
 AI evaluates war likelihood each turn:
 
@@ -539,7 +655,7 @@ OpportunityBonus = +20% if target is at war with another race
 
 ---
 
-## 9. Constants Summary
+## 10. Constants Summary
 
 | Constant | Value | Description |
 |----------|-------|-------------|
@@ -560,42 +676,51 @@ OpportunityBonus = +20% if target is at war with another race
 | HAMSTER_TREATY_BONUS | +5 | Effective relation boost for treaties |
 | REPUTATION_TRACK_MAX | +100 | Maximum reputation per track |
 | REPUTATION_TRACK_MIN | -100 | Minimum reputation per track |
+| DOMINANCE_WARNING_THRESHOLD | 0.33 | Population fraction triggering dominance warning |
+| DOMINANCE_COALITION_THRESHOLD | 0.40 | Population fraction triggering coalition penalty |
+| DOMINANCE_PENALTY_PER_TURN | 2 | Relation penalty per turn toward dominant empire |
+| DOMINANCE_PENALTY_MAX | -30 | Floor: penalty stops pushing below -30 per this mechanic |
+| COALITION_WAR_BOOST | +20 | AI war_tendency boost vs dominant empire when coalition active |
+| COALITION_ALLIANCE_BOOST | +30 | AI alliance acceptance boost among non-dominant races when coalition active |
+| CHAMELEON_INCOMING_DISTRUST | -10 | Flat starting modifier: all races start -10 toward Chameleons (MOO1 Darlok mechanic) |
+| TRADE_RAMP_TURNS | 30 | Turns for trade income to reach full value |
+| RENEGOTIATION_RETENTION | 0.5 | Fraction of trade ramp progress retained on voluntary renegotiation |
 
 ---
 
-## 10. Edge Cases
+## 11. Edge Cases
 
-### 10.1 Relationship Overflow
+### 11.1 Relationship Overflow
 
 - If relationship would exceed +100, cap at +100
 - If relationship would drop below -100, cap at -100
 - Capping does not lose the "excess" - future negative/positive actions still apply normally
 
-### 10.2 Extinct Races
+### 11.2 Extinct Races
 
 - Relations with extinct races are preserved in case of resurrection (rare event)
 - Relations with races that exterminated others: +10 to all who hated the extinct race
 
-### 10.3 First Turn Contact
+### 11.3 First Turn Contact
 
 - Cannot declare war on turn of first contact
 - First contact triggers one-time personality evaluation
 - AI races with extreme negative starting relations may declare war on turn 2
 
-### 10.4 Council Effects
+### 11.4 Council Effects
 
 - During Council sessions, temporary +5 bonus to all relations
 - After Council rejection, -10 to relations with races who voted against you
 - After Council acceptance, +20 to relations with supporting races
 
-### 10.5 Spy Frame Jobs (Chameleons)
+### 11.5 Spy Frame Jobs (Chameleons)
 
 - When Chameleons frame another race:
   - Framed race receives spy-caught penalty from target
   - If frame is detected (30% chance), Chameleons receive -75 from target
   - Detection chance increases +10% per previous frame job detected
 
-### 10.6 Simultaneous Actions
+### 11.6 Simultaneous Actions
 
 - Multiple relationship changes in same turn are summed before applying
 - Order of operations: Actions → Decay → Treaty Bonuses → Cap
@@ -603,7 +728,7 @@ OpportunityBonus = +20% if target is at war with another race
 
 ---
 
-## 11. Algorithm: Turn Relationship Update
+## 12. Algorithm: Turn Relationship Update
 
 ```pseudocode
 function UpdateRelationships(race_a, race_b):
@@ -647,9 +772,9 @@ function UpdateRelationships(race_a, race_b):
 
 ---
 
-## 12. Data Tables (JSON)
+## 13. Data Tables (JSON)
 
-### 12.1 Racial Diplomacy Stats
+### 13.1 Racial Diplomacy Stats
 
 ```json
 {
@@ -758,7 +883,7 @@ function UpdateRelationships(race_a, race_b):
 }
 ```
 
-### 12.2 Racial Attitude Matrix
+### 13.2 Racial Attitude Matrix
 
 ```json
 {
@@ -768,6 +893,7 @@ function UpdateRelationships(race_a, race_b):
     {"from": "ferrets", "to": "rabbits", "modifier": -25},
     {"from": "ferrets", "to": "chameleons", "modifier": -15},
     {"from": "chameleons", "to": "*", "modifier": -10},
+    {"from": "*", "to": "chameleons", "modifier": -10, "note": "Incoming distrust: all races start -10 toward Chameleons (mirrors MOO1 Darlok universal unease). This is separate from the Chameleon outgoing -10. Both apply, for a net -20 initial modifier between any race and Chameleons."},
     {"from": "budgies", "to": "guinea_pigs", "modifier": 10},
     {"from": "budgies", "to": "ferrets", "modifier": 10},
     {"from": "rats", "to": "mice", "modifier": 15},
@@ -777,7 +903,7 @@ function UpdateRelationships(race_a, race_b):
 }
 ```
 
-### 12.3 Treaty Definitions
+### 13.3 Treaty Definitions
 
 ```json
 {
@@ -846,7 +972,7 @@ function UpdateRelationships(race_a, race_b):
 }
 ```
 
-### 12.4 Diplomatic Actions
+### 13.4 Diplomatic Actions
 
 ```json
 {
@@ -890,9 +1016,9 @@ function UpdateRelationships(race_a, race_b):
 
 ---
 
-## 13. Examples
+## 14. Examples
 
-### Example 1: Building an Alliance (Hamsters → Rats)
+### 14.1 Example: Building an Alliance (Hamsters → Rats)
 
 **Turn 1: First Contact**
 ```
@@ -930,7 +1056,7 @@ Result: Alliance formed
 New Relation: +95 + 50 = +100 (capped at Allied maximum)
 ```
 
-### Example 2: War and Recovery (Guinea Pigs → Hamsters)
+### 14.2 Example: War and Recovery (Guinea Pigs → Hamsters)
 
 **Initial Relations:**
 ```

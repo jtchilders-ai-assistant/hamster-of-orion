@@ -32,7 +32,8 @@ Evaluate all beings as potential prey or threats. Respect Budgies as fellow hunt
 - **Ground Combat**: +15% (deadly commandos)
 - **Ship Combat**: +30% (superior weapon accuracy)
 - **Espionage**: +10% (patient stalkers)
-- **Diplomacy**: -10% (predatory instincts unnerve others)
+- **Diplomacy**: -30% (catastrophic predatory instincts — matches MOO1 Mrrshan as worst-relations race in the galaxy)
+- **Starting Relations**: Blood Enemies with most races — nearly all civilizations begin at maximum distrust; war is almost inevitable early game
 
 ### Special Abilities
 - **Deadly Accuracy**: All weapons gain +4 Attack Levels (equivalent to 4 tiers of targeting computers) — increases hit chance, not raw damage
@@ -54,13 +55,13 @@ Evaluate all beings as potential prey or threats. Respect Budgies as fellow hunt
 ## AI Behavior
 
 ### Personality Archetype
-Aggressive / Weapon-Focused / Opportunistic
+Ruthless Militarist / Diplomatically Catastrophic (matches MOO1 Mrrshan — worst diplomatic relations in the galaxy)
 
 ### Diplomatic Tendencies
-- **Natural Allies**: Budgies (mutual respect), Guinea Pigs (useful blunt instrument)
-- **Natural Enemies**: Rabbits (instinctive prey response), Chameleons (dishonorable tactics)
-- **Trade Behavior**: Fair but calculating
-- **Treaty Reliability**: Medium-High - pragmatic, will break if clear advantage
+- **Natural Allies**: Budgies (grudging respect), Guinea Pigs (useful blunt instrument)
+- **Natural Enemies**: Essentially everyone — Ferrets are blood enemies with most races; Rabbits (prey instinct), Chameleons (dishonorable), Hamsters (weakness), Ants (alien), Hermit Crabs (prey)
+- **Trade Behavior**: Rarely trades — prefers to take what it wants
+- **Treaty Reliability**: Low — pragmatic, will break if clear advantage; diplomatic isolation means treaties rarely form anyway
 
 ### Strategic Priorities
 1. Research superior weapons technology

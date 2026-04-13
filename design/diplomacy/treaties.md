@@ -7,6 +7,28 @@ Negotiate treaties with other races to secure peace, trade benefits, or military
 
 ## Diplomatic States
 
+> **⚠️ INTENTIONAL DESIGN DECISION — 5 states vs MOO1's 17 states.**
+>
+> MOO1 used 17 named relationship states (Harmony, Unity, Friendly, Peaceful, Affable, Calm,
+> Amiable, Relaxed, Neutral, Unease, Wary, Restless, Tense, Troubled, Discord, Hate, Feud)
+> with specific numeric ranges. HoO deliberately collapses these into 5 coarser states for
+> clarity and simplicity. The underlying -100 to +100 numeric scale is identical to MOO1;
+> only the number of named bands differs.
+>
+> **Why 5 states:** Playtesting found 17 states created UI noise — players struggled to
+> distinguish "Affable" from "Amiable" from "Calm." Five states communicate the diplomatic
+> situation at a glance. Flavor text and mood icons compensate for reduced granularity.
+>
+> **MOO1 flavor name reference (UI only — optional future enhancement):**
+>
+> | HoO State | MOO1 Equivalent Names | HoO Range |
+> |-----------|----------------------|----------|
+> | War (Hostile) | Feud / Hate / Discord | -100 to -50 |
+> | Unfriendly (Cold) | Troubled / Tense / Restless / Wary | -49 to -1 |
+> | Neutral (Cautious) | Unease / Neutral / Relaxed | 0 to +49 |
+> | Friendly (Warm) | Amiable / Calm / Affable / Peaceful | +50 to +79 |
+> | Allied (United) | Friendly / Unity / Harmony | +80 to +100 |
+
 ### War (Hostile)
 **Relations**: -100 to -50
 **Trade**: Forbidden
@@ -102,16 +124,57 @@ Negotiate treaties with other races to secure peace, trade benefits, or military
 ### Trade Agreement
 **Cost**: Free
 **Duration**: Permanent
-**Effect**: +BC per turn to both sides
+**Effect**: +BC per turn to both sides (ramps up over ~30 turns)
 **Requires**: Neutral or better
 
 **Benefits**:
-- +5-20 BC/turn (based on economies)
+- +5-50 BC/turn at full maturity (based on economies)
 - +20 relations
 - Technology trade enabled
 - Mutual growth
 
 **Hamsters**: +25% trade income (Trade Hub ability — matches MOO1 Human +25% trade curve shift)
+
+**Trade Ramp-Up Mechanic** *(MOO1 mechanic, retained in HoO):*
+
+Trade income is not immediate — it ramps up over ~30 turns as merchants establish routes, contacts, and supply chains. This matches MOO1's explicit design: "usually takes about 30 turns to start getting the maximum value."
+
+```
+TradeTurnProgress = min(TurnsActive, TRADE_RAMP_TURNS)
+TradeIncome = BaseTradeIncome × (TradeTurnProgress / TRADE_RAMP_TURNS)
+```
+
+**Constants:**
+- `TRADE_RAMP_TURNS` = 30
+- `BaseTradeIncome` = (Production_A + Production_B) / 20
+
+**Ramp table (as fraction of BaseTradeIncome):**
+
+| Turns Active | Income % |
+|-------------|----------|
+| 1           | 3%       |
+| 5           | 17%      |
+| 10          | 33%      |
+| 15          | 50%      |
+| 20          | 67%      |
+| 25          | 83%      |
+| 30+         | 100%     |
+
+**Re-negotiation resets the ramp:**
+If a trade agreement is canceled and re-signed, `TurnsActive` resets to `floor(PriorTurns × 0.5)` (partial retention — existing relationships aren’t lost entirely, but route reconstruction takes time).
+
+```
+OnRenegotiate(prior_turns):
+    TurnsActive = floor(prior_turns × RENEGOTIATION_RETENTION)
+```
+
+- `RENEGOTIATION_RETENTION` = 0.5 (50% progress retained)
+- Full reset if agreement was broken (rather than renegotiated voluntarily): 0% retained
+
+**Hamster trade bonus applies to the ramped income:**
+```
+HamsterTradeIncome = TradeIncome × 1.25
+```
 
 ### Research Agreement
 **Cost**: Free

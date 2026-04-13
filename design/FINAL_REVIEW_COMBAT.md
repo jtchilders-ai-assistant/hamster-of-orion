@@ -107,12 +107,12 @@ MOO1: combat squares moved = floor(maneuver / 2). Inertial Stabilizer adds 1 mov
 
 ### Discrepancies
 
-**D8 — Hit formula structure: percentage-per-level values differ**
+**D8 — Hit formula structure: percentage-per-level values differ** ✅ **FIXED**
 MOO1 uses **10% per level** of advantage (targeting level vs. maneuver level). Our formula uses **5% per Battle Computer rating point** for attack and **3% per maneuver level** for defense. These are not equivalent:
 - A Mark V computer vs. Maneuver 5 ship: MOO1 = 50% (equal → 50%). Our formula: `50 + 5×5 - 5×3 = 50 + 25 - 15 = 60%`. **Our formula gives 60%, MOO1 gives 50% for the same matchup.**
 - The differential system (attacker_level vs defender_level → ±10% per difference) is the canonical MOO1 approach. Our design replaced it with independent multipliers that produce different outcomes.
 
-**Recommendation:** Refactor to `hit_chance = 50 + (attacker_computer_level - defender_maneuver_level) × 10`, clamped 5–95%. Racial bonuses add to the respective level, not directly to hit_chance.
+**FIXED:** Refactored to `hit_chance = 50 + (attacker_computer_level - defender_maneuver_level) × 10`, clamped 5–95%. Racial bonuses now add to the respective level (Ferrets: +4 attacker, Budgies: +3 defender). Non-MOO1 enhancement modifiers (experience, point-blank, size, range) are preserved but documented as intentional additions. Updated `combat-algorithm.md` Sections 9-10 and `combat-mechanics.md`.
 
 **D9 — Cloaking: our design -20, MOO1 +5 maneuver**
 MOO1: Cloaking Device adds +5 to the defender's maneuver for hit purposes (so a maneuver 5 ship becomes effectively maneuver 10 when cloaked = -5 levels advantage for attacker = -50% hit in MOO1's system). Our design applies a flat -20 to hit_chance, which is not equivalent and doesn't scale with attacker capability. Under the MOO1 differential formula, cloaking should add +5 to defender's effective maneuver, not apply a fixed -20. The design's current +5 defense_bonus from cloaking AND -20 from the `cloaked` flag double-counts (flagged as issue 4.6 in prior review).
@@ -156,13 +156,14 @@ MOO1 has no experience system or combat accuracy bonus from experience in the at
 
 ### Discrepancies
 
-**D15 — Damage roll is separate from hit roll in our design; MOO1 maps damage across the hit range**
+**D15 — Damage roll is separate from hit roll in our design; MOO1 maps damage across the hit range** ✅ **FIXED**
 MOO1's damage mechanic is that the degree of success on the attack roll determines damage: rolling exactly at the hit threshold gives minimum damage; rolling 100 gives maximum damage. Our design rolls hit independently and then rolls damage separately. This is a significant mechanical divergence:
 - In MOO1, a ship that barely hits (just over 50%) tends to do minimum damage. A ship with high hit chance and a high roll gets both a hit AND high damage.
 - Our design treats hit and damage as fully independent, which produces a different probability distribution.
-This is a fundamental MOO1 mechanic that is absent from our design. **High priority architectural decision needed.**
 
-**D16 — "Armor Piercing" in MOO1 halves shields, not multiplies hull damage**
+**FIXED:** `resolve_beam_attack()` now maps damage across the hit roll range: `damage_fraction = (roll - hit_threshold) / success_range`, then `base_damage = damage_min + floor(damage_fraction × (damage_max - damage_min))`. Same formula applied to torpedo impacts. Updated `combat-algorithm.md` Sections 8 and 20.
+
+**D16 — "Armor Piercing" in MOO1 halves shields, not multiplies hull damage** ✅ **FIXED**
 The MOO1 Shields page explicitly states: "There is a special type of weapon that halves the values of the defender's shields (round down), referred to as 'Armor Piercing'." The weapons listed: Neutron Pellet Gun, Mass Driver, Hard Beam, Gauss Autocannon, Particle Beam.
 
 Our design has:
@@ -172,11 +173,17 @@ Our design has:
 
 The design has invented a new taxonomy (`halves_shields` vs `ignores_half_shields` vs `armor_piercing`) that doesn't match MOO1's simpler single mechanic: **halves shield level for that hit**. All five MOO1 armor-piercing weapons should use the same `halves_shields` effect.
 
-**D17 — "Ion Cannon" listed as having `halves_shields` — incorrect vs MOO1**
+**FIXED:** `armor_piercing` now correctly means "halves defender's shield class (round down) for this hit." Removed ×1.5 hull multiplier. Removed `halves_shields` and `ignores_half_shields` specials. All five AP weapons (Neutron Pellet Gun, Mass Driver, Hard Beam, Gauss Autocannon, Particle Beam) now use `special: "armor_piercing"`. Updated `combat-algorithm.md` Section 11 and `weapons-complete.md`.
+
+**D17 — "Ion Cannon" listed as having `halves_shields` — incorrect vs MOO1** ✅ **FIXED**
 MOO1 Weapons page: Ion Cannon is level 10, "Deals 3-8 damage to target" with no armor piercing or special effect. Our design gives it `halves_shields`. This needs correction.
 
-**D18 — Hellfire Torpedo MOO1 mechanic differs from our design**
+**FIXED:** Removed `halves_shields` from Ion Cannon. `special` is now `null`. Updated `weapons-complete.md` table and JSON.
+
+**D18 — Hellfire Torpedo MOO1 mechanic differs from our design** ✅ **FIXED**
 MOO1 Weapons page: "Hellfire Torpedoes - Deals 4 attacks to the target per hit, each for 25 damage. Fires every other turn." → Total 100 damage per torpedo hit (4 × 25). Our design models it as `bonus_vs_shields` (+10 damage to shields_current). That's a significant divergence. The MOO1 mechanic is **4 separate 25-damage hits**, not a shield bonus.
+
+**FIXED:** Hellfire Torpedo now has `special: "hellfire_multi_hit"`. The `apply_weapon_effects()` function fires 4 separate 25-damage `apply_damage()` calls, each resolved independently through shields. JSON updated with `attacks: 4`, `damage_min/max: 25`. Table updated to show 25×4. Updated `combat-algorithm.md` Section 11b and `weapons-complete.md`.
 
 **D19 — No Oracle Interface component defined**
 MOO1: Oracle Interface is a high-level Computers tech that makes all non-missile/torpedo/bomb weapons count as armor piercing. Our design doesn't mention this component. It should be in `components-complete.md`.
@@ -302,11 +309,15 @@ MOO1: reduces target's targeting computer level by 2–6 per hit. Not in our des
 - Torpedoes fire every 2 turns (cooldown = 2) ✓
 - Torpedoes: "always hit - no intercept, no ECM" — **partially wrong** per MOO1 (torpedoes follow missile rules including ECM)
 
-**D32 — Missile fuel: 20 turns vs. MOO1's 2 turns**
+**D32 — Missile fuel: 20 turns vs. MOO1's 2 turns** ✅ **FIXED**
 MOO1: ship-launched missiles self-destruct after 2 turns without hitting. Our design sets `remaining_fuel: 20`. This makes missiles effectively infinite-range in combat, which changes tactics significantly. **Should be 2 turns.**
 
-**D33 — Torpedo immunity to intercept and ECM — incorrect per MOO1**
+**FIXED:** `remaining_fuel` changed from 20 to 2 in `launch_missile()`. Same 2-turn fuel applied to torpedoes (which follow missile rules). Updated `combat-algorithm.md` Sections 16 and 20.
+
+**D33 — Torpedo immunity to intercept and ECM — incorrect per MOO1** ✅ **FIXED**
 Our design (Section 20): "Cannot be intercepted by point defense. Cannot be affected by ECM." MOO1 Attack_roll page: "Torpedo weapons follow the rules for Missiles." This means torpedoes in MOO1 ARE subject to ECM and should follow the same targeting formula. Our design incorrectly gives torpedoes auto-hit status.
+
+**FIXED:** `fire_torpedo()` and `resolve_torpedo_impact()` now follow missile rules: point defense intercept attempted, hit chance = `80 - (ecm_rating × 5) - (maneuver_rating × 2)` clamped 10–95%, and damage mapped across hit roll range. Removed auto-hit language. Updated `combat-algorithm.md` Section 20 and `weapons-complete.md` torpedo notes.
 
 ---
 
@@ -323,8 +334,10 @@ Our design (Section 20): "Cannot be intercepted by point defense. Cannot be affe
 - `stream` effect: "beam locks onto target — damage repeats each End Phase until target breaks free"
 - This is used for Graviton Beam in our components
 
-**D34 — "Stream" mechanic doesn't match MOO1 Graviton/Tachyon Beam behavior**
+**D34 — "Stream" mechanic doesn't match MOO1 Graviton/Tachyon Beam behavior** ✅ **FIXED**
 MOO1's Graviton and Tachyon beams do damage overflow to adjacent ships in a stack — they are NOT continuous-damage lock-on weapons. Our design implements `stream` as a persistent hold/damage-over-time effect with a break-free mechanic, which is a fundamentally different concept. The carry-over damage mechanic (excess damage hits the next ship) is the correct MOO1 behavior and is **completely absent** from our design.
+
+**FIXED:** `special: "stream"` removed from Graviton Beam and Tachyon Beam. Replaced with `special: "overflow_damage"`. `apply_weapon_effects()` now implements the overflow mechanic: when a ship is killed, overkill damage is applied to the next ship of the same design in the stack. Updated `combat-algorithm.md` Section 11b and `weapons-complete.md`.
 
 ---
 
@@ -349,15 +362,15 @@ The racial combat bonuses are directionally correct after REVIEW_COMBAT fixes. T
 
 ### Critical Issues (Architectural)
 
-| ID | Issue | MOO1 Source |
-|----|-------|-------------|
-| D8 | Hit formula structure — our formula produces wrong percentages vs MOO1's differential system | Attack_roll |
-| D15 | Damage roll is separate from hit roll — MOO1 maps damage across the hit range | Damage |
-| D16 | "Armor Piercing" in our design is wrong mechanic — MOO1 AP halves shields, not multiplies hull | Shields |
-| D17 | Ion Cannon has `halves_shields` — not a MOO1 mechanic | Weapons |
-| D18 | Hellfire Torpedo: our design gives +10 shield bonus; MOO1 = 4 separate 25-damage hits | Weapons |
-| D33 | Torpedoes auto-hit in our design; MOO1 follows same formula as missiles (ECM applies) | Attack_roll |
-| D34 | Graviton/Tachyon "streaming" mechanic — our design has hold/DoT; MOO1 has damage overflow to next ship | Weapons, Misc |
+| ID | Issue | MOO1 Source | Status |
+|----|-------|-------------|--------|
+| D8 | Hit formula structure — our formula produces wrong percentages vs MOO1's differential system | Attack_roll | ✅ FIXED |
+| D15 | Damage roll is separate from hit roll — MOO1 maps damage across the hit range | Damage | ✅ FIXED |
+| D16 | "Armor Piercing" in our design is wrong mechanic — MOO1 AP halves shields, not multiplies hull | Shields | ✅ FIXED |
+| D17 | Ion Cannon has `halves_shields` — not a MOO1 mechanic | Weapons | ✅ FIXED |
+| D18 | Hellfire Torpedo: our design gives +10 shield bonus; MOO1 = 4 separate 25-damage hits | Weapons | ✅ FIXED |
+| D33 | Torpedoes auto-hit in our design; MOO1 follows same formula as missiles (ECM applies) | Attack_roll | ✅ FIXED |
+| D34 | Graviton/Tachyon "streaming" mechanic — our design has hold/DoT; MOO1 has damage overflow to next ship | Weapons, Misc | ✅ FIXED |
 
 ### High-Priority Issues (Wrong Mechanic)
 
@@ -370,7 +383,7 @@ The racial combat bonuses are directionally correct after REVIEW_COMBAT fixes. T
 | D23 | Ion Stream Projector: HP%-based damage (MOO1) vs. engine disable (our design) | Weapons, Misc |
 | D24 | Neutron Stream Projector: HP%-based damage (MOO1) partially captured | Weapons, Misc |
 | D26 | Point defense formula differs (missile tech level matters in MOO1) | Miscellaneous_factors |
-| D32 | Missile fuel: 20 turns vs. MOO1's 2 turns | Attack_range |
+| D32 | Missile fuel: 20 turns vs. MOO1's 2 turns | Attack_range | ✅ FIXED |
 
 ### Missing MOO1 Mechanics
 
@@ -404,17 +417,17 @@ The racial combat bonuses are directionally correct after REVIEW_COMBAT fixes. T
 ## Recommended Fix Priority
 
 ### Fix First (Blocking — Wrong Mechanics)
-1. **D16** — Rename `armor_piercing` effect to `halves_shields`; all five AP weapons use same mechanic
-2. **D17** — Remove `halves_shields` from Ion Cannon (it's just a regular beam)
-3. **D18** — Hellfire Torpedo: implement as 4 separate 25-damage attacks, not a shield bonus
-4. **D23** — Ion Stream Projector: HP%-based damage (20% current HP + 1%/firing ship), not engine disable
-5. **D33** — Torpedoes: follow missile ECM rules; not auto-hit
-6. **D32** — Missile fuel: change from 20 turns to 2 turns
-7. **D34** — Graviton/Tachyon: implement damage-overflow-to-next-ship, not hold/DoT
+1. **D16** ✅ FIXED — `armor_piercing` now halves shield class; all five AP weapons use same mechanic
+2. **D17** ✅ FIXED — Removed `halves_shields` from Ion Cannon (plain beam weapon)
+3. **D18** ✅ FIXED — Hellfire Torpedo: 4 separate 25-damage attacks via `hellfire_multi_hit`
+4. **D23** — Ion Stream Projector: HP%-based damage (20% current HP + 1%/firing ship), not engine disable (deferred)
+5. **D33** ✅ FIXED — Torpedoes: follow missile ECM rules; not auto-hit
+6. **D32** ✅ FIXED — Missile fuel: changed from 20 turns to 2 turns
+7. **D34** ✅ FIXED — Graviton/Tachyon: damage-overflow-to-next-ship via `overflow_damage`
 
 ### Fix Next (High Value MOO1 Mechanics)
-8. **D8** — Refactor hit formula to differential system: `50 + (attacker_level - defender_level) × 10`
-9. **D15** — Damage mapped across hit roll range (or document as intentional divergence)
+8. **D8** ✅ FIXED — Hit formula refactored to differential system: `50 + (attacker_level - defender_level) × 10`
+9. **D15** ✅ FIXED — Damage mapped across hit roll range (same formula in beam attacks and torpedo impacts)
 10. **D3** — Retreat: requires one full turn before exiting
 11. **D5** — High-maneuver ships can act twice per round
 12. **D6** — Teleporter/decloaking ships always act first

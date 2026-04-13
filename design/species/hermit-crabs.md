@@ -27,6 +27,8 @@ Fascinated by but confused by organic life's haste. View rapid-breeders (Rabbits
 ### Racial Bonuses
 - **Production**: +25% (efficient resource extraction)
 - **Research**: +0% (balanced)
+- **Research Field Bonuses**: Computers +20% (silicon-based cognition; matches MOO1 Silicoids)
+- **Research Field Penalties**: All other fields -20% (Propulsion, Weapons, Construction, Force Fields, Planetology; matches MOO1 Silicoids)
 - **Food**: Not applicable (absorb minerals directly)
 - **Growth**: -50% (extremely slow reproduction)
 - **Ground Combat**: +25% (shells provide natural armor)
@@ -36,6 +38,8 @@ Fascinated by but confused by organic life's haste. View rapid-breeders (Rabbits
 
 ### Special Abilities
 - **Universal Adaptation**: Can colonize ANY planet type without terraforming
+- **No Pollution Cost**: Never spend production on ecological restoration — immune to pollution economic penalties (matches MOO1 Silicoids' defining advantage)
+- **Cannot Terraform**: Cannot use Atmospheric Terraforming, Soil Enrichment, or Advanced Soil Enrichment technologies (matches MOO1 Silicoids' defining restriction — the Faustian bargain for universal colonization)
 - **Radiation Immunity**: Hostile environments don't affect production
 - **No Food Requirement**: Don't need agriculture - frees up all farming slots for production/research
 - **Armored Shell**: Natural +50% defense bonus on ground combat
@@ -56,13 +60,13 @@ Fascinated by but confused by organic life's haste. View rapid-breeders (Rabbits
 ## AI Behavior
 
 ### Personality Archetype
-Defensive / Expansion-Focused / Patient
+Xenophobic Expansionist (matches MOO1 Silicoids — distrustful of all races, aggressive about territory, but not openly warlike without provocation)
 
 ### Diplomatic Tendencies
-- **Natural Allies**: Rats (fellow contemplatives), Hamsters (patient diplomats)
-- **Natural Enemies**: None (conflict is temporary)
-- **Trade Behavior**: Fair but slow to negotiate
-- **Treaty Reliability**: Absolute - promises are eternal
+- **Natural Allies**: None — deeply distrustful of all biological life
+- **Natural Enemies**: All races viewed with deep suspicion; positive diplomacy effects are halved
+- **Trade Behavior**: Transactional and cold — only trades when clearly beneficial
+- **Treaty Reliability**: Medium — keeps treaties when convenient, but Xenophobic distrust makes lasting alliances rare
 
 ### Strategic Priorities
 1. Colonize hostile worlds others cannot

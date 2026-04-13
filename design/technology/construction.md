@@ -168,6 +168,7 @@ Armor and equipment for planetary invasions.
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
 | Maximum Space (+80%) | 40 | — | +80% hull space |
+| Powered Armor | 40 | Powered Armor | +30 ground combat (MOO1 L40; replaces and improves Armored Exoskeleton) |
 | Adamantium Armor | 42 | Adamantium Armor | HP ×3.5, +25 ground |
 
 ---
@@ -267,6 +268,7 @@ In MOO1, all 4 hull sizes are available from the start. Construction technology 
 |-----------|------------|--------------|------|
 | Battle Suits | 11 | +10 | Armor |
 | Armored Exoskeleton | 24 | +20 | Armor |
+| Powered Armor | 40 | +30 | Armor (MOO1 L40) |
 | Bio-Terminator Suit | 55 | +40 | Armor |
 
 ### Repair Systems
@@ -684,6 +686,18 @@ In MOO1, all 4 hull sizes are available from the start. Construction technology 
             "effect": {
               "space_bonus_percent": 80,
               "description": "+80% hull space for all ship sizes"
+            }
+          },
+          {
+            "id": "powered_armor",
+            "name": "Powered Armor",
+            "tech_level": 40,
+            "category": "ground",
+            "unlocks": "powered_armor",
+            "moo1_level": 40,
+            "effect": {
+              "ground_bonus": 30,
+              "description": "Replaces and improves Armored Exoskeleton; +30 to all ground combat rolls"
             }
           },
           {

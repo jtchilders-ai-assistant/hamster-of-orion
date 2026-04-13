@@ -27,6 +27,7 @@ Respect those who prove themselves in battle. Contemptuous of ground-dwellers wh
 ### Racial Bonuses
 - **Production**: -10% (focus on quality over quantity)
 - **Research**: +0% (balanced)
+- **Research Field Bonuses**: Propulsion +40% (field expert — reach distant planets faster, better engines sooner; matches MOO1 Alkari)
 - **Food**: -10% (poor farmers, prefer hunting)
 - **Growth**: +0% (balanced)
 - **Ground Combat**: -20% (terrible at ground warfare)
@@ -55,13 +56,13 @@ Respect those who prove themselves in battle. Contemptuous of ground-dwellers wh
 ## AI Behavior
 
 ### Personality Archetype
-Aggressive / Combat Specialist
+Honorable Militarist (matches MOO1 Alkari — aggressive in combat but honor-bound; will not betray allies or attack without cause)
 
 ### Diplomatic Tendencies
-- **Natural Allies**: Ferrets (mutual respect for hunters), Guinea Pigs (honor-bound)
-- **Natural Enemies**: Chameleons (dishonorable tactics), Ants (incomprehensible collectivism)
+- **Natural Allies**: Ferrets (mutual respect for hunters), Guinea Pigs (honor-bound warriors)
+- **Natural Enemies**: Chameleons (dishonorable tactics — Honorable races react strongly to betrayal and sabotage), Ants (incomprehensible collectivism)
 - **Trade Behavior**: Fair but uninterested in economics
-- **Treaty Reliability**: High - honor-bound to keep promises
+- **Treaty Reliability**: Very High — honor is everything; breaking promises is anathema
 
 ### Strategic Priorities
 1. Build superior combat fleet

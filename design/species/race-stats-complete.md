@@ -337,7 +337,7 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
         }
       },
       "ai_behavior": {
-        "archetype": "expansionist",
+        "archetype": "industrialist",
         "aggression": 0.6,
         "expansion": 0.9,
         "research_focus": 0.3,
@@ -346,7 +346,8 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
         "natural_allies": [],
         "natural_enemies": [],
         "treaty_reliability": 1.0,
-        "declares_war_first": true
+        "declares_war_first": true,
+        "archetype_note": "MOO1 Klackons = Industrialist (builds factories, not fleets). Prioritize production_focus over expansion in strategic decision-making."
       },
       "leader_names": {
         "coordinators": ["Efficiency-Node-Alpha", "Production-Nexus-12", "War-Coordinator-Prime"],
@@ -376,6 +377,13 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
         "espionage": 0,
         "diplomacy": -10
       },
+      "research_field_bonuses": {
+        "computers": 40
+      },
+      "research_field_penalties": {
+        "planetology": -20
+      },
+      "moo1_research_note": "Matches Meklar: +40% Computers (expert field), -20% Planetology (poor field).",
       "special_abilities": [
         {
           "id": "automated_production",
@@ -414,6 +422,16 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
             "type": "pollution_reduction",
             "value": 50
           }
+        },
+        {
+          "id": "no_refit_costs",
+          "name": "No Refit Costs",
+          "description": "Never pay refit costs when upgrading ship components to newly researched technology",
+          "effect": {
+            "type": "refit_cost",
+            "no_refit_costs": true
+          },
+          "moo1_note": "Matches Meklar core trait — significant economic advantage when tech is advancing."
         },
         {
           "id": "tech_integration",
@@ -464,7 +482,7 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
         }
       },
       "ai_behavior": {
-        "archetype": "researcher",
+        "archetype": "erratic_industrialist",
         "aggression": 0.3,
         "expansion": 0.5,
         "research_focus": 0.8,
@@ -472,7 +490,9 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
         "diplomacy_priority": 0.4,
         "natural_allies": ["ants", "rats"],
         "natural_enemies": [],
-        "treaty_reliability": 0.85,
+        "treaty_reliability": 0.45,
+        "treaty_reliability_note": "Erratic personality — priorities shift unpredictably. Low reliability reflects MOO1 Meklar Erratic AI. Use volatility_flag: true to add random behavior variance.",
+        "volatility_flag": true,
         "declares_war_first": false
       },
       "leader_names": {
@@ -629,6 +649,10 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
         "espionage": -5,
         "diplomacy": 5
       },
+      "research_field_bonuses": {
+        "planetology": 40
+      },
+      "moo1_research_note": "Matches Sakkra: +40% Planetology (expert field). Enables better terraforming, soil enrichment, higher max population per planet.",
       "special_abilities": [
         {
           "id": "exponential_growth",
@@ -713,15 +737,16 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
         }
       },
       "ai_behavior": {
-        "archetype": "expansionist",
-        "aggression": 0.2,
+        "archetype": "aggressive_expansionist",
+        "aggression": 0.55,
+        "aggression_note": "Raised from 0.2 to match MOO1 Sakkra Aggressive Expansionist — will contest border planets and react strongly to encroachment.",
         "expansion": 1.0,
         "research_focus": 0.3,
         "production_focus": 0.5,
-        "diplomacy_priority": 0.5,
+        "diplomacy_priority": 0.4,
         "natural_allies": ["hamsters"],
         "natural_enemies": [],
-        "treaty_reliability": 0.85,
+        "treaty_reliability": 0.75,
         "declares_war_first": false
       },
       "leader_names": {
@@ -752,6 +777,17 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
         "espionage": -30,
         "diplomacy": 0
       },
+      "research_field_bonuses": {
+        "computers": 20
+      },
+      "research_field_penalties": {
+        "propulsion": -20,
+        "weapons": -20,
+        "construction": -20,
+        "force_fields": -20,
+        "planetology": -20
+      },
+      "moo1_research_note": "Matches Silicoids: +20% Computers, -20% all other fields.",
       "special_abilities": [
         {
           "id": "universal_adaptation",
@@ -761,6 +797,27 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
             "type": "colonization_restriction",
             "value": "none"
           }
+        },
+        {
+          "id": "no_pollution_cost",
+          "name": "No Pollution Cost",
+          "description": "Never spend production on ecological restoration. Immune to all pollution economic penalties.",
+          "effect": {
+            "type": "pollution_immunity",
+            "no_pollution_cost": true
+          },
+          "moo1_note": "Silicoids' defining early-game advantage — other races waste ~40% of production on pollution control; Hermit Crabs spend zero."
+        },
+        {
+          "id": "cannot_terraform",
+          "name": "Cannot Terraform",
+          "description": "Cannot use Atmospheric Terraforming, Soil Enrichment, or Advanced Soil Enrichment technologies.",
+          "effect": {
+            "type": "tech_restriction",
+            "restricted_techs": ["atmospheric_terraforming", "soil_enrichment", "advanced_soil_enrichment"],
+            "cannot_terraform": true
+          },
+          "moo1_note": "Silicoids' defining restriction — the Faustian bargain balancing universal colonization. Without it, Hermit Crabs are strictly better than MOO1 Silicoids."
         },
         {
           "id": "radiation_immunity",
@@ -848,15 +905,17 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
         }
       },
       "ai_behavior": {
-        "archetype": "defensive",
-        "aggression": 0.0,
+        "archetype": "xenophobic_expansionist",
+        "aggression": 0.45,
+        "aggression_note": "Raised from 0.0 to match MOO1 Silicoids Xenophobic personality — distrustful of all races, will contest territory, halved positive diplomacy scaling.",
         "expansion": 0.7,
         "research_focus": 0.5,
         "production_focus": 0.7,
-        "diplomacy_priority": 0.5,
-        "natural_allies": ["rats", "hamsters"],
+        "diplomacy_priority": 0.2,
+        "diplomacy_note": "Xenophobic: all positive diplomacy effects halved. Distrust is the baseline, not neutrality.",
+        "natural_allies": [],
         "natural_enemies": [],
-        "treaty_reliability": 1.0,
+        "treaty_reliability": 0.6,
         "declares_war_first": false
       },
       "leader_names": {
@@ -887,6 +946,11 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
         "espionage": -20,
         "diplomacy": -20
       },
+      "research_field_bonuses": {
+        "weapons": 20,
+        "construction": 20
+      },
+      "moo1_research_note": "Matches Bulrathi: +20% Weapons, +20% Construction. Better infantry equipment and ship armor — thematically fitting for the warrior race.",
       "special_abilities": [
         {
           "id": "warrior_culture",
@@ -1002,8 +1066,11 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
         "ground_combat": 15,
         "ship_combat": 30,
         "espionage": 10,
-        "diplomacy": -10
+        "diplomacy": -30
       },
+      "diplomacy_note": "Raised from -10 to -30 to match MOO1 Mrrshan — worst diplomatic relations in the game. Blood enemies with most races; war is nearly inevitable early game. MOO1 Mrrshan's diplomatic catastrophe is their defining weakness.",
+      "starting_relations": "blood_enemies_all",
+      "starting_relations_note": "All races begin at near-maximum distrust. Positive diplomacy effects are severely curtailed.",
       "special_abilities": [
         {
           "id": "deadly_accuracy",
@@ -1124,6 +1191,10 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
         "movement_range_bonus": 1,
         "description": "All Budgie ships gain +1 movement range (defined in technology/categories.md Propulsion specializations)"
       },
+      "research_field_bonuses": {
+        "propulsion": 40
+      },
+      "moo1_research_note": "Matches Alkari: +40% Propulsion (expert field). Budgies research better engines and reach distant planets faster than any other race.",
       "special_abilities": [
         {
           "id": "superior_pilots",
@@ -1203,16 +1274,19 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
         }
       },
       "ai_behavior": {
-        "archetype": "aggressive",
-        "aggression": 0.6,
+        "archetype": "honorable_militarist",
+        "aggression": 0.35,
+        "aggression_note": "Lowered from 0.6 to match MOO1 Alkari Honorable personality. Budgies fight hard when challenged but don't initiate unprovoked war.",
         "expansion": 0.4,
         "research_focus": 0.5,
         "production_focus": 0.4,
-        "diplomacy_priority": 0.4,
+        "diplomacy_priority": 0.5,
         "natural_allies": ["ferrets", "guinea_pigs"],
         "natural_enemies": ["chameleons", "ants"],
-        "treaty_reliability": 0.85,
-        "declares_war_first": true
+        "treaty_reliability": 0.9,
+        "treaty_reliability_note": "Honorable — honor-bound to keep promises. Reacts very strongly to betrayal and unprovoked attacks.",
+        "declares_war_first": false,
+        "declares_war_first_note": "Changed from true to false. Honorable races do not attack without cause. Alkari were Honorable Militarist — aggressive in combat response, not in initiation."
       },
       "leader_names": {
         "male": ["Skydancer", "Cloudstriker", "Windcaller", "Galeforce", "Stormwing"],
@@ -1368,7 +1442,7 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
 | Rabbits | +10% | -10% | +25% | +100% | +5% | -10% | -5% | +5% | Population Growth |
 | Hermit Crabs | +25% | +0% | N/A | -50% | +25% | +0% | -30% | +0% | Universal Colonization |
 | Guinea Pigs | +10% | -20% | +0% | +10% | +50% | +10% | -20% | -20% | Ground Combat |
-| Ferrets | +0% | +10% | +5% | +0% | +15% | +30% | +10% | -10% | Ship Attack |
+| Ferrets | +0% | +10% | +5% | +0% | +15% | +30% | +10% | -30% (blood enemies) | Ship Attack |
 | Budgies | -10% | +0% | -10% | +0% | -20% | +50% | -10% | +0% | Ship Defense/Evasion |
 | Chameleons | -10% | +20% (Computers) | +0% | -10% | +0% | -10% | +60% (+30 flat spy roll) | -15% (Unease) | Espionage |
 

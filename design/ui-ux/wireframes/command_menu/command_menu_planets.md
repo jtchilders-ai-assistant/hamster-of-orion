@@ -1,17 +1,17 @@
-# Command Menu: PLANETS (F6) - MOO1-Accurate Wireframe
+# Command Menu: PLANETS (F2) - MOO1-Accurate Wireframe
 
 ## Overview
 
-The PLANETS command button opens the Planet Management screen. This is a **full-screen modal** that provides a tabular overview of all planets currently owned by the player's empire.
+The PLANETS command button opens the Planet Management screen. This is a **full-screen replacement view** (replaces the galaxy map) that provides a tabular overview of all planets currently owned by the player's empire. The bottom command bar remains visible (QoL improvement over MOO1).
 
 **Reference**: Master of Orion (1993) Planet Management Screen  
-**Hotkey**: F6
+**Hotkey**: F2
 
 ---
 
 ## Screen Layout
 
-This screen is a **full-screen modal** and does **NOT** display the bottom command bar.
+This screen is a **full navigation screen with the bottom command bar** (QoL improvement over MOO1). The OK button at the bottom-right returns to the Galaxy Map.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────────────┐

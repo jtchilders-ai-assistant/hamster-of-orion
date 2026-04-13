@@ -58,14 +58,14 @@ Screenshots are located in `../moo_screens/`. The following screenshots are avai
 
 | Category | MOO1 Screens | HoO Documented | HoO Wireframes | Status |
 |----------|-------------|----------------|----------------|--------|
-| Pre-Game | 6 | 4 | 0 | ⚠️ Partial |
-| Core Gameplay | 8 | 8 | 0 | ⚠️ Need Wireframes |
-| Combat | 3 | 1 | 0 | ⚠️ Missing Details |
-| Information | 5 | 5 | 0 | ✅ Good Coverage |
-| Diplomacy | 4 | 3 | 0 | ⚠️ Missing Screens |
+| Pre-Game | 6 | 4 | 1 (`new-game-setup.md`) | ⚠️ Partial |
+| Core Gameplay | 8 | 8 | 6 (`galaxy-map.md`, `command_menu_map.md`, `command_menu_planets.md`, `command_menu_fleet.md`, `command_menu_tech.md`, `command_menu_design.md`) | ✅ Wireframed |
+| Combat | 3 | 3 | 1 (`tactical-combat-ui.md`) | ⚠️ Partial — ground combat stub |
+| Information | 5 | 5 | 1 (`research-tree.md`) | ✅ Good Coverage |
+| Diplomacy | 4 | 3 | 1 (`diplomacy-screen.md`) | ⚠️ Stub wireframe |
 | Victory/Defeat | 4 | 2 | 0 | ⚠️ Incomplete |
 | System | 4 | 3 | 0 | ⚠️ Partial |
-| **TOTAL** | **34** | **26** | **0** | **Gap: 8 screens** |
+| **TOTAL** | **34** | **28** | **10** | **Gap: 6 screens** |
 
 ---
 
@@ -894,14 +894,18 @@ Each field researches exactly one tech at a time. See `wireframes/research-tree.
 | File | Status | Coverage | Priority Updates |
 |------|--------|----------|------------------|
 | `UI_OVERVIEW.md` | ✅ Good | General design | Add settings details |
-| `main-screens.md` | ✅ Good | Core screens | Add missing UI elements |
+| `main-screens.md` | ✅ Good | Core screens | Stale-text fixed 2026-04-13 |
 | `information-displays.md` | ✅ Excellent | Reports | Minor additions |
-| `tactical-combat-ui.md` | ❌ Missing | Combat | **CREATE FILE** |
-| `ground-combat-ui.md` | ❌ Missing | Invasion | **CREATE FILE** |
-| `espionage-ui.md` | ❌ Missing | Spy screens | **CREATE FILE** |
+| `tactical-combat-ui.md` | ✅ Expanded | Combat (full) | HP bars, MP, initiative, damage, missiles, bombardment added 2026-04-13 |
+| `ground-combat-ui.md` | ✅ Created | Invasion | Created 2026-04-13 |
+| `spy-network-ui.md` | ✅ Created | Spy screens | Created 2026-04-13 |
 | `save-load-ui.md` | ❌ Missing | Save/Load | **CREATE FILE** |
 | `random-events-ui.md` | ❌ Missing | Events | **CREATE FILE** |
-| `wireframes/*.md` | ❌ Missing | All screens | **CREATE FILES** |
+| `wireframes/new-game-setup.md` | ⚠️ Stub | New game flow | Needs full ASCII detail |
+| `wireframes/galaxy-map.md` | ✅ Good | Galaxy map | Complete |
+| `wireframes/command_menu/*.md` | ✅ Good | Command screens | 6 files complete; hotkey F2 fixed 2026-04-13 |
+| `wireframes/research-tree.md` | ✅ Good | Tech tree | Complete |
+| `wireframes/diplomacy-screen.md` | ⚠️ Stub | Diplomacy | Needs full layout |
 
 ---
 

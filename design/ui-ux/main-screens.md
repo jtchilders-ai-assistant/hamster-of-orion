@@ -461,7 +461,7 @@ When a colony is clicked, shows detailed management:
 
 Based on `moo_tech.png` screenshot.
 
-**This is a full-screen modal with NO bottom command bar.** Click OK to return to Galaxy Map.
+**This is a full navigation screen with the bottom command bar** (QoL improvement over MOO1's modal). Use F-keys or the command bar to switch screens. The OK button in the lower-right returns to Galaxy Map.
 
 ![Technology Screen](../moo_screens/moo_tech.png)
 
@@ -614,7 +614,7 @@ Based on `moo_design.png` and `moo_ship_design.png` screenshots.
 
 ## 6. Fleet Screen (F3)
 
-**Full-screen modal with NO bottom command bar.** Click OK to return to Galaxy Map.
+**This is a full navigation screen with the bottom command bar** (QoL improvement over MOO1's modal). Use F-keys or the command bar to switch screens. The OK button at the bottom-right returns to Galaxy Map.
 
 Based on `moo_fleet_screen.png` screenshot.
 

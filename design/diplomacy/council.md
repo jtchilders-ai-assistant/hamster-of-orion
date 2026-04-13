@@ -403,7 +403,13 @@ function CalculateVoteScore(voter, candidate):
     reputation_factor = reputation × REPUTATION_WEIGHT
     reputation_factor += GetReputationPenalties(candidate)
     
-    return relation_factor + fear_factor + bribery_factor + racial_factor + reputation_factor
+    // Population dominance penalty (MOO1 mechanic)
+    // All voters penalize a candidate who controls 40%+ of galactic population
+    dominance_penalty = 0
+    if candidate.is_dominant:  // See relationship-formulas.md Section 7
+        dominance_penalty = DOMINANCE_COUNCIL_PENALTY  // -20
+    
+    return relation_factor + fear_factor + bribery_factor + racial_factor + reputation_factor + dominance_penalty
 ```
 
 **Constants:**
@@ -416,6 +422,7 @@ function CalculateVoteScore(voter, candidate):
 - `HAMSTER_COUNCIL_BONUS` = 5
 - `ABSTAIN_THRESHOLD` = 5
 - `LOW_SCORE_THRESHOLD` = 20
+- `DOMINANCE_COUNCIL_PENALTY` = -20 (applied to candidate who controls ≥40% of galactic population; see relationship-formulas.md Section 7)
 
 ---
 
@@ -663,7 +670,8 @@ Council outcomes affect relations:
     "MANDATE_COOLDOWN": 50,
     "ALLIANCE_VOTE_LOYALTY": 0.80,
     "CHAMELEON_LOYALTY": 0.50,
-    "HERMIT_CRAB_ABSTAIN_CHANCE": 0.25
+    "HERMIT_CRAB_ABSTAIN_CHANCE": 0.25,
+    "DOMINANCE_COUNCIL_PENALTY": -20
   }
 }
 ```

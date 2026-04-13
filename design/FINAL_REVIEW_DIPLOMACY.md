@@ -2,6 +2,7 @@
 
 **Reviewer:** Wesley Crusher (subagent)
 **Date:** 2026-04-13
+**Fixes Applied:** 2026-04-13 (see Section 11 — Fixes Applied)
 **Method:** Design files compared against StrategyWiki MOO1 Diplomacy page
 (https://strategywiki.org/wiki/Master_of_Orion/Diplomacy) and
 StrategyWiki MOO1 Spying page
@@ -377,16 +378,16 @@ predictably opportunistic, not truly erratic.
 
 ### 🔴 Significant — MOO1 Mechanics Missing or Mismatched
 
-| # | Issue | File | MOO1 Source |
-|---|-------|------|-------------|
-| S1 | Spy roll formula is fundamentally different | `espionage.md` | StrategyWiki/Spying |
-| S2 | Two-phase spy roll system not implemented | `espionage.md` | StrategyWiki/Spying |
-| S3 | "All Spies Fail" catastrophic result not modeled | `espionage.md` | StrategyWiki/Spying |
-| S4 | Defense spending as % of galactic resources not modeled | `espionage.md` | StrategyWiki/Spying |
-| S5 | Frame job is a critical success roll, not a separate mission | `espionage.md` | StrategyWiki/Spying |
-| S6 | Trade ramp-up mechanic (30 turns to full value) not in design | `trade.md` | StrategyWiki/Diplomacy |
-| S7 | Population dominance coalition trigger not modeled | `relationship-formulas.md` | StrategyWiki/Diplomacy |
-| S8 | 17-state relationship indicator names not used | `treaties.md`, `relationship-formulas.md` | StrategyWiki/Diplomacy |
+| # | Issue | File | MOO1 Source | Status |
+|---|-------|------|-------------|--------|
+| S1 | Spy roll formula is fundamentally different | `espionage.md` | StrategyWiki/Spying | ✅ FIXED — Documented as intentional HoO design (Design Philosophy section) |
+| S2 | Two-phase spy roll system not implemented | `espionage.md` | StrategyWiki/Spying | ✅ FIXED — Documented as intentional HoO design (Design Philosophy section) |
+| S3 | "All Spies Fail" catastrophic result not modeled | `espionage.md` | StrategyWiki/Spying | ✅ FIXED — Added Section 1.3 with full mechanic |
+| S4 | Defense spending as % of galactic resources not modeled | `espionage.md` | StrategyWiki/Spying | 🟡 DEFERRED — HoO uses security level system (intentional simplification; not a critical fix) |
+| S5 | Frame job is a critical success roll, not a separate mission | `espionage.md` | StrategyWiki/Spying | ✅ FIXED — Documented as intentional HoO standalone mission (Section 6.6) |
+| S6 | Trade ramp-up mechanic (30 turns to full value) not in design | `trade.md` | StrategyWiki/Diplomacy | ✅ FIXED — Added to treaties.md Trade Agreement section with full formula |
+| S7 | Population dominance coalition trigger not modeled | `relationship-formulas.md` | StrategyWiki/Diplomacy | ✅ FIXED — Added Section 7 (Population Dominance Coalition) |
+| S8 | 17-state relationship indicator names not used | `treaties.md`, `relationship-formulas.md` | StrategyWiki/Diplomacy | ✅ FIXED — Documented as intentional 5-state simplification with MOO1 flavor map in treaties.md |
 
 ### 🟠 Additions Beyond MOO1 (Design Expansions — Not Errors)
 
@@ -429,7 +430,7 @@ These features don't exist in MOO1 and are **original additions** to this game:
 
 ## 9. Actionable Recommendations
 
-### Priority 1 — Decide on Spy System Architecture
+### Priority 1 — Decide on Spy System Architecture ✅ FIXED
 
 The MOO1 spy system (two-phase roll chart) is fundamentally different from what's designed.
 The current design is richer but not MOO1-faithful. This is a **design decision**, not a bug.
@@ -443,7 +444,7 @@ The current design is richer but not MOO1-faithful. This is a **design decision*
 
 **Recommendation:** Option A. The current design is better than MOO1's spy system. Just document it clearly.
 
-### Priority 2 — Add Population Dominance Coalition Trigger
+### Priority 2 — Add Population Dominance Coalition Trigger ✅ FIXED
 
 This is a documented MOO1 mechanic with no equivalent in the design. Add to `relationship-formulas.md`:
 
@@ -456,7 +457,7 @@ DOMINANCE_WARNING_THRESHOLD = 0.33  // AI starts sending warnings here
 When a single empire controls ≥40% of total galactic population, all other empires receive a
 flat -30 relation penalty toward that empire each turn, regardless of treaties.
 
-### Priority 3 — Add Trade Ramp-Up Mechanic
+### Priority 3 — Add Trade Ramp-Up Mechanic ✅ FIXED
 
 MOO1's trade treaties ramp up over ~30 turns. Add to `trade.md`:
 
@@ -467,23 +468,23 @@ TradeIncome = BaseTradeIncome × (TradeTurnProgress / 30)
 
 Re-negotiating a treaty resets `TurnsActive` to `floor(prior_turns × 0.5)` (partial retention).
 
-### Priority 4 — Add Relationship Indicator Names (UI Layer)
+### Priority 4 — Add Relationship Indicator Names (UI Layer) ✅ FIXED
 
 Add a mapping table to `relationship-formulas.md` that maps the -100 to +100 scale to
 MOO1-accurate flavor names (or custom equivalents). This doesn't change any math — it's purely
 for UI display. Even custom names would give the game the texture MOO1 had.
 
-### Priority 5 — Fix Incoming Chameleon Distrust
+### Priority 5 — Fix Incoming Chameleon Distrust ✅ FIXED
 
-In `relationship-formulas.md` Section 12.2, add:
+In `relationship-formulas.md` Section 13.2 (renumbered), added:
 ```json
-{"from": "*", "to": "chameleons", "modifier": -10}
+{"from": "*", "to": "chameleons", "modifier": -10, "note": "Incoming distrust..."}
 ```
 
-Currently only the outgoing attitude (`chameleons → *`) is modeled. MOO1's Darloks received
-universal distrust FROM all races, not just distrust directed toward others.
+Also updated Section 5.3 table to show both outgoing and incoming modifiers for Chameleons,
+with a worked example of the net asymmetric effect.
 
-### Priority 6 — Document the Intentional Expansions
+### Priority 6 — Document the Intentional Expansions ✅ FIXED
 
 Add a section to `espionage.md` and `treaties.md` noting which features are MOO1 adaptations
 vs. original additions. This helps future reviewers and developers understand design intent.
@@ -495,10 +496,10 @@ vs. original additions. This helps future reviewers and developers understand de
 The diplomacy system is **well-designed and internally consistent**, with the prior Critical
 issues all resolved (per `REVIEW_DIPLOMACY.md`). The main deviations from MOO1 are:
 
-1. **Spy system**: Substantially expanded beyond MOO1 (acceptable, arguably better)
-2. **Relationship states**: Collapsed from 17 to 5 (lose MOO1 flavor, fine mechanically)
-3. **Trade ramp-up**: Missing key MOO1 mechanic (should be added)
-4. **Population dominance**: Missing key MOO1 coalition trigger (should be added)
+1. **Spy system**: Substantially expanded beyond MOO1 (acceptable, arguably better) — ✅ documented
+2. **Relationship states**: Collapsed from 17 to 5 (lose MOO1 flavor, fine mechanically) — ✅ documented
+3. **Trade ramp-up**: Missing key MOO1 mechanic — ✅ ADDED to treaties.md
+4. **Population dominance**: Missing key MOO1 coalition trigger — ✅ ADDED to relationship-formulas.md
 5. **Treaty additions**: Research Pact and Defensive Pact don't exist in MOO1 (acceptable additions)
 
 The **council.md** and **relationship-formulas.md** are the strongest files — detailed, consistent,
@@ -509,8 +510,35 @@ The prior `REVIEW_DIPLOMACY.md` identified 30 remaining open issues (H1-H8, M1-M
 Those all remain valid — this review adds 8 new MOO1-specific findings (S1-S8) that were outside
 the scope of the prior internal consistency review.
 
+**All 7 critical issues from the fix tasklist are now resolved.** See Section 11 below.
+
+---
+
+## 11. Fixes Applied (2026-04-13)
+
+All critical issues identified in the fix tasklist have been addressed:
+
+| Fix # | Description | File Changed | Status |
+|-------|-------------|-------------|--------|
+| F1 | Document spy system as HoO original design (% success formula vs MOO1 two-phase) | `espionage.md` | ✅ FIXED |
+| F2 | Document frame job as HoO standalone mission (vs MOO1 Phase 2 critical success outcome) | `espionage.md` | ✅ FIXED |
+| F3 | Add "All Spies Fail" catastrophic result (natural 100 on detection die) | `espionage.md` | ✅ FIXED |
+| F4 | Add trade ramp-up mechanic (~30 turns to full value, renegotiation resets ramp) | `treaties.md` | ✅ FIXED |
+| F5 | Add population dominance coalition mechanic (40%+ pop → all races unite) | `relationship-formulas.md`, `council.md` | ✅ FIXED |
+| F6 | Document 5 states as intentional simplification of MOO1's 17 states, with flavor name map | `treaties.md` | ✅ FIXED |
+| F7 | Add incoming Chameleon distrust (all races start -10 toward Chameleons, not just outgoing) | `relationship-formulas.md` | ✅ FIXED |
+
+**Summary of file changes:**
+
+- **`espionage.md`**: Added "HoO vs MOO1 Design Philosophy" section; Section 1.3 "All Spies Fail"; Section 6.6 frame job note; changelog v1.3
+- **`treaties.md`**: Added relationship state intentional simplification note; expanded Trade Agreement with full ramp-up mechanic and formula
+- **`relationship-formulas.md`**: Added Section 7 "Population Dominance Coalition" (full mechanic, thresholds, AI coalition boost, algorithm); added incoming Chameleon distrust to Section 5.3 table and Section 13.2 JSON; added new constants; renumbered sections 7–13 → 8–14
+- **`council.md`**: Added `DOMINANCE_COUNCIL_PENALTY` to `CalculateVoteScore()` and constants
+- **`FINAL_REVIEW_DIPLOMACY.md`**: Marked all priority items and S1-S8 discrepancies with status
+
 ---
 
 *Generated: 2026-04-13*
+*Fixes applied: 2026-04-13 by Wesley Crusher (subagent)*
 *Reference: StrategyWiki MOO1 Diplomacy + Spying pages (fetched live)*
 *Design files reviewed: espionage.md, treaties.md, relationship-formulas.md, council.md, ai-personalities.md, trade.md*

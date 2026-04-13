@@ -94,15 +94,15 @@ There are 14 environment types organized by habitability:
 {
   "environment_types": {
     "hostile": {
-      "description": "Require colonization technology. Population growth 0.5x.",
-      "growth_modifier": 0.5,
+      "description": "Require colonization technology. Per-environment growth/capacity modifiers defined in economy/population-growth.md (authoritative).",
       "requires_tech": true,
       "types": [
         {
           "id": "radiated",
           "name": "Radiated",
           "hostility_rank": 1,
-          "pop_capacity_modifier": 0.30,
+          "growth_modifier": 0.10,
+          "pop_capacity_modifier": 0.20,
           "tech_required": "controlled_radiated_environment",
           "description": "Intense radiation bombardment. Most hostile environment."
         },
@@ -110,6 +110,7 @@ There are 14 environment types organized by habitability:
           "id": "toxic",
           "name": "Toxic",
           "hostility_rank": 2,
+          "growth_modifier": 0.20,
           "pop_capacity_modifier": 0.30,
           "tech_required": "controlled_toxic_environment",
           "description": "Corrosive atmosphere and lethal chemicals."
@@ -118,7 +119,8 @@ There are 14 environment types organized by habitability:
           "id": "inferno",
           "name": "Inferno",
           "hostility_rank": 3,
-          "pop_capacity_modifier": 0.40,
+          "growth_modifier": 0.20,
+          "pop_capacity_modifier": 0.30,
           "tech_required": "controlled_inferno_environment",
           "description": "Extremely high temperatures, volcanic activity."
         },
@@ -126,6 +128,7 @@ There are 14 environment types organized by habitability:
           "id": "dead",
           "name": "Dead",
           "hostility_rank": 4,
+          "growth_modifier": 0.30,
           "pop_capacity_modifier": 0.40,
           "tech_required": "controlled_dead_environment",
           "description": "No atmosphere or water. Lifeless rock."
@@ -134,7 +137,8 @@ There are 14 environment types organized by habitability:
           "id": "tundra",
           "name": "Tundra",
           "hostility_rank": 5,
-          "pop_capacity_modifier": 0.50,
+          "growth_modifier": 0.50,
+          "pop_capacity_modifier": 0.60,
           "tech_required": "controlled_tundra_environment",
           "description": "Frozen world with extreme cold."
         },
@@ -142,6 +146,7 @@ There are 14 environment types organized by habitability:
           "id": "barren",
           "name": "Barren",
           "hostility_rank": 6,
+          "growth_modifier": 0.40,
           "pop_capacity_modifier": 0.50,
           "tech_required": "controlled_barren_environment",
           "description": "Thin atmosphere, minimal resources."
@@ -149,64 +154,69 @@ There are 14 environment types organized by habitability:
       ]
     },
     "standard": {
-      "description": "Colonizable from game start. Population growth 1.0x.",
-      "growth_modifier": 1.0,
+      "description": "Colonizable from game start. Per-environment growth/capacity modifiers defined in economy/population-growth.md (authoritative).",
       "requires_tech": false,
       "types": [
         {
           "id": "minimal",
           "name": "Minimal",
           "hostility_rank": 7,
-          "pop_capacity_modifier": 0.60,
+          "growth_modifier": 0.60,
+          "pop_capacity_modifier": 0.70,
           "description": "Oxygen-poor atmosphere, barely supports life."
         },
         {
           "id": "desert",
           "name": "Desert",
           "hostility_rank": 8,
-          "pop_capacity_modifier": 0.70,
+          "growth_modifier": 0.70,
+          "pop_capacity_modifier": 0.80,
           "description": "Scarce water, dust storms, extreme heat."
         },
         {
           "id": "steppe",
           "name": "Steppe",
           "hostility_rank": 9,
-          "pop_capacity_modifier": 0.80,
+          "growth_modifier": 0.80,
+          "pop_capacity_modifier": 0.90,
           "description": "Rugged terrain, seasonal extremes."
         },
         {
           "id": "arid",
           "name": "Arid",
           "hostility_rank": 10,
-          "pop_capacity_modifier": 0.80,
+          "growth_modifier": 0.80,
+          "pop_capacity_modifier": 0.90,
           "description": "Limited water, dry but livable."
         },
         {
           "id": "ocean",
           "name": "Ocean",
           "hostility_rank": 11,
-          "pop_capacity_modifier": 0.90,
+          "growth_modifier": 0.90,
+          "pop_capacity_modifier": 1.00,
           "description": "Mostly water with limited land masses."
         },
         {
           "id": "jungle",
           "name": "Jungle",
           "hostility_rank": 12,
-          "pop_capacity_modifier": 0.90,
+          "growth_modifier": 0.90,
+          "pop_capacity_modifier": 1.00,
           "description": "Lush vegetation, young world, dense atmosphere."
         },
         {
           "id": "terran",
           "name": "Terran",
           "hostility_rank": 13,
+          "growth_modifier": 1.00,
           "pop_capacity_modifier": 1.00,
           "description": "Earth-like conditions. Ideal for colonization."
         }
       ]
     },
     "legendary": {
-      "description": "Perfect world. Population growth 2.0x. Cannot spawn naturally.",
-      "growth_modifier": 2.0,
+      "description": "Perfect world. Cannot spawn naturally — created through terraforming only (Gaia Transformation tech).",
       "requires_tech": false,
       "spawns_naturally": false,
       "types": [
@@ -214,6 +224,7 @@ There are 14 environment types organized by habitability:
           "id": "gaia",
           "name": "Gaia",
           "hostility_rank": 14,
+          "growth_modifier": 1.00,
           "pop_capacity_modifier": 1.00,
           "description": "Paradise world. Only created through terraforming."
         }
@@ -223,24 +234,28 @@ There are 14 environment types organized by habitability:
 }
 ```
 
+> **Authoritative reference:** All per-environment growth modifiers and capacity modifiers above are sourced from `economy/population-growth.md` §3, which is the canonical source of truth. Do not modify these values here without updating population-growth.md to match.
+
 ### 2.2 Environment Summary Table
 
 | Environment | Category | Growth Mult | Pop Capacity Mult | Tech Required |
 |-------------|----------|-------------|-------------------|---------------|
-| Radiated | Hostile | 0.5× | 0.30× | Controlled Radiated |
-| Toxic | Hostile | 0.5× | 0.30× | Controlled Toxic |
-| Inferno | Hostile | 0.5× | 0.40× | Controlled Inferno |
-| Dead | Hostile | 0.5× | 0.40× | Controlled Dead |
-| Tundra | Hostile | 0.5× | 0.50× | Controlled Tundra |
-| Barren | Hostile | 0.5× | 0.50× | Controlled Barren |
-| Minimal | Standard | 1.0× | 0.60× | None |
-| Desert | Standard | 1.0× | 0.70× | None |
-| Steppe | Standard | 1.0× | 0.80× | None |
-| Arid | Standard | 1.0× | 0.80× | None |
-| Ocean | Standard | 1.0× | 0.90× | None |
-| Jungle | Standard | 1.0× | 0.90× | None |
-| Terran | Standard | 1.0× | 1.00× | None |
-| Gaia | Legendary | 2.0× | 1.00× | None (Terraformed only) |
+| Radiated | Hostile | 0.10× | 0.20× | Controlled Radiated |
+| Toxic | Hostile | 0.20× | 0.30× | Controlled Toxic |
+| Inferno | Hostile | 0.20× | 0.30× | Controlled Inferno |
+| Dead | Hostile | 0.30× | 0.40× | Controlled Dead |
+| Tundra | Hostile | 0.50× | 0.60× | Controlled Tundra |
+| Barren | Hostile | 0.40× | 0.50× | Controlled Barren |
+| Minimal | Standard | 0.60× | 0.70× | None |
+| Desert | Standard | 0.70× | 0.80× | None |
+| Steppe | Standard | 0.80× | 0.90× | None |
+| Arid | Standard | 0.80× | 0.90× | None |
+| Ocean | Standard | 0.90× | 1.00× | None |
+| Jungle | Standard | 0.90× | 1.00× | None |
+| Terran | Standard | 1.00× | 1.00× | None |
+| Gaia | Legendary | 1.00× | 1.00× | None (Terraformed only) |
+
+> **Note:** Growth and capacity modifiers are authoritative from `economy/population-growth.md` §3. The former binary model (hostile=0.5×, standard=1.0×) has been replaced with the graduated 14-value scale. Gaia growth modifier is 1.00× (same as Terran) — it was never 2.0× in population-growth.md.
 
 ---
 

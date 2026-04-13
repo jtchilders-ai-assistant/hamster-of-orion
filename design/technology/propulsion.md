@@ -121,6 +121,7 @@ Fleet-wide speed improvements.
 |-----------|------------|---------|--------|
 | Reajax Fuel Cells | 24 | High-Capacity Fuel | Range 9 parsecs |
 | Warp Dissipator | 24 | Warp Dissipator | Prevent enemy retreat |
+| Intergalactic Star Gates | 27 | Star Gates | 3,000 BC infrastructure; ships travel any owned colony in 1 turn (MOO1 L27) |
 
 ---
 
@@ -159,6 +160,8 @@ Fleet-wide speed improvements.
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
 | Iridium Fuel Cells | 37 | Maximum Fuel | Range 11 parsecs |
+| Ionic Pulsar | 40 | Ionic Pulsar | Area damage — 10 damage to all ships in adjacent hexes (upgraded Energy Pulsar) (MOO1 L40) |
+| Sub-Space Interdictor | 43 | Sub-Space Interdictor | Nullifies Sub-Space Teleporters over all owned planets in system (MOO1 L43) |
 
 ---
 
@@ -240,10 +243,25 @@ Fleet-wide speed improvements.
 | Inertial Stabilizer | 3 | +2 Defense, +2 Initiative | 15 | 25 BC |
 | Energy Pulsar | 12 | 1-6 damage to adjacent ships (see §4) | 70 | 75 BC |
 | Inertial Nullifier | 20 | +4 Defense, +4 Initiative | 20 | 50 BC |
-| Warp Dissipator | 24 | Prevent all enemy fleet retreat (combat zone) | 25 | 55 BC |
+| Warp Dissipator | 24 | Prevent all enemy fleet retreat (combat zone) **[Design change: MOO1 = maneuver debuff −0-1/turn; design = complete retreat block]** | 25 | 55 BC |
 | Sub-Space Teleporter | 28 | Teleport any hex | 35 | 75 BC |
 | Displacement Device | 43 | 33% avoid hit | 40 | 110 BC |
-| High Energy Focus | 48 | +2 Init, +1 Attack | 30 | 80 BC |
+| High Energy Focus | 48 | +2 Init, +1 Attack **[Design change: MOO1 = +3 beam range; design = tactical stats bonus]** | 30 | 80 BC |
+| Intergalactic Star Gates | 27 | Build colony-to-colony star gates (3,000 BC); ships travel any owned colony in 1 turn | 0 | 3,000 BC |
+| Ionic Pulsar | 40 | 10 damage to all adjacent ships (improved Energy Pulsar; indiscriminate) | 80 | 90 BC |
+| Sub-Space Interdictor | 43 | Nullifies Sub-Space Teleporters in all systems containing owned planets | 40 | 120 BC |
+
+---
+
+## Design Departures from MOO1 (Documented Intentional Changes)
+
+The following propulsion mechanics differ from MOO1. These are documented here as intentional design decisions for **Hamster of Orion**:
+
+| System | MOO1 Mechanic | Design Mechanic | Rationale |
+|--------|---------------|-----------------|----------|
+| **Warp Dissipator** | Reduces defender maneuverability by 0-1 per turn (probabilistic) | Prevents **all** enemy fleet retreat from combat zone | Simpler, stronger, more decisive mechanic |
+| **High Energy Focus** | +3 attack **range** to all direct-fire beams | +2 Initiative, +1 Attack rating (tactical stat buff) | Repositioned from range extension to initiative dominance |
+| **Engine speeds** | MOO1 tops at speed 9 (Hyper Drives, L48) | Design compresses speeds 1-2 lower at each tier; adds Hyper-X (8) and Temporal (9) above MOO1 cap | Spreads engine progression across more tech tiers for longer tech race |
 
 ---
 

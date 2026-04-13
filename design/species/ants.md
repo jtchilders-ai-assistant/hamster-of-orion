@@ -56,7 +56,7 @@ Fascinating but inefficient. Individuality appears to cause 43.7% productivity l
 ## AI Behavior
 
 ### Personality Archetype
-Expansionist / Production-Focused / Relentless
+Industrialist / Production-Focused / Relentless (matches MOO1 Klackons — Industrialist strategy: builds factories, not fleets; prioritizes economic output over territorial aggression)
 
 ### Diplomatic Tendencies
 - **Natural Allies**: None (cannot truly "ally" with non-hive entities)

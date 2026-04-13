@@ -45,7 +45,7 @@ The economy and colony design documents are **substantially faithful to MOO1** i
 
 ---
 
-### CRITICAL-1 — Population Manual Labor Output: Fixed vs Tech-Scaled
+### CRITICAL-1 — Population Manual Labor Output: Fixed vs Tech-Scaled ✅ FIXED
 
 **MOO1 Behavior (from StrategyWiki "Growing your population"):**
 
@@ -70,11 +70,13 @@ Population_Production = Population × Base_Pop_Output × Racial_Production_Modif
 ```
 Note: At game start (TL ~1), output is ≈ 0.5 BC — so early game is correct; error compounds later.
 
+**✅ FIXED 2026-04-13:** Updated `economy/factory-formulas.md` §3 and algorithm, and `economy/slider-mathematics.md` §5 and JSON schema. Formula is now `Base_Pop_Output = 0.5 + (Planetology_TL / 50 × 1.5)` with a TL cap of 50. Worked examples updated. Klackon/Ants note retained as-is (1.5× racial modifier still applies to scaled output).
+
 **Klackon/Ants special ability note (MOO1):** The Klackon (Ants in our design) double their manual labor output. In MOO1 this means 1–4 BC/pop (not a 1.5× production modifier as currently documented). Verify whether the 1.5× Ants production modifier in `factory-formulas.md` correctly represents this or needs adjustment.
 
 ---
 
-### CRITICAL-2 — Mineral Richness Modifier Not Integrated Into Production Formula
+### CRITICAL-2 — Mineral Richness Modifier Not Integrated Into Production Formula ✅ FIXED
 
 **MOO1 Behavior:**
 Mineral richness multiplies factory output. This is established in MOO1 and referenced consistently in the design galaxy/planet docs.
@@ -105,11 +107,13 @@ Note: `planets/population.md` correctly shows:
 ```
 Total_Production *= Mineral_Richness_Modifier
 ```
-but `economy/factory-formulas.md` does not. **These docs are inconsistent with each other.**
+but `economy/factory-formulas.md` did not. **These docs were inconsistent with each other.**
+
+**✅ FIXED 2026-04-13:** Added `Mineral_Richness_Modifier` table (Ultra Poor ×0.33 → Ultra Rich ×3.0) to `economy/factory-formulas.md` §3 and JSON schema. Updated `economy/slider-mathematics.md` §5 formula and JSON schema. Applied as multiplier to gross production: `Gross = (Factory_Production + Population_Production) × Mineral_Richness_Modifier`. Worked examples updated.
 
 ---
 
-### MODERATE-1 — Planet Size Max-Pop Values Are Inconsistent
+### MODERATE-1 — Planet Size Max-Pop Values Are Inconsistent ✅ FIXED
 
 **economy/population-growth.md and economy/factory-formulas.md:**
 | Size | Max Pop |
@@ -135,9 +139,11 @@ but `economy/factory-formulas.md` does not. **These docs are inconsistent with e
 
 **Recommendation:** Decide: use fixed per-size values (simpler, more MOO1) or variable ranges (more variety). If ranges are kept, update `economy/population-growth.md` and `factory-formulas.md` to use the generated `base_population` value rather than hardcoded per-size numbers. The economy docs' "Base Planet Sizes" tables should be labeled as typical/representative values, not definitive.
 
+**✅ FIXED 2026-04-13:** Chose to keep variable ranges (more variety). Updated `economy/population-growth.md` §2 and JSON schema to show ranges alongside typical midpoints, with explicit note that formulas must use `planet.base_population` (generated value). Updated `economy/factory-formulas.md` §6 and JSON schema similarly. `planets/generation-tables.md` §4 is already authoritative for ranges.
+
 ---
 
-### MODERATE-2 — Environment Growth Modifiers: Granular vs Binary
+### MODERATE-2 — Environment Growth Modifiers: Granular vs Binary ✅ FIXED
 
 **economy/population-growth.md:**
 Uses 14 distinct growth modifiers (Gaia 1.0 → Radiated 0.10), a detailed graduated scale.
@@ -154,9 +160,11 @@ Uses a simple binary model for the environment summary table:
 
 **Recommendation:** `economy/population-growth.md` should be treated as authoritative for growth rates (it's more detailed and MOO1-consistent). Update `generation-tables.md` to remove the simple binary growth modifiers from the environment type JSON schema, or add a note that the per-environment growth rates are defined in `economy/population-growth.md`.
 
+**✅ FIXED 2026-04-13:** Updated `planets/generation-tables.md` §2.1 JSON and §2.2 summary table to use the full 14-value graduated scale from `economy/population-growth.md` (authoritative). Removed the binary category-level `growth_modifier` fields. Added per-environment `growth_modifier` and `pop_capacity_modifier` fields to each type entry. Added authoritative-reference note to both the JSON block and the summary table.
+
 ---
 
-### MODERATE-3 — Environment Capacity Modifiers Differ Between Docs
+### MODERATE-3 — Environment Capacity Modifiers Differ Between Docs ✅ FIXED
 
 **economy/population-growth.md capacity modifiers (selected):**
 | Environment | Capacity Mod |
@@ -184,6 +192,13 @@ The values for Radiated, Inferno, Tundra, and Barren differ between the two docu
 - Tundra: 0.60 vs 0.50
 
 **Recommendation:** `economy/population-growth.md` should be authoritative; update `generation-tables.md` to match.
+
+**✅ FIXED 2026-04-13:** Updated `planets/generation-tables.md` §2.1 and §2.2 to match `economy/population-growth.md` values exactly:
+- Radiated: 0.30 → **0.20** (was wrong in gen-tables)
+- Inferno: 0.40 → **0.30**
+- Tundra: 0.50 → **0.60**
+- Minimal: 0.60 → **0.70** (standard category correction)
+All values now synchronized with population-growth.md as the single source of truth.
 
 ---
 
@@ -352,18 +367,18 @@ These are confirmed departures from MOO1 that should be explicitly labeled as Ho
 
 ## Action Items Summary
 
-| Priority | Issue | Files Affected |
-|----------|-------|----------------|
-| 🔴 CRITICAL | Pop labor output must scale with Planetology TL, not fixed at 0.5 | `economy/factory-formulas.md`, `economy/slider-mathematics.md` |
-| 🔴 CRITICAL | Mineral richness modifier missing from production formula | `economy/factory-formulas.md`, `economy/slider-mathematics.md` |
-| 🟡 MODERATE | Planet size max-pop values inconsistent (fixed vs range) | `economy/population-growth.md`, `economy/factory-formulas.md` |
-| 🟡 MODERATE | Environment growth modifiers: graduated vs binary contradiction | `planets/generation-tables.md` |
-| 🟡 MODERATE | Environment capacity modifier values differ between two docs | `planets/generation-tables.md` vs `economy/population-growth.md` |
-| 🟢 MINOR | Gaia spawn rules missing from some docs | `planets/planet-types.md`, `economy/population-growth.md` |
-| 🟢 MINOR | Hostile env table ordering counterintuitive in planet-types.md | `planets/planet-types.md` |
-| 🟢 MINOR | ECO growth bonus not labeled as non-MOO1 extension | `economy/slider-mathematics.md` |
-| 🟢 MINOR | Food/starvation system needs slider integration or removal | `economy/population-growth.md`, `economy/slider-mathematics.md` |
-| 🟢 MINOR | Morale growth modifier not labeled as non-MOO1 extension | `economy/population-growth.md` |
+| Priority | Issue | Files Affected | Status |
+|----------|-------|----------------|--------|
+| 🔴 CRITICAL | Pop labor output must scale with Planetology TL, not fixed at 0.5 | `economy/factory-formulas.md`, `economy/slider-mathematics.md` | ✅ FIXED 2026-04-13 |
+| 🔴 CRITICAL | Mineral richness modifier missing from production formula | `economy/factory-formulas.md`, `economy/slider-mathematics.md` | ✅ FIXED 2026-04-13 |
+| 🟡 MODERATE | Planet size max-pop values inconsistent (fixed vs range) | `economy/population-growth.md`, `economy/factory-formulas.md` | ✅ FIXED 2026-04-13 |
+| 🟡 MODERATE | Environment growth modifiers: graduated vs binary contradiction | `planets/generation-tables.md` | ✅ FIXED 2026-04-13 |
+| 🟡 MODERATE | Environment capacity modifier values differ between two docs | `planets/generation-tables.md` vs `economy/population-growth.md` | ✅ FIXED 2026-04-13 |
+| 🟢 MINOR | Gaia spawn rules missing from some docs | `planets/planet-types.md`, `economy/population-growth.md` | ⏳ Open |
+| 🟢 MINOR | Hostile env table ordering counterintuitive in planet-types.md | `planets/planet-types.md` | ⏳ Open |
+| 🟢 MINOR | ECO growth bonus not labeled as non-MOO1 extension | `economy/slider-mathematics.md` | ⏳ Open |
+| 🟢 MINOR | Food/starvation system needs slider integration or removal | `economy/population-growth.md`, `economy/slider-mathematics.md` | ⏳ Open |
+| 🟢 MINOR | Morale growth modifier not labeled as non-MOO1 extension | `economy/population-growth.md` | ⏳ Open |
 
 ---
 

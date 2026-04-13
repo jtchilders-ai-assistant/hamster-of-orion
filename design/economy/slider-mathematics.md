@@ -188,9 +188,11 @@ Because TECH diverts population, the actual production used by SHIP/DEF/IND/ECO 
 ```
 Active_Population = Population × (1 - TECH_Percent / 100)
 
+# Population labor output scales with Planetology tech (MOO1 faithful):
+# Base_Pop_Output = 0.5 + (Planetology_TL / 50 × 1.5)  [min 0.5, max 2.0 at TL 50]
 Factory_Production = Operating_Factories × 1.0 × Racial_Production_Modifier
-Population_Production = Active_Population × 0.5 × Racial_Production_Modifier
-Gross_Production = Factory_Production + Population_Production
+Population_Production = Active_Population × Base_Pop_Output × Racial_Production_Modifier
+Gross_Production = (Factory_Production + Population_Production) × Mineral_Richness_Modifier
 
 Pollution = Operating_Factories × Waste_Rate
 Cleanup_Cost = Pollution × 0.5 × Cleanup_Modifier
@@ -328,16 +330,17 @@ Operating = min(80, 80) = 80
 
 **Step 3 — Gross Production:**
 ```
+# Planetology TL 1 (game start): Base_Pop_Output = 0.5 + (1/50 × 1.5) = 0.53
 Factory_Production = 80 × 1.0 × 1.0 = 80 BC
-Population_Production = 32 × 0.5 × 1.0 = 16 BC
-Gross_Production = 96 BC
+Population_Production = 32 × 0.53 × 1.0 = 16.96 BC
+Gross_Production = (80 + 16.96) × 1.0 (Normal richness) = 96.96 BC
 ```
 
 **Step 4 — Cleanup:**
 ```
 Pollution = 80 × 1.0 = 80 units
 Cleanup_Cost = 80 × 0.5 × 1.0 = 40 BC
-Net_Production = 96 - 40 = 56 BC
+Net_Production = 96.96 - 40 = 56.96 → 56 BC (floor)
 ```
 
 **Step 5 — Slider Allocation:**
@@ -375,27 +378,28 @@ TECH_RP = 8 × 1.0 × 1.0 = 8 RP/turn (distributed across 6 research fields)
 ```
 Active_Population = 100 × (1 - 0.40) = 60M
 Operating = min(500, 100×5) = 500
+# Assume Planetology TL 40: Base_Pop_Output = 0.5 + (40/50 × 1.5) = 1.70
 Factory_Production = 500 × 1.0 × 1.5 = 750 BC
-Population_Production = 60 × 0.5 × 1.5 = 45 BC
-Gross = 795 BC
+Population_Production = 60 × 1.70 × 1.5 = 153 BC
+Gross = (750 + 153) × 1.0 (Normal richness) = 903 BC
 ```
 
 **Cleanup:**
 ```
 Pollution = 500 × 0.40 = 200 units
 Cleanup_Cost = 200 × 0.5 × 0.40 = 40 BC
-Net_Production = 755 BC
+Net_Production = 903 - 40 = 863 BC
 ```
 
 **Slider Allocation:**
 ```
 SHIP_BC = 0 BC (queue empty → Reserve)
 DEF_BC  = 0 BC
-IND_BC  = 755 × 0.30 = 226 BC → max factories already reached → Reserve
-ECO_BC  = 755 × 0.30 = 226 BC → cleanup done; max pop → no growth; max terraform → Reserve
+IND_BC  = 863 × 0.30 = 258.9 BC → max factories already reached → Reserve
+ECO_BC  = 863 × 0.30 = 258.9 BC → cleanup done; max pop → no growth; max terraform → Reserve
 ```
 
-**Reserve this turn:** 0 + 226 + 226 = **452 BC to Empire Reserve**
+**Reserve this turn:** 0 + 258.9 + 258.9 = **~518 BC to Empire Reserve**
 
 **TECH:** 40M scientists × 1.5 (racial) = 60 RP/turn
 
@@ -484,9 +488,19 @@ This uncleaned pollution reduces effective planet capacity, increasing populatio
 
   "production_constants": {
     "base_factory_output_per_turn":     1.0,
-    "base_population_output_per_turn":  0.5,
+    "base_pop_output_formula":          "0.5 + (planetology_tl / 50.0 * 1.5)",
+    "base_pop_output_min":              0.5,
+    "base_pop_output_max":              2.0,
+    "mineral_richness_applied_to":      "gross_production",
     "eco_growth_bc_efficiency":         0.1,
     "base_cleanup_cost_per_pollution":  0.5
+  },
+  "mineral_richness_modifiers": {
+    "ultra_poor": 0.33,
+    "poor":       0.50,
+    "normal":     1.00,
+    "rich":       2.00,
+    "ultra_rich": 3.00
   }
 }
 ```

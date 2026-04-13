@@ -46,57 +46,80 @@ Turn-based tactical combat on a hexagonal grid. Inspired by MOO1's auto-resolve 
 ## Main Combat Screen
 
 ### Full Battle Interface
+
+This is the primary tactical combat view. Ships on the hex grid display HP bars and movement point indicators directly on (or adjacent to) their hex token. The initiative/turn order strip runs along the top of the UI. A combat log panel tracks all events.
+
 ```
 ╔════════════════════════════════════════════════════════════╗
-║ TACTICAL COMBAT - Alpha Centauri | Turn 3 | Round 1/10    ║
+║ TACTICAL COMBAT - Alpha Centauri | Round 3 of max 10      ║
 ╠════════════════════════════════════════════════════════════╣
+║ ┌─Initiative─Strip──────────────────────────────────────┐ ║
+║ │▶ [YOUR Dest] [ENM Scout] [YOUR Crus] [ENM Ftr] ...   │ ║
+║ │   HP:90/100   HP:30/50    HP:200/200  HP:80/80        │ ║
+║ │ (active)                                              │ ║
+║ └───────────────────────────────────────────────────────┘ ║
 ║                                                             ║
 ║  ┌─────────────────────────────────────────────────────┐  ║
 ║  │                HEX BATTLE GRID                      │  ║
 ║  │                                                     │  ║
 ║  │      ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡                     │  ║
-║  │     ⬡ ⬡ ⬡ ⬡[E]⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡                    │  ║
-║  │    ⬡ ⬡ ⬡[E]⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡                     │  ║
-║  │   ⬡ ⬡ ⬡ ⬡[E]⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡                    │  ║
+║  │     ⬡ ⬡ ⬡ [E₁] ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡                   │  ║
+║  │    ⬡ ⬡ [E₂] ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡                    │  ║
+║  │    E₁: ██░░ HP  E₂: ████ HP                        │  ║
+║  │    MP:3/4        MP:2/4                             │  ║
 ║  │  ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡                     │  ║
 ║  │   ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡                      │  ║
-║  │    ⬡ ⬡[Y]⬡ ⬡ ⬡ ⬡ ⬡ ⬡ ⬡[Y]⬡                     │  ║
-║  │     ⬡ ⬡ ⬡ ⬡[Y]⬡ ⬡ ⬡ ⬡ ⬡ ⬡                      │  ║
-║  │      ⬡ ⬡ ⬡ ⬡ ⬡[Y]⬡ ⬡ ⬡ ⬡                       │  ║
+║  │    ⬡ [Y₁] ⬡ ⬡ ⬡ ⬡ ⬡ ⬡ [Y₂] ⬡                   │  ║
+║  │    Y₁: ████ HP  Y₂: ████ HP  ← HP bars per token  │  ║
+║  │    MP:4/4 ◀▶   MP:0/4 ✓ done                       │  ║
+║  │     ⬡ ⬡ ⬡ [Y₃] ⬡ ⬡ ⬡ ⬡ ⬡ ⬡                     │  ║
+║  │    Y₃: ██████ HP   MP:3/4                         │  ║
+║  │      ⬡ ⬡ ⬡ ⬡ [Y₄] ⬡ ⬡ ⬡ ⬡                      │  ║
+║  │    Y₄: ████████ HP  MP:5/6                        │  ║
 ║  │                                                     │  ║
-║  │  [Y] = Your Ships (Green)                          │  ║
-║  │  [E] = Enemy Ships (Red)                           │  ║
-║  │  ⬡ = Empty space                                   │  ║
-║  │  Highlighted hexes = Movement range                │  ║
+║  │  [Y] = Your Ships (Green)   [E] = Enemy (Red)      │  ║
+║  │  ██ = HP bar (green→yellow→red as HP drops)        │  ║
+║  │  MP = Movement Points left this turn               │  ║
+║  │  Highlighted hexes = movement range                │  ║
+║  │  ~M~ on grid = in-flight missile token             │  ║
 ║  └─────────────────────────────────────────────────────┘  ║
 ║                                                             ║
 ║ ┌─Selected─Ship─────────────┐ ┌─Combat─Log──────────────┐ ║
-║ │ Destroyer "Vengeance"     │ │ Turn 3:                 │ ║
-║ │ ━━━━━━━━━━━━━━━━━━━━━━━ │ │ • Your Destroyer moves  │ ║
-║ │ HP: [████████████░] 90/100│ │ • Enemy Scout fires     │ ║
-║ │ Shield: [█████░░] 10/14   │ │   Miss!                 │ ║
-║ │                           │ │ • Your Cruiser fires    │ ║
-║ │ Weapons:                  │ │   HIT! 45 damage        │ ║
-║ │ • Plasma×4 [READY]        │ │ • Enemy Scout destroyed │ ║
-║ │ • Missiles×2 [READY]      │ │                         │ ║
-║ │                           │ │ Turn 2:                 │ ║
-║ │ Movement: 4 hexes left    │ │ • Initiative roll...    │ ║
-║ │ Accuracy: 75% at range 3  │ │ • Battle begins!        │ ║
-║ │                           │ └─────────────────────────┘ ║
-║ │ [MOVE] [FIRE] [SPECIAL]   │                            ║
-║ │ [END TURN] [RETREAT]      │  ┌─Enemy─Target────────┐  ║
-║ └───────────────────────────┘  │ Scout Ship          │  ║
-║                                │ HP: 30/50           │  ║
-║ ┌─Action─Phase──────────────┐  │ Shield: 0/0         │  ║
-║ │ FIRING PHASE              │  │ Weapons:            │  ║
-║ │ Select weapon and target  │  │ • Laser×2           │  ║
-║ │                           │  │ Distance: 3 hexes   │  ║
-║ │ Your Turn!                │  │ Hit Chance: 75%     │  ║
-║ └───────────────────────────┘  └─────────────────────┘  ║
+║ │ Destroyer "Vengeance"     │ │ Round 3:                │ ║
+║ │ ━━━━━━━━━━━━━━━━━━━━━━━ │ │ • Vengeance moves N     │ ║
+║ │ HP:  [████████████░] 90/100│ │ • Scout fires — Miss!   │ ║
+║ │ SHD: [█████░░░░░░] 10/14  │ │ • Cruiser fires:        │ ║
+║ │ MP:  [████░░░░] 4/6 left  │ │   -45 dmg (Scout)  💥  │ ║
+║ │                           │ │ • Scout DESTROYED       │ ║
+║ │ Weapons:                  │ │                         │ ║
+║ │ • Plasma×4 [READY]        │ │ Round 2:                │ ║
+║ │ • Missiles×2 [3 in flight]│ │ • Initiative rolled     │ ║
+║ │                           │ │ • Battle begins!        │ ║
+║ │ Accuracy: 75% at range 3  │ └─────────────────────────┘ ║
+║ │                           │                            ║
+║ │ [MOVE] [FIRE] [SPECIAL]   │  ┌─Enemy─Target────────┐  ║
+║ │ [WAIT] [DONE]  [RETREAT]  │  │ Scout Ship          │  ║
+║ └───────────────────────────┘  │ HP: [██░░] 30/50    │  ║
+║                                │ SHD: [░░░░] 0/0     │  ║
+║ ┌─Action─Phase──────────────┐  │ Weapons: Laser×2    │  ║
+║ │ YOUR TURN — FIRING PHASE  │  │ Distance: 3 hexes   │  ║
+║ │ Select weapon and target  │  │ Hit Chance: 75%     │  ║
+║ │                           │  └─────────────────────┘  ║
+║ └───────────────────────────┘                            ║
 ╠════════════════════════════════════════════════════════════╣
-║ [AUTO-FINISH] [RETREAT] [OPTIONS] [END TURN ⏎]            ║
+║ Speed: [SLOW][NORM][FAST][⚡] │ [AUTO-FINISH] [RETREAT]   ║
 ╚════════════════════════════════════════════════════════════╝
 ```
+
+**Key UI elements explained:**
+- **Initiative strip** (top bar): All ships sorted by speed/initiative, showing faction, name, and HP. Active ship has ▶ marker.
+- **HP bars on grid tokens**: Each ship token on the hex grid shows a small HP bar (color coded: green > 50%, yellow 25–50%, red < 25%).
+- **MP display on grid tokens**: Movement Points remaining shown as `MP:n/max` below each token. Done ships show `✓ done`.
+- **WAIT button**: Ship yields its place in turn order — acts last this round. Useful for letting faster ships close distance.
+- **DONE button**: Confirms ship is finished for this round (same as END TURN for that ship).
+- **Missiles in flight**: `[3 in flight]` shown in weapon list; missile tokens (~M~) appear on the hex grid and advance each round.
+- **Combat log**: Scrollable event log; damage numbers shown inline (e.g. `-45 dmg`).
+- **Combat speed bar**: Slow / Normal / Fast / Instant — controls animation speed globally.
 
 ---
 
@@ -128,6 +151,49 @@ Turn-based tactical combat on a hexagonal grid. Inspired by MOO1's auto-resolve 
      Click hex to move
 ```
 
+
+---
+
+## Per-Ship HP Bars and Movement Points (On-Grid Display)
+
+### HP Bar on Ship Tokens
+
+Each ship token on the hex grid renders a small HP bar directly beneath the ship icon. This gives at-a-glance health status without opening the detail panel.
+
+```
+     ┌────────────────────────────┐
+     │  Token layout (per hex):   │
+     │                            │
+     │       [Y] or [E]           │
+     │    ███████░░░  ← HP bar     │
+     │    MP: 3/4                 │  ← movement points
+     │                            │
+     │  HP bar colors:            │
+     │  ████████  Green  (>50% HP)   │
+     │  ████████  Yellow (25-50% HP) │
+     │  ████████  Red    (<25% HP)   │
+     └────────────────────────────┘
+```
+
+**Movement Points (MP) display:**
+- Shows `MP: n/max` below each token
+- Decrements as the ship moves
+- `MP: 0/4 ✓ done` when the ship has exhausted its moves
+- `MP: 4/4 ◄►` when a ship is selected and waiting for movement input
+- Ships that used WAIT show `[WAIT]` tag until they act
+
+**Hover tooltip** (on mouse-over of a token):
+```
+┌──────────────────────────────────────┐
+│ Destroyer "Vengeance" (Yours)       │
+│ HP:  90/100  [█████████░░] 90%   │
+│ SHD: 10/14   [███████░░░░] 71%   │
+│ MP:  4/6     [██████░░░░░] 67%   │
+│ Weapons: Plasma×4, Rockets×2          │
+│ Speed: 5  Initiative: 3rd          │
+└──────────────────────────────────────┘
+```
+
 ---
 
 ## Combat Phases (Per Turn)
@@ -147,14 +213,27 @@ Turn-based tactical combat on a hexagonal grid. Inspired by MOO1's auto-resolve 
 ```
 
 ### Initiative Order Display
+
+The **initiative strip** runs across the top of the combat screen as a horizontal band. Ships are listed left-to-right in act order (highest speed first; ties broken by computer level). The currently acting ship has a `▶` marker and is highlighted. When a ship uses **WAIT**, it slides to the end of the strip for this round. Destroyed ships are removed with a strikethrough animation.
+
 ```
-┌─Turn─Order───────────────────┐
-│ 1. ▶ Your Cruiser (Speed 5) │
-│ 2.   Enemy Fighter (Speed 5) │
-│ 3.   Your Destroyer (Speed 4)│
-│ 4.   Enemy Scout (Speed 4)   │
-│ 5.   Your Destroyer (Speed 4)│
-│ 6.   Enemy Destroyer (Speed 3│
+┌─Initiative─Strip─(top─of─screen)────────────────────────┐
+│ ▶[Your Crus] [ENM Ftr] [Your Dest] [ENM Scout] [ENM Dest]  │
+│  HP:██████  HP:██████ HP:███████  HP:██░░░░   HP:███████  │
+│  200/200   80/80   90/100     30/50     200/200    │
+│  Spd 5     Spd 5   Spd 4      Spd 4     Spd 3      │
+│(acting now)                                         │
+└─────────────────────────────────────────────────────┘
+```
+
+**Compact sidebar fallback** (when grid is zoomed in and top strip doesn’t fit):
+```
+┌─Turn─Order──────────────┐
+│ 1. ▶ Your Cruiser (Spd 5)  │
+│ 2.   Enemy Fighter (Spd 5) │
+│ 3.   Your Dest. (Spd 4)   │
+│ 4.   Enemy Scout (Spd 4)  │
+│ 5.   Enemy Dest. (Spd 3)  │
 └──────────────────────────────┘
 ▶ = Currently acting
 ```
@@ -263,6 +342,48 @@ Turn-based tactical combat on a hexagonal grid. Inspired by MOO1's auto-resolve 
 ```
 
 ---
+
+
+---
+
+## Missile Tracking (In-Flight Missiles)
+
+Missiles are **persistent tokens** on the hex grid. Unlike beam weapons (which resolve instantly), missiles travel hex-by-hex each round until they reach their target or are destroyed by point defense.
+
+### Missile Token Display
+```
+     Hex grid after launch:
+
+          [Y] fires rockets
+           |
+           ↓
+     ⬡ ⬡ [~M~] ⬡ ⬡    ← missile token (turn 1)
+      ⬡ ⬡ ⬡ ⬡ ⬡
+       ⬡ ⬡ [E] ⬡          ← target
+```
+
+- `~M~` = missile in flight (animated projectile icon)
+- Missiles advance toward target every round
+- Multiple missiles show as `~M₂~`, `~M₃~`, etc.
+- Point defense ships auto-fire when a missile enters range
+- Combat log records each missile's status: **launched / in-flight / intercepted / impact**
+
+### Missile Status in Selected-Ship Panel
+```
+┌─Selected─Ship─────────────┐
+│ Destroyer "Vengeance"     │
+│ Weapons:                  │
+│ • Plasma×4  [READY]         │
+│ • Rockets×2 [3 in flight]  │  ← shows count
+│              Round 2 of 4 │  ← ETA to target
+│ • Rockets×2 [RELOAD 2]     │  ← reloading
+└───────────────────────────┘
+```
+
+### Point Defense Auto-Fire
+When a missile token enters a ship’s point defense range, PD fires automatically (no player action required). The result appears in the combat log:
+- `• PD intercepts missile — DESTROYED`
+- `• PD fires at missile — MISSED (continues)`
 
 ## Special Systems UI
 
@@ -563,6 +684,29 @@ Turn-based tactical combat on a hexagonal grid. Inspired by MOO1's auto-resolve 
 ```
 
 ---
+
+
+---
+
+## Bombardment Phase Trigger (Post-Combat)
+
+Bombardment is **not** part of the tactical combat round sequence. It is triggered **after** combat resolves (either through all enemies destroyed or retreated). The flow is:
+
+```
+Space Combat
+     ↓ (all enemy ships destroyed or retreated)
+[COMBAT RESULT screen]
+     ↓ [CONTINUE]
+[BOMBARD or INVADE decision screen]
+     ↓ player chooses: Bombard / Invade / Leave
+[Bombardment UI  -or-  Ground Combat UI]
+     ↓ completion
+[Return to Galaxy Map]
+```
+
+If the player’s ships won but the planet still has defenses (bases, shields), the Bombardment screen opens automatically. If defenses have already been cleared during combat, the player is offered the **LAUNCH INVASION** button immediately.
+
+**State machine note:** `state-transitions.md` §9 should add a `BOMBARDMENT_PHASE` state between `COMBAT_RESULT` and `RETURN_TO_MAP`. See that file for the combat state machine.
 
 ## Performance Optimizations
 

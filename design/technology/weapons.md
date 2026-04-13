@@ -38,6 +38,7 @@ In each game, players are offered **2-3 random technologies** at each tier. Not 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
 | Laser | 1 | Laser beam weapon | 1-4 damage, range 1 |
+| Heavy Lasers | 1 | Heavy Laser beam weapon | 1-7 damage, range 2 (MOO1 L1) |
 | Nuclear Missile | 1 | Nuclear Missile | 4 damage, speed 2 |
 | Nuclear Bomb | 3 | Nuclear Bomb | 3-12 bombardment damage |
 
@@ -53,6 +54,7 @@ In each game, players are offered **2-3 random technologies** at each tier. Not 
 | Hyper-V Rockets | 4 | Hyper-V Rocket | 6 damage, speed 3.5 |
 | Neutron Pellet Gun | 5 | Neutron Pellet Gun | 2-5 damage, armor-piercing |
 | Gatling Laser | 6 | Gatling Laser | 1-4 ×4 attacks |
+| Anti-Missile Rockets | 6 | Anti-Missile Rockets | **Point defense** — destroys 40% of incoming missiles (−1% per missile tech level) (MOO1 L6) |
 | Hand Lasers | 5 | Hand Lasers | +5 ground combat |
 
 ---
@@ -73,7 +75,7 @@ In each game, players are offered **2-3 random technologies** at each tier. Not 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
 | Ion Cannon | 10 | Ion Cannon | 3-8 damage, halves shields |
-| Scatter Pack V | 10 | Scatter Pack V | 5 ×5 MIRV missiles |
+| Scatter Pack V | 10 | Scatter Pack V | 6 ×5 MIRV missiles (5 MIRVs × 6 dmg each) |
 | Fusion Bomb | 10 | Fusion Bomb | 5-20 bombardment damage |
 | Merculite Missiles | 12 | Merculite Missile | 10 damage, speed 4 |
 | Gatling Laser Rifle | 12 | Gatling Laser Rifle | +10 ground combat |
@@ -98,7 +100,7 @@ In each game, players are offered **2-3 random technologies** at each tier. Not 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
 | Hard Beam | 18 | Hard Beam | 8-12 damage, no range penalty |
-| Scatter Pack VII | 18 | Scatter Pack VII | 7 ×5 MIRV missiles |
+| Scatter Pack VII | 18 | Scatter Pack VII | 10 ×7 MIRV missiles (7 MIRVs × 10 dmg each) |
 | Fusion Rifle | 18 | Fusion Rifle | +15 ground combat |
 
 ---
@@ -111,6 +113,7 @@ In each game, players are offered **2-3 random technologies** at each tier. Not 
 | Fusion Beam | 20 | Fusion Beam | 4-16 damage |
 | Anti-Matter Bomb | 20 | Anti-Matter Bomb | 10-40 bombardment |
 | Pulson Missiles | 21 | Pulson Missile | 20 damage, speed 5 |
+| Ion Stream Projector | 21 | Ion Stream Projector | Deals 20% of target's current HP as damage (HP-percentage; ignores armor class) (MOO1 L21) |
 
 ---
 
@@ -133,7 +136,7 @@ In each game, players are offered **2-3 random technologies** at each tier. Not 
 | Megabolt Cannon | 25 | Megabolt Cannon | 2-20 damage, chain to 4 ships |
 | Phasor | 27 | Phasor | 5-20 damage, long range |
 | Hand Phasors | 27 | Hand Phasors | +20 ground combat |
-| Doom Virus | 28 | — | **See Planetology field** (bio weapons are not in Weapons field) |
+| Doom Virus | 25 | — | **See Planetology field** (Planetology L25 is canonical; this entry is reference only) |
 
 ---
 
@@ -154,7 +157,7 @@ In each game, players are offered **2-3 random technologies** at each tier. Not 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
 | Auto-Blaster | 32 | Auto-Blaster | 4-16 ×3 attacks |
-| Scatter Pack X | 33 | Scatter Pack X | 10 ×5 MIRV missiles |
+| Scatter Pack X | 33 | Scatter Pack X | 15 ×10 MIRV missiles (10 MIRVs × 15 dmg each) |
 
 ---
 
@@ -174,6 +177,7 @@ In each game, players are offered **2-3 random technologies** at each tier. Not 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
 | Gauss Autocannon | 37 | Gauss Autocannon | 7-10 ×4 attacks |
+| Pulse Phasor | 38 | Pulse Phasor | 5-20 damage ×3 attacks per turn (fires Phasor 3× per turn) (MOO1 L38) |
 | Plasma Rifle | 38 | Plasma Rifle | +25 ground combat |
 
 ---
@@ -185,8 +189,8 @@ In each game, players are offered **2-3 random technologies** at each tier. Not 
 |-----------|------------|---------|--------|
 | Particle Beam | 40 | Particle Beam | 10-20 damage |
 | Plasma Cannon | 42 | Plasma Cannon | 6-30 damage, ×2 shield damage |
-| Proton Torpedo | 42 | Proton Torpedo | 40 damage, no intercept |
-| Bio Terminator | 42 | — | **See Planetology field** (bio weapons are not in Weapons field) |
+| Proton Torpedo | 42 | Proton Torpedo | 75 damage, no intercept |
+| Bio Terminator | 33 | — | **See Planetology field** (Planetology L33 is canonical; this entry is reference only) |
 
 ---
 
@@ -196,6 +200,7 @@ In each game, players are offered **2-3 random technologies** at each tier. Not 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
 | Neutronium Bomb | 43 | Neutronium Bomb | 30-125 bombardment |
+| Tri-Focus Plasma Cannon | 45 | Tri-Focus Plasma Cannon | 6-30 damage ×3 attacks per turn (heavy triple-plasma weapon) (MOO1 L45) |
 | Death Ray | 45 | Death Ray | 200-1000 damage, instant kill small |
 
 ---
@@ -206,7 +211,8 @@ In each game, players are offered **2-3 random technologies** at each tier. Not 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
 | Disruptor | 47 | Disruptor | 10-40 damage |
-| Plasma Torpedo | 48 | Plasma Torpedo | 75 damage, no intercept |
+| Neutron Stream Projector | 47 | Neutron Stream Projector | Deals 40% of target's current HP as damage (upgraded Ion Stream Projector; HP-percentage damage) (MOO1 L47) |
+| Plasma Torpedo | 48 | Plasma Torpedo | 150 damage, no intercept |
 
 ---
 
@@ -225,7 +231,7 @@ In each game, players are offered **2-3 random technologies** at each tier. Not 
 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
-| Stellar Converter | 55 | Stellar Converter | 10-35 ×20, destroys planets |
+| Stellar Converter | 55 | Stellar Converter | 10-35 ×4 attacks, destroys planets |
 
 ---
 
@@ -311,8 +317,8 @@ Heavy warheads, cannot be intercepted, fire every 2 turns.
 |------------|---------|--------|
 | 25 | Anti-Matter | 30 |
 | 35 | Hellfire | 25 (+10 vs shields) |
-| 42 | Proton | 40 |
-| 48 | Plasma | 75 |
+| 42 | Proton | 75 |
+| 48 | Plasma | 150 |
 
 ### Bombs (5 total)
 Planetary bombardment weapons.
@@ -333,8 +339,8 @@ Kill population, permanent damage, diplomatic penalty.
 | Tech Level (Planetology) | Weapon | Kill Rate | Max Pop Reduction |
 |--------------------------|--------|-----------|-------------------|
 | 9 | Death Spores | 1M per combat round | -10% permanent |
-| 25 | Doom Virus | 2M per combat round | -25% permanent |
-| 33 | Bio Terminator | 3M per combat round | -50% permanent |
+| 25 | Doom Virus | 2M per combat round | -25% permanent (Planetology L25 canonical) |
+| 33 | Bio Terminator | 3M per combat round | -50% permanent (Planetology L33 canonical) |
 
 ### Ground Combat Weapons (6 total)
 Passive bonuses to ground combat.
@@ -462,6 +468,8 @@ Passive bonuses to ground combat.
             "id": "scatter_pack_v",
             "name": "Scatter Pack V",
             "tech_level": 10,
+            "damage_per_mirv": 6,
+            "mirv_count": 5,
             "category": "missile",
             "unlocks": "scatter_pack_v"
           },
@@ -539,6 +547,8 @@ Passive bonuses to ground combat.
             "id": "scatter_pack_vii",
             "name": "Scatter Pack VII",
             "tech_level": 18,
+            "damage_per_mirv": 10,
+            "mirv_count": 7,
             "category": "missile",
             "unlocks": "scatter_pack_vii"
           },
@@ -636,7 +646,9 @@ Passive bonuses to ground combat.
           {
             "id": "doom_virus",
             "name": "Doom Virus",
-            "tech_level": 28,
+            "tech_level": 25,
+            "tech_field": "planetology",
+            "canonical_source": "planetology.md",
             "category": "biological",
             "unlocks": "doom_virus"
           }
@@ -686,6 +698,8 @@ Passive bonuses to ground combat.
             "id": "scatter_pack_x",
             "name": "Scatter Pack X",
             "tech_level": 33,
+            "damage_per_mirv": 15,
+            "mirv_count": 10,
             "category": "missile",
             "unlocks": "scatter_pack_x"
           }
@@ -756,13 +770,16 @@ Passive bonuses to ground combat.
             "id": "proton_torpedo",
             "name": "Proton Torpedo",
             "tech_level": 42,
+            "damage": 75,
             "category": "torpedo",
             "unlocks": "proton_torpedo"
           },
           {
             "id": "bio_terminator",
             "name": "Bio Terminator",
-            "tech_level": 42,
+            "tech_level": 33,
+            "tech_field": "planetology",
+            "canonical_source": "planetology.md",
             "category": "biological",
             "unlocks": "bio_terminator"
           }
@@ -805,6 +822,7 @@ Passive bonuses to ground combat.
             "id": "plasma_torpedo",
             "name": "Plasma Torpedo",
             "tech_level": 48,
+            "damage": 150,
             "category": "torpedo",
             "unlocks": "plasma_torpedo"
           }
@@ -840,6 +858,7 @@ Passive bonuses to ground combat.
             "id": "stellar_converter",
             "name": "Stellar Converter",
             "tech_level": 55,
+            "attacks": 4,
             "category": "beam",
             "unlocks": "stellar_converter"
           }

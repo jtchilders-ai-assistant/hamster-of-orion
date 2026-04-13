@@ -70,22 +70,45 @@ Effective_Factory_Output = Operating_Factories × Base_Factory_Output × Racial_
 
 ### 3. Total Planetary Production
 
-Total production includes both factory output and population labor:
+Total production includes both factory output and population labor, scaled by Planetology tech and mineral richness:
 
 ```
-Total_Production = Factory_Production + Population_Production
+Total_Production = (Factory_Production + Population_Production) × Mineral_Richness_Modifier
 
 Where:
   Factory_Production = Operating_Factories × 1 × Racial_Production_Modifier
-  Population_Production = Population × 0.5 × Racial_Production_Modifier
+  Population_Production = Population × Base_Pop_Output × Racial_Production_Modifier
+
+  Base_Pop_Output = 0.5 + (Planetology_TL / 50 × 1.5)
+    # Scales from 0.5 BC/pop at TL 0 → 2.0 BC/pop at TL 50
+    # At game start (TL ~1): ≈ 0.53 BC/pop (effectively 0.5)
+    # At TL 25: 1.25 BC/pop  |  At TL 50: 2.0 BC/pop
 ```
 
-**Note:** Each colonist contributes 0.5 BC/turn of base production (representing manual labor outside factories).
+**Population Labor Scaling (MOO1 Faithful):** Each colonist contributes between 0.5 and 2.0 BC/turn depending on the empire's Planetology technology level. This represents improvements in agricultural efficiency and industrial tools from environmental research. At game start, output is effectively 0.5 BC/pop; by TL 50 it reaches the MOO1 maximum of 2.0 BC/pop.
 
-**Example:** A Hamster planet with 50 population and 100 factories:
+**Mineral Richness Modifier:** Applied to total production (factory + population labor combined). Modifiers by richness level:
+
+| Richness Level | Modifier |
+|----------------|----------|
+| Ultra Poor | ×0.33 |
+| Poor | ×0.50 |
+| Normal | ×1.00 |
+| Rich | ×2.00 |
+| Ultra Rich | ×3.00 |
+
+See `planets/generation-tables.md` §5 for full richness probability tables.
+
+**Example:** A Hamster planet with 50 population, 100 factories, Planetology TL 25, Normal richness:
+- Base_Pop_Output: 0.5 + (25/50 × 1.5) = 1.25 BC/pop
 - Factory Production: 100 × 1 × 1.00 = 100 BC
-- Population Production: 50 × 0.5 × 1.00 = 25 BC
-- **Total Production: 125 BC/turn**
+- Population Production: 50 × 1.25 × 1.00 = 62.5 BC
+- Subtotal: 162.5 BC × 1.00 (Normal) = **162.5 BC/turn**
+
+**Early-game example (TL 1, Normal richness):** 50 pop, 100 factories, Hamsters:
+- Base_Pop_Output: 0.5 + (1/50 × 1.5) = 0.53 BC/pop
+- Factory Production: 100 BC, Population Production: 26.5 BC
+- **Total: 126.5 BC/turn** (nearly identical to fixed-0.5 formula early-game)
 
 ---
 
@@ -147,13 +170,15 @@ Max_Factories = Max_Population × Robotic_Controls_Level
 
 Where `Max_Population` is determined by planet size and terraforming.
 
-| Planet Base Size | Max Population (Base) |
-|------------------|----------------------|
-| Tiny | 20 |
-| Small | 40 |
-| Medium | 60 |
-| Large | 80 |
-| Huge | 100 |
+| Planet Base Size | Typical Max Pop | Generated Range |
+|------------------|-----------------|------------------|
+| Tiny | 15 | 10–20 |
+| Small | 32 | 25–40 |
+| Medium | 55 | 45–70 |
+| Large | 85 | 75–100 |
+| Huge | 120 | 100–150 |
+
+**Note:** Actual max population per planet is generated within these ranges (see `planets/generation-tables.md` §4). Economy formulas must use the planet's generated `base_population` value, not a hardcoded per-size constant. The "Typical" values above are representative midpoints for estimation purposes only.
 
 With Terraforming, max population can increase significantly (see Population Growth spec).
 
@@ -252,7 +277,10 @@ Effective_Operating_Factories = min(Factories_Built, Workers_For_Production × R
 {
   "factory_system": {
     "base_output_per_factory": 1.0,
-    "base_output_per_population": 0.5,
+    "base_pop_output_formula": "0.5 + (planetology_tl / 50.0 * 1.5)",
+    "base_pop_output_min": 0.5,
+    "base_pop_output_max": 2.0,
+    "base_pop_output_tl_cap": 50,
     "base_factory_cost": 10,
     "min_factory_cost": 2,
     "base_pollution_per_factory": 1.0,
@@ -313,12 +341,21 @@ Effective_Operating_Factories = min(Factories_Built, Workers_For_Production × R
     "hermit_crabs": 1.00
   },
   
+  "mineral_richness_modifiers": {
+    "ultra_poor": 0.33,
+    "poor": 0.50,
+    "normal": 1.00,
+    "rich": 2.00,
+    "ultra_rich": 3.00
+  },
+
   "planet_base_sizes": {
-    "tiny": { "max_population": 20 },
-    "small": { "max_population": 40 },
-    "medium": { "max_population": 60 },
-    "large": { "max_population": 80 },
-    "huge": { "max_population": 100 }
+    "comment": "These are representative mid-range values. Actual max_population is generated per-planet within a range (see planets/generation-tables.md §4). Economy formulas should use the generated base_population value, not these hardcoded numbers.",
+    "tiny": { "max_population": 15, "range": [10, 20] },
+    "small": { "max_population": 32, "range": [25, 40] },
+    "medium": { "max_population": 55, "range": [45, 70] },
+    "large": { "max_population": 85, "range": [75, 100] },
+    "huge": { "max_population": 120, "range": [100, 150] }
   }
 }
 ```
@@ -331,18 +368,21 @@ Effective_Operating_Factories = min(Factories_Built, Workers_For_Production × R
 function calculate_planetary_production(planet, empire):
     # Get constants
     base_factory_output = 1.0
-    base_pop_output = 0.5
+    # Population labor scales with Planetology tech (MOO1 faithful)
+    planetology_tl = get_planetology_tech_level(empire)
+    base_pop_output = 0.5 + (min(planetology_tl, 50) / 50.0 * 1.5)
     racial_modifier = get_racial_production_modifier(empire.race)
     robotic_level = get_robotic_controls_level(empire)
+    mineral_richness_modifier = get_mineral_richness_modifier(planet.richness)
     
     # Calculate operable factories
     max_operable = planet.population * robotic_level
     operating_factories = min(planet.factories, max_operable)
     
-    # Calculate gross production
+    # Calculate gross production (before richness modifier)
     factory_production = operating_factories * base_factory_output * racial_modifier
     population_production = planet.population * base_pop_output * racial_modifier
-    gross_production = factory_production + population_production
+    gross_production = (factory_production + population_production) * mineral_richness_modifier
     
     # Calculate pollution cleanup
     waste_rate = get_waste_rate(empire)
@@ -437,16 +477,19 @@ When capturing an enemy planet:
 - Factories: 80
 - Robotic Controls: II (2:1)
 - No waste reduction
+- Planetology TL 1 (game start)
+- Mineral richness: Normal (×1.0)
 
 **Calculation:**
 1. Max operable factories: 40 × 2 = 80
 2. Operating factories: min(80, 80) = 80
-3. Factory production: 80 × 1 × 1.0 = 80 BC
-4. Population production: 40 × 0.5 × 1.0 = 20 BC
-5. Gross production: 100 BC
-6. Pollution: 80 × 1.0 = 80 units
-7. Cleanup cost: 80 × 0.5 × 1.0 = 40 BC
-8. **Net production: 100 - 40 = 60 BC/turn**
+3. Base_Pop_Output: 0.5 + (1/50 × 1.5) = 0.53 BC/pop
+4. Factory production: 80 × 1 × 1.0 = 80 BC
+5. Population production: 40 × 0.53 × 1.0 = 21.2 BC
+6. Gross production: (80 + 21.2) × 1.0 = 101.2 BC
+7. Pollution: 80 × 1.0 = 80 units
+8. Cleanup cost: 80 × 0.5 × 1.0 = 40 BC
+9. **Net production: 101.2 - 40 = 61.2 BC/turn**
 
 ---
 
@@ -459,16 +502,21 @@ When capturing an enemy planet:
 - Robotic Controls: V (5:1)
 - Reduced Industrial Waste 40%
 - Enhanced Eco Restoration (tech level 11, cleanup_modifier 0.40)
+- Planetology TL 30 (mid-late game)
+- Mineral richness: Rich (×2.0)
 
 **Calculation:**
 1. Max operable factories: 60 × 5 = 300
 2. Operating factories: min(300, 300) = 300
-3. Factory production: 300 × 1 × 1.5 = 450 BC
-4. Population production: 60 × 0.5 × 1.5 = 45 BC
-5. Gross production: 495 BC
-6. Pollution: 300 × 0.40 = 120 units
-7. Cleanup cost: 120 × 0.5 × 0.40 = 24 BC
-8. **Net production: 495 - 24 = 471 BC/turn**
+3. Base_Pop_Output: 0.5 + (30/50 × 1.5) = 1.40 BC/pop
+4. Factory production: 300 × 1 × 1.5 = 450 BC
+5. Population production: 60 × 1.40 × 1.5 = 126 BC
+6. Gross production: (450 + 126) × 2.0 = 1,152 BC
+7. Pollution: 300 × 0.40 = 120 units
+8. Cleanup cost: 120 × 0.5 × 0.40 = 24 BC
+9. **Net production: 1,152 - 24 = 1,128 BC/turn**
+
+*(Compare to the old formula without richness/scaling: 471 BC/turn — mineral richness and Planetology tech together make Rich planets in the late game hugely more valuable.)*
 
 ---
 

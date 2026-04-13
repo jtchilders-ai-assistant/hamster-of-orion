@@ -27,6 +27,8 @@ Primitives clinging to obsolete biological forms. View Ants with professional re
 ### Racial Bonuses
 - **Production**: +25% (automated factories)
 - **Research**: +15% (cybernetic-enhanced intelligence)
+- **Research Field Bonuses**: Computers +40% (field expert, matches MOO1 Meklar)
+- **Research Field Penalties**: Planetology -20% (matches MOO1 Meklar)
 - **Food**: -50% (heavily mechanized population needs less)
 - **Growth**: -25% (slow reproduction, complex augmentation)
 - **Ground Combat**: +15% (cyborg troops, combat drones)
@@ -39,6 +41,7 @@ Primitives clinging to obsolete biological forms. View Ants with professional re
 - **Cybernetic Workers**: Population produces more with less
 - **Robotic Labor**: Can work hostile environments without terraforming
 - **Reduced Waste**: Pollution generates 50% slower
+- **No Refit Costs**: Never pay refit costs when upgrading ship components (matches MOO1 Meklar)
 - **Tech Integration**: Can reverse-engineer captured technology faster
 
 ### Starting Technologies
@@ -55,13 +58,13 @@ Primitives clinging to obsolete biological forms. View Ants with professional re
 ## AI Behavior
 
 ### Personality Archetype
-Researcher / Production-Focused / Methodical
+Erratic Industrialist (matches MOO1 Meklar — unpredictable, shifting priorities)
 
 ### Diplomatic Tendencies
 - **Natural Allies**: Ants (respect for optimization), Rats (fellow researchers)
 - **Natural Enemies**: None specific (views all as potential customers for tech)
 - **Trade Behavior**: Enthusiastic about tech trading
-- **Treaty Reliability**: High - logical and contract-oriented
+- **Treaty Reliability**: Low-to-Medium — erratic behavior means priorities shift unpredictably
 
 ### Strategic Priorities
 1. Establish advanced production infrastructure

@@ -35,3 +35,18 @@
 **Effect**: Board enemy ships  
 **Mechanic**: Capture instead of destroy  
 **Strategy**: Salvage enemy technology  
+
+---
+
+## Lightning Shield
+**Tech Level (Design):** 25  
+**MOO1 Level:** 46  
+**Effect (Design):** Reflects 50% of incoming damage back to attacker  
+**Effect (MOO1):** Destroys incoming missiles with 100% base chance (minus 1% per missile tech level of the attacking missile) — similar to Zyro Shield but at higher tier  
+
+**Design Note (Intentional Departure from MOO1):**  
+The Lightning Shield in *Hamster of Orion* is a redesigned mechanic. In MOO1, it is a Level 46 missile interceptor (the highest-tier missile defense). In this design, it has been repositioned to Level 25 with a damage-reflection mechanic rather than missile interception. This is an intentional change:
+- **Level shift** (46 → 25): Provides a mid-game force field option between Repulsor Beam and Zyro Shield.
+- **Mechanic shift** (missile interceptor → damage reflector): Adds a unique counter-attack flavor not present in MOO1.
+
+If the MOO1 missile-destroyer behavior is desired instead, see the **Zyro Shield** (L31), which destroys 75% of incoming missiles (design omits the MOO1 missile-tech-level penalty for simplicity).

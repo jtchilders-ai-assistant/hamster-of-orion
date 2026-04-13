@@ -27,6 +27,7 @@ Respect strength wherever found. Contemptuous of weak races (Hamsters, Rabbits).
 ### Racial Bonuses
 - **Production**: +10% (strong workers)
 - **Research**: -20% (anti-intellectual culture)
+- **Research Field Bonuses**: Weapons +20%, Construction +20% (matches MOO1 Bulrathi — better infantry gear and ship armor, thematically fitting)
 - **Food**: +0% (efficient herbivores)
 - **Growth**: +10% (large litters)
 - **Ground Combat**: +50% (devastating infantry)

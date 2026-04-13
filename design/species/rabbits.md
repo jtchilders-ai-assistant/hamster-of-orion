@@ -27,6 +27,7 @@ Everyone is potential warren space. Nervous around predators (Ferrets trigger in
 ### Racial Bonuses
 - **Production**: +10% (many workers)
 - **Research**: -10% (focus on survival over innovation)
+- **Research Field Bonuses**: Planetology +40% (field expert — better terraforming, soil enrichment, higher max pop; matches MOO1 Sakkra)
 - **Food**: +25% (expert farmers and foragers)
 - **Growth**: +100% (exponential reproduction)
 - **Ground Combat**: +5% (overwhelming numbers)
@@ -55,13 +56,13 @@ Everyone is potential warren space. Nervous around predators (Ferrets trigger in
 ## AI Behavior
 
 ### Personality Archetype
-Expansionist / Population-Focused / Defensive
+Aggressive Expansionist (matches MOO1 Sakkra — strongly driven to expand, will contest border planets)
 
 ### Diplomatic Tendencies
-- **Natural Allies**: Hamsters (fellow pacifists), anyone who doesn't attack
-- **Natural Enemies**: None intentional (avoids conflicts)
+- **Natural Allies**: Hamsters (peaceful coexistence useful for breeding room), anyone who gives space
+- **Natural Enemies**: Anyone encroaching on warren space — Rabbits react aggressively to crowding
 - **Trade Behavior**: Generous with food, need everything else
-- **Treaty Reliability**: High - wants peace to breed in safety
+- **Treaty Reliability**: Medium — keeps peace when it serves growth, aggressive when space is contested
 
 ### Strategic Priorities
 1. Colonize every available planet immediately

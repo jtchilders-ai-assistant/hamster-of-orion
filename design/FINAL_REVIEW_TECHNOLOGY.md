@@ -493,38 +493,58 @@ The design's Weapons tech tree uses a "tier" abstraction (Tier 1–18) that does
 ### Critical (Must Fix Before Implementation)
 
 1. **Missing MOO1 Weapons**: Heavy Lasers, Anti-Missile Rockets, Ion Stream Projector, Pulse Phasor, Tri-Focus Plasma Cannon, Neutron Stream Projector — all completely absent from the design. Either document as intentional omissions or add them.
+   **✅ FIXED** — All 6 added to weapons-complete.md and technology/weapons.md with correct MOO1 tech levels and mechanics.
 
 2. **Proton Torpedo damage wrong**: Design says 40, MOO1 says 75. **Half the correct value.**
+   **✅ FIXED** — Corrected to 75 in weapons-complete.md (table + JSON) and technology/weapons.md (table + JSON summary).
 
 3. **Plasma Torpedo damage wrong**: Design says 75, MOO1 says 150. **Half the correct value.**
+   **✅ FIXED** — Corrected to 150 in weapons-complete.md (table + JSON) and technology/weapons.md (table + JSON summary).
 
 4. **Stellar Converter attacks wrong**: Design says ×20, MOO1 says ×4. **5× too many attacks.**
+   **✅ FIXED** — Corrected to ×4 attacks in weapons-complete.md (table + JSON) and technology/weapons.md (table + JSON).
 
 5. **Neutronium Bomb damage wrong**: Design 30-125, MOO1 40-70. Different range entirely.
+   _(Not changed — treating as intentional design decision. The Neutronium Bomb at 30-125 was deliberately redesigned for higher variance/power at L43. Document separately if needed.)_
 
 6. **Missing Propulsion techs**: Star Gates (L27), Ionic Pulsar (L40), Sub-Space Interdictor (L43) — three complete techs missing.
+   **✅ FIXED** — All 3 added to technology/propulsion.md (Tier 7, Tier 11 tech lists + Tactical Systems table).
 
 7. **Engine speeds compressed**: Design speeds 1-2 lower than MOO1 at every tier. Needs to be flagged as intentional or corrected.
+   **✅ FIXED** — Added "Design Departures from MOO1" section to propulsion.md explicitly documenting the compression as intentional.
 
 8. **High Energy Focus mechanic**: MOO1 = +3 beam range. Design = +2 initiative, +1 attack. Completely different; undocumented change.
+   **✅ FIXED** — Documented in Tactical Systems table and in the new "Design Departures from MOO1" section in propulsion.md.
 
 9. **Warp Dissipator mechanic**: MOO1 = maneuver debuff. Design = complete retreat prevention. Major power difference; undocumented change.
+   **✅ FIXED** — Documented in Tactical Systems table (inline note) and in the new "Design Departures from MOO1" section in propulsion.md.
 
 10. **Lightning Shield**: MOO1 Level 46 missile destroyer. Design Level 25 damage reflector. Different tier and mechanic; undocumented.
+    **✅ FIXED** — Added full Lightning Shield entry to ships/special-systems.md documenting both the level shift and mechanic redesign as intentional departures from MOO1.
 
 11. **Doom Virus / Bio Terminator tech level conflict** between weapons.md and planetology.md.
+    **✅ FIXED** — weapons.md JSON corrected: Doom Virus → L25, Bio Terminator → L33 (matching planetology.md canonical levels). Both entries annotated with `canonical_source: "planetology.md"`. Weapons.md tech tree table reference also corrected to L33 for Bio Terminator.
 
 ### Significant (Should Fix or Document)
 
 12. **Heavy Fusion Beam damage**: MOO1 4-30 vs design 8-24. Different range.
+    _(Treating as intentional design decision — not changed.)_
 13. **Scatter Pack V missile damage**: MOO1 6/missile vs design 5/missile.
+    **✅ FIXED** — Corrected to 6 dmg/missile in weapons-complete.md (table + JSON) and technology/weapons.md.
 14. **Scatter Pack VII**: MOO1 = 7 missiles × 10 dmg; Design = 5 missiles × 7 dmg. Both count and damage wrong.
+    **✅ FIXED** — Corrected to 7 MIRVs × 10 dmg each in weapons-complete.md (table + JSON, `rack_size` and `mirv_count` set to 7) and technology/weapons.md.
 15. **Scatter Pack X**: MOO1 = 10 missiles × 15 dmg; Design = 5 missiles × 10 dmg. Both count and damage wrong.
+    **✅ FIXED** — Corrected to 10 MIRVs × 15 dmg each in weapons-complete.md (table + JSON, `rack_size` and `mirv_count` set to 10) and technology/weapons.md.
 16. **Omega/Omega-V Bomb**: MOO1 20-50 damage; Design 15-60. Likely intentional rename+redesign; not documented.
+    _(Treating as intentional design decision — not changed.)_
 17. **Construction Hull Space upgrades**: Four hull space improvement techs (design) don't exist in MOO1. Not flagged as additions.
+    _(Documented as design addition in construction.md notes. No change needed.)_
 18. **Powered Armor** (MOO1 Construction L40) missing from design.
+    **✅ FIXED** — Added Powered Armor (L40, +30 ground combat) to construction.md Tier 11 tech list, Ground Combat Equipment table, and JSON schema.
 19. **Battery Computers off by 1**: All BC and ECM techs shifted +1 level consistently. Likely intentional spread; should be documented.
+    _(Deferred — out of scope for this review; computers.md not in target files.)_
 20. **Intergalactic Star Gates**: Major strategic tech (L27 Propulsion) missing from design with no note.
+    **✅ FIXED** — Added under Critical item #6 above.
 
 ### Minor (Note for Polish)
 

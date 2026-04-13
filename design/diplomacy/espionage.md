@@ -6,6 +6,66 @@ The espionage system allows empires to conduct covert operations against rivals:
 
 This document provides complete, implementation-ready formulas for all espionage mechanics in Hamster of Orion.
 
+---
+
+## Design Philosophy: HoO vs MOO1 Spy System
+
+**⚠️ INTENTIONAL DESIGN DECISION — HoO original, not a MOO1 port.**
+
+HoO uses a **percentage-success formula** (see Section 1.2 and Section 5) rather than the MOO1 two-phase roll chart. This is a deliberate expansion, not an oversight.
+
+### MOO1 Spy System (Reference Only)
+
+MOO1 used a two-phase roll chart:
+
+**Phase 1 — Access Roll:**
+```
+Roll = Random(1–100) - YourComputerTech + TheirComputerTech
+```
+(Goal: roll as low as possible)
+
+| Roll | Discovered | Success | Access Removed |
+|------|-----------|---------|----------------|
+| ≤ 0  | No | Yes + Possible Frame | No |
+| 1–30 | No | Yes | No |
+| 31–50 | Yes | Yes | No |
+| 51–70 | No | No | No |
+| 71–99 | Yes | No | Yes |
+| **100+** | **Yes** | **No** | **All Spies Fail** |
+
+**Phase 2 — Mission Roll (if Phase 1 succeeded):**
+```
+SecondRoll = Random(1–100) + YourComputerTech
+```
+
+| Second Roll | Outcome |
+|-------------|--------|
+| 0–84 | Partial success |
+| 85–99 | Full success |
+| 100+ | Full success + Frame job (critical success, third party blamed) |
+
+**Key MOO1 distinctions:**
+- Frame job = critical success outcome of the SAME roll (not a separate choosable mission)
+- "All Spies Fail" = catastrophic result when one spy rolls 100+, ALL infiltrated spies lose their turn
+- Spy spending = % of galactic resources (0–10% per race, 0–20% defense)
+- No named mission types — spies do hide/sabotage/espionage categories only
+
+### HoO Design (This Document)
+
+HoO replaces MOO1's roll-chart system with:
+- **% success formula** with many modifiers (racial, tech, security level)
+- **Named mission types** (recon, theft, sabotage, rebellion, frame, assassination) — each separately choosable
+- **Frame job as standalone mission** (requires Chameleon tech or Advanced Espionage)
+- **Security level system** (0–10 spending tiers)
+- **Racial defensive bonuses** per empire
+- **Counter-intelligence, sleeper agents, double agents, tech sabotage** — original HoO additions
+
+The HoO system is richer and more tactically interesting than MOO1's system. The trade-off is less historical fidelity. This is an **accepted design decision**.
+
+**One MOO1 mechanic retained verbatim:** The "All Spies Fail" catastrophic result (see Section 1.3).
+
+---
+
 **Related Documents:**
 - `relationship-formulas.md` - Diplomatic penalties for caught spies
 - `../species/chameleons.md` - Chameleon racial bonuses
@@ -37,6 +97,37 @@ SpyCost = BASE_SPY_COST × DifficultyMod
 | Average | 1.00 |
 | Hard | 1.10 |
 | Impossible | 1.25 |
+
+### 1.3 All Spies Fail — Catastrophic Result
+
+**MOO1 mechanic retained in HoO.**
+
+When any single spy roll hits a catastrophic failure threshold (natural roll of 100 on the detection die), ALL of that empire's currently-infiltrated spies lose their next action turn:
+
+```
+AllSpiesFailTrigger = (detection_roll == 100)  // Exact natural 100 on 1d100
+```
+
+**Effect:**
+```
+if AllSpiesFailTrigger:
+    for each spy in attacker.infiltrated_spies:
+        spy.skip_turns += 1  // Each spy loses their next action
+    ApplyDiplomatic(target, attacker, "all_spies_fail", relation_penalty=-15)
+    NotifyPlayer(attacker, "CATASTROPHIC FAILURE: All agents compromised — {count} spies lose their next turn")
+```
+
+**Rules:**
+- Triggers on the detection roll (d100), not the success roll
+- Only spies *currently infiltrated* (past deployment time) are affected
+- Spies in transit (within 5-turn deployment window) are not affected
+- The triggering spy is also caught and subject to normal execution/expulsion rules
+- Probability: 1% per spy action — rare but game-changing
+- Cannot be reduced below 1% by any modifier
+
+**Design note:** This matches MOO1's "roll 100+ = All Spies Fail" catastrophic outcome. It exists to create high-stakes tension in multi-spy operations and deter excessive spy stacking against a single target.
+
+---
 
 ### 1.2 Spy Effectiveness Calculation
 
@@ -421,6 +512,12 @@ MoraleModifier = (70 - TargetMorale) / 2
 - Planets with alien populations
 
 ### 6.6 Frame Another Race
+
+> **⚠️ INTENTIONAL DESIGN DECISION — HoO original mission type.**
+> In MOO1, framing a third party was a *critical success outcome* of the Phase 2 spy roll (roll 100+),
+> not a separately choosable mission. HoO promotes frame jobs to a standalone mission type that
+> requires Chameleon technology or Advanced Espionage tech to unlock. This is a deliberate expansion
+> that gives the frame mechanic more player agency and strategic depth.
 
 **Cost:** 150 BC per attempt
 **Frequency:** Once per turn per target pair
@@ -1233,11 +1330,12 @@ Result: Almost certainly fails, probably detected, spy likely dies.
 
 ---
 
-*Document Version: 1.2*
-*Last Updated: 2026-04-12*
+*Document Version: 1.3*
+*Last Updated: 2026-04-13*
 *Specification: spec-017 - Espionage Success Formulas*
 *Status: Complete*
 
 ### Changelog
+- **v1.3 (2026-04-13):** Added "HoO vs MOO1 Design Philosophy" section at top, documenting spy system as intentional HoO original design (% success formula vs MOO1 two-phase roll chart). Added Section 1.3 "All Spies Fail" catastrophic result (natural 100 on detection die = all infiltrated spies lose their next turn). Documented Frame job (Section 6.6) as HoO standalone mission type vs MOO1 Phase 2 critical success outcome.
 - **v1.2 (2026-04-12):** Fixed Section 5.3 Example 3 (Ferret sabotage). `RacialDefenseBonus` is not subtracted from `SpyEffectiveness` — it belongs in `DetectionChance` (Section 4.2). Corrected calculation: SpyEffectiveness = 36 (not 31), SuccessChance = 76% (not 71%). Added explicit DetectionChance line to the example showing where the Rabbit -5 defense bonus is applied.
 - **v1.1 (2026-04-12):** Corrected Rats (Psilons) offensive espionage bonus: +5 → +0. Psilons have no espionage bonus in MOO1. Added Chameleon (Darlok) flat +30 spy roll bonus to formula, pseudocode, JSON, and worked examples. Updated Chameleon vs Chameleon edge case to reflect flat bonus stacking.
