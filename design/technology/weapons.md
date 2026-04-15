@@ -75,6 +75,7 @@ In each game, players are offered **2-3 random technologies** at each tier. Not 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
 | Ion Cannon | 10 | Ion Cannon | 3-8 damage, halves shields |
+| Heavy Ion Cannon | 10 | Heavy Ion Cannon | 3-15 damage, range 2 (MOO1 L10) |
 | Scatter Pack V | 10 | Scatter Pack V | 6 ×5 MIRV missiles (5 MIRVs × 6 dmg each) |
 | Fusion Bomb | 10 | Fusion Bomb | 5-20 bombardment damage |
 | Merculite Missiles | 12 | Merculite Missile | 10 damage, speed 4 |
@@ -88,6 +89,7 @@ In each game, players are offered **2-3 random technologies** at each tier. Not 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
 | Neutron Blaster | 13 | Neutron Blaster | 3-12 damage, kills crew |
+| Heavy Neutron Blaster | 15 | Heavy Neutron Blaster | 3-24 damage, range 2 (MOO1 L15) |
 | Graviton Beam | 15 | Graviton Beam | 1-15 damage, stream |
 | Stinger Missiles | 15 | Stinger Missile | 15 damage, speed 4.5 |
 | Death Spores | 15 | — | **See Planetology field** (bio weapons are not in Weapons field) |
@@ -101,7 +103,7 @@ In each game, players are offered **2-3 random technologies** at each tier. Not 
 |-----------|------------|---------|--------|
 | Hard Beam | 18 | Hard Beam | 8-12 damage, no range penalty |
 | Scatter Pack VII | 18 | Scatter Pack VII | 10 ×7 MIRV missiles (7 MIRVs × 10 dmg each) |
-| Fusion Rifle | 18 | Fusion Rifle | +15 ground combat |
+| Fusion Rifle | 24 | Fusion Rifle | +20 ground combat (MOO1 L24) |
 
 ---
 
@@ -135,7 +137,7 @@ In each game, players are offered **2-3 random technologies** at each tier. Not 
 |-----------|------------|---------|--------|
 | Megabolt Cannon | 25 | Megabolt Cannon | 2-20 damage, chain to 4 ships |
 | Phasor | 27 | Phasor | 5-20 damage, long range |
-| Hand Phasors | 27 | Hand Phasors | +20 ground combat |
+| Hand Phasors | 31 | Hand Phasors | +25 ground combat (MOO1 L31) |
 | Doom Virus | 25 | — | **See Planetology field** (Planetology L25 is canonical; this entry is reference only) |
 
 ---
@@ -178,7 +180,7 @@ In each game, players are offered **2-3 random technologies** at each tier. Not 
 |-----------|------------|---------|--------|
 | Gauss Autocannon | 37 | Gauss Autocannon | 7-10 ×4 attacks |
 | Pulse Phasor | 38 | Pulse Phasor | 5-20 damage ×3 attacks per turn (fires Phasor 3× per turn) (MOO1 L38) |
-| Plasma Rifle | 38 | Plasma Rifle | +25 ground combat |
+| Plasma Rifle | 42 | Plasma Rifle | +30 ground combat (MOO1 L42) |
 
 ---
 
@@ -200,7 +202,7 @@ In each game, players are offered **2-3 random technologies** at each tier. Not 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
 | Neutronium Bomb | 43 | Neutronium Bomb | 30-125 bombardment |
-| Tri-Focus Plasma Cannon | 45 | Tri-Focus Plasma Cannon | 6-30 damage ×3 attacks per turn (heavy triple-plasma weapon) (MOO1 L45) |
+| Tri-Focus Plasma Cannon | 45 | Tri-Focus Plasma Cannon | 20-50 damage (focused triple-plasma weapon) (MOO1 L45) |
 | Death Ray | 45 | Death Ray | 200-1000 damage, instant kill small |
 
 ---
@@ -222,7 +224,7 @@ In each game, players are offered **2-3 random technologies** at each tier. Not 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
 | Mauler Device | 50 | Mauler Device | 20-100 damage, 100% accuracy |
-| Mauler Pistol | 50 | Mauler Pistol | +30 ground combat |
+| Mauler Pistol | 50 | Mauler Pistol | +35 ground combat (**Design addition** — not in MOO1, extends weapon progression) |
 
 ---
 
@@ -345,14 +347,14 @@ Kill population, permanent damage, diplomatic penalty.
 ### Ground Combat Weapons (6 total)
 Passive bonuses to ground combat.
 
-| Tech Level | Weapon | Bonus |
-|------------|--------|-------|
-| 5 | Hand Lasers | +5 |
-| 12 | Gatling Laser Rifle | +10 |
-| 18 | Fusion Rifle | +15 |
-| 27 | Hand Phasors | +20 |
-| 38 | Plasma Rifle | +25 |
-| 50 | Mauler Pistol | +30 |
+| Tech Level | Weapon | Bonus | Notes |
+|------------|--------|-------|-------|
+| 5 | Hand Lasers | +5 | MOO1 L5 |
+| 12 | Gatling Laser Rifle | +10 | MOO1 L12 (Ion Rifle renamed) |
+| 24 | Fusion Rifle | +20 | MOO1 L24 |
+| 31 | Hand Phasors | +25 | MOO1 L31 |
+| 42 | Plasma Rifle | +30 | MOO1 L42 |
+| 50 | Mauler Pistol | +35 | **Design addition** — extends progression |
 
 ---
 
@@ -492,7 +494,18 @@ Passive bonuses to ground combat.
             "name": "Gatling Laser Rifle",
             "tech_level": 12,
             "category": "ground",
+            "ground_bonus": 10,
             "unlocks": "gatling_laser_rifle"
+          },
+          {
+            "id": "heavy_ion_cannon",
+            "name": "Heavy Ion Cannon",
+            "tech_level": 10,
+            "category": "beam",
+            "damage": "3-15",
+            "range": 2,
+            "moo1_level": 10,
+            "unlocks": "heavy_ion_cannon"
           }
         ]
       },
@@ -528,6 +541,16 @@ Passive bonuses to ground combat.
             "tech_level": 15,
             "category": "biological",
             "unlocks": "death_spores"
+          },
+          {
+            "id": "heavy_neutron_blaster",
+            "name": "Heavy Neutron Blaster",
+            "tech_level": 15,
+            "category": "beam",
+            "damage": "3-24",
+            "range": 2,
+            "moo1_level": 15,
+            "unlocks": "heavy_neutron_blaster"
           }
         ]
       },
@@ -555,9 +578,12 @@ Passive bonuses to ground combat.
           {
             "id": "fusion_rifle",
             "name": "Fusion Rifle",
-            "tech_level": 18,
+            "tech_level": 24,
             "category": "ground",
-            "unlocks": "fusion_rifle"
+            "ground_bonus": 20,
+            "moo1_level": 24,
+            "unlocks": "fusion_rifle",
+            "note": "Moved to Tier 8 to match MOO1 L24"
           }
         ]
       },
@@ -639,9 +665,12 @@ Passive bonuses to ground combat.
           {
             "id": "hand_phasors",
             "name": "Hand Phasors",
-            "tech_level": 27,
+            "tech_level": 31,
             "category": "ground",
-            "unlocks": "hand_phasors"
+            "ground_bonus": 25,
+            "moo1_level": 31,
+            "unlocks": "hand_phasors",
+            "note": "Moved to Tier 11 to match MOO1 L31"
           },
           {
             "id": "doom_virus",
@@ -741,9 +770,12 @@ Passive bonuses to ground combat.
           {
             "id": "plasma_rifle",
             "name": "Plasma Rifle",
-            "tech_level": 38,
+            "tech_level": 42,
             "category": "ground",
-            "unlocks": "plasma_rifle"
+            "ground_bonus": 30,
+            "moo1_level": 42,
+            "unlocks": "plasma_rifle",
+            "note": "Moved to Tier 14 to match MOO1 L42"
           }
         ]
       },
@@ -845,7 +877,10 @@ Passive bonuses to ground combat.
             "name": "Mauler Pistol",
             "tech_level": 50,
             "category": "ground",
-            "unlocks": "mauler_pistol"
+            "ground_bonus": 35,
+            "design_addition": true,
+            "unlocks": "mauler_pistol",
+            "note": "Design addition — not in MOO1, extends ground weapon progression"
           }
         ]
       },
@@ -867,7 +902,7 @@ Passive bonuses to ground combat.
     ],
     
     "categories": {
-      "beam": 22,
+      "beam": 24,
       "missile": 11,
       "torpedo": 4,
       "bomb": 5,
@@ -925,5 +960,5 @@ Passive bonuses to ground combat.
 
 ---
 
-*Last Updated: 2026-03-22*
+*Last Updated: 2026-04-15*
 *Specification: spec-009 - Complete Tech Tree - Weapons Field*
