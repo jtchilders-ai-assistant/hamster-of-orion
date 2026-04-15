@@ -71,8 +71,8 @@ Unique targeting and combat abilities.
 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
-| Battle Computer II | 6 | BC Mark II | +2 Attack Rating |
-| ECM Jammer I | 3 | ECM I | +1 Missile Defense |
+| Battle Computer II | 5 | BC Mark II | +2 Attack Rating |
+| ECM Jammer I | 2 | ECM I | +1 Missile Defense |
 | Robotic Controls III | 8 | RC III | 3 factories per pop |
 
 ---
@@ -82,8 +82,8 @@ Unique targeting and combat abilities.
 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
-| Battle Computer III | 11 | BC Mark III | +3 Attack Rating |
-| ECM Jammer II | 8 | ECM II | +2 Missile Defense |
+| Battle Computer III | 10 | BC Mark III | +3 Attack Rating |
+| ECM Jammer II | 7 | ECM II | +2 Missile Defense |
 
 ---
 
@@ -92,9 +92,9 @@ Unique targeting and combat abilities.
 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
-| Battle Computer IV | 16 | BC Mark IV | +4 Attack Rating |
-| ECM Jammer III | 13 | ECM III | +3 Missile Defense |
-| Improved Space Scanner | 14 | ISS | Colony: 7, Ship: 2, shows ETA |
+| Battle Computer IV | 15 | BC Mark IV | +4 Attack Rating |
+| ECM Jammer III | 12 | ECM III | +3 Missile Defense |
+| Improved Space Scanner | 13 | ISS | Colony: 7, Ship: 2, shows ETA |
 
 ---
 
@@ -103,7 +103,7 @@ Unique targeting and combat abilities.
 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
-| ECM Jammer IV | 18 | ECM IV | +4 Missile Defense |
+| ECM Jammer IV | 17 | ECM IV | +4 Missile Defense |
 | Robotic Controls IV | 18 | RC IV | 4 factories per pop |
 
 ---
@@ -113,9 +113,9 @@ Unique targeting and combat abilities.
 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
-| Battle Computer V | 21 | BC Mark V | +5 Attack Rating |
-| ECM Jammer V | 23 | ECM V | +5 Missile Defense |
-| Advanced Space Scanner | 24 | ASS | Colony: 9, Ship: 3, planet stats |
+| Battle Computer V | 20 | BC Mark V | +5 Attack Rating |
+| ECM Jammer V | 22 | ECM V | +5 Missile Defense |
+| Advanced Space Scanner | 23 | ASS | Colony: 9, Ship: 3, planet stats |
 
 ---
 
@@ -124,8 +124,8 @@ Unique targeting and combat abilities.
 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
-| Battle Computer VI | 26 | BC Mark VI | +6 Attack Rating |
-| ECM Jammer VI | 28 | ECM VI | +6 Missile Defense |
+| Battle Computer VI | 25 | BC Mark VI | +6 Attack Rating |
+| ECM Jammer VI | 27 | ECM VI | +6 Missile Defense |
 | Robotic Controls V | 28 | RC V | 5 factories per pop |
 
 ---
@@ -135,7 +135,7 @@ Unique targeting and combat abilities.
 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
-| Battle Computer VII | 31 | BC Mark VII | +7 Attack Rating |
+| Battle Computer VII | 30 | BC Mark VII | +7 Attack Rating |
 
 ---
 
@@ -144,7 +144,7 @@ Unique targeting and combat abilities.
 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
-| ECM Jammer VII | 33 | ECM VII | +7 Missile Defense |
+| ECM Jammer VII | 32 | ECM VII | +7 Missile Defense |
 | Hyperspace Communications | 34 | Hypercomm | Reroute fleets in transit |
 | Subspace Scanner | 35 | SSS | Colony: 12, Ship: 4 |
 
@@ -155,8 +155,8 @@ Unique targeting and combat abilities.
 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
-| Battle Computer VIII | 36 | BC Mark VIII | +8 Attack Rating |
-| ECM Jammer VIII | 38 | ECM VIII | +8 Missile Defense |
+| Battle Computer VIII | 35 | BC Mark VIII | +8 Attack Rating |
+| ECM Jammer VIII | 37 | ECM VIII | +8 Missile Defense |
 | Robotic Controls VI | 38 | RC VI | 6 factories per pop |
 
 ---
@@ -166,8 +166,8 @@ Unique targeting and combat abilities.
 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
-| Battle Computer IX | 41 | BC Mark IX | +9 Attack Rating |
-| ECM Jammer IX | 43 | ECM IX | +9 Missile Defense |
+| Battle Computer IX | 40 | BC Mark IX | +9 Attack Rating |
+| ECM Jammer IX | 42 | ECM IX | +9 Missile Defense |
 
 ---
 
@@ -176,7 +176,7 @@ Unique targeting and combat abilities.
 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
-| Battle Computer X | 46 | BC Mark X | +10 Attack Rating |
+| Battle Computer X | 45 | BC Mark X | +10 Attack Rating |
 | Hyper Scanner | 45 | Hyper Scanner | Colony: 15, Ship: 5, see cloaked |
 | Oracle Interface | 46 | Oracle | All weapons armor-piercing |
 
@@ -187,9 +187,9 @@ Unique targeting and combat abilities.
 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
-| ECM Jammer X | 48 | ECM X | +10 Missile Defense |
+| ECM Jammer X | 47 | ECM X | +10 Missile Defense |
 | Robotic Controls VII | 48 | RC VII | 7 factories per pop |
-| Technology Nullifier | 49 | Tech Nullifier | Target -2 to -5 attack rating |
+| Technology Nullifier | 49 | Tech Nullifier | Target -2 to -6 attack rating |
 
 ---
 
@@ -210,15 +210,15 @@ Unique targeting and combat abilities.
 | Computer | Tech Level | Attack Rating | Space | Cost |
 |----------|------------|---------------|-------|------|
 | Mark I | 1 | +1 | 5 | 10 BC |
-| Mark II | 6 | +2 | 6 | 15 BC |
-| Mark III | 11 | +3 | 7 | 22 BC |
-| Mark IV | 16 | +4 | 8 | 30 BC |
-| Mark V | 21 | +5 | 9 | 40 BC |
-| Mark VI | 26 | +6 | 10 | 52 BC |
-| Mark VII | 31 | +7 | 11 | 65 BC |
-| Mark VIII | 36 | +8 | 12 | 80 BC |
-| Mark IX | 41 | +9 | 14 | 100 BC |
-| Mark X | 46 | +10 | 16 | 125 BC |
+| Mark II | 5 | +2 | 6 | 15 BC |
+| Mark III | 10 | +3 | 7 | 22 BC |
+| Mark IV | 15 | +4 | 8 | 30 BC |
+| Mark V | 20 | +5 | 9 | 40 BC |
+| Mark VI | 25 | +6 | 10 | 52 BC |
+| Mark VII | 30 | +7 | 11 | 65 BC |
+| Mark VIII | 35 | +8 | 12 | 80 BC |
+| Mark IX | 40 | +9 | 14 | 100 BC |
+| Mark X | 45 | +10 | 16 | 125 BC |
 | Mark XI | 50 | +11 | 18 | 150 BC |
 
 **Hit Chance Formula:**
@@ -230,16 +230,16 @@ Hit_Chance = 50% + (Attack_Rating × 5%) - (Target_Defense × 3%)
 
 | ECM | Tech Level | Missile Defense | Space | Cost |
 |-----|------------|-----------------|-------|------|
-| Mark I | 3 | +1 | 4 | 8 BC |
-| Mark II | 8 | +2 | 5 | 12 BC |
-| Mark III | 13 | +3 | 6 | 18 BC |
-| Mark IV | 18 | +4 | 7 | 25 BC |
-| Mark V | 23 | +5 | 8 | 35 BC |
-| Mark VI | 28 | +6 | 9 | 45 BC |
-| Mark VII | 33 | +7 | 10 | 58 BC |
-| Mark VIII | 38 | +8 | 12 | 72 BC |
-| Mark IX | 43 | +9 | 14 | 90 BC |
-| Mark X | 48 | +10 | 16 | 110 BC |
+| Mark I | 2 | +1 | 4 | 8 BC |
+| Mark II | 7 | +2 | 5 | 12 BC |
+| Mark III | 12 | +3 | 6 | 18 BC |
+| Mark IV | 17 | +4 | 7 | 25 BC |
+| Mark V | 22 | +5 | 8 | 35 BC |
+| Mark VI | 27 | +6 | 9 | 45 BC |
+| Mark VII | 32 | +7 | 10 | 58 BC |
+| Mark VIII | 37 | +8 | 12 | 72 BC |
+| Mark IX | 42 | +9 | 14 | 90 BC |
+| Mark X | 47 | +10 | 16 | 110 BC |
 
 **Missile Hit Formula:**
 ```
@@ -264,8 +264,8 @@ Missile_Hit = Base_Accuracy - (ECM_Level × 5%)
 | Scanner | Tech Level | Colony Detect | Ship Detect | Space | Cost |
 |---------|------------|---------------|-------------|-------|------|
 | Deep Space | 4 | 5 | 1 | 5 | 15 BC |
-| Improved | 14 | 7 | 2 | 6 | 25 BC |
-| Advanced | 24 | 9 | 3 | 8 | 40 BC |
+| Improved | 13 | 7 | 2 | 6 | 25 BC |
+| Advanced | 23 | 9 | 3 | 8 | 40 BC |
 | Subspace | 35 | 12 | 4 | 10 | 60 BC |
 | Hyper | 45 | 15 | 5 | 12 | 85 BC |
 
@@ -276,7 +276,7 @@ Missile_Hit = Base_Accuracy - (ECM_Level × 5%)
 | Battle Scanner | 1 | +3 Init, +1 Target, see stats | 8 | 20 BC |
 | Hyperspace Comm | 34 | Reroute fleets | 10 | 50 BC |
 | Oracle Interface | 46 | All weapons armor-piercing | 25 | 100 BC |
-| Tech Nullifier | 49 | Target -2 to -5 attack | 30 | 120 BC |
+| Tech Nullifier | 49 | Target -2 to -6 attack | 30 | 120 BC |
 
 ---
 
@@ -435,7 +435,7 @@ The Computers field creates an arms race:
           {
             "id": "battle_computer_2",
             "name": "Battle Computer II",
-            "tech_level": 6,
+            "tech_level": 5,
             "category": "targeting",
             "unlocks": "bc_mark_2",
             "effect": {
@@ -445,7 +445,7 @@ The Computers field creates an arms race:
           {
             "id": "ecm_jammer_1",
             "name": "ECM Jammer I",
-            "tech_level": 3,
+            "tech_level": 2,
             "category": "ecm",
             "unlocks": "ecm_1",
             "effect": {
@@ -471,7 +471,7 @@ The Computers field creates an arms race:
           {
             "id": "battle_computer_3",
             "name": "Battle Computer III",
-            "tech_level": 11,
+            "tech_level": 10,
             "category": "targeting",
             "unlocks": "bc_mark_3",
             "effect": {
@@ -481,7 +481,7 @@ The Computers field creates an arms race:
           {
             "id": "ecm_jammer_2",
             "name": "ECM Jammer II",
-            "tech_level": 8,
+            "tech_level": 7,
             "category": "ecm",
             "unlocks": "ecm_2",
             "effect": {
@@ -498,7 +498,7 @@ The Computers field creates an arms race:
           {
             "id": "battle_computer_4",
             "name": "Battle Computer IV",
-            "tech_level": 16,
+            "tech_level": 15,
             "category": "targeting",
             "unlocks": "bc_mark_4",
             "effect": {
@@ -508,7 +508,7 @@ The Computers field creates an arms race:
           {
             "id": "ecm_jammer_3",
             "name": "ECM Jammer III",
-            "tech_level": 13,
+            "tech_level": 12,
             "category": "ecm",
             "unlocks": "ecm_3",
             "effect": {
@@ -518,7 +518,7 @@ The Computers field creates an arms race:
           {
             "id": "improved_scanner",
             "name": "Improved Space Scanner",
-            "tech_level": 14,
+            "tech_level": 13,
             "category": "scanner",
             "unlocks": "improved_scanner",
             "effect": {
@@ -537,7 +537,7 @@ The Computers field creates an arms race:
           {
             "id": "ecm_jammer_4",
             "name": "ECM Jammer IV",
-            "tech_level": 18,
+            "tech_level": 17,
             "category": "ecm",
             "unlocks": "ecm_4",
             "effect": {
@@ -563,7 +563,7 @@ The Computers field creates an arms race:
           {
             "id": "battle_computer_5",
             "name": "Battle Computer V",
-            "tech_level": 21,
+            "tech_level": 20,
             "category": "targeting",
             "unlocks": "bc_mark_5",
             "effect": {
@@ -573,7 +573,7 @@ The Computers field creates an arms race:
           {
             "id": "ecm_jammer_5",
             "name": "ECM Jammer V",
-            "tech_level": 23,
+            "tech_level": 22,
             "category": "ecm",
             "unlocks": "ecm_5",
             "effect": {
@@ -583,7 +583,7 @@ The Computers field creates an arms race:
           {
             "id": "advanced_scanner",
             "name": "Advanced Space Scanner",
-            "tech_level": 24,
+            "tech_level": 23,
             "category": "scanner",
             "unlocks": "advanced_scanner",
             "effect": {
@@ -602,7 +602,7 @@ The Computers field creates an arms race:
           {
             "id": "battle_computer_6",
             "name": "Battle Computer VI",
-            "tech_level": 26,
+            "tech_level": 25,
             "category": "targeting",
             "unlocks": "bc_mark_6",
             "effect": {
@@ -612,7 +612,7 @@ The Computers field creates an arms race:
           {
             "id": "ecm_jammer_6",
             "name": "ECM Jammer VI",
-            "tech_level": 28,
+            "tech_level": 27,
             "category": "ecm",
             "unlocks": "ecm_6",
             "effect": {
@@ -629,7 +629,7 @@ The Computers field creates an arms race:
           {
             "id": "battle_computer_7",
             "name": "Battle Computer VII",
-            "tech_level": 31,
+            "tech_level": 30,
             "category": "targeting",
             "unlocks": "bc_mark_7",
             "effect": {
@@ -655,7 +655,7 @@ The Computers field creates an arms race:
           {
             "id": "ecm_jammer_7",
             "name": "ECM Jammer VII",
-            "tech_level": 33,
+            "tech_level": 32,
             "category": "ecm",
             "unlocks": "ecm_7",
             "effect": {
@@ -693,7 +693,7 @@ The Computers field creates an arms race:
           {
             "id": "battle_computer_8",
             "name": "Battle Computer VIII",
-            "tech_level": 36,
+            "tech_level": 35,
             "category": "targeting",
             "unlocks": "bc_mark_8",
             "effect": {
@@ -703,7 +703,7 @@ The Computers field creates an arms race:
           {
             "id": "ecm_jammer_8",
             "name": "ECM Jammer VIII",
-            "tech_level": 38,
+            "tech_level": 37,
             "category": "ecm",
             "unlocks": "ecm_8",
             "effect": {
@@ -729,7 +729,7 @@ The Computers field creates an arms race:
           {
             "id": "battle_computer_9",
             "name": "Battle Computer IX",
-            "tech_level": 41,
+            "tech_level": 40,
             "category": "targeting",
             "unlocks": "bc_mark_9",
             "effect": {
@@ -739,7 +739,7 @@ The Computers field creates an arms race:
           {
             "id": "ecm_jammer_9",
             "name": "ECM Jammer IX",
-            "tech_level": 43,
+            "tech_level": 42,
             "category": "ecm",
             "unlocks": "ecm_9",
             "effect": {
@@ -756,7 +756,7 @@ The Computers field creates an arms race:
           {
             "id": "battle_computer_10",
             "name": "Battle Computer X",
-            "tech_level": 46,
+            "tech_level": 45,
             "category": "targeting",
             "unlocks": "bc_mark_10",
             "effect": {
@@ -795,7 +795,7 @@ The Computers field creates an arms race:
           {
             "id": "ecm_jammer_10",
             "name": "ECM Jammer X",
-            "tech_level": 48,
+            "tech_level": 47,
             "category": "ecm",
             "unlocks": "ecm_10",
             "effect": {
@@ -818,7 +818,7 @@ The Computers field creates an arms race:
             "category": "special",
             "unlocks": "tech_nullifier",
             "effect": {
-              "target_attack_reduction": [-5, -2]
+              "target_attack_reduction": [-6, -2]
             }
           }
         ]
@@ -888,31 +888,31 @@ The Computers field creates an arms race:
 | Mark | Tech Level | Attack Rating |
 |------|------------|---------------|
 | I | 1 | +1 |
-| II | 6 | +2 |
-| III | 11 | +3 |
-| IV | 16 | +4 |
-| V | 21 | +5 |
-| VI | 26 | +6 |
-| VII | 31 | +7 |
-| VIII | 36 | +8 |
-| IX | 41 | +9 |
-| X | 46 | +10 |
+| II | 5 | +2 |
+| III | 10 | +3 |
+| IV | 15 | +4 |
+| V | 20 | +5 |
+| VI | 25 | +6 |
+| VII | 30 | +7 |
+| VIII | 35 | +8 |
+| IX | 40 | +9 |
+| X | 45 | +10 |
 | XI | 50 | +11 |
 
 ### ECM Jammers (10 total)
 
 | Mark | Tech Level | Missile Defense |
 |------|------------|-----------------|
-| I | 3 | +1 |
-| II | 8 | +2 |
-| III | 13 | +3 |
-| IV | 18 | +4 |
-| V | 23 | +5 |
-| VI | 28 | +6 |
-| VII | 33 | +7 |
-| VIII | 38 | +8 |
-| IX | 43 | +9 |
-| X | 48 | +10 |
+| I | 2 | +1 |
+| II | 7 | +2 |
+| III | 12 | +3 |
+| IV | 17 | +4 |
+| V | 22 | +5 |
+| VI | 27 | +6 |
+| VII | 32 | +7 |
+| VIII | 37 | +8 |
+| IX | 42 | +9 |
+| X | 47 | +10 |
 
 ### Robotic Controls (6 total)
 
@@ -930,8 +930,8 @@ The Computers field creates an arms race:
 | Scanner | Tech Level | Colony/Ship Range |
 |---------|------------|-------------------|
 | Deep Space | 4 | 5/1 |
-| Improved | 14 | 7/2 |
-| Advanced | 24 | 9/3 |
+| Improved | 13 | 7/2 |
+| Advanced | 23 | 9/3 |
 | Subspace | 35 | 12/4 |
 | Hyper | 45 | 15/5 |
 
@@ -948,5 +948,5 @@ The Computers field creates an arms race:
 
 ---
 
-*Last Updated: 2026-03-22*
+*Last Updated: 2026-04-15*
 *Specification: spec-012 - Complete Tech Tree - Computers Field*

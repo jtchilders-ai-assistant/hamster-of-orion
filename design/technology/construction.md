@@ -871,5 +871,5 @@ In MOO1, all 4 hull sizes are available from the start. Construction technology 
 
 ---
 
-*Last Updated: 2026-03-22*
+*Last Updated: 2026-04-15*
 *Specification: spec-011 - Complete Tech Tree - Construction Field*

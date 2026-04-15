@@ -85,7 +85,7 @@ Special devices: Repulsor Beams, Cloaking Devices, Stasis Fields, and ultimate w
 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
-| Class II Deflector Shield | 5 | Class II Deflector | -2 damage per hit |
+| Class II Deflector Shield | 4 | Class II Deflector | -2 damage per hit |
 
 ---
 
@@ -104,110 +104,110 @@ Special devices: Repulsor Beams, Cloaking Devices, Stasis Fields, and ultimate w
 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
-| Class IV Deflector Shield | 12 | Class IV Deflector | -4 damage per hit |
 | Planetary Shield V | 12 | Planetary Shield V | -5 bombardment damage |
-| Class V Deflector Shield | 14 | Class V Deflector | -5 damage per hit |
+| Class IV Deflector Shield | 14 | Class IV Deflector | -4 damage per hit |
 
 ---
 
-### Tier 5 (Tech Level 15-18) - Tactical Fields
+### Tier 5 (Tech Level 15-20) - Tactical Fields & Mid Shields
 **Research Cost:** 500 RP
 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
 | Repulsor Beam | 16 | Repulsor Beam | Push enemy ships 2 hexes away |
-| Class VI Deflector Shield | 18 | Class VI Deflector | -6 damage per hit |
+| Class V Deflector Shield | 20 | Class V Deflector | -5 damage per hit |
 
 ---
 
-### Tier 6 (Tech Level 19-22) - Advanced Protection
+### Tier 6 (Tech Level 21-24) - Advanced Protection
 **Research Cost:** 1,000 RP
 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
-| Class VII Deflector Shield | 20 | Class VII Deflector | -7 damage per hit |
 | Personal Absorption Shield | 21 | Personal Absorption | +20 ground combat bonus |
 | Planetary Shield X | 22 | Planetary Shield X | -10 bombardment damage |
+| Class VI Deflector Shield | 24 | Class VI Deflector | -6 damage per hit |
 
 ---
 
-### Tier 7 (Tech Level 23-26) - Stealth Technology
+### Tier 7 (Tech Level 25-30) - Stealth Technology & Heavy Shields
 **Research Cost:** 1,500 RP
 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
-| Class VIII Deflector Shield | 24 | Class VIII Deflector | -8 damage per hit |
-| Lightning Shield | 25 | Lightning Shield | +50% damage vs missiles |
+| Class VIII Deflector Shield | 26 | Class VIII Deflector | -8 damage per hit |
 | Cloaking Device | 27 | Cloaking Device | +5 Defense, invisible until firing |
+| Class VII Deflector Shield | 30 | Class VII Deflector | -7 damage per hit |
 
 ---
 
-### Tier 8 (Tech Level 27-30) - Heavy Shielding
+### Tier 8 (Tech Level 31-34) - Heavy Shielding & Missile Defense
 **Research Cost:** 3,000 RP
 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
-| Class IX Deflector Shield | 28 | Class IX Deflector | -9 damage per hit |
+| Zyro Shield | 31 | Zyro Shield | 75% chance to destroy incoming missiles − 1% per missile tech level |
+| Planetary Shield XV | 32 | Planetary Shield XV | -15 bombardment damage |
+| Class IX Deflector Shield | 34 | Class IX Deflector | -9 damage per hit |
 
 ---
 
-### Tier 9 (Tech Level 31-34) - Missile Defense
+### Tier 9 (Tech Level 35-38) - Disabling Fields
 **Research Cost:** 5,000 RP
 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
-| Zyro Shield | 31 | Zyro Shield | 75% chance to destroy incoming missiles |
-| Class X Deflector Shield | 32 | Class X Deflector | -10 damage per hit |
-| Planetary Shield XV | 32 | Planetary Shield XV | -15 bombardment damage |
-
----
-
-### Tier 10 (Tech Level 35-38) - Disabling Fields
-**Research Cost:** 8,000 RP
-
-| Tech Name | Tech Level | Unlocks | Effect |
-|-----------|------------|---------|--------|
-| Class XI Deflector Shield | 36 | Class XI Deflector | -11 damage per hit |
+| Class X Deflector Shield | 36 | Class X Deflector | -10 damage per hit |
 | Stasis Field | 37 | Stasis Field | Disables all weapons on target ship 1 turn |
 | Personal Barrier Shield | 38 | Personal Barrier | +30 ground combat bonus |
 
 ---
 
-### Tier 11 (Tech Level 39-42) - Fortress Shields
-**Research Cost:** 12,000 RP
+### Tier 10 (Tech Level 39-42) - Fortress Shields
+**Research Cost:** 8,000 RP
 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
-| Class XII Deflector Shield | 40 | Class XII Deflector | -12 damage per hit |
+| Class XI Deflector Shield | 40 | Class XI Deflector | -11 damage per hit |
 | Planetary Shield XX | 42 | Planetary Shield XX | -20 bombardment damage |
 
 ---
 
-### Tier 12 (Tech Level 43-46) - Ultimate Defense
+### Tier 11 (Tech Level 43-46) - Ultimate Defense
+**Research Cost:** 12,000 RP
+
+| Tech Name | Tech Level | Unlocks | Effect |
+|-----------|------------|---------|--------|
+| Black Hole Generator | 43 | Black Hole Generator | Destroys 25-100% of target stack − 2% per shield class |
+| Class XII Deflector Shield | 44 | Class XII Deflector | -12 damage per hit |
+| Lightning Shield | 46 | Lightning Shield | 100% chance to destroy incoming missiles − 1% per missile tech level |
+
+---
+
+### Tier 12 (Tech Level 47-49) - Legendary Shields
 **Research Cost:** 18,000 RP
 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
-| Black Hole Generator | 43 | Black Hole Generator | Destroys 25-100% of target stack |
-| Class XIII Deflector Shield | 44 | Class XIII Deflector | -13 damage per hit |
+| Class XIII Deflector Shield | 48 | Class XIII Deflector | -13 damage per hit |
 
 ---
 
-### Tier 13 (Tech Level 47-49) - Legendary Shields
+### Tier 13 (Tech Level 50+) - Ultimate Shielding I
 **Research Cost:** 30,000 RP
 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
-| Class XIV Deflector Shield | 48 | Class XIV Deflector | -14 damage per hit |
+| Class XIV Deflector Shield | 50 | Class XIV Deflector | -14 damage per hit |
 
 ---
 
-### Tier 14 (Tech Level 50+) - Ultimate Shielding
+### Tier 14 (Tech Level 52+) - Ultimate Shielding II
 **Research Cost:** 50,000 RP
 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
-| Class XV Deflector Shield | 50 | Class XV Deflector | -15 damage per hit |
+| Class XV Deflector Shield | 52 | Class XV Deflector | -15 damage per hit |
 
 ---
 
@@ -218,20 +218,20 @@ Special devices: Repulsor Beams, Cloaking Devices, Stasis Fields, and ultimate w
 | Shield | Tech Level | Absorbs | Space | Cost | Notes |
 |--------|------------|---------|-------|------|-------|
 | Class I | 1 | 1 | 8 | 12 BC | Starting |
-| Class II | 5 | 2 | 10 | 18 BC | — |
+| Class II | 4 | 2 | 10 | 18 BC | — |
 | Class III | 10 | 3 | 12 | 25 BC | — |
-| Class IV | 12 | 4 | 14 | 32 BC | — |
-| Class V | 14 | 5 | 16 | 42 BC | — |
-| Class VI | 18 | 6 | 18 | 52 BC | — |
-| Class VII | 20 | 7 | 20 | 65 BC | — |
-| Class VIII | 24 | 8 | 22 | 78 BC | — |
-| Class IX | 28 | 9 | 24 | 92 BC | — |
-| Class X | 32 | 10 | 26 | 108 BC | — |
-| Class XI | 36 | 11 | 28 | 125 BC | — |
-| Class XII | 40 | 12 | 30 | 145 BC | — |
-| Class XIII | 44 | 13 | 32 | 165 BC | — |
-| Class XIV | 48 | 14 | 34 | 190 BC | — |
-| Class XV | 50 | 15 | 36 | 220 BC | Ultimate |
+| Class IV | 14 | 4 | 14 | 32 BC | — |
+| Class V | 20 | 5 | 16 | 42 BC | — |
+| Class VI | 24 | 6 | 18 | 52 BC | — |
+| Class VII | 30 | 7 | 20 | 65 BC | — |
+| Class VIII | 26 | 8 | 22 | 78 BC | — |
+| Class IX | 34 | 9 | 24 | 92 BC | — |
+| Class X | 36 | 10 | 26 | 108 BC | — |
+| Class XI | 40 | 11 | 28 | 125 BC | — |
+| Class XII | 44 | 12 | 30 | 145 BC | — |
+| Class XIII | 48 | 13 | 32 | 165 BC | — |
+| Class XIV | 50 | 14 | 34 | 190 BC | — |
+| Class XV | 52 | 15 | 36 | 220 BC | Ultimate |
 
 ### Shield Space Formula
 ```
@@ -316,14 +316,16 @@ Personal shields add directly to defending/attacking troops' combat rolls.
 
 | Component | Tech Level | Effect | Space | Cost |
 |-----------|------------|--------|-------|------|
-| Lightning Shield | 25 | +50% damage reflection vs missiles | 15 | 45 BC |
+| Lightning Shield | 46 | 100% chance to destroy incoming missiles − 1% per missile tech level | 15 | 45 BC |
 
 **Mechanics:**
-- When a missile is destroyed by shields, 50% of its damage reflects back
-- Reflected damage targets the launching ship's stack
-- Does not work against torpedoes
-- Does not work if missile penetrates shields
-- Stacks with Zyro Shield
+- Base 100% chance to destroy each incoming missile before impact
+- Chance reduced by 1% per missile tech level (e.g., Tech Level 20 missiles face 80% destruction chance)
+- Roll made per missile, not per salvo
+- Does NOT affect torpedoes (torpedoes are immune)
+- Does NOT affect bombs
+- Does NOT affect beam weapons
+- Stacks multiplicatively with ECM and Zyro Shield
 
 ---
 
@@ -349,20 +351,27 @@ Personal shields add directly to defending/attacking troops' combat rolls.
 
 | Component | Tech Level | Effect | Space | Cost |
 |-----------|------------|--------|-------|------|
-| Zyro Shield | 31 | 75% missile destruction chance | 25 | 70 BC |
+| Zyro Shield | 31 | 75% chance to destroy incoming missiles − 1% per missile tech level | 25 | 70 BC |
 
 **Mechanics:**
-- Each incoming missile has 75% chance to be destroyed before impact
+- Base 75% chance to destroy each incoming missile before impact
+- Chance reduced by 1% per missile tech level (e.g., Tech Level 20 missiles face 55% destruction chance)
 - Roll made per missile, not per salvo
 - Does NOT affect torpedoes (torpedoes are immune)
 - Does NOT affect bombs
 - Does NOT affect beam weapons
 - Stacks multiplicatively with ECM
 
+**Formula:**
+```
+Destruction_Chance = max(0, 0.75 - (Missile_Tech_Level × 0.01))
+```
+
 **Example:**
-A ship with Zyro Shield and ECM V faces a 10-missile salvo:
-- Zyro destroys average 7.5 missiles
-- Remaining 2.5 missiles face ECM accuracy penalty
+A ship with Zyro Shield and ECM V faces a 10-missile salvo (Tech Level 15 missiles):
+- Zyro destruction chance: 75% - 15% = 60%
+- Zyro destroys average 6 missiles
+- Remaining 4 missiles face ECM accuracy penalty
 - Very few missiles will actually hit
 
 ---
@@ -397,28 +406,38 @@ This means Stasis Field effectively grants one free combat round against a prior
 
 | Component | Tech Level | Effect | Space | Cost |
 |-----------|------------|--------|-------|------|
-| Black Hole Generator | 43 | Destroys 25-100% of stack | 100 | 250 BC |
+| Black Hole Generator | 43 | Destroys 25-100% of target stack − 2% per shield class | 100 | 250 BC |
 
 **Mechanics:**
 - Targets entire enemy ship stack
-- Roll 1d4: result × 25% = percentage of stack destroyed
+- Roll 1d4: result × 25% = base percentage of stack destroyed
+- Destruction percentage reduced by 2% per shield class on target ships
 - Affected ships are completely destroyed (no escape, no salvage)
 - 3 turn cooldown before can be used again
 - Requires capital ship (Huge hull only)
 - Does NOT work on Orion Guardian (reduced to 10% damage)
 
+**Formula:**
+```
+Base_Destruction = Roll × 25%
+Actual_Destruction = max(0, Base_Destruction - (Target_Shield_Class × 2%))
+```
+
 **Destruction Roll:**
-| Roll | Destruction |
-|------|-------------|
+| Roll | Base Destruction |
+|------|------------------|
 | 1 | 25% of ships |
 | 2 | 50% of ships |
 | 3 | 75% of ships |
 | 4 | 100% of ships |
 
 **Example:**
-Enemy has 12 Large ships. You activate Black Hole Generator and roll 3.
-- 75% × 12 = 9 ships destroyed instantly
-- 3 ships remain
+Enemy has 12 Large ships with Class VII shields. You activate Black Hole Generator and roll 3.
+- Base destruction: 75%
+- Shield reduction: 7 × 2% = 14%
+- Actual destruction: 75% - 14% = 61%
+- Ships destroyed: 12 × 0.61 = 7.32 → 7 ships destroyed instantly
+- Ships remaining: 5 ships
 
 ---
 
@@ -511,15 +530,15 @@ This creates a constant push to upgrade both weapons and shields.
 | 1 | 1 | 1 (starting) |
 | 2 | 1 | 1 |
 | 3 | 2 | 2 |
-| 4 | 3 | 2-3 |
+| 4 | 2 | 2 |
 | 5 | 2 | 2 |
 | 6 | 3 | 2-3 |
 | 7 | 3 | 2-3 |
-| 8 | 1 | 1 |
+| 8 | 3 | 2-3 |
 | 9 | 3 | 2-3 |
-| 10 | 3 | 2-3 |
-| 11 | 2 | 2 |
-| 12 | 2 | 2 |
+| 10 | 2 | 2 |
+| 11 | 3 | 2-3 |
+| 12 | 1 | 1 |
 | 13 | 1 | 1 |
 | 14 | 1 | 1 |
 
@@ -602,7 +621,7 @@ If not in your tree, must acquire via:
           {
             "id": "deflector_2",
             "name": "Class II Deflector Shield",
-            "tech_level": 5,
+            "tech_level": 4,
             "category": "ship_shield",
             "unlocks": "class_2_deflector",
             "effect": {
@@ -653,20 +672,6 @@ If not in your tree, must acquire via:
         "research_cost": 300,
         "technologies": [
           {
-            "id": "deflector_4",
-            "name": "Class IV Deflector Shield",
-            "tech_level": 12,
-            "category": "ship_shield",
-            "unlocks": "class_4_deflector",
-            "effect": {
-              "damage_absorption": 4
-            },
-            "component": {
-              "space": 14,
-              "cost": 32
-            }
-          },
-          {
             "id": "planetary_5",
             "name": "Planetary Shield V",
             "tech_level": 12,
@@ -682,24 +687,24 @@ If not in your tree, must acquire via:
             }
           },
           {
-            "id": "deflector_5",
-            "name": "Class V Deflector Shield",
+            "id": "deflector_4",
+            "name": "Class IV Deflector Shield",
             "tech_level": 14,
             "category": "ship_shield",
-            "unlocks": "class_5_deflector",
+            "unlocks": "class_4_deflector",
             "effect": {
-              "damage_absorption": 5
+              "damage_absorption": 4
             },
             "component": {
-              "space": 16,
-              "cost": 42
+              "space": 14,
+              "cost": 32
             }
           }
         ]
       },
       {
         "tier": 5,
-        "tech_level_range": [15, 18],
+        "tech_level_range": [15, 20],
         "research_cost": 500,
         "technologies": [
           {
@@ -718,41 +723,26 @@ If not in your tree, must acquire via:
             }
           },
           {
-            "id": "deflector_6",
-            "name": "Class VI Deflector Shield",
-            "tech_level": 18,
+            "id": "deflector_5",
+            "name": "Class V Deflector Shield",
+            "tech_level": 20,
             "category": "ship_shield",
-            "unlocks": "class_6_deflector",
+            "unlocks": "class_5_deflector",
             "effect": {
-              "damage_absorption": 6
+              "damage_absorption": 5
             },
             "component": {
-              "space": 18,
-              "cost": 52
+              "space": 16,
+              "cost": 42
             }
           }
         ]
       },
       {
         "tier": 6,
-        "tech_level_range": [19, 22],
+        "tech_level_range": [21, 24],
         "research_cost": 1000,
         "technologies": [
-          {
-            "id": "deflector_7",
-            "name": "Class VII Deflector Shield",
-            "tech_level": 20,
-            "category": "ship_shield",
-            "unlocks": "class_7_deflector",
-            "always_available": true,
-            "effect": {
-              "damage_absorption": 7
-            },
-            "component": {
-              "space": 20,
-              "cost": 65
-            }
-          },
           {
             "id": "personal_absorption",
             "name": "Personal Absorption Shield",
@@ -776,18 +766,32 @@ If not in your tree, must acquire via:
               "build_cost": 1000,
               "maintenance": 10
             }
+          },
+          {
+            "id": "deflector_6",
+            "name": "Class VI Deflector Shield",
+            "tech_level": 24,
+            "category": "ship_shield",
+            "unlocks": "class_6_deflector",
+            "effect": {
+              "damage_absorption": 6
+            },
+            "component": {
+              "space": 18,
+              "cost": 52
+            }
           }
         ]
       },
       {
         "tier": 7,
-        "tech_level_range": [23, 27],
+        "tech_level_range": [25, 30],
         "research_cost": 1500,
         "technologies": [
           {
             "id": "deflector_8",
             "name": "Class VIII Deflector Shield",
-            "tech_level": 24,
+            "tech_level": 26,
             "category": "ship_shield",
             "unlocks": "class_8_deflector",
             "effect": {
@@ -796,21 +800,6 @@ If not in your tree, must acquire via:
             "component": {
               "space": 22,
               "cost": 78
-            }
-          },
-          {
-            "id": "lightning_shield",
-            "name": "Lightning Shield",
-            "tech_level": 25,
-            "category": "tactical_field",
-            "unlocks": "lightning_shield",
-            "effect": {
-              "missile_damage_reflection": 0.50,
-              "description": "Reflects 50% damage of destroyed missiles back to attacker"
-            },
-            "component": {
-              "space": 15,
-              "cost": 45
             }
           },
           {
@@ -827,34 +816,28 @@ If not in your tree, must acquire via:
               "space": 30,
               "cost": 80
             }
-          }
-        ]
-      },
-      {
-        "tier": 8,
-        "tech_level_range": [28, 30],
-        "research_cost": 3000,
-        "technologies": [
+          },
           {
-            "id": "deflector_9",
-            "name": "Class IX Deflector Shield",
-            "tech_level": 28,
+            "id": "deflector_7",
+            "name": "Class VII Deflector Shield",
+            "tech_level": 30,
             "category": "ship_shield",
-            "unlocks": "class_9_deflector",
+            "unlocks": "class_7_deflector",
+            "always_available": true,
             "effect": {
-              "damage_absorption": 9
+              "damage_absorption": 7
             },
             "component": {
-              "space": 24,
-              "cost": 92
+              "space": 20,
+              "cost": 65
             }
           }
         ]
       },
       {
-        "tier": 9,
+        "tier": 8,
         "tech_level_range": [31, 34],
-        "research_cost": 5000,
+        "research_cost": 3000,
         "technologies": [
           {
             "id": "zyro_shield",
@@ -863,26 +846,13 @@ If not in your tree, must acquire via:
             "category": "tactical_field",
             "unlocks": "zyro_shield",
             "effect": {
-              "missile_destroy_chance": 0.75,
-              "description": "75% chance to destroy each incoming missile"
+              "missile_destroy_chance_base": 0.75,
+              "missile_destroy_chance_penalty_per_tech_level": 0.01,
+              "description": "75% chance to destroy each incoming missile − 1% per missile tech level"
             },
             "component": {
               "space": 25,
               "cost": 70
-            }
-          },
-          {
-            "id": "deflector_10",
-            "name": "Class X Deflector Shield",
-            "tech_level": 32,
-            "category": "ship_shield",
-            "unlocks": "class_10_deflector",
-            "effect": {
-              "damage_absorption": 10
-            },
-            "component": {
-              "space": 26,
-              "cost": 108
             }
           },
           {
@@ -898,26 +868,40 @@ If not in your tree, must acquire via:
               "build_cost": 2000,
               "maintenance": 15
             }
+          },
+          {
+            "id": "deflector_9",
+            "name": "Class IX Deflector Shield",
+            "tech_level": 34,
+            "category": "ship_shield",
+            "unlocks": "class_9_deflector",
+            "effect": {
+              "damage_absorption": 9
+            },
+            "component": {
+              "space": 24,
+              "cost": 92
+            }
           }
         ]
       },
       {
-        "tier": 10,
+        "tier": 9,
         "tech_level_range": [35, 38],
-        "research_cost": 8000,
+        "research_cost": 5000,
         "technologies": [
           {
-            "id": "deflector_11",
-            "name": "Class XI Deflector Shield",
+            "id": "deflector_10",
+            "name": "Class X Deflector Shield",
             "tech_level": 36,
             "category": "ship_shield",
-            "unlocks": "class_11_deflector",
+            "unlocks": "class_10_deflector",
             "effect": {
-              "damage_absorption": 11
+              "damage_absorption": 10
             },
             "component": {
-              "space": 28,
-              "cost": 125
+              "space": 26,
+              "cost": 108
             }
           },
           {
@@ -951,22 +935,22 @@ If not in your tree, must acquire via:
         ]
       },
       {
-        "tier": 11,
+        "tier": 10,
         "tech_level_range": [39, 42],
-        "research_cost": 12000,
+        "research_cost": 8000,
         "technologies": [
           {
-            "id": "deflector_12",
-            "name": "Class XII Deflector Shield",
+            "id": "deflector_11",
+            "name": "Class XI Deflector Shield",
             "tech_level": 40,
             "category": "ship_shield",
-            "unlocks": "class_12_deflector",
+            "unlocks": "class_11_deflector",
             "effect": {
-              "damage_absorption": 12
+              "damage_absorption": 11
             },
             "component": {
-              "space": 30,
-              "cost": 145
+              "space": 28,
+              "cost": 125
             }
           },
           {
@@ -986,9 +970,9 @@ If not in your tree, must acquire via:
         ]
       },
       {
-        "tier": 12,
+        "tier": 11,
         "tech_level_range": [43, 46],
-        "research_cost": 18000,
+        "research_cost": 12000,
         "technologies": [
           {
             "id": "black_hole_generator",
@@ -999,8 +983,9 @@ If not in your tree, must acquire via:
             "effect": {
               "stack_destruction_min": 0.25,
               "stack_destruction_max": 1.00,
+              "destruction_penalty_per_shield_class": 0.02,
               "cooldown_turns": 3,
-              "description": "Destroys 25-100% of target ship stack (roll 1d4 × 25%)"
+              "description": "Destroys 25-100% of target ship stack (roll 1d4 × 25%) − 2% per shield class"
             },
             "component": {
               "space": 100,
@@ -1009,9 +994,46 @@ If not in your tree, must acquire via:
             }
           },
           {
+            "id": "deflector_12",
+            "name": "Class XII Deflector Shield",
+            "tech_level": 44,
+            "category": "ship_shield",
+            "unlocks": "class_12_deflector",
+            "effect": {
+              "damage_absorption": 12
+            },
+            "component": {
+              "space": 30,
+              "cost": 145
+            }
+          },
+          {
+            "id": "lightning_shield",
+            "name": "Lightning Shield",
+            "tech_level": 46,
+            "category": "tactical_field",
+            "unlocks": "lightning_shield",
+            "effect": {
+              "missile_destroy_chance_base": 1.00,
+              "missile_destroy_chance_penalty_per_tech_level": 0.01,
+              "description": "100% chance to destroy each incoming missile − 1% per missile tech level"
+            },
+            "component": {
+              "space": 15,
+              "cost": 45
+            }
+          }
+        ]
+      },
+      {
+        "tier": 12,
+        "tech_level_range": [47, 49],
+        "research_cost": 18000,
+        "technologies": [
+          {
             "id": "deflector_13",
             "name": "Class XIII Deflector Shield",
-            "tech_level": 44,
+            "tech_level": 48,
             "category": "ship_shield",
             "unlocks": "class_13_deflector",
             "effect": {
@@ -1026,13 +1048,13 @@ If not in your tree, must acquire via:
       },
       {
         "tier": 13,
-        "tech_level_range": [47, 49],
+        "tech_level_range": [50, 51],
         "research_cost": 30000,
         "technologies": [
           {
             "id": "deflector_14",
             "name": "Class XIV Deflector Shield",
-            "tech_level": 48,
+            "tech_level": 50,
             "category": "ship_shield",
             "unlocks": "class_14_deflector",
             "effect": {
@@ -1047,13 +1069,13 @@ If not in your tree, must acquire via:
       },
       {
         "tier": 14,
-        "tech_level_range": [50, 55],
+        "tech_level_range": [52, 55],
         "research_cost": 50000,
         "technologies": [
           {
             "id": "deflector_15",
             "name": "Class XV Deflector Shield",
-            "tech_level": 50,
+            "tech_level": 52,
             "category": "ship_shield",
             "unlocks": "class_15_deflector",
             "effect": {
@@ -1072,7 +1094,7 @@ If not in your tree, must acquire via:
       "ship_shield": 15,
       "planetary_shield": 4,
       "personal_shield": 3,
-      "tactical_field": 5
+      "tactical_field": 6
     },
     
     "racial_bonuses": {
@@ -1094,20 +1116,20 @@ If not in your tree, must acquire via:
 | Class | Tech Level | Absorbs | Space | Cost |
 |-------|------------|---------|-------|------|
 | I | 1 | 1 | 8 | 12 BC |
-| II | 5 | 2 | 10 | 18 BC |
+| II | 4 | 2 | 10 | 18 BC |
 | III | 10 | 3 | 12 | 25 BC |
-| IV | 12 | 4 | 14 | 32 BC |
-| V | 14 | 5 | 16 | 42 BC |
-| VI | 18 | 6 | 18 | 52 BC |
-| VII | 20 | 7 | 20 | 65 BC |
-| VIII | 24 | 8 | 22 | 78 BC |
-| IX | 28 | 9 | 24 | 92 BC |
-| X | 32 | 10 | 26 | 108 BC |
-| XI | 36 | 11 | 28 | 125 BC |
-| XII | 40 | 12 | 30 | 145 BC |
-| XIII | 44 | 13 | 32 | 165 BC |
-| XIV | 48 | 14 | 34 | 190 BC |
-| XV | 50 | 15 | 36 | 220 BC |
+| IV | 14 | 4 | 14 | 32 BC |
+| V | 20 | 5 | 16 | 42 BC |
+| VI | 24 | 6 | 18 | 52 BC |
+| VII | 30 | 7 | 20 | 65 BC |
+| VIII | 26 | 8 | 22 | 78 BC |
+| IX | 34 | 9 | 24 | 92 BC |
+| X | 36 | 10 | 26 | 108 BC |
+| XI | 40 | 11 | 28 | 125 BC |
+| XII | 44 | 12 | 30 | 145 BC |
+| XIII | 48 | 13 | 32 | 165 BC |
+| XIV | 50 | 14 | 34 | 190 BC |
+| XV | 52 | 15 | 36 | 220 BC |
 
 ### Planetary Shields (4 total)
 
@@ -1126,16 +1148,16 @@ If not in your tree, must acquire via:
 | Personal Absorption | 21 | +20 |
 | Personal Barrier | 38 | +30 |
 
-### Tactical Fields (5 total)
+### Tactical Fields (6 total)
 
 | System | Tech Level | Effect | Space | Cost |
 |--------|------------|--------|-------|------|
 | Repulsor Beam | 16 | Push 2 hexes | 20 | 35 BC |
-| Lightning Shield | 25 | 50% missile reflect | 15 | 45 BC |
 | Cloaking Device | 27 | +5 Def, invisible | 30 | 80 BC |
-| Zyro Shield | 31 | 75% missile destroy | 25 | 70 BC |
+| Zyro Shield | 31 | 75% − 1%/missile TL missile destroy | 25 | 70 BC |
 | Stasis Field | 37 | Disable 1 turn | 45 | 90 BC |
-| Black Hole Gen | 43 | 25-100% stack destroy | 100 | 250 BC |
+| Black Hole Gen | 43 | 25-100% stack destroy − 2%/shield class | 100 | 250 BC |
+| Lightning Shield | 46 | 100% − 1%/missile TL missile destroy | 15 | 45 BC |
 
 ---
 
@@ -1154,12 +1176,14 @@ If not in your tree, must acquire via:
 - **Biological Weapons:** Ignore shields and planetary shields
 
 ### Zyro Shield Edge Cases
+- Base 75% destruction chance reduced by 1% per missile tech level
 - Does not affect torpedoes
 - Roll per missile, not per salvo
 - MIRV missiles: each warhead rolled separately
 - Stacks with ECM (multiplicative)
 
 ### Black Hole Generator Limitations
+- Base destruction (25-100%) reduced by 2% per shield class on target
 - Only usable on Huge hull ships
 - 3-turn cooldown between uses
 - Does NOT affect Orion Guardian (10% damage cap)
@@ -1189,17 +1213,22 @@ If not in your tree, must acquire via:
 - Result: 0 damage from all 4 shots (shields completely negate)
 
 ### Example 3: Zyro Shield vs Missile Salvo
-**Situation:** 20-missile salvo incoming. Ship has Zyro Shield (75% destroy).
-- Expected missiles destroyed: 20 × 0.75 = 15
-- Expected missiles hitting: 5
-- (Then ECM reduces hit chance on remaining 5)
+**Situation:** 20-missile salvo (Tech Level 10 missiles) incoming. Ship has Zyro Shield.
+- Base destruction chance: 75%
+- Tech level penalty: 10 × 1% = 10%
+- Actual destruction chance: 75% - 10% = 65%
+- Expected missiles destroyed: 20 × 0.65 = 13
+- Expected missiles hitting: 7
+- (Then ECM reduces hit chance on remaining 7)
 
 ### Example 4: Black Hole Generator
-**Situation:** Enemy has 8 Large ships. You activate Black Hole Generator.
+**Situation:** Enemy has 8 Large ships with Class V Shields. You activate Black Hole Generator.
 - Roll 1d4: result is 3
-- Destruction: 3 × 25% = 75%
-- Ships destroyed: 8 × 0.75 = 6 ships
-- Ships remaining: 2 ships
+- Base destruction: 3 × 25% = 75%
+- Shield reduction: 5 × 2% = 10%
+- Actual destruction: 75% - 10% = 65%
+- Ships destroyed: 8 × 0.65 = 5.2 → 5 ships
+- Ships remaining: 3 ships
 
 ### Example 5: Hermit Crab Racial Bonus
 **Situation:** Hermit Crab ship with Class VIII Deflector (normally absorbs 8).
@@ -1220,5 +1249,5 @@ If not in your tree, must acquire via:
 
 ---
 
-*Last Updated: 2026-03-22*
+*Last Updated: 2026-04-15*
 *Specification: spec-013 - Complete Tech Tree - Force Fields Field*

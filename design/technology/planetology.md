@@ -23,16 +23,16 @@ In each game, players are offered **2-3 random technologies** at each tier. Not 
 |------------|------------|------------|-----------------|
 | 1 | 1 | Starting | Free (baseline) |
 | 2 | 2-3 | Early | 60-140 RP |
-| 3 | 4-6 | Early | 400-570 RP |
-| 4 | 7-9 | Early-Mid | 1,020-1,600 RP |
-| 5 | 10-13 | Mid | 2,300-3,600 RP |
-| 6 | 14-17 | Mid | 4,090-5,180 RP |
-| 7 | 18-21 | Mid-Late | 6,400-7,740 RP |
-| 8 | 22-25 | Late | 9,210-11,660 RP |
-| 9 | 26-29 | Late | 14,400-18,490 RP |
-| 10 | 30-33 | End | 20,730-25,600 RP |
-| 11 | 34-37 | End | 28,220-30,970 RP |
-| 12 | 38+ | Ultimate | 40,000+ RP |
+| 3 | 5-6 | Early | 400-570 RP |
+| 4 | 8-10 | Early-Mid | 570-1,600 RP |
+| 5 | 12-15 | Mid | 2,300-4,620 RP |
+| 6 | 16-18 | Mid | 4,090-6,400 RP |
+| 7 | 20-22 | Mid-Late | 4,090-7,740 RP |
+| 8 | 24-27 | Late | 9,210-11,660 RP |
+| 9 | 30-34 | Late | 14,400-28,220 RP |
+| 10 | 36-40 | End | 20,730-25,600 RP |
+| 11 | 42-44 | End | 28,220-40,000 RP |
+| 12 | 50 | Ultimate | 78,400+ RP |
 
 ---
 
@@ -87,118 +87,109 @@ Converts hostile planets to habitable environments.
 
 ---
 
-### Tier 3 (Tech Level 4-6) - Hostile World Colonization
+### Tier 3 (Tech Level 5-6) - Hostile World Colonization
 **Research Cost:** 400-570 RP
 
 | Tech Name | Tech Level | RP Cost | Category | Effect |
 |-----------|------------|---------|----------|--------|
-| Improved Eco Restoration | 4 | 400 | eco_restoration | Eliminates 3 waste per 1 BC |
-| Improved Terraforming +20 | 6 | 570 | terraforming | +20 max pop, 5 BC/million |
+| Improved Eco Restoration | 5 | 400 | eco_restoration | Eliminates 3 waste per 1 BC |
 | Controlled Tundra Environment | 6 | 570 | colonization | Colonize tundra planets |
 
 ---
 
-### Tier 4 (Tech Level 7-9) - Population Expansion
+### Tier 4 (Tech Level 8-10) - Population Expansion
 **Research Cost:** 1,020-1,600 RP
 
 | Tech Name | Tech Level | RP Cost | Category | Effect |
 |-----------|------------|---------|----------|--------|
-| Controlled Dead Environment | 8 | 1,290 | colonization | Colonize dead planets |
-| Death Spores | 9 | 1,600 | bio_weapon | -1M pop per combat round, -10% max pop permanent |
+| Improved Terraforming +20 | 8 | 570 | terraforming | +20 max pop, 5 BC/million |
+| Controlled Dead Environment | 9 | 1,290 | colonization | Colonize dead planets |
+| Death Spores | 10 | 1,600 | bio_weapon | -1M pop per combat round, -10% max pop permanent |
 
 ---
 
-### Tier 5 (Tech Level 10-13) - Mid-Game Expansion
-**Research Cost:** 2,300-3,600 RP
+### Tier 5 (Tech Level 12-15) - Mid-Game Expansion
+**Research Cost:** 2,300-4,620 RP
 
 | Tech Name | Tech Level | RP Cost | Category | Effect |
 |-----------|------------|---------|----------|--------|
-| Improved Terraforming +30 | 10 | 2,300 | terraforming | +30 max pop, 4 BC/million |
-| Controlled Inferno Environment | 10 | 2,300 | colonization | Colonize inferno planets |
-| Enhanced Eco Restoration | 11 | 2,700 | eco_restoration | Eliminates 5 waste per 1 BC |
-| Controlled Toxic Environment | 13 | 3,600 | colonization | Colonize toxic planets |
+| Controlled Inferno Environment | 12 | 2,300 | colonization | Colonize inferno planets |
+| Enhanced Eco Restoration | 13 | 2,700 | eco_restoration | Eliminates 5 waste per 1 BC |
+| Improved Terraforming +30 | 14 | 2,300 | terraforming | +30 max pop, 4 BC/million |
+| Controlled Toxic Environment | 15 | 3,600 | colonization | Colonize toxic planets |
 
 ---
 
-### Tier 6 (Tech Level 14-17) - Advanced Colonization
-**Research Cost:** 4,090-5,180 RP
+### Tier 6 (Tech Level 16-18) - Advanced Colonization
+**Research Cost:** 4,090-6,400 RP
 
 | Tech Name | Tech Level | RP Cost | Category | Effect |
 |-----------|------------|---------|----------|--------|
-| Improved Terraforming +40 | 14 | 4,090 | terraforming | +40 max pop, 4 BC/million |
-| Soil Enrichment | 14 | 4,090 | enrichment | +25 max pop capacity (per planet, one-time 150 BC) |
-| Bio Toxin Antidote | 15 | 4,620 | bio_defense | Reduces bio casualties by 1M |
-| Controlled Radiated Environment | 17 | 5,180 | colonization | Colonize radiated planets |
+| Soil Enrichment | 16 | 4,090 | enrichment | +25 max pop capacity (per planet, one-time 150 BC) |
+| Bio Toxin Antidote | 17 | 4,620 | bio_defense | Reduces bio casualties by 1M |
+| Controlled Radiated Environment | 18 | 5,180 | colonization | Colonize radiated planets |
 
 ---
 
-### Tier 7 (Tech Level 18-21) - Late Expansion
-**Research Cost:** 6,400-7,740 RP
+### Tier 7 (Tech Level 20-22) - Late Expansion
+**Research Cost:** 4,090-7,740 RP
 
 | Tech Name | Tech Level | RP Cost | Category | Effect |
 |-----------|------------|---------|----------|--------|
-| Improved Terraforming +50 | 18 | 6,400 | terraforming | +50 max pop, 3 BC/million |
-| Cloning | 19 | 7,050 | cloning | Grow 1M pop per 10 BC |
-| Atmospheric Terraforming | 21 | 7,740 | atmosphere | Convert hostile→standard, 200 BC |
+| Improved Terraforming +40 | 20 | 4,090 | terraforming | +40 max pop, 4 BC/million |
+| Cloning | 21 | 7,050 | cloning | Grow 1M pop per 10 BC |
+| Atmospheric Terraforming | 22 | 7,740 | atmosphere | Convert hostile→standard, 200 BC |
 
 ---
 
-### Tier 8 (Tech Level 22-25) - Industrial Ecology
+### Tier 8 (Tech Level 24-27) - Industrial Ecology
 **Research Cost:** 9,210-11,660 RP
 
 | Tech Name | Tech Level | RP Cost | Category | Effect |
 |-----------|------------|---------|----------|--------|
-| Improved Terraforming +60 | 22 | 9,210 | terraforming | +60 max pop, 3 BC/million |
-| Advanced Eco Restoration | 22 | 9,210 | eco_restoration | Eliminates 10 waste per 1 BC |
-| Doom Virus | 25 | 11,660 | bio_weapon | -2M pop per combat round, -25% max pop permanent |
+| Advanced Eco Restoration | 24 | 9,210 | eco_restoration | Eliminates 10 waste per 1 BC |
+| Doom Virus | 27 | 11,660 | bio_weapon | -2M pop per combat round, -25% max pop permanent |
 
 ---
 
-### Tier 9 (Tech Level 26-29) - Gaia Transformation
-**Research Cost:** 14,400-18,490 RP
+### Tier 9 (Tech Level 30-34) - Gaia Transformation
+**Research Cost:** 14,400-28,220 RP
 
 | Tech Name | Tech Level | RP Cost | Category | Effect |
 |-----------|------------|---------|----------|--------|
-| Advanced Soil Enrichment | 26 | 14,400 | enrichment | +50 max pop capacity (per planet, one-time 300 BC; replaces Basic) |
-| Complete Eco Restoration | 29 | 18,490 | eco_restoration | Eliminates 20 waste per 1 BC |
+| Advanced Soil Enrichment | 30 | 14,400 | enrichment | +50 max pop capacity (per planet, one-time 300 BC; replaces Basic) |
+| Improved Terraforming +60 | 32 | 9,210 | terraforming | +60 max pop, 3 BC/million |
+| Complete Eco Restoration | 34 | 18,490 | eco_restoration | Eliminates 20 waste per 1 BC |
 
 ---
 
-### Tier 10 (Tech Level 30-33) - Bio Warfare Mastery
+### Tier 10 (Tech Level 36-40) - Bio Warfare Mastery
 **Research Cost:** 20,730-25,600 RP
 
 | Tech Name | Tech Level | RP Cost | Category | Effect |
 |-----------|------------|---------|----------|--------|
-| Improved Terraforming +80 | 30 | 20,730 | terraforming | +80 max pop, 2 BC/million |
-| Universal Antidote | 30 | 20,730 | bio_defense | Reduces bio casualties by 2M |
-| Bio Terminator | 33 | 25,600 | bio_weapon | -3M pop per combat round, -50% max pop permanent |
+| Universal Antidote | 36 | 20,730 | bio_defense | Reduces bio casualties by 2M |
+| Improved Terraforming +80 | 38 | 20,730 | terraforming | +80 max pop, 2 BC/million |
+| Bio Terminator | 40 | 25,600 | bio_weapon | -3M pop per combat round, -50% max pop permanent |
 
 ---
 
-### Tier 11 (Tech Level 34-37) - Advanced Cloning
-**Research Cost:** 28,220-30,970 RP
+### Tier 11 (Tech Level 42-44) - Advanced Cloning
+**Research Cost:** 28,220-40,000 RP
 
 | Tech Name | Tech Level | RP Cost | Category | Effect |
 |-----------|------------|---------|----------|--------|
-| Advanced Cloning | 34 | 28,220 | cloning | Grow 1M pop per 5 BC |
+| Advanced Cloning | 42 | 28,220 | cloning | Grow 1M pop per 5 BC |
+| Improved Terraforming +100 | 44 | 40,000 | terraforming | +100 max pop, 2 BC/million |
 
 ---
 
-### Tier 12 (Tech Level 38-45) - Ultimate Terraforming
-**Research Cost:** 40,000+ RP
-
-| Tech Name | Tech Level | RP Cost | Category | Effect |
-|-----------|------------|---------|----------|--------|
-| Improved Terraforming +100 | 38 | 40,000 | terraforming | +100 max pop, 2 BC/million |
-
----
-
-### Tier 13 (Tech Level 46+) - Complete Terraforming
+### Tier 12 (Tech Level 50) - Complete Terraforming
 **Research Cost:** 78,400+ RP
 
 | Tech Name | Tech Level | RP Cost | Category | Effect |
 |-----------|------------|---------|----------|--------|
-| Complete Terraforming +120 | 46 | 78,400 | terraforming | +120 max pop, 2 BC/million |
+| Complete Terraforming +120 | 50 | 78,400 | terraforming | +120 max pop, 6 BC/million |
 
 ---
 
@@ -230,14 +221,13 @@ Terraforming permanently increases the maximum population capacity of planets. T
 | Technology | Tech Level | RP Cost | Max Pop Bonus | Cost per Million |
 |------------|------------|---------|---------------|------------------|
 | Improved Terraforming +10 | 2 | 60 | +10 | 5 BC |
-| Improved Terraforming +20 | 6 | 570 | +20 | 5 BC |
-| Improved Terraforming +30 | 10 | 2,300 | +30 | 4 BC |
-| Improved Terraforming +40 | 14 | 4,090 | +40 | 4 BC |
-| Improved Terraforming +50 | 18 | 6,400 | +50 | 3 BC |
-| Improved Terraforming +60 | 22 | 9,210 | +60 | 3 BC |
-| Improved Terraforming +80 | 30 | 20,730 | +80 | 2 BC |
-| Improved Terraforming +100 | 38 | 40,000 | +100 | 2 BC |
-| Complete Terraforming +120 | 46 | 78,400 | +120 | 2 BC |
+| Improved Terraforming +20 | 8 | 570 | +20 | 5 BC |
+| Improved Terraforming +30 | 14 | 2,300 | +30 | 4 BC |
+| Improved Terraforming +40 | 20 | 4,090 | +40 | 4 BC |
+| Improved Terraforming +60 | 32 | 9,210 | +60 | 3 BC |
+| Improved Terraforming +80 | 38 | 20,730 | +80 | 2 BC |
+| Improved Terraforming +100 | 44 | 40,000 | +100 | 2 BC |
+| Complete Terraforming +120 | 50 | 78,400 | +120 | 6 BC |
 
 **Terraforming Formula:**
 ```
@@ -254,8 +244,8 @@ Soil Enrichment permanently increases a planet's maximum population capacity by 
 
 | Technology | Tech Level | RP Cost | Max Pop Bonus | One-Time Cost |
 |------------|------------|---------|---------------|---------------|
-| Soil Enrichment | 14 | 4,090 | +25 | 150 BC |
-| Advanced Soil Enrichment | 26 | 14,400 | +50 | 300 BC |
+| Soil Enrichment | 16 | 4,090 | +25 | 150 BC |
+| Advanced Soil Enrichment | 30 | 14,400 | +50 | 300 BC |
 
 **Soil Enrichment Formula:**
 ```
@@ -283,10 +273,10 @@ Each technology unlocks colonization of a specific hostile environment type. Her
 | (Base) | — | — | Standard environments | None |
 | Controlled Barren Environment | 3 | 140 | Barren | 1 (least hostile) |
 | Controlled Tundra Environment | 6 | 570 | Tundra | 2 |
-| Controlled Dead Environment | 8 | 1,290 | Dead | 3 |
-| Controlled Inferno Environment | 10 | 2,300 | Inferno | 4 |
-| Controlled Toxic Environment | 13 | 3,600 | Toxic | 5 |
-| Controlled Radiated Environment | 17 | 5,180 | Radiated | 6 (most hostile) |
+| Controlled Dead Environment | 9 | 1,290 | Dead | 3 |
+| Controlled Inferno Environment | 12 | 2,300 | Inferno | 4 |
+| Controlled Toxic Environment | 15 | 3,600 | Toxic | 5 |
+| Controlled Radiated Environment | 18 | 5,180 | Radiated | 6 (most hostile) |
 
 **Environment Hostility Effects:**
 - Hostile environments have 0.5× population growth rate
@@ -310,10 +300,10 @@ The mechanic is expressed as a **`Cleanup_Modifier`** multiplier on the base cle
 | Technology | Tech Level | RP Cost | Cleanup Modifier | Equivalent Waste/BC |
 |------------|------------|---------|------------------|---------------------|
 | Ecological Restoration | 1 | Free | 1.00 | 2 waste / 1 BC |
-| Improved Eco Restoration | 4 | 400 | 0.67 | 3 waste / 1 BC |
-| Enhanced Eco Restoration | 11 | 2,700 | 0.40 | 5 waste / 1 BC |
-| Advanced Eco Restoration | 22 | 9,210 | 0.20 | 10 waste / 1 BC |
-| Complete Eco Restoration | 29 | 18,490 | 0.10 | 20 waste / 1 BC |
+| Improved Eco Restoration | 5 | 400 | 0.67 | 3 waste / 1 BC |
+| Enhanced Eco Restoration | 13 | 2,700 | 0.40 | 5 waste / 1 BC |
+| Advanced Eco Restoration | 24 | 9,210 | 0.20 | 10 waste / 1 BC |
+| Complete Eco Restoration | 34 | 18,490 | 0.10 | 20 waste / 1 BC |
 
 **Pollution Cleanup Formula:**
 ```
@@ -340,9 +330,9 @@ Bio weapons are ship-mounted special weapons that kill planetary population. Eac
 
 | Weapon | Tech Level | RP Cost | Kill Rate | Space | Cost | Max Pop Reduction |
 |--------|------------|---------|-----------|-------|------|-------------------|
-| Death Spores | 9 | 1,600 | 1M per combat round | 150 | 100 BC | -10% permanent |
-| Doom Virus | 25 | 11,660 | 2M per combat round | 200 | 200 BC | -25% permanent |
-| Bio Terminator | 33 | 25,600 | 3M per combat round | 250 | 300 BC | -50% permanent |
+| Death Spores | 10 | 1,600 | 1M per combat round | 150 | 100 BC | -10% permanent |
+| Doom Virus | 27 | 11,660 | 2M per combat round | 200 | 200 BC | -25% permanent |
+| Bio Terminator | 40 | 25,600 | 3M per combat round | 250 | 300 BC | -50% permanent |
 
 **Bio Weapon Mechanics:**
 - Ship must have bio weapon equipped in design
@@ -373,8 +363,8 @@ Antidotes reduce casualties from enemy biological weapon attacks.
 
 | Technology | Tech Level | RP Cost | Casualty Reduction |
 |------------|------------|---------|-------------------|
-| Bio Toxin Antidote | 15 | 4,620 | -1M per attack |
-| Universal Antidote | 30 | 20,730 | -2M per attack |
+| Bio Toxin Antidote | 17 | 4,620 | -1M per attack |
+| Universal Antidote | 36 | 20,730 | -2M per attack |
 
 **Bio Defense Formula:**
 ```
@@ -395,8 +385,8 @@ Cloning provides a flat bonus to population growth per turn, on top of natural l
 
 | Technology | Tech Level | RP Cost | Flat Bonus per Turn |
 |------------|------------|---------|---------------------|
-| Cloning | 11 | 7,050 | +2 pop/turn |
-| Advanced Cloning | 22 | 28,220 | +5 pop/turn |
+| Cloning | 21 | 7,050 | +2 pop/turn |
+| Advanced Cloning | 42 | 28,220 | +5 pop/turn |
 
 **Cloning Formula:**
 ```
@@ -623,13 +613,13 @@ Max_Population = (Base_Size + Terraforming_Bonus + Soil_Enrichment_Bonus) × Env
       },
       {
         "tier": 3,
-        "tech_level_range": [4, 6],
+        "tech_level_range": [5, 6],
         "research_cost_range": [400, 570],
         "technologies": [
           {
             "id": "improved_eco_restoration",
             "name": "Improved Eco Restoration",
-            "tech_level": 4,
+            "tech_level": 5,
             "research_cost": 400,
             "category": "eco_restoration",
             "effect": {
@@ -637,18 +627,6 @@ Max_Population = (Base_Size + Terraforming_Bonus + Soil_Enrichment_Bonus) × Env
               "waste_per_bc": 3
             },
             "description": "Improved pollution cleanup. Cleanup cost = Waste × 0.5 × 0.67 (equivalent: 3 waste eliminated per 1 BC spent)."
-          },
-          {
-            "id": "improved_terraforming_20",
-            "name": "Improved Terraforming +20",
-            "tech_level": 6,
-            "research_cost": 570,
-            "category": "terraforming",
-            "effect": {
-              "max_pop_bonus": 20,
-              "cost_per_million": 5
-            },
-            "description": "Increases population capacity of planets by 20M for a cost of 5 BC per million."
           },
           {
             "id": "controlled_tundra_environment",
@@ -665,13 +643,25 @@ Max_Population = (Base_Size + Terraforming_Bonus + Soil_Enrichment_Bonus) × Env
       },
       {
         "tier": 4,
-        "tech_level_range": [7, 9],
-        "research_cost_range": [1290, 1600],
+        "tech_level_range": [8, 10],
+        "research_cost_range": [570, 1600],
         "technologies": [
+          {
+            "id": "improved_terraforming_20",
+            "name": "Improved Terraforming +20",
+            "tech_level": 8,
+            "research_cost": 570,
+            "category": "terraforming",
+            "effect": {
+              "max_pop_bonus": 20,
+              "cost_per_million": 5
+            },
+            "description": "Increases population capacity of planets by 20M for a cost of 5 BC per million."
+          },
           {
             "id": "controlled_dead_environment",
             "name": "Controlled Dead Environment",
-            "tech_level": 8,
+            "tech_level": 9,
             "research_cost": 1290,
             "category": "colonization",
             "effect": {
@@ -682,7 +672,7 @@ Max_Population = (Base_Size + Terraforming_Bonus + Soil_Enrichment_Bonus) × Env
           {
             "id": "death_spores",
             "name": "Death Spores",
-            "tech_level": 9,
+            "tech_level": 10,
             "research_cost": 1600,
             "category": "bio_weapon",
             "effect": {
@@ -696,25 +686,13 @@ Max_Population = (Base_Size + Terraforming_Bonus + Soil_Enrichment_Bonus) × Env
       },
       {
         "tier": 5,
-        "tech_level_range": [10, 13],
-        "research_cost_range": [2300, 3600],
+        "tech_level_range": [12, 15],
+        "research_cost_range": [2300, 4620],
         "technologies": [
-          {
-            "id": "improved_terraforming_30",
-            "name": "Improved Terraforming +30",
-            "tech_level": 10,
-            "research_cost": 2300,
-            "category": "terraforming",
-            "effect": {
-              "max_pop_bonus": 30,
-              "cost_per_million": 4
-            },
-            "description": "Increases population capacity of planets by 30M for a cost of 4 BC per million."
-          },
           {
             "id": "controlled_inferno_environment",
             "name": "Controlled Inferno Environment",
-            "tech_level": 10,
+            "tech_level": 12,
             "research_cost": 2300,
             "category": "colonization",
             "effect": {
@@ -725,7 +703,7 @@ Max_Population = (Base_Size + Terraforming_Bonus + Soil_Enrichment_Bonus) × Env
           {
             "id": "enhanced_eco_restoration",
             "name": "Enhanced Eco Restoration",
-            "tech_level": 11,
+            "tech_level": 13,
             "research_cost": 2700,
             "category": "eco_restoration",
             "effect": {
@@ -735,9 +713,21 @@ Max_Population = (Base_Size + Terraforming_Bonus + Soil_Enrichment_Bonus) × Env
             "description": "Enhanced pollution cleanup. Cleanup cost = Waste × 0.5 × 0.40 (equivalent: 5 waste eliminated per 1 BC spent)."
           },
           {
+            "id": "improved_terraforming_30",
+            "name": "Improved Terraforming +30",
+            "tech_level": 14,
+            "research_cost": 2300,
+            "category": "terraforming",
+            "effect": {
+              "max_pop_bonus": 30,
+              "cost_per_million": 4
+            },
+            "description": "Increases population capacity of planets by 30M for a cost of 4 BC per million."
+          },
+          {
             "id": "controlled_toxic_environment",
             "name": "Controlled Toxic Environment",
-            "tech_level": 13,
+            "tech_level": 15,
             "research_cost": 3600,
             "category": "colonization",
             "effect": {
@@ -749,25 +739,13 @@ Max_Population = (Base_Size + Terraforming_Bonus + Soil_Enrichment_Bonus) × Env
       },
       {
         "tier": 6,
-        "tech_level_range": [14, 17],
-        "research_cost_range": [4090, 5180],
+        "tech_level_range": [16, 18],
+        "research_cost_range": [4090, 6400],
         "technologies": [
-          {
-            "id": "improved_terraforming_40",
-            "name": "Improved Terraforming +40",
-            "tech_level": 14,
-            "research_cost": 4090,
-            "category": "terraforming",
-            "effect": {
-              "max_pop_bonus": 40,
-              "cost_per_million": 4
-            },
-            "description": "Increases population capacity of planets by 40M for a cost of 4 BC per million."
-          },
           {
             "id": "soil_enrichment",
             "name": "Soil Enrichment",
-            "tech_level": 14,
+            "tech_level": 16,
             "research_cost": 4090,
             "category": "enrichment",
             "effect": {
@@ -779,7 +757,7 @@ Max_Population = (Base_Size + Terraforming_Bonus + Soil_Enrichment_Bonus) × Env
           {
             "id": "bio_toxin_antidote",
             "name": "Bio Toxin Antidote",
-            "tech_level": 15,
+            "tech_level": 17,
             "research_cost": 4620,
             "category": "bio_defense",
             "effect": {
@@ -790,7 +768,7 @@ Max_Population = (Base_Size + Terraforming_Bonus + Soil_Enrichment_Bonus) × Env
           {
             "id": "controlled_radiated_environment",
             "name": "Controlled Radiated Environment",
-            "tech_level": 17,
+            "tech_level": 18,
             "research_cost": 5180,
             "category": "colonization",
             "effect": {
@@ -802,25 +780,25 @@ Max_Population = (Base_Size + Terraforming_Bonus + Soil_Enrichment_Bonus) × Env
       },
       {
         "tier": 7,
-        "tech_level_range": [18, 21],
-        "research_cost_range": [6400, 7740],
+        "tech_level_range": [20, 22],
+        "research_cost_range": [4090, 7740],
         "technologies": [
           {
-            "id": "improved_terraforming_50",
-            "name": "Improved Terraforming +50",
-            "tech_level": 18,
-            "research_cost": 6400,
+            "id": "improved_terraforming_40",
+            "name": "Improved Terraforming +40",
+            "tech_level": 20,
+            "research_cost": 4090,
             "category": "terraforming",
             "effect": {
-              "max_pop_bonus": 50,
-              "cost_per_million": 3
+              "max_pop_bonus": 40,
+              "cost_per_million": 4
             },
-            "description": "Increases population capacity of planets by 50M for a cost of 3 BC per million."
+            "description": "Increases population capacity of planets by 40M for a cost of 4 BC per million."
           },
           {
             "id": "cloning",
             "name": "Cloning",
-            "tech_level": 19,
+            "tech_level": 21,
             "research_cost": 7050,
             "category": "cloning",
             "effect": {
@@ -831,7 +809,7 @@ Max_Population = (Base_Size + Terraforming_Bonus + Soil_Enrichment_Bonus) × Env
           {
             "id": "atmospheric_terraforming",
             "name": "Atmospheric Terraforming",
-            "tech_level": 21,
+            "tech_level": 22,
             "research_cost": 7740,
             "category": "atmosphere",
             "effect": {
@@ -1175,19 +1153,18 @@ Max_Population = (Base_Size + Terraforming_Bonus + Soil_Enrichment_Bonus) × Env
 
 ## Category Summaries
 
-### Terraforming (9 technologies)
+### Terraforming (8 technologies)
 
 | Technology | Tech Level | RP Cost | Max Pop | BC/Million |
 |------------|------------|---------|---------|------------|
 | Terraforming +10 | 2 | 60 | +10 | 5 |
-| Terraforming +20 | 6 | 570 | +20 | 5 |
-| Terraforming +30 | 10 | 2,300 | +30 | 4 |
-| Terraforming +40 | 14 | 4,090 | +40 | 4 |
-| Terraforming +50 | 18 | 6,400 | +50 | 3 |
-| Terraforming +60 | 22 | 9,210 | +60 | 3 |
-| Terraforming +80 | 30 | 20,730 | +80 | 2 |
-| Terraforming +100 | 38 | 40,000 | +100 | 2 |
-| Complete Terraforming +120 | 46 | 78,400 | +120 | 2 |
+| Terraforming +20 | 8 | 570 | +20 | 5 |
+| Terraforming +30 | 14 | 2,300 | +30 | 4 |
+| Terraforming +40 | 20 | 4,090 | +40 | 4 |
+| Terraforming +60 | 32 | 9,210 | +60 | 3 |
+| Terraforming +80 | 38 | 20,730 | +80 | 2 |
+| Terraforming +100 | 44 | 40,000 | +100 | 2 |
+| Complete Terraforming +120 | 50 | 78,400 | +120 | 6 |
 
 ### Colonization (6 technologies)
 
@@ -1195,20 +1172,20 @@ Max_Population = (Base_Size + Terraforming_Bonus + Soil_Enrichment_Bonus) × Env
 |------------|------------|---------|-------------|
 | Controlled Barren | 3 | 140 | Barren |
 | Controlled Tundra | 6 | 570 | Tundra |
-| Controlled Dead | 8 | 1,290 | Dead |
-| Controlled Inferno | 10 | 2,300 | Inferno |
-| Controlled Toxic | 13 | 3,600 | Toxic |
-| Controlled Radiated | 17 | 5,180 | Radiated |
+| Controlled Dead | 9 | 1,290 | Dead |
+| Controlled Inferno | 12 | 2,300 | Inferno |
+| Controlled Toxic | 15 | 3,600 | Toxic |
+| Controlled Radiated | 18 | 5,180 | Radiated |
 
 ### Ecological Restoration (5 technologies)
 
 | Technology | Tech Level | RP Cost | Cleanup Modifier | Waste/BC |
 |------------|------------|---------|------------------|----------|
 | Ecological Restoration | 1 | Free | 1.00 | 2 |
-| Improved Eco Restoration | 4 | 400 | 0.67 | 3 |
-| Enhanced Eco Restoration | 11 | 2,700 | 0.40 | 5 |
-| Advanced Eco Restoration | 22 | 9,210 | 0.20 | 10 |
-| Complete Eco Restoration | 29 | 18,490 | 0.10 | 20 |
+| Improved Eco Restoration | 5 | 400 | 0.67 | 3 |
+| Enhanced Eco Restoration | 13 | 2,700 | 0.40 | 5 |
+| Advanced Eco Restoration | 24 | 9,210 | 0.20 | 10 |
+| Complete Eco Restoration | 34 | 18,490 | 0.10 | 20 |
 
 **Formula:** `Cleanup_Cost = Total_Waste × 0.5 × Cleanup_Modifier`
 See `../economy/factory-formulas.md` §8 for full pollution calculation.
@@ -1217,36 +1194,36 @@ See `../economy/factory-formulas.md` §8 for full pollution calculation.
 
 | Weapon | Tech Level | RP Cost | Kill Rate | Space | Cost |
 |--------|------------|---------|-----------|-------|------|
-| Death Spores | 9 | 1,600 | 1M per combat round | 150 | 100 BC |
-| Doom Virus | 25 | 11,660 | 2M per combat round | 200 | 200 BC |
-| Bio Terminator | 33 | 25,600 | 3M per combat round | 250 | 300 BC |
+| Death Spores | 10 | 1,600 | 1M per combat round | 150 | 100 BC |
+| Doom Virus | 27 | 11,660 | 2M per combat round | 200 | 200 BC |
+| Bio Terminator | 40 | 25,600 | 3M per combat round | 250 | 300 BC |
 
 ### Bio-Defense (2 technologies)
 
 | Technology | Tech Level | RP Cost | Reduction |
 |------------|------------|---------|-----------|
-| Bio Toxin Antidote | 15 | 4,620 | -1M |
-| Universal Antidote | 30 | 20,730 | -2M |
+| Bio Toxin Antidote | 17 | 4,620 | -1M |
+| Universal Antidote | 36 | 20,730 | -2M |
 
 ### Enrichment (2 technologies)
 
 | Technology | Tech Level | RP Cost | Max Pop Bonus | One-Time Cost |
 |------------|------------|---------|---------------|---------------|
-| Soil Enrichment | 14 | 4,090 | +25 | 150 BC |
-| Advanced Soil Enrichment | 26 | 14,400 | +50 | 300 BC |
+| Soil Enrichment | 16 | 4,090 | +25 | 150 BC |
+| Advanced Soil Enrichment | 30 | 14,400 | +50 | 300 BC |
 
 ### Cloning (2 technologies)
 
 | Technology | Tech Level | RP Cost | BC/Million |
 |------------|------------|---------|------------|
-| Cloning | 19 | 7,050 | 10 BC |
-| Advanced Cloning | 34 | 28,220 | 5 BC |
+| Cloning | 21 | 7,050 | 10 BC |
+| Advanced Cloning | 42 | 28,220 | 5 BC |
 
 ### Atmospheric (1 technology)
 
 | Technology | Tech Level | RP Cost | Effect | Cost |
 |------------|------------|---------|--------|------|
-| Atmospheric Terraforming | 21 | 7,740 | Hostile→Standard | 200 BC |
+| Atmospheric Terraforming | 22 | 7,740 | Hostile→Standard | 200 BC |
 
 ---
 
@@ -1320,5 +1297,5 @@ Total growth this turn: 1.75 + 5 = 6.75 → 6 pop (fractional 0.75 carries over)
 
 ---
 
-*Last Updated: 2026-03-22*
+*Last Updated: 2026-04-15*
 *Specification: spec-014 - Complete Tech Tree - Planetology Field*
