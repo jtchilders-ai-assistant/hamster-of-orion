@@ -23,26 +23,26 @@ Beam weapons fire instantly and cannot be intercepted. Damage is rolled between 
 | Laser | 1 | 1-4 | 1 | 10 | 5 BC | Starting weapon |
 | Heavy Lasers | 1 | 1-7 | 2 | 20 | 10 BC | Range 2 variant of Laser |
 | Gatling Laser | 6 | 1-4 ×4 | 1 | 20 | 12 BC | 4 attacks per turn |
-| Neutron Pellet Gun | 5 | 2-5 | 2 | 15 | 8 BC | Armor-piercing (halves shield class) |
+| Neutron Pellet Gun | 7 | 2-5 | 2 | 15 | 8 BC | Armor-piercing (halves shield class) |
 | Ion Cannon | 10 | 3-8 | 2 | 15 | 15 BC | — |
-| Mass Driver | 8 | 5-8 | 3 | 20 | 18 BC | Armor-piercing (halves shield class) |
+| Mass Driver | 13 | 5-8 | 3 | 20 | 18 BC | Armor-piercing (halves shield class) |
 | Neutron Blaster | 13 | 3-12 | 3 | 25 | 25 BC | Kills crew on hit |
-| Graviton Beam | 15 | 1-15 | 5 | 20 | 22 BC | Overflow (excess damage hits next ship in stack) |
-| Hard Beam | 18 | 8-12 | 4 | 25 | 30 BC | No range penalty; Armor-piercing (halves shield class) |
+| Graviton Beam | 17 | 1-15 | 5 | 20 | 22 BC | Overflow (excess damage hits next ship in stack) |
+| Hard Beam | 19 | 8-12 | 4 | 25 | 30 BC | No range penalty; Armor-piercing (halves shield class) |
 | Fusion Beam | 20 | 4-16 | 4 | 30 | 35 BC | — |
-| Heavy Fusion Beam | 22 | 8-24 | 4 | 45 | 50 BC | — |
+| Heavy Fusion Beam | 20 | 4-30 | 4 | 45 | 50 BC | Range 2 variant of Fusion Beam |
 | Megabolt Cannon | 25 | 2-20 | 5 | 30 | 38 BC | Chain lightning (hits 4) |
-| Phasor | 27 | 5-20 | 6 | 35 | 45 BC | — |
+| Phasor | 26 | 5-20 | 6 | 35 | 45 BC | — |
 | Heavy Phasor | 30 | 10-40 | 6 | 55 | 70 BC | — |
-| Auto-Blaster | 32 | 4-16 ×3 | 4 | 50 | 60 BC | 3 attacks per turn |
-| Tachyon Beam | 35 | 1-25 | 7 | 40 | 55 BC | Overflow (excess damage hits next ship in stack) |
-| Gauss Autocannon | 37 | 7-10 ×4 | 6 | 60 | 75 BC | 4 attacks per turn; Armor-piercing (halves shield class) |
-| Particle Beam | 40 | 10-20 | 6 | 45 | 60 BC | Armor-piercing (halves shield class) |
-| Plasma Cannon | 42 | 6-30 | 7 | 50 | 70 BC | Shield damage ×2 |
+| Auto-Blaster | 28 | 4-16 ×3 | 4 | 50 | 60 BC | 3 attacks per turn |
+| Tachyon Beam | 30 | 1-25 | 7 | 40 | 55 BC | Overflow (excess damage hits next ship in stack) |
+| Gauss Autocannon | 32 | 7-10 ×4 | 6 | 60 | 75 BC | 4 attacks per turn; Armor-piercing (halves shield class) |
+| Particle Beam | 33 | 10-20 | 6 | 45 | 60 BC | Armor-piercing (halves shield class) |
+| Plasma Cannon | 35 | 6-30 | 7 | 50 | 70 BC | Shield damage ×2 |
 | Death Ray | 45 | 200-1000 | 8 | 100 | 150 BC | Instant kill small ships |
-| Disruptor | 47 | 10-40 | 8 | 60 | 85 BC | — |
-| Mauler Device | 50 | 20-100 | 9 | 150 | 200 BC | Always hits (100% acc) |
-| Stellar Converter | 55 | 10-35 ×4 | 10 | 200 | 500 BC | Destroys planets |
+| Disruptor | 37 | 10-40 | 8 | 60 | 85 BC | Range 2 |
+| Mauler Device | 48 | 20-100 | 9 | 150 | 200 BC | Always hits (100% acc) |
+| Stellar Converter | 46 | 10-35 ×4 | 10 | 200 | 500 BC | Destroys planets |
 
 ### Beam Weapon Notes
 
@@ -60,20 +60,20 @@ Range_Penalty = max(0, (Distance - Optimal_Range) × 0.10)
 
 Missiles are tracking projectiles that deal fixed damage. They can be shot down by point defense weapons or affected by ECM jammers.
 
-| Weapon | Tech Level | Damage | Speed | Space | Cost | Racks | Special |
-|--------|------------|--------|-------|-------|------|-------|---------|
-| Nuclear Missile | 1 | 4 | 2 | 10 | 5 BC | 2 | Starting missile |
-| Anti-Missile Rockets | 6 | — | — | 15 | 12 BC | 4 | **Point defense** — destroys 40% of incoming missiles (−1% per missile tech level) |
-| Hyper-V Rocket | 4 | 6 | 3.5 | 12 | 8 BC | 2 | — |
-| Hyper-X Rocket | 7 | 8 | 4 | 15 | 12 BC | 2 | — |
-| Scatter Pack V | 10 | 6 ×5 | 3.5 | 20 | 15 BC | 5 | MIRV warhead (5 MIRVs × 6 dmg each) |
-| Merculite Missile | 12 | 10 | 4 | 18 | 18 BC | 2 | — |
-| Stinger Missile | 15 | 15 | 4.5 | 20 | 22 BC | 2 | — |
-| Scatter Pack VII | 18 | 10 ×7 | 4 | 25 | 25 BC | 7 | MIRV warhead (7 MIRVs × 10 dmg each) |
-| Pulson Missile | 21 | 20 | 5 | 25 | 30 BC | 2 | — |
-| Hercular Missile | 24 | 25 | 5 | 28 | 35 BC | 2 | — |
-| Zeon Missile | 30 | 30 | 6 | 30 | 40 BC | 2 | — |
-| Scatter Pack X | 33 | 15 ×10 | 5 | 35 | 45 BC | 10 | MIRV warhead (10 MIRVs × 15 dmg each) |
+| Weapon | Tech Level | Damage | Speed | Space | Cost | Racks | Attack Bonus | Special |
+|--------|------------|--------|-------|-------|------|-------|--------------|--------|
+| Nuclear Missile | 1 | 4 | 2 | 10 | 5 BC | 2 | +1 | Starting missile |
+| Anti-Missile Rockets | 6 | — | — | 15 | 12 BC | 4 | — | **Point defense** — destroys 40% of incoming missiles (−1% per missile tech level) |
+| Hyper-V Rocket | 4 | 6 | 3.5 | 12 | 8 BC | 2 | +1 | — |
+| Hyper-X Rocket | 8 | 8 | 4 | 15 | 12 BC | 2 | +1 | — |
+| Scatter Pack V | 11 | 6 ×5 | 3.5 | 20 | 15 BC | 5 | +1 | MIRV warhead (5 MIRVs × 6 dmg each) |
+| Merculite Missile | 14 | 10 | 4 | 18 | 18 BC | 2 | +2 | — |
+| Stinger Missile | 18 | 15 | 4.5 | 20 | 22 BC | 2 | +3 | — |
+| Scatter Pack VII | 27 | 10 ×7 | 4 | 25 | 25 BC | 7 | +3 | MIRV warhead (7 MIRVs × 10 dmg each) |
+| Pulson Missile | 29 | 20 | 5 | 25 | 30 BC | 2 | +4 | — |
+| Hercular Missile | 34 | 25 | 5 | 28 | 35 BC | 2 | +5 | — |
+| Zeon Missile | 41 | 30 | 6 | 30 | 40 BC | 2 | +7 | — |
+| Scatter Pack X | 44 | 15 ×10 | 5 | 35 | 45 BC | 10 | +5 | MIRV warhead (10 MIRVs × 15 dmg each) |
 
 ### Missile Mechanics
 
@@ -99,10 +99,10 @@ Torpedoes are heavy warheads that cannot be intercepted but fire only every 2 tu
 
 | Weapon | Tech Level | Damage | Speed | Space | Cost | Special |
 |--------|------------|--------|-------|-------|------|---------|
-| Anti-Matter Torpedo | 25 | 30 | 4 | 40 | 50 BC | Cannot be intercepted |
-| Hellfire Torpedo | 35 | 25×4 | 5 | 45 | 55 BC | 4 separate 25-damage attacks per hit (100 total) |
-| Proton Torpedo | 42 | 75 | 5 | 50 | 70 BC | Cannot be intercepted |
-| Plasma Torpedo | 48 | 150 | 6 | 60 | 100 BC | Cannot be intercepted |
+| Anti-Matter Torpedo | 23 | 30 | 4 | 40 | 50 BC | Cannot be intercepted |
+| Hellfire Torpedo | 40 | 25×4 | 5 | 45 | 55 BC | 4 separate 25-damage attacks per hit (100 total) |
+| Proton Torpedo | 43 | 75 | 5 | 50 | 70 BC | Cannot be intercepted |
+| Plasma Torpedo | 50 | 150 | 6 | 60 | 100 BC | Cannot be intercepted; -15 damage per space traveled |
 
 ### Torpedo Mechanics
 
@@ -121,8 +121,8 @@ Bombs are used for orbital bombardment. They destroy population, factories, and 
 | Nuclear Bomb | 3 | 3-12 | 25 | 15 BC | Basic bombardment |
 | Fusion Bomb | 10 | 5-20 | 35 | 25 BC | — |
 | Anti-Matter Bomb | 20 | 10-40 | 50 | 40 BC | — |
-| Omega-V Bomb | 30 | 15-60 | 70 | 60 BC | — |
-| Neutronium Bomb | 43 | 30-125 | 100 | 100 BC | Maximum destruction |
+| Omega-V Bomb | 22 | 20-50 | 70 | 60 BC | — |
+| Neutronium Bomb | 39 | 40-70 | 100 | 100 BC | Maximum destruction |
 
 ### Bomb Mechanics
 
