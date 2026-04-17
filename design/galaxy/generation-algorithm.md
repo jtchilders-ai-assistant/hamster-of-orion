@@ -350,6 +350,8 @@ function GeneratePlanet(star):
     // Apply nebula bonus
     if planet.in_nebula:
         planet.resources = ApplyNebulaBonus(planet.resources)
+        // Note: Original MOO1 had special high-value planets hidden in nebulae.
+        // This is handled via the resource upgrade chance in ApplyNebulaBonus.
     
     return planet
 ```
@@ -637,10 +639,10 @@ function PlaceOrion(stars, map_center):
     
     // Convert to Orion
     best_star.name = "Orion"
-    best_star.color = "white"  // Orion is always white
+    best_star.color = "yellow"  // Orion is always a yellow star per MOO1
     best_star.special = "orion"
     best_star.planet = {
-        environment: "dead",       // Hostile but irrelevant
+        environment: "gaia",      // Orion is a Gaia-class planet
         size: {type: "huge", base_pop: 100},
         resources: "ultra_rich",
         special: "orion",
@@ -725,6 +727,15 @@ function PlaceArtifactsWorlds(stars, config, orion_star):
 ## 7. Nebula Placement
 
 ### 7.1 Nebula Properties
+
+Tactical Combat Effects:
+- **Shield Nullification**: When a ship is inside a nebula during tactical combat, its deflector shields do not function.
+- **Missile Inaccuracy**: Missiles fired at a target located within a nebula have a very high chance to miss, making them ineffective.
+- **Planetary Defense Invincibility**: If a nebula covers a planet, planetary defensive structures (Missile Bases, Star Bases) may become immune to missile fire.
+
+Strategic Effects:
+- **Encourages Beam Weapons**: Combat inside a nebula forces reliance on beam weapons.
+- **Hidden Riches**: Systems in nebulae often hold high-value planets (e.g., Ultra-Rich or Terran) due to increased resource upgrade chances.
 
 Nebulae are regions of space with special properties:
 - Ships reduced to **Warp 1** speed
