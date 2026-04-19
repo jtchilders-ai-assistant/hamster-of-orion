@@ -1,59 +1,36 @@
-# Current Task: turn-system
+# Current Task: production-system
 
 ## Task ID
-turn-system
+production-system
 
 ## Name
-Turn processing system
+Production and sliders
 
 ## Description
-Implement the turn processing loop as described in design/technical/development-roadmap.md and the data structures in design/technical/data-structures.md.
+Implement production calculation per design/economy/slider-mathematics.md
 
-## Output
-Primary output: `src/game/systems/turn.ts`
+## Output Files
+- Primary: `src/game/systems/production.ts`
 
 ## Acceptance Criteria
-- `nextTurn()` advances game state (increments turn counter, updates year)
-- Calls production, growth, and research systems (stub/delegate calls are fine since those systems are pending — use no-op stubs that can be replaced)
-- Unit tests pass
+1. 5 sliders sum to 100% (SHIP, DEF, IND, ECO, TECH)
+2. SHIP/DEF/IND/ECO/TECH calculations correct per design/economy/slider-mathematics.md
+3. Pollution and cleanup work
+4. Unit tests pass
 
-## What to Implement
+## Dependencies (all done)
+- turn-system ✓
 
-### Turn System Architecture
-Create `src/game/systems/turn.ts` with a `processTurn(state: GameState): GameState` function that:
+## Steps
 
-1. Increments `state.meta.turn` by 1
-2. Updates `state.meta.year` to `2500 + turn`
-3. Calls (stub) production processing per planet
-4. Calls (stub) population growth per planet
-5. Calls (stub) research processing per empire
-6. Returns the updated state
-
-Also create a Redux-style action in `src/game/actions/turn.ts`:
-- `nextTurn()` action creator returning `{ type: 'NEXT_TURN' }`
-- A `turnReducer(state, action)` that calls `processTurn` when action type is `NEXT_TURN`
-
-### Integration with Store
-Wire the reducer into the store (check how existing reducers are registered in `src/game/store.ts`).
-
-### Tests
-Create `test/game/systems/turn.test.ts` with tests covering:
-- `processTurn` increments turn counter
-- `processTurn` correctly updates year (2500 + turn)
-- Multiple consecutive turns work correctly
-- Action `nextTurn()` dispatched to the store advances turn
-- State is not mutated (immutability check)
-
-## Reference Files
-- `design/technical/data-structures.md` — GameState, Planet, Empire types
-- `design/technical/development-roadmap.md` — Turn cycle overview
-- `src/game/state.ts` — Existing type definitions
-- `src/game/store.ts` — Store class and existing reducers
-- `src/game/systems/races.ts` — Example of existing system implementation
-- `test/game/systems/races.test.ts` — Example of existing test style
-
-## Notes
-- Keep production/growth/research as stub calls (e.g., `processProduction(state)` that returns state unchanged) — those will be implemented in subsequent tasks
-- No DOM imports — pure TypeScript only
-- No `any` types
-- Run `npm run typecheck && npm run test` before marking complete
+1. Read `design/economy/slider-mathematics.md` for exact formulas
+2. Read `design/technical/data-structures.md` for Planet/Empire type definitions
+3. Check existing `src/game/systems/turn.ts` for how production stub was wired in
+4. Implement `src/game/systems/production.ts` with:
+   - Slider validation (sum to 100)
+   - Per-slider production allocation functions
+   - Pollution and cleanup calculations
+   - Wire into turn system (replace stub)
+5. Write tests in `test/game/systems/production.test.ts`
+6. Run `npm run typecheck && npm run test`
+7. Update `.agents/workflow-state.json` with state="TESTING" and worker_output summary

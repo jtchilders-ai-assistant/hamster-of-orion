@@ -37,20 +37,30 @@ describe('Production System', () => {
       isPoor: false,
       isGaia: false,
       hasArtifacts: false,
+      resourceLevel: 'normal',
+      researchMultiplier: 1.0,
+      startingPopulation: null,
+      startingFactories: null,
     };
 
     const output = calculateBaseProduction(planet);
-    // 40 factories * 1.0 + 50 pop * 0.5 = 40 + 25 = 65
-    expect(output).toBe(65);
+    // With TECH slider at 20%, active pop = 50 × 0.8 = 40
+    // Factory: 40 × 1.0 = 40 BC
+    // Pop (TL1): 40 × 0.53 = 21.2 BC
+    // Gross: 61.2 BC
+    // Pollution: 40 factories × 1.0 waste = 40 units
+    // Cleanup: 40 × 0.5 × 1.0 = 20 BC
+    // Net: floor(61.2 - 20) = 41 BC
+    expect(output).toBe(41);
   });
 
   it('applies richness multiplier correctly', () => {
-    const richPlanet = { isRich: true, isPoor: false } as Planet;
-    const poorPlanet = { isRich: false, isPoor: true } as Planet;
-    const normalPlanet = { isRich: false, isPoor: false } as Planet;
+    const richPlanet = { isRich: true, isPoor: false, resourceLevel: 'rich' } as Planet;
+    const poorPlanet = { isRich: false, isPoor: true, resourceLevel: 'poor' } as Planet;
+    const normalPlanet = { isRich: false, isPoor: false, resourceLevel: 'normal' } as Planet;
 
-    expect(getRichnessMultiplier(richPlanet)).toBe(1.5);
-    expect(getRichnessMultiplier(poorPlanet)).toBe(0.75);
+    expect(getRichnessMultiplier(richPlanet)).toBe(2.0);
+    expect(getRichnessMultiplier(poorPlanet)).toBe(0.5);
     expect(getRichnessMultiplier(normalPlanet)).toBe(1.0);
   });
 
@@ -83,6 +93,10 @@ describe('Production System', () => {
       isPoor: false,
       isGaia: false,
       hasArtifacts: false,
+      resourceLevel: 'normal',
+      researchMultiplier: 1.0,
+      startingPopulation: null,
+      startingFactories: null,
     };
 
     const output = distributeProduction(planet);

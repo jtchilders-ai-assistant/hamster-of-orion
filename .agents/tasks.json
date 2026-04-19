@@ -103,7 +103,7 @@
       "id": "production-system",
       "name": "Production and sliders",
       "type": "code",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         "turn-system"
       ],

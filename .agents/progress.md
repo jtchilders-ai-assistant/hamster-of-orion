@@ -21,7 +21,7 @@ Completed 8 review and integration tasks from March 2026.
 | galaxy-generation | Galaxy generation | ⏳ Pending |
 | race-data | Race data | ⏳ Pending |
 | turn-system | Turn processing | ⏳ Pending |
-| production-system | Production/sliders | ⏳ Pending |
+| production-system | Production/sliders | ✅ Done |
 | population-growth | Population growth | ⏳ Pending |
 | research-system | Research/tech | ⏳ Pending |
 | debug-hooks | Debug interface | ⏳ Pending |
@@ -116,4 +116,24 @@ Completed 8 review and integration tasks from March 2026.
 - No `any` types ✓
 - TypeScript typecheck: PASS ✓
 - Tests: 186/186 passed (24 new turn tests) ✓
+- Committed & pushed
+- [2026-04-19T22:41:15Z] ORCHESTRATOR: State=WORKING, task=production-system. Worker active (4m24s elapsed). Waiting for completion.
+
+## 2026-04-19 17:46 CDT - TESTING → VERIFYING
+- Task: production-system
+- Tests: 224/224 passed, typecheck clean (confirmed fresh run)
+- State: VERIFYING — verifier subagent spawned
+
+## 2026-04-19T22:47 UTC - production-system APPROVED & DONE
+- Verifier confirmed all acceptance criteria met
+- 5 sliders sum to 100%: validateSliders() enforces within 1% tolerance ✓
+- SHIP/DEF/IND/ECO/TECH calculations per slider-mathematics.md ✓ (TECH diverts pop before gross calc, 4 sliders split 100% of net)
+- Pollution (wasteRate × factories) and cleanup (0.5 × pollution × cleanupModifier) ✓
+- ECO sub-phases: cleanup → growth bonus → terraforming ✓
+- Factory construction with carry-over progress and max-factory overflow to Empire Reserve ✓
+- Racial modifiers: factory efficiency (Mice 1.5×), RC level bonus ✓
+- No DOM imports in src/game/ ✓
+- No `any` types ✓
+- TypeScript typecheck: PASS ✓
+- Tests: 224/224 passed (41 new production tests) ✓
 - Committed & pushed
