@@ -38,7 +38,7 @@
       "id": "game-state-types",
       "name": "GameState type definitions",
       "type": "code",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         "store"
       ],

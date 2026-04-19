@@ -61,6 +61,11 @@ export function generateGalaxy(options: GalaxyOptions): Galaxy {
       },
       allIds: [orionId],
     },
+    quadTree: {
+      bounds: { x: 0, y: 0, width: config.width, height: config.height },
+      systemIds: [orionId],
+      children: null,
+    },
     orionSystemId: orionId,
     homeSystemIds: {},
     fogOfWar: {},

@@ -1,27 +1,21 @@
-# Current Task: store
+# Current Task: game-state-types
 
-## Task ID: store
-## Name: Store class implementation
+## Task ID: game-state-types
+## Name: GameState type definitions
 ## Type: code
 
 ## Description
-Implement Redux-compatible Store class per ARCHITECTURE.md
+Define all TypeScript interfaces for game state per data-structures.md
 
 ## Output Files
-- src/game/store.ts
+- src/game/state.ts
+- src/game/types/ (any sub-types needed)
 
 ## Acceptance Criteria
-- TypeScript compiles without errors
-- Store has getState(), dispatch(), subscribe() methods
-- Unit tests pass
+- All interfaces from data-structures.md defined
+- No 'any' types used
+- Compiles without errors
 
 ## Dependencies (all complete)
 - scaffold ✅
-
-## Reference Docs
-- design/technical/ARCHITECTURE.md
-- design/technical/data-structures.md
-- src/game/state.ts (existing type definitions)
-
-## Notes
-The scaffold already created a placeholder src/game/store.ts. Review and fully implement it with proper Redux-compatible Store class including getState(), dispatch(), and subscribe() methods. Write unit tests in test/game/store.test.ts.
+- store ✅

@@ -79,6 +79,22 @@ export interface GalaxyCoord {
   y: number;
 }
 
+// ── Spatial Index ───────────────────────────────────────────────────────────────
+
+export interface QuadTreeNode {
+  bounds: { x: number; y: number; width: number; height: number };
+  systemIds: SystemId[];
+  children: QuadTreeNode[] | null;  // null = leaf node
+}
+
+// ── Region ────────────────────────────────────────────────────────────────────
+
+export interface Region {
+  centerX: number;
+  centerY: number;
+  radius: number;
+}
+
 // ── Galaxy & Star Systems ─────────────────────────────────────────────────────
 
 export interface StarSystem {
@@ -118,9 +134,12 @@ export interface Galaxy {
     allIds: SystemId[];
   };
 
+  // Spatial index for fast lookups
+  quadTree: QuadTreeNode;
+
   orionSystemId: SystemId;
   homeSystemIds: Record<EmpireId, SystemId>;
-  fogOfWar: Record<EmpireId, SystemId[]>;
+  fogOfWar: Record<EmpireId, SystemId[]>;  // Unexplored systems per empire
 }
 
 // ── Planets & Colonies ────────────────────────────────────────────────────────
@@ -205,7 +224,7 @@ export type FleetOrder =
   | { type: 'none' }
   | { type: 'move'; target: SystemId }
   | { type: 'patrol'; systems: SystemId[] }
-  | { type: 'explore'; region: string }
+  | { type: 'explore'; region: Region }
   | { type: 'attack'; target: FleetId }
   | { type: 'bombard'; target: PlanetId }
   | { type: 'invade'; target: PlanetId }
@@ -443,6 +462,80 @@ export interface Empire {
   defeatedTurn: number | null;
 }
 
+// ── AI Empire ───────────────────────────────────────────────────────────────
+
+export interface AIPersonality {
+  type: PersonalityType;
+  aggression: number;      // 0-100
+  expansionism: number;    // 0-100
+  diplomacy: number;       // 0-100
+  research: number;        // 0-100
+  traits: AITrait[];
+}
+
+export interface AIStrategy {
+  primary: StrategyGoal;
+  secondary: StrategyGoal;
+
+  economicFocus: 'production' | 'research' | 'growth';
+  militaryStance: 'defensive' | 'neutral' | 'aggressive';
+  diplomaticGoal: 'isolation' | 'alliances' | 'domination';
+
+  targetEmpires: Record<EmpireId, TargetPriority>;
+  targetSystems: SystemId[];
+
+  lastEvaluation: number;   // Turn
+  nextEvaluation: number;   // Turn
+}
+
+export interface AIMemory {
+  // Remember player actions
+  playerBetrayals: number;
+  playerAggression: number;
+  playerDiplomacy: number;
+
+  // Strategic memory
+  lastWars: Array<{ enemy: EmpireId; outcome: 'won' | 'lost'; turn: number }>;
+  failedInvasions: PlanetId[];
+  lostSystems: SystemId[];
+
+  // Diplomatic memory
+  brokenTreaties: Array<{ empire: EmpireId; turn: number }>;
+  receivedHelp: Array<{ empire: EmpireId; type: string; turn: number }>;
+}
+
+export interface AIWeights {
+  // Production allocation preferences
+  shipWeight: number;
+  defenseWeight: number;
+  industryWeight: number;
+  ecologyWeight: number;
+  researchWeight: number;
+
+  // Research priorities
+  weaponsPriority: number;
+  propulsionPriority: number;
+  constructionPriority: number;
+  computersPriority: number;
+  forceFieldsPriority: number;
+  biotechPriority: number;
+
+  // Military decisions
+  fleetSizeThreshold: number;  // When to attack
+  threatTolerance: number;     // When threatened
+  retreatThreshold: number;    // HP% to retreat
+}
+
+export interface AIEmpire {
+  id: EmpireId;
+  raceId: RaceId;
+  empireName: string;
+  personality: AIPersonality;
+  strategy: AIStrategy;
+  memory: AIMemory;
+  weights: AIWeights;
+}
+
 // ── Combat ────────────────────────────────────────────────────────────────────
 
 export interface CombatShip {
@@ -615,6 +708,9 @@ export interface GameState {
     allIds: CombatId[];
     activeCombatId: CombatId | null;
   };
+
+  // AI state (keyed by EmpireId for non-player empires)
+  aiEmpires: Record<EmpireId, AIEmpire>;
 
   highCouncil: HighCouncil | null;
 

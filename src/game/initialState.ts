@@ -80,6 +80,11 @@ export const initialState: GameState = {
     orionSystemId: '',
     homeSystemIds: {},
     fogOfWar: {},
+    quadTree: {
+      bounds: { x: 0, y: 0, width: 30, height: 30 },
+      systemIds: [],
+      children: null,
+    },
   },
 
   planets: { byId: {}, allIds: [] },
@@ -98,6 +103,8 @@ export const initialState: GameState = {
     allIds: [],
     activeCombatId: null,
   },
+
+  aiEmpires: {},
 
   highCouncil: null,
 
