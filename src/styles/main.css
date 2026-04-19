@@ -1,0 +1,204 @@
+/* Hamster of Orion — Main Styles */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --color-bg: #000a1a;
+  --color-bg-panel: #0a1a2e;
+  --color-border: #1a3a5c;
+  --color-accent: #00aaff;
+  --color-accent-dim: #005588;
+  --color-text: #c0d8f0;
+  --color-text-dim: #607080;
+  --color-warning: #ffaa00;
+  --color-danger: #ff3333;
+  --color-success: #00cc66;
+
+  --font-mono: 'Courier New', Courier, monospace;
+  --font-sans: 'Segoe UI', Arial, sans-serif;
+
+  --panel-width: 280px;
+  --command-bar-height: 44px;
+  --status-bar-height: 28px;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  overflow: hidden;
+}
+
+#app {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+/* ── Screens ── */
+
+.screen {
+  display: none;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+}
+
+.screen.active {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Galaxy Screen Layout ── */
+
+#galaxy-screen {
+  display: none;
+  flex-direction: row;
+  position: relative;
+}
+
+#galaxy-screen.active {
+  display: flex;
+}
+
+#star-map {
+  flex: 1;
+  display: block;
+  background: #000;
+  cursor: crosshair;
+}
+
+/* ── Info Panel ── */
+
+#info-panel {
+  width: var(--panel-width);
+  background: var(--color-bg-panel);
+  border-left: 1px solid var(--color-border);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  /* Leave room for command bar and status bar */
+  height: calc(100% - var(--command-bar-height) - var(--status-bar-height));
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.panel h2 {
+  font-size: 15px;
+  font-family: var(--font-mono);
+  color: var(--color-accent);
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+}
+
+.panel .stat {
+  font-size: 12px;
+  color: var(--color-text-dim);
+  display: flex;
+  justify-content: space-between;
+}
+
+.panel .stat span {
+  color: var(--color-text);
+  font-weight: bold;
+}
+
+.panel button {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  padding: 4px 8px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-transform: uppercase;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.panel button:hover {
+  background: var(--color-accent-dim);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+
+/* ── Command Bar ── */
+
+#command-bar {
+  position: absolute;
+  bottom: var(--status-bar-height);
+  left: 0;
+  right: var(--panel-width);
+  height: var(--command-bar-height);
+  background: var(--color-bg-panel);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 8px;
+}
+
+#command-bar button {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  padding: 6px 12px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-transform: uppercase;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+#command-bar button:hover {
+  background: var(--color-accent-dim);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+
+#next-turn {
+  margin-left: auto;
+  background: var(--color-accent-dim) !important;
+  border-color: var(--color-accent) !important;
+  color: #fff !important;
+  font-weight: bold;
+}
+
+#next-turn:hover {
+  background: var(--color-accent) !important;
+}
+
+/* ── Status Bar ── */
+
+#status-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--status-bar-height);
+  background: #060e1a;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 0 12px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-text-dim);
+}
+
+#status-bar span {
+  color: var(--color-text);
+}

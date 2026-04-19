@@ -8,7 +8,7 @@
       "id": "scaffold",
       "name": "Project scaffold",
       "type": "setup",
-      "status": "pending",
+      "status": "done",
       "description": "Initialize Vite + TypeScript project with folder structure per ARCHITECTURE.md",
       "output": "src/, package.json, vite.config.ts, tsconfig.json",
       "acceptance": [

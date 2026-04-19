@@ -1,0 +1,12 @@
+[
+  {
+    "id": "hamsters",
+    "name": "Hamsters",
+    "plural": "Hamster Empire",
+    "description": "Industrious rodents with a knack for engineering.",
+    "bonuses": {
+      "production": 1.1,
+      "miniaturization": 1.05
+    }
+  }
+]
