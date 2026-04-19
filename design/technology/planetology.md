@@ -1004,7 +1004,8 @@ Max_Population = (Base_Size + Terraforming_Bonus + Soil_Enrichment_Bonus) × Env
         "research_cost": 48400,
         "category": "future_tech",
         "effect": {
-          "general_improvement": true
+          "population_growth_bonus": 0.02,
+          "description": "Future tech: +2% population growth rate (cumulative)"
         }
       },
       {
@@ -1014,7 +1015,8 @@ Max_Population = (Base_Size + Terraforming_Bonus + Soil_Enrichment_Bonus) × Env
         "research_cost": 57600,
         "category": "future_tech",
         "effect": {
-          "general_improvement": true
+          "population_growth_bonus": 0.02,
+          "description": "Future tech: +2% population growth rate (cumulative)"
         }
       },
       {
@@ -1024,7 +1026,8 @@ Max_Population = (Base_Size + Terraforming_Bonus + Soil_Enrichment_Bonus) × Env
         "research_cost": 67600,
         "category": "future_tech",
         "effect": {
-          "general_improvement": true
+          "population_growth_bonus": 0.02,
+          "description": "Future tech: +2% population growth rate (cumulative)"
         }
       },
       {
@@ -1034,7 +1037,8 @@ Max_Population = (Base_Size + Terraforming_Bonus + Soil_Enrichment_Bonus) × Env
         "research_cost": 90000,
         "category": "future_tech",
         "effect": {
-          "general_improvement": true
+          "population_growth_bonus": 0.02,
+          "description": "Future tech: +2% population growth rate (cumulative)"
         }
       },
       {
@@ -1044,7 +1048,8 @@ Max_Population = (Base_Size + Terraforming_Bonus + Soil_Enrichment_Bonus) × Env
         "research_cost": 102400,
         "category": "future_tech",
         "effect": {
-          "general_improvement": true
+          "population_growth_bonus": 0.02,
+          "description": "Future tech: +2% population growth rate (cumulative)"
         }
       },
       {
@@ -1054,7 +1059,8 @@ Max_Population = (Base_Size + Terraforming_Bonus + Soil_Enrichment_Bonus) × Env
         "research_cost": 115600,
         "category": "future_tech",
         "effect": {
-          "general_improvement": true
+          "population_growth_bonus": 0.02,
+          "description": "Future tech: +2% population growth rate (cumulative)"
         }
       },
       {
@@ -1064,7 +1070,8 @@ Max_Population = (Base_Size + Terraforming_Bonus + Soil_Enrichment_Bonus) × Env
         "research_cost": 129600,
         "category": "future_tech",
         "effect": {
-          "general_improvement": true
+          "population_growth_bonus": 0.02,
+          "description": "Future tech: +2% population growth rate (cumulative)"
         }
       },
       {
@@ -1074,7 +1081,8 @@ Max_Population = (Base_Size + Terraforming_Bonus + Soil_Enrichment_Bonus) × Env
         "research_cost": 144400,
         "category": "future_tech",
         "effect": {
-          "general_improvement": true
+          "population_growth_bonus": 0.02,
+          "description": "Future tech: +2% population growth rate (cumulative)"
         }
       },
       {
@@ -1084,7 +1092,8 @@ Max_Population = (Base_Size + Terraforming_Bonus + Soil_Enrichment_Bonus) × Env
         "research_cost": 160000,
         "category": "future_tech",
         "effect": {
-          "general_improvement": true
+          "population_growth_bonus": 0.02,
+          "description": "Future tech: +2% population growth rate (cumulative)"
         }
       }
     ],

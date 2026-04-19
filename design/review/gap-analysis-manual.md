@@ -352,10 +352,9 @@ The design documentation is **production-ready**. No blocking issues.
 
 ### Optional Enhancements
 
-1. **Auto-Combat AI Detail** (`ships/auto-combat-ai.md`)
-   - Expand targeting priority logic
-   - Document retreat decisions
-   - ~200 lines estimated
+1. **Auto-Combat AI Detail** — ✅ DONE
+   - Integrated into `ships/combat-algorithm.md` §25 (Auto-Combat AI)
+   - Targeting priority, weapon selection, movement AI, retreat decisions all documented
 
 2. **Fleet Management Patterns** (`ships/fleet-management.md`)
    - Rally point system

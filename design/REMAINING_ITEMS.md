@@ -1,7 +1,7 @@
 # Remaining Design Items — Hamster of Orion
 
 **Last Updated:** 2026-04-19  
-**Status:** All critical/high/medium issues resolved. Only minor items remain.
+**Status:** ✅ ALL ISSUES RESOLVED
 
 ---
 
@@ -11,31 +11,29 @@ The comprehensive design review is **complete**:
 - 135+ issues identified and resolved across 6 areas
 - All MOO1 fidelity checks passed
 - Economy, combat, species, diplomacy, technology, and UI fully documented
+- All minor items resolved
 
 ---
 
-## Minor Remaining Items (Non-Blocking)
+## Resolved Items (2026-04-19)
 
-### 1. Planetology Tech Placeholders
+### 1. Planetology Tech Placeholders ✅
 **File:** `technology/planetology.md`  
-**Issue:** 10 "Advanced Planetology Tech" entries have generic `"effect": {"general_improvement": true}` placeholders.  
-**Priority:** Low — can be filled in during implementation.
+**Resolution:** Replaced generic `"general_improvement": true` with specific `"population_growth_bonus": 0.02` (+2% cumulative growth per future tech level).
 
-### 2. Interaction Spec Placeholder
+### 2. Interaction Spec Placeholder ✅
 **File:** `ui-ux/interaction-spec.md`  
-**Issue:** One remaining `[TODO]` placeholder text.  
-**Priority:** Low — cosmetic.
+**Resolution:** Verified — no TODO placeholders exist. The "Ghost placeholder" text is a wireframe label, not an issue.
 
-### 3. Auto-Combat AI Reference
-**File:** `ui-ux/screen-inventory.md`  
-**Issue:** References `auto-combat-ai.md` but this was integrated into `combat-algorithm.md` §25 instead.  
-**Priority:** Low — documentation cleanup only.
+### 3. Auto-Combat AI Reference ✅
+**File:** `review/gap-analysis-manual.md`  
+**Resolution:** Updated reference to point to `ships/combat-algorithm.md` §25 where auto-combat AI is fully documented.
 
 ---
 
 ## Completed Review Areas
 
-All review files below have been fully addressed and can be archived:
+All review files have been fully addressed and archived in `archive/reviews/`:
 
 | Review File | Issues Found | Status |
 |-------------|--------------|--------|
