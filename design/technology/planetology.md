@@ -148,7 +148,7 @@ Converts hostile planets to habitable environments.
 | Tech Name | Tech Level | RP Cost | Category | Effect |
 |-----------|------------|---------|----------|--------|
 | Advanced Eco Restoration | 24 | 9,210 | eco_restoration | Eliminates 10 waste per 1 BC |
-| Doom Virus | 27 | 11,660 | bio_weapon | -2M pop per combat round, -25% max pop permanent |
+| Doom Virus | 25 | 11,660 | bio_weapon | -2M pop per combat round, -25% max pop permanent |
 
 ---
 
@@ -170,7 +170,7 @@ Converts hostile planets to habitable environments.
 |-----------|------------|---------|----------|--------|
 | Universal Antidote | 36 | 20,730 | bio_defense | Reduces bio casualties by 2M |
 | Improved Terraforming +80 | 38 | 20,730 | terraforming | +80 max pop, 2 BC/million |
-| Bio Terminator | 40 | 25,600 | bio_weapon | -3M pop per combat round, -50% max pop permanent |
+| Bio Terminator | 33 | 25,600 | bio_weapon | -3M pop per combat round, -50% max pop permanent |
 
 ---
 
@@ -331,8 +331,8 @@ Bio weapons are ship-mounted special weapons that kill planetary population. Eac
 | Weapon | Tech Level | RP Cost | Kill Rate | Space | Cost | Max Pop Reduction |
 |--------|------------|---------|-----------|-------|------|-------------------|
 | Death Spores | 10 | 1,600 | 1M per combat round | 150 | 100 BC | -10% permanent |
-| Doom Virus | 27 | 11,660 | 2M per combat round | 200 | 200 BC | -25% permanent |
-| Bio Terminator | 40 | 25,600 | 3M per combat round | 250 | 300 BC | -50% permanent |
+| Doom Virus | 25 | 11,660 | 2M per combat round | 200 | 200 BC | -25% permanent |
+| Bio Terminator | 33 | 25,600 | 3M per combat round | 250 | 300 BC | -50% permanent |
 
 **Bio Weapon Mechanics:**
 - Ship must have bio weapon equipped in design
@@ -1195,8 +1195,8 @@ See `../economy/factory-formulas.md` §8 for full pollution calculation.
 | Weapon | Tech Level | RP Cost | Kill Rate | Space | Cost |
 |--------|------------|---------|-----------|-------|------|
 | Death Spores | 10 | 1,600 | 1M per combat round | 150 | 100 BC |
-| Doom Virus | 27 | 11,660 | 2M per combat round | 200 | 200 BC |
-| Bio Terminator | 40 | 25,600 | 3M per combat round | 250 | 300 BC |
+| Doom Virus | 25 | 11,660 | 2M per combat round | 200 | 200 BC |
+| Bio Terminator | 33 | 25,600 | 3M per combat round | 250 | 300 BC |
 
 ### Bio-Defense (2 technologies)
 
