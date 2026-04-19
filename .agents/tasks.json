@@ -87,7 +87,7 @@
       "id": "turn-system",
       "name": "Turn processing system",
       "type": "code",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         "game-state-types"
       ],
