@@ -1,21 +1,35 @@
-# Current Task: game-state-types
+# Current Task: galaxy-generation
 
-## Task ID: game-state-types
-## Name: GameState type definitions
-## Type: code
+## Task ID
+galaxy-generation
+
+## Name
+Galaxy generation system
 
 ## Description
-Define all TypeScript interfaces for game state per data-structures.md
+Implement galaxy generation per design/galaxy/generation-algorithm.md
 
-## Output Files
-- src/game/state.ts
-- src/game/types/ (any sub-types needed)
+## Primary Output
+`src/game/generators/galaxy.ts`
+
+## Dependencies (all done)
+- game-state-types ✅
 
 ## Acceptance Criteria
-- All interfaces from data-structures.md defined
-- No 'any' types used
-- Compiles without errors
+- Generates stars with correct distribution
+- Assigns planets with environment types
+- Places homeworlds for all races
+- Unit tests pass
 
-## Dependencies (all complete)
-- scaffold ✅
-- store ✅
+## Key Design Files to Read
+- design/galaxy/generation-algorithm.md
+- design/galaxy/star-systems.md
+- design/galaxy/map-generation.md
+- src/game/state.ts (for types)
+- src/game/initialState.ts (for reference)
+
+## Notes
+- No DOM imports in src/game/
+- No `any` types
+- All logic must be pure functions (no side effects)
+- Write unit tests alongside implementation

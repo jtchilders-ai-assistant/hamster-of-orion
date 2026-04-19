@@ -54,7 +54,7 @@
       "id": "galaxy-generation",
       "name": "Galaxy generation system",
       "type": "code",
-      "status": "pending",
+      "status": "in-progress",
       "dependencies": [
         "game-state-types"
       ],

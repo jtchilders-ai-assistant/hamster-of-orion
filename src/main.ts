@@ -13,15 +13,20 @@ import { App } from './ui/app';
 console.log('🐹 Hamster of Orion — Initializing...');
 
 // Generate initial galaxy
-const galaxy = generateGalaxy({
+const genResult = generateGalaxy({
   size: 'medium',
   shape: 'spiral',
-  seed: 'test-seed',
+  seed: 42,
+  playerCount: 4,
 });
 
 const startingState: GameState = {
   ...initialState,
-  galaxy,
+  galaxy: genResult.galaxy,
+  planets: {
+    byId: genResult.planets,
+    allIds: genResult.planetIds,
+  },
   currentScreen: 'galaxy',
 };
 

@@ -40,7 +40,11 @@ export type StarType = 'yellow' | 'green' | 'red' | 'blue' | 'white' | 'purple';
 
 export type PlanetType =
   | 'terran' | 'ocean' | 'jungle' | 'arid' | 'tundra'
-  | 'toxic' | 'radiated' | 'barren' | 'dead' | 'gas_giant';
+  | 'toxic' | 'radiated' | 'barren' | 'dead' | 'gas_giant'
+  | 'gaia' | 'steppe' | 'desert' | 'minimal' | 'inferno';
+
+export type ResourceLevel = 'ultra_poor' | 'poor' | 'normal' | 'rich' | 'ultra_rich';
+export type GalaxyRegion = 'safe_zones' | 'wild_pellet_fields' | 'dark_sectors' | 'omega_sector';
 export type PlanetSize = 'tiny' | 'small' | 'medium' | 'large' | 'huge';
 export type Morale = 'ecstatic' | 'happy' | 'content' | 'unrest' | 'rebellion';
 export type MonsterType = 'amoeba' | 'crystal' | 'dragon';
@@ -110,6 +114,7 @@ export interface StarSystem {
 
   hasAsteroids: boolean;
   hasNebula: boolean;
+  nebulaId: string | null;
   hasWormhole: boolean;
   wormholeTarget: SystemId | null;
 
@@ -119,6 +124,24 @@ export interface StarSystem {
   hasGuardian: boolean;
   hasArtifacts: boolean;
   hasSpaceMonster: MonsterType | null;
+
+  region: GalaxyRegion;
+  clusterId: string | null;
+}
+
+export interface Nebula {
+  id: string;
+  centerX: number;
+  centerY: number;
+  radius: number;
+  starIds: SystemId[];
+}
+
+export interface Cluster {
+  id: string;
+  centerStarId: SystemId;
+  memberStarIds: SystemId[];
+  region: GalaxyRegion;
 }
 
 export interface Galaxy {
@@ -136,6 +159,10 @@ export interface Galaxy {
 
   // Spatial index for fast lookups
   quadTree: QuadTreeNode;
+
+  nebulae: Nebula[];
+  clusters: Cluster[];
+  artifactsSystemIds: SystemId[];
 
   orionSystemId: SystemId;
   homeSystemIds: Record<EmpireId, SystemId>;
@@ -196,6 +223,12 @@ export interface Planet {
   isPoor: boolean;
   isGaia: boolean;
   hasArtifacts: boolean;
+
+  // Galaxy generation metadata
+  resourceLevel: ResourceLevel;
+  researchMultiplier: number;
+  startingPopulation: number | null;
+  startingFactories: number | null;
 }
 
 export interface BuildingEffect {
