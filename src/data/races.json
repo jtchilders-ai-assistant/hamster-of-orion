@@ -1,12 +1,980 @@
-[
-  {
-    "id": "hamsters",
-    "name": "Hamsters",
-    "plural": "Hamster Empire",
-    "description": "Industrious rodents with a knack for engineering.",
-    "bonuses": {
-      "production": 1.1,
-      "miniaturization": 1.05
+{
+  "races": [
+    {
+      "id": "hamsters",
+      "name": "Hamsters",
+      "moo1Equivalent": "Humans",
+      "description": "Diplomatic survivors, adaptable and balanced in all things. Natural mediators who seek peaceful resolution but fight tenaciously when cornered.",
+      "homeworld": {
+        "name": "Hamsteria Prime",
+        "type": "terran",
+        "climate": "temperate",
+        "size": "medium",
+        "special": null
+      },
+      "bonuses": {
+        "production": 0,
+        "research": 0,
+        "food": 10,
+        "growth": 0,
+        "groundCombat": -10,
+        "shipCombat": 0,
+        "espionage": -20,
+        "diplomacy": 30
+      },
+      "researchFieldBonuses": {
+        "force_fields": 40,
+        "propulsion": 20,
+        "planetology": 20
+      },
+      "researchFieldPenalties": {},
+      "canConductEspionage": true,
+      "immuneToEspionage": false,
+      "spyRollBonus": 0,
+      "specialAbilities": [
+        {
+          "id": "universal_diplomat",
+          "name": "Universal Diplomat",
+          "description": "All other races start at Neutral rather than Unfriendly",
+          "effect": {
+            "type": "starting_relations",
+            "value": 20,
+            "scope": "all_races"
+          }
+        },
+        {
+          "id": "trade_hub",
+          "name": "Trade Hub",
+          "description": "+25% credits from trade agreements",
+          "effect": {
+            "type": "trade_bonus",
+            "value": 25
+          }
+        },
+        {
+          "id": "council_favorite",
+          "name": "Council Favorite",
+          "description": "+1 vote in High Council elections",
+          "effect": {
+            "type": "council_votes",
+            "value": 1
+          }
+        },
+        {
+          "id": "adaptive",
+          "name": "Adaptive",
+          "description": "Can colonize any planet type at reduced penalty (-25% hostility penalty)",
+          "effect": {
+            "type": "colonization_penalty_reduction",
+            "value": 25
+          }
+        }
+      ],
+      "startingTechnologies": [
+        "nuclear_engines",
+        "controlled_environment",
+        "nuclear_missile",
+        "titanium_armor"
+      ],
+      "aiBehavior": {
+        "archetype": "diplomat",
+        "aggression": 0.1,
+        "expansion": 0.5,
+        "researchFocus": 0.5,
+        "productionFocus": 0.5,
+        "diplomacyPriority": 0.9,
+        "naturalAllies": [],
+        "naturalEnemies": [],
+        "treatyReliability": 0.95,
+        "declaresWarFirst": false
+      },
+      "shipPrefix": "HSS"
+    },
+    {
+      "id": "ants",
+      "name": "Ants",
+      "moo1Equivalent": "Klackons",
+      "description": "Hive-minded collectives with perfect industrial efficiency. The individual is nothing; the Collective is all.",
+      "homeworld": {
+        "name": "Formicae",
+        "type": "arid",
+        "climate": "dry",
+        "size": "large",
+        "special": "mineral_rich"
+      },
+      "bonuses": {
+        "production": 50,
+        "research": -10,
+        "food": 20,
+        "growth": 25,
+        "groundCombat": 20,
+        "shipCombat": 0,
+        "espionage": 0,
+        "diplomacy": -30
+      },
+      "researchFieldBonuses": {},
+      "researchFieldPenalties": {},
+      "canConductEspionage": false,
+      "immuneToEspionage": true,
+      "spyRollBonus": 0,
+      "specialAbilities": [
+        {
+          "id": "perfect_efficiency",
+          "name": "Perfect Efficiency",
+          "description": "No population unrest, ever. Maximum production always.",
+          "effect": {
+            "type": "morale",
+            "value": "immune_to_unrest"
+          }
+        },
+        {
+          "id": "hive_mind",
+          "name": "Hive Mind",
+          "description": "Immune to espionage, sabotage, and diplomatic manipulation",
+          "effect": {
+            "type": "espionage_immunity",
+            "value": true
+          }
+        },
+        {
+          "id": "rapid_industrialization",
+          "name": "Rapid Industrialization",
+          "description": "New colonies reach full production 50% faster",
+          "effect": {
+            "type": "colony_development_speed",
+            "value": 50
+          }
+        },
+        {
+          "id": "expendable_units",
+          "name": "Expendable Units",
+          "description": "Ships and troops cost 10% less to produce",
+          "effect": {
+            "type": "military_cost_reduction",
+            "value": 10
+          }
+        },
+        {
+          "id": "overpopulation",
+          "name": "Overpopulation",
+          "description": "Can support 25% more population per planet",
+          "effect": {
+            "type": "max_population_bonus",
+            "value": 25
+          }
+        }
+      ],
+      "startingTechnologies": [
+        "retro_engines",
+        "automated_factory",
+        "mass_driver",
+        "reinforced_hull"
+      ],
+      "aiBehavior": {
+        "archetype": "industrialist",
+        "aggression": 0.6,
+        "expansion": 0.9,
+        "researchFocus": 0.3,
+        "productionFocus": 0.9,
+        "diplomacyPriority": 0.1,
+        "naturalAllies": [],
+        "naturalEnemies": [],
+        "treatyReliability": 1.0,
+        "declaresWarFirst": true
+      },
+      "shipPrefix": "CAS"
+    },
+    {
+      "id": "mice",
+      "name": "Mice",
+      "moo1Equivalent": "Meklar",
+      "description": "Cybernetically-enhanced technologists, masters of automation. The flesh is weak; the machine is eternal.",
+      "homeworld": {
+        "name": "Cyberia",
+        "type": "terran",
+        "climate": "controlled",
+        "size": "medium",
+        "special": "artifacts"
+      },
+      "bonuses": {
+        "production": 25,
+        "research": 15,
+        "food": -50,
+        "growth": -25,
+        "groundCombat": 15,
+        "shipCombat": 15,
+        "espionage": 0,
+        "diplomacy": -10
+      },
+      "researchFieldBonuses": {
+        "computers": 40
+      },
+      "researchFieldPenalties": {
+        "planetology": -20
+      },
+      "canConductEspionage": true,
+      "immuneToEspionage": false,
+      "spyRollBonus": 0,
+      "specialAbilities": [
+        {
+          "id": "automated_production",
+          "name": "Automated Production",
+          "description": "Factories operate at 150% normal efficiency",
+          "effect": {
+            "type": "factory_efficiency",
+            "value": 50
+          }
+        },
+        {
+          "id": "cybernetic_workers",
+          "name": "Cybernetic Workers",
+          "description": "Start with Robotic Controls +2 levels above baseline; population operates at enhanced efficiency",
+          "effect": {
+            "type": "starting_robotic_controls_bonus",
+            "value": 2,
+            "productionPerPopBonus": 2
+          }
+        },
+        {
+          "id": "robotic_labor",
+          "name": "Robotic Labor",
+          "description": "Can work hostile environments without terraforming penalties",
+          "effect": {
+            "type": "hostile_environment_penalty",
+            "value": 0
+          }
+        },
+        {
+          "id": "reduced_waste",
+          "name": "Reduced Waste",
+          "description": "Pollution generates 50% slower",
+          "effect": {
+            "type": "pollution_reduction",
+            "value": 50
+          }
+        },
+        {
+          "id": "no_refit_costs",
+          "name": "No Refit Costs",
+          "description": "Never pay refit costs when upgrading ship components",
+          "effect": {
+            "type": "refit_cost",
+            "noRefitCosts": true
+          }
+        },
+        {
+          "id": "tech_integration",
+          "name": "Tech Integration",
+          "description": "Reverse-engineer captured technology 50% faster",
+          "effect": {
+            "type": "reverse_engineering_speed",
+            "value": 50
+          }
+        }
+      ],
+      "startingTechnologies": [
+        "nuclear_engines",
+        "automated_repair",
+        "battle_computer_1",
+        "robotic_controls_3"
+      ],
+      "aiBehavior": {
+        "archetype": "erratic_industrialist",
+        "aggression": 0.3,
+        "expansion": 0.5,
+        "researchFocus": 0.8,
+        "productionFocus": 0.8,
+        "diplomacyPriority": 0.4,
+        "naturalAllies": ["ants", "rats"],
+        "naturalEnemies": [],
+        "treatyReliability": 0.45,
+        "declaresWarFirst": false,
+        "volatilityFlag": true
+      },
+      "shipPrefix": "MCS"
+    },
+    {
+      "id": "rats",
+      "name": "Rats",
+      "moo1Equivalent": "Psilons",
+      "description": "Hyper-intelligent researchers dedicated to pure science. Knowledge above all; ignorance is the only true evil.",
+      "homeworld": {
+        "name": "Scientifica",
+        "type": "terran",
+        "climate": "temperate",
+        "size": "medium",
+        "special": "artifacts"
+      },
+      "bonuses": {
+        "production": -10,
+        "research": 75,
+        "food": 0,
+        "growth": -10,
+        "groundCombat": -20,
+        "shipCombat": 10,
+        "espionage": 0,
+        "diplomacy": 10
+      },
+      "researchFieldBonuses": {},
+      "researchFieldPenalties": {},
+      "researchBonusAllFields": true,
+      "canConductEspionage": true,
+      "immuneToEspionage": false,
+      "spyRollBonus": 0,
+      "specialAbilities": [
+        {
+          "id": "genius_researchers",
+          "name": "Genius Researchers",
+          "description": "Technology costs 50% less RP to research",
+          "effect": {
+            "type": "research_cost_reduction",
+            "value": 50
+          }
+        },
+        {
+          "id": "academic_network",
+          "name": "Academic Network",
+          "description": "Always gets multiple tech choices per field (minimum 3)",
+          "effect": {
+            "type": "tech_choices",
+            "value": 3
+          }
+        },
+        {
+          "id": "eureka_moments",
+          "name": "Eureka Moments",
+          "description": "5% chance per turn to receive free breakthrough technology",
+          "effect": {
+            "type": "free_tech_chance",
+            "value": 5
+          }
+        },
+        {
+          "id": "quick_study",
+          "name": "Quick Study",
+          "description": "Can reverse-engineer captured tech immediately",
+          "effect": {
+            "type": "instant_reverse_engineering",
+            "value": true
+          }
+        },
+        {
+          "id": "scientific_method",
+          "name": "Scientific Method",
+          "description": "Immune to false intelligence from Chameleons",
+          "effect": {
+            "type": "false_intel_immunity",
+            "value": true
+          }
+        }
+      ],
+      "startingTechnologies": [
+        "nuclear_engines",
+        "deep_space_scanner",
+        "research_lab",
+        "colony_base"
+      ],
+      "aiBehavior": {
+        "archetype": "researcher",
+        "aggression": 0.2,
+        "expansion": 0.4,
+        "researchFocus": 1.0,
+        "productionFocus": 0.3,
+        "diplomacyPriority": 0.6,
+        "naturalAllies": ["mice", "hamsters"],
+        "naturalEnemies": ["guinea_pigs"],
+        "treatyReliability": 0.9,
+        "declaresWarFirst": false
+      },
+      "shipPrefix": "RSS"
+    },
+    {
+      "id": "rabbits",
+      "name": "Rabbits",
+      "moo1Equivalent": "Sakkra",
+      "description": "Prolific breeders who reproduce at alarming rates. Population as power; the warren that breeds fastest inherits the galaxy.",
+      "homeworld": {
+        "name": "Leporis",
+        "type": "terran",
+        "climate": "temperate",
+        "size": "huge",
+        "special": "fertile"
+      },
+      "bonuses": {
+        "production": 10,
+        "research": -10,
+        "food": 25,
+        "growth": 100,
+        "groundCombat": 5,
+        "shipCombat": -10,
+        "espionage": -5,
+        "diplomacy": 5
+      },
+      "researchFieldBonuses": {
+        "planetology": 40
+      },
+      "researchFieldPenalties": {},
+      "canConductEspionage": true,
+      "immuneToEspionage": false,
+      "spyRollBonus": 0,
+      "specialAbilities": [
+        {
+          "id": "exponential_growth",
+          "name": "Exponential Growth",
+          "description": "Population growth rate doubled",
+          "effect": {
+            "type": "growth_multiplier",
+            "value": 2.0
+          }
+        },
+        {
+          "id": "rapid_colonization",
+          "name": "Rapid Colonization",
+          "description": "Can colonize planets with minimal infrastructure (50% reduced setup time)",
+          "effect": {
+            "type": "colony_setup_reduction",
+            "value": 50
+          }
+        },
+        {
+          "id": "overflow_population",
+          "name": "Overflow Population",
+          "description": "Can transfer excess population to new colonies instantly",
+          "effect": {
+            "type": "instant_population_transfer",
+            "value": true
+          }
+        },
+        {
+          "id": "democratic_resilience",
+          "name": "Democratic Resilience",
+          "description": "Conquered populations rebel 50% less often",
+          "effect": {
+            "type": "rebellion_reduction",
+            "value": 50
+          }
+        },
+        {
+          "id": "swarm_tactics",
+          "name": "Swarm Tactics",
+          "description": "Can field massive fleets of cheap ships (ships cost 15% less)",
+          "effect": {
+            "type": "ship_cost_reduction",
+            "value": 15
+          }
+        }
+      ],
+      "startingTechnologies": [
+        "retro_engines",
+        "colony_ship",
+        "hyper_v_rockets",
+        "standard_fuel_cells"
+      ],
+      "aiBehavior": {
+        "archetype": "aggressive_expansionist",
+        "aggression": 0.55,
+        "expansion": 1.0,
+        "researchFocus": 0.3,
+        "productionFocus": 0.5,
+        "diplomacyPriority": 0.4,
+        "naturalAllies": ["hamsters"],
+        "naturalEnemies": [],
+        "treatyReliability": 0.75,
+        "declaresWarFirst": false
+      },
+      "shipPrefix": "RCS"
+    },
+    {
+      "id": "hermit_crabs",
+      "name": "Hermit Crabs",
+      "moo1Equivalent": "Silicoids",
+      "description": "Crystalline-shelled beings immune to environmental hazards. Patient, enduring, and utterly self-sufficient.",
+      "homeworld": {
+        "name": "Crystalia",
+        "type": "radiated",
+        "climate": "hostile",
+        "size": "large",
+        "special": "mineral_ultra_rich"
+      },
+      "bonuses": {
+        "production": 25,
+        "research": 0,
+        "food": 0,
+        "growth": -50,
+        "groundCombat": 25,
+        "shipCombat": 0,
+        "espionage": -30,
+        "diplomacy": 0
+      },
+      "researchFieldBonuses": {
+        "computers": 20
+      },
+      "researchFieldPenalties": {
+        "propulsion": -20,
+        "weapons": -20,
+        "construction": -20,
+        "force_fields": -20,
+        "planetology": -20
+      },
+      "canConductEspionage": true,
+      "immuneToEspionage": false,
+      "spyRollBonus": 0,
+      "specialAbilities": [
+        {
+          "id": "universal_adaptation",
+          "name": "Universal Adaptation",
+          "description": "Can colonize ANY planet type without terraforming penalty",
+          "effect": {
+            "type": "colonization_restriction",
+            "value": "none"
+          }
+        },
+        {
+          "id": "no_pollution_cost",
+          "name": "No Pollution Cost",
+          "description": "Never spend production on ecological restoration. Immune to all pollution economic penalties.",
+          "effect": {
+            "type": "pollution_immunity",
+            "noPollutionCost": true
+          }
+        },
+        {
+          "id": "cannot_terraform",
+          "name": "Cannot Terraform",
+          "description": "Cannot use Atmospheric Terraforming, Soil Enrichment, or Advanced Soil Enrichment technologies.",
+          "effect": {
+            "type": "tech_restriction",
+            "restrictedTechs": ["atmospheric_terraforming", "soil_enrichment", "advanced_soil_enrichment"],
+            "cannotTerraform": true
+          }
+        },
+        {
+          "id": "radiation_immunity",
+          "name": "Radiation Immunity",
+          "description": "Hostile environments don't affect production",
+          "effect": {
+            "type": "hostile_production_penalty",
+            "value": 0
+          }
+        },
+        {
+          "id": "no_food_requirement",
+          "name": "No Food Requirement",
+          "description": "Don't need agriculture - frees all farming slots for production/research",
+          "effect": {
+            "type": "food_consumption",
+            "value": 0
+          }
+        },
+        {
+          "id": "armored_shell",
+          "name": "Armored Shell",
+          "description": "Natural +50% defense bonus in ground combat",
+          "effect": {
+            "type": "ground_defense_bonus",
+            "value": 50
+          }
+        },
+        {
+          "id": "patient",
+          "name": "Patient",
+          "description": "Immune to morale penalties and unrest",
+          "effect": {
+            "type": "morale_immunity",
+            "value": true
+          }
+        },
+        {
+          "id": "mineral_consumption",
+          "name": "Mineral Consumption",
+          "description": "Can extract resources from asteroids (+2 minerals per asteroid belt)",
+          "effect": {
+            "type": "asteroid_mining",
+            "value": 2
+          }
+        }
+      ],
+      "startingTechnologies": [
+        "nuclear_engines",
+        "controlled_environment",
+        "duralloy_armor",
+        "automated_factory"
+      ],
+      "aiBehavior": {
+        "archetype": "xenophobic_expansionist",
+        "aggression": 0.45,
+        "expansion": 0.7,
+        "researchFocus": 0.5,
+        "productionFocus": 0.7,
+        "diplomacyPriority": 0.2,
+        "naturalAllies": [],
+        "naturalEnemies": [],
+        "treatyReliability": 0.6,
+        "declaresWarFirst": false
+      },
+      "shipPrefix": "HCS"
+    },
+    {
+      "id": "guinea_pigs",
+      "name": "Guinea Pigs",
+      "moo1Equivalent": "Bulrathi",
+      "description": "Stocky warriors with unmatched strength and endurance. A warrior's worth is measured in scars and victories.",
+      "homeworld": {
+        "name": "Cavissia",
+        "type": "terran",
+        "climate": "temperate",
+        "size": "large",
+        "special": "high_gravity"
+      },
+      "bonuses": {
+        "production": 10,
+        "research": -20,
+        "food": 0,
+        "growth": 10,
+        "groundCombat": 50,
+        "shipCombat": 10,
+        "espionage": -20,
+        "diplomacy": -20
+      },
+      "researchFieldBonuses": {
+        "weapons": 20,
+        "construction": 20
+      },
+      "researchFieldPenalties": {},
+      "canConductEspionage": true,
+      "immuneToEspionage": false,
+      "spyRollBonus": 0,
+      "specialAbilities": [
+        {
+          "id": "warrior_culture",
+          "name": "Warrior Culture",
+          "description": "Ground troops deal +50% damage and have +25% morale",
+          "effect": {
+            "type": "ground_damage_bonus",
+            "value": 50,
+            "moraleBonus": 25
+          }
+        },
+        {
+          "id": "fearless",
+          "name": "Fearless",
+          "description": "Immune to morale penalties from losing battles",
+          "effect": {
+            "type": "battle_morale_immunity",
+            "value": true
+          }
+        },
+        {
+          "id": "heavy_worlders",
+          "name": "Heavy Worlders",
+          "description": "Can colonize high-gravity worlds at no penalty",
+          "effect": {
+            "type": "high_gravity_penalty",
+            "value": 0
+          }
+        },
+        {
+          "id": "relentless",
+          "name": "Relentless",
+          "description": "Conquered planets integrate 50% faster",
+          "effect": {
+            "type": "conquest_integration_speed",
+            "value": 50
+          }
+        }
+      ],
+      "startingTechnologies": [
+        "hyper_v_rockets",
+        "reinforced_hull",
+        "hand_lasers",
+        "duralloy_armor"
+      ],
+      "aiBehavior": {
+        "archetype": "aggressive",
+        "aggression": 0.9,
+        "expansion": 0.7,
+        "researchFocus": 0.2,
+        "productionFocus": 0.7,
+        "diplomacyPriority": 0.1,
+        "naturalAllies": ["budgies", "ferrets"],
+        "naturalEnemies": ["chameleons", "hamsters"],
+        "treatyReliability": 0.5,
+        "declaresWarFirst": true
+      },
+      "shipPrefix": "GPS"
+    },
+    {
+      "id": "ferrets",
+      "name": "Ferrets",
+      "moo1Equivalent": "Mrrshan",
+      "description": "Sleek hunters with lethal accuracy and predatory instincts. A true hunter needs only one shot.",
+      "homeworld": {
+        "name": "Mustela",
+        "type": "terran",
+        "climate": "temperate",
+        "size": "medium",
+        "special": null
+      },
+      "bonuses": {
+        "production": 0,
+        "research": 10,
+        "food": 5,
+        "growth": 0,
+        "groundCombat": 15,
+        "shipCombat": 30,
+        "espionage": 10,
+        "diplomacy": -30
+      },
+      "researchFieldBonuses": {},
+      "researchFieldPenalties": {},
+      "canConductEspionage": true,
+      "immuneToEspionage": false,
+      "spyRollBonus": 0,
+      "specialAbilities": [
+        {
+          "id": "deadly_accuracy",
+          "name": "Deadly Accuracy",
+          "description": "All weapons gain +4 Attack Levels (increases hit chance only — no damage bonus)",
+          "effect": {
+            "type": "weapon_attack_bonus",
+            "attackLevelBonus": 4
+          }
+        },
+        {
+          "id": "first_strike",
+          "name": "First Strike",
+          "description": "Ferret ships always fire first in combat round",
+          "effect": {
+            "type": "combat_initiative",
+            "value": "always_first"
+          }
+        },
+        {
+          "id": "hunters_instinct",
+          "name": "Hunter's Instinct",
+          "description": "Can detect cloaked/hidden enemy ships (+50% detection)",
+          "effect": {
+            "type": "cloak_detection_bonus",
+            "value": 50
+          }
+        },
+        {
+          "id": "efficient_killers",
+          "name": "Efficient Killers",
+          "description": "Ships cost 10% less to build",
+          "effect": {
+            "type": "ship_cost_reduction",
+            "value": 10
+          }
+        }
+      ],
+      "startingTechnologies": [
+        "nuclear_engines",
+        "laser_cannon",
+        "battle_scanner",
+        "class_1_shield"
+      ],
+      "aiBehavior": {
+        "archetype": "aggressive",
+        "aggression": 0.7,
+        "expansion": 0.5,
+        "researchFocus": 0.6,
+        "productionFocus": 0.5,
+        "diplomacyPriority": 0.3,
+        "naturalAllies": ["budgies", "guinea_pigs"],
+        "naturalEnemies": ["rabbits", "chameleons"],
+        "treatyReliability": 0.7,
+        "declaresWarFirst": true
+      },
+      "shipPrefix": "FHS"
+    },
+    {
+      "id": "budgies",
+      "name": "Budgies",
+      "moo1Equivalent": "Alkari",
+      "description": "Avian acrobats and superior pilots, masters of three-dimensional combat. The sky has no limits, neither should we.",
+      "homeworld": {
+        "name": "Aeria",
+        "type": "terran",
+        "climate": "temperate",
+        "size": "medium",
+        "special": "low_gravity"
+      },
+      "bonuses": {
+        "production": -10,
+        "research": 0,
+        "food": -10,
+        "growth": 0,
+        "groundCombat": -20,
+        "shipCombat": 50,
+        "espionage": -10,
+        "diplomacy": 0
+      },
+      "researchFieldBonuses": {
+        "propulsion": 40
+      },
+      "researchFieldPenalties": {},
+      "movementRangeBonus": 1,
+      "canConductEspionage": true,
+      "immuneToEspionage": false,
+      "spyRollBonus": 0,
+      "specialAbilities": [
+        {
+          "id": "superior_pilots",
+          "name": "Superior Pilots",
+          "description": "All ships gain +3 combat initiative, +3 defense level, and +20% evasion",
+          "effect": {
+            "type": "ship_combat_bonus",
+            "initiativeBonus": 3,
+            "defenseLevelBonus": 3,
+            "evasionBonus": 20
+          }
+        },
+        {
+          "id": "three_dimensional_tactics",
+          "name": "Three-Dimensional Tactics",
+          "description": "Enemy missile accuracy reduced by 30%",
+          "effect": {
+            "type": "enemy_missile_penalty",
+            "value": 30
+          }
+        },
+        {
+          "id": "dogfighter",
+          "name": "Dogfighter",
+          "description": "Small ships get additional +15% combat bonus",
+          "effect": {
+            "type": "small_ship_bonus",
+            "value": 15
+          }
+        },
+        {
+          "id": "flight_school",
+          "name": "Flight School",
+          "description": "New ships enter combat with veteran crew status (+1 experience level)",
+          "effect": {
+            "type": "starting_experience",
+            "value": 1
+          }
+        }
+      ],
+      "startingTechnologies": [
+        "ion_drives",
+        "battle_computer_1",
+        "fusion_bomb",
+        "class_1_shield"
+      ],
+      "aiBehavior": {
+        "archetype": "honorable_militarist",
+        "aggression": 0.35,
+        "expansion": 0.4,
+        "researchFocus": 0.5,
+        "productionFocus": 0.4,
+        "diplomacyPriority": 0.5,
+        "naturalAllies": ["ferrets", "guinea_pigs"],
+        "naturalEnemies": ["chameleons", "ants"],
+        "treatyReliability": 0.9,
+        "declaresWarFirst": false
+      },
+      "shipPrefix": "FAS"
+    },
+    {
+      "id": "chameleons",
+      "name": "Chameleons",
+      "moo1Equivalent": "Darloks",
+      "description": "Color-shifting spies whose true allegiance no one can discern. Information is power; trust no one.",
+      "homeworld": {
+        "name": "Chromatia",
+        "type": "jungle",
+        "climate": "humid",
+        "size": "medium",
+        "special": "artifacts"
+      },
+      "bonuses": {
+        "production": -10,
+        "research": 20,
+        "food": 0,
+        "growth": -10,
+        "groundCombat": 0,
+        "shipCombat": -10,
+        "espionage": 60,
+        "diplomacy": -15
+      },
+      "researchFieldBonuses": {
+        "computers": 20
+      },
+      "researchFieldPenalties": {},
+      "canConductEspionage": true,
+      "immuneToEspionage": false,
+      "spyRollBonus": 30,
+      "specialAbilities": [
+        {
+          "id": "master_spies",
+          "name": "Master Spies",
+          "description": "Espionage missions cost 50% less and succeed 25% more often",
+          "effect": {
+            "type": "espionage_cost_reduction",
+            "value": 50,
+            "successBonus": 25
+          }
+        },
+        {
+          "id": "infiltrators",
+          "name": "Infiltrators",
+          "description": "Can see enemy technology, production, and fleet movements",
+          "effect": {
+            "type": "intel_visibility",
+            "value": "full"
+          }
+        },
+        {
+          "id": "false_flags",
+          "name": "False Flags",
+          "description": "Can frame other races for espionage acts",
+          "effect": {
+            "type": "frame_ability",
+            "value": true
+          }
+        },
+        {
+          "id": "sleeper_agents",
+          "name": "Sleeper Agents",
+          "description": "Sabotage can be delayed by 1-5 turns and is untraceable",
+          "effect": {
+            "type": "delayed_sabotage",
+            "maxDelay": 5,
+            "untraceable": true
+          }
+        },
+        {
+          "id": "technology_theft",
+          "name": "Technology Theft",
+          "description": "Stealing tech is 50% easier than normal espionage",
+          "effect": {
+            "type": "tech_theft_bonus",
+            "value": 50
+          }
+        }
+      ],
+      "startingTechnologies": [
+        "hyper_x_rockets",
+        "ecm_jammer_1",
+        "cloaking_device",
+        "battle_scanner"
+      ],
+      "aiBehavior": {
+        "archetype": "sneaky",
+        "aggression": 0.3,
+        "expansion": 0.4,
+        "researchFocus": 0.5,
+        "productionFocus": 0.3,
+        "diplomacyPriority": 0.7,
+        "naturalAllies": [],
+        "naturalEnemies": [],
+        "treatyReliability": 0.2,
+        "declaresWarFirst": false
+      },
+      "shipPrefix": "CSS"
     }
-  }
-]
+  ]
+}

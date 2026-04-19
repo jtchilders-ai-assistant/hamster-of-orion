@@ -1,10 +1,17 @@
 {
   "state": "TESTING",
-  "current_task": "store",
+  "current_task": "race-data",
   "worker_output": {
-    "files_created": ["test/game/store.test.ts"],
-    "files_modified": [],
-    "tests_added": ["test/game/store.test.ts"],
-    "summary": "The scaffold-generated src/game/store.ts was already a complete, correct Redux-compatible Store<T> implementation with getState(), dispatch(), and subscribe() methods. No changes needed to store.ts itself. Wrote 25 unit tests in test/game/store.test.ts covering: constructor/getState initialization, dispatch with sequential updates/payloads/unknown actions, subscribe with multiple listeners, unsubscribe correctness, re-subscribe, LOAD_STATE injection, and integration with a game-like state shape. All 31 tests (25 new + 6 pre-existing) pass. TypeScript compiles clean."
+    "files_created": [
+      "src/game/systems/races.ts",
+      "test/game/systems/races.test.ts"
+    ],
+    "files_modified": [
+      "src/data/races.json"
+    ],
+    "tests_added": [
+      "test/game/systems/races.test.ts (94 tests)"
+    ],
+    "summary": "Replaced placeholder races.json stub with full data for all 10 races per design/species/race-stats-complete.md. Each race has: bonuses (production/research/food/growth/groundCombat/shipCombat/espionage/diplomacy), per-field research bonuses/penalties, canConductEspionage/immuneToEspionage flags (Ants: both set correctly), spyRollBonus (Chameleons: 30), specialAbilities, startingTechnologies (4 each), aiBehavior, and shipPrefix. Implemented races.ts with typed RaceDefinition interface and all formula functions from the design doc: applyRacialBonus, applyProductionBonus, applyResearchBonus, applyFieldResearchBonus (handles per-field bonuses/penalties and Rats allFields flag), applyGrowthBonus, applyGroundCombatBonus (with 10% minimum floor), applyShipAttackBonus/Defense (additive shipCombat/10 formula), applyEspionageBonus (Ants two-way isolation, Chameleons flat spy roll + percentage), startingRelationship, applyDiplomacyBonus, hasAbility/getAbility, and Mice-specific helpers (miceEffectiveRCLevel, miceFactoryProduction). No any types, no DOM. All 94 races tests pass; 162 total tests pass. TypeScript compiles clean."
   }
 }
