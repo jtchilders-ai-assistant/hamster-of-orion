@@ -154,7 +154,7 @@
       "id": "debug-hooks",
       "name": "Debug interface for testing",
       "type": "code",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         "store",
         "game-state-types"

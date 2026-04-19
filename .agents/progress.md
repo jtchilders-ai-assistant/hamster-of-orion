@@ -24,7 +24,7 @@ Completed 8 review and integration tasks from March 2026.
 | production-system | Production/sliders | ✅ Done |
 | population-growth | Population growth | ✅ Done |
 | research-system | Research/tech | ⏳ Pending |
-| debug-hooks | Debug interface | ⏳ Pending |
+| debug-hooks | Debug interface | ✅ Done |
 | app-shell | App shell/routing | ⏳ Pending |
 | galaxy-map-canvas | Galaxy map UI | ⏳ Pending |
 | info-panel | Info panel | ⏳ Pending |
@@ -186,3 +186,23 @@ Completed 8 review and integration tasks from March 2026.
 - No `any` types ✓
 - TypeScript typecheck: PASS ✓
 - Tests: 367/367 passed (101 new research tests) ✓
+## 2026-04-19T23:21:40Z — Orchestrator: Starting task debug-hooks
+- State: IDLE → WORKING
+- Task: Debug interface for testing (window.__HAMSTER_DEBUG__)
+- Dependencies satisfied: store ✅, game-state-types ✅
+2026-04-19T23:26:36Z [ORCHESTRATOR] Task: debug-hooks | Tests: PASS (386/386) | State: TESTING→VERIFYING | Verifier spawned: b49338b4
+
+## 2026-04-19T23:27:00Z - debug-hooks APPROVED & DONE
+- Verifier confirmed all acceptance criteria met
+- loadState() injects state via LOAD_STATE action ✓
+- getState() returns current store state ✓
+- dispatch() sends arbitrary actions to the store ✓
+- Dev-only guard: isDev parameter defaults to import.meta.env.DEV ✓
+- Pure buildDebugInterface() factory enables unit testing without touching globals ✓
+- Uses globalThis (not window) for cross-environment compatibility ✓
+- test/fixtures/states.ts: earlyGameState (turn 1) and midGameState (turn 50, 2 empires) ✓
+- No DOM imports in src/game/ ✓
+- No `any` types ✓
+- TypeScript typecheck: PASS ✓
+- Tests: 386/386 passed (19 new debug tests) ✓
+- Committed & pushed
