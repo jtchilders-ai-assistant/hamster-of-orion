@@ -353,11 +353,12 @@ renderStarSystem(ctx, system) {
 renderStar(ctx, system, x, y) {
   // Get star color based on type
   const starColors = {
-    'red': '#ff6b6b',
-    'orange': '#ffa500',
     'yellow': '#ffeb3b',
+    'green': '#4caf50',
+    'red': '#ff6b6b',
+    'blue': '#2196f3',
     'white': '#ffffff',
-    'blue': '#2196f3'
+    'purple': '#9c27b0'
   };
 
   const color = starColors[system.starType] || '#ffffff';

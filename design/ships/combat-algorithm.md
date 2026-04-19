@@ -13,6 +13,19 @@ This document specifies the complete combat resolution algorithm for Hamster of 
 
 ---
 
+## Terminology Glossary
+
+| Term | Definition |
+|------|------------|
+| **Hull Size** | Ship class (Small/Medium/Large/Huge) — determines Base_HP and component space |
+| **Hull Space** | Available slots for components on a ship (varies by hull size) |
+| **Armor** | Defensive technology that multiplies Base_HP (e.g., Titanium = 1.0×, Zortrium = 1.5×) |
+| **HP** | Hit Points = Base_HP × Armor_Multiplier — the ship's actual health |
+| **Shields** | Energy barrier that absorbs damage before HP; regenerates between combats |
+| **Shield Class** | Shield strength level (I–XV); determines absorption capacity |
+
+---
+
 ## Combat Initialization
 
 ### 1. Battle Setup

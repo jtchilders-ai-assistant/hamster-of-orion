@@ -83,7 +83,7 @@ interface StarSystem {
   coordinates: { x: number; y: number };  // Galaxy position
 
   // Star properties
-  starType: StarType;          // 'red' | 'orange' | 'yellow' | 'white' | 'blue'
+  starType: StarType;          // 'yellow' | 'green' | 'red' | 'blue' | 'white' | 'purple'
   starClass: string;           // 'M5', 'G2', 'B1', etc.
 
   // Planets
@@ -108,7 +108,7 @@ interface StarSystem {
   hasSpaceMonster: MonsterType | null;  // 'amoeba' | 'crystal' | 'dragon' | null
 }
 
-type StarType = 'red' | 'orange' | 'yellow' | 'white' | 'blue';
+type StarType = 'yellow' | 'green' | 'red' | 'blue' | 'white' | 'purple';
 type PlanetId = string;  // 'pla_001'
 type FleetId = string;   // 'flt_001'
 type MonsterType = 'amoeba' | 'crystal' | 'dragon' | null;

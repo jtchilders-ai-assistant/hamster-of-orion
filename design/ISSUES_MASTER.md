@@ -1,10 +1,10 @@
 # Master Issues List - Hamster of Orion Design Review
 
 **Generated:** 2026-04-12  
-**Last Updated:** 2026-04-12  
+**Last Updated:** 2026-04-18  
 **Total Issues:** ~135 across 6 review areas  
-**Resolved:** 135+ issues (All Critical/High/Medium + MOO1 fidelity fixes)
-**Status:** ✅ COMPLETE — Full MOO1 comparison review completed and all critical discrepancies fixed
+**Resolved:** All critical issues (31/31) + High/Medium + MOO1 fidelity fixes
+**Status:** ✅ COMPLETE — All critical issues resolved across all 6 areas
 
 This document consolidates all critical and high-priority issues found during the comprehensive design review. Individual detailed reports are in their respective directories.
 
@@ -25,7 +25,7 @@ This document consolidates all critical and high-priority issues found during th
 
 ## 🔴 CRITICAL ISSUES (Implementation Blockers)
 
-### Diplomacy (6) — ✅ 5 RESOLVED
+### Diplomacy (6) — ✅ 6 RESOLVED
 
 | ID | Issue | Status |
 |----|-------|--------|
@@ -33,7 +33,7 @@ This document consolidates all critical and high-priority issues found during th
 | D-C2 | Hamsters diplomacy multiplier conflict | ✅ **FIXED** — Clarified: base 1.30, positive ×2.0, combined 2.60 |
 | D-C3 | Ants espionage contradictory modifiers | ✅ **FIXED** — Now uses boolean flags consistently |
 | D-C4 | Ants defense "Immune" vs "+100" | ✅ **FIXED** — Uses `immune_to_espionage: true` flag |
-| D-C5 | Ferret spy formula missing term | 🔴 OPEN |
+| D-C5 | Ferret spy formula missing term | ✅ **FIXED** — Added `racial_aggression_multiplier` (Ferrets: 1.10×) to SpyEffectiveness formula |
 | D-C6 | Rats espionage +5 vs +15 | ✅ **FIXED** — Set to +0% (Psilons have no spy bonus in MOO1) |
 
 ### Combat (8) — ✅ ALL RESOLVED
@@ -61,35 +61,35 @@ This document consolidates all critical and high-priority issues found during th
 | M-C6 | Miniaturization cap: 80% vs 50% | ✅ **FIXED** — Changed to 50% (MOO1 value) |
 | M-C7 | `slider-mathematics.md` doesn't exist | ✅ **FIXED** — Created 524-line document |
 
-### Structure (4)
+### Structure (4) — ✅ 4 RESOLVED (ALL)
 
-| ID | Issue | Files Affected |
-|----|-------|----------------|
-| S-C1 | PROJECT_STRUCTURE.md is stale: 15 files don't exist, 27 not listed | `PROJECT_STRUCTURE.md` |
-| S-C2 | `dark_sectors` region defined but never assigned in generation | `space-regions.md`, `generation-algorithm.md` |
-| S-C3 | Hermit Crabs/Ants homeworld: Lore says radiated/arid, code forces terran | `hermit-crabs.md`, `ants.md`, `generation-algorithm.md` |
-| S-C4 | "Five paths to victory" wrong — doc explicitly says 2 | `PROJECT_STRUCTURE.md` |
-| S-C5 | Star color "Orange" vs "Green" — same slot, different names | `star-systems.md`, `generation-algorithm.md` |
+| ID | Issue | Status |
+|----|-------|--------|
+| S-C1 | PROJECT_STRUCTURE.md is stale: 15 files don't exist, 27 not listed | ✅ **FIXED** — Updated to reflect actual file layout as of 2026-04-18 |
+| S-C2 | `dark_sectors` region defined but never assigned in generation | ✅ **FIXED** — Already implemented: nebulae set `in_nebula=true`, then `DetermineRegion()` assigns `dark_sectors` |
+| S-C3 | Hermit Crabs/Ants homeworld: Lore says radiated/arid, code forces terran | ✅ **FIXED** — Intentional design decision: Terran for balance, lore homeworlds are backstory. Documented in species files and `ConfigureAsHomeworld()` |
+| S-C4 | "Five paths to victory" wrong — doc explicitly says 2 | ✅ **FIXED** — Both `victory-conditions.md` and `PROJECT_STRUCTURE.md` now correctly state two victory paths |
+| S-C5 | Star color "Orange" vs "Green" — same slot, different names | ✅ **FIXED** — Standardized on Green. Updated `data-structures.md` and `rendering-pipeline.md` to match |
 
-### UI/UX (5)
+### UI/UX (5) — ✅ 5 RESOLVED (ALL)
 
-| ID | Issue | Files Affected |
-|----|-------|----------------|
-| U-C1 | MAP button: 3 docs describe it 3 different ways | `command_menu_map.md`, `navigation-flow.md`, `state-transitions.md` |
-| U-C2 | F7 Reports screen: Listed but missing from command bar | `state-transitions.md`, `navigation-flow.md` |
-| U-C3 | Tech/Fleet "no command bar" but nav matrix allows F-keys | `state-transitions.md` |
-| U-C4 | Research: 6 simultaneous sliders vs one-at-a-time | `screen-inventory.md`, wireframes |
-| U-C5 | Keyboard conflicts: G, R, F, D assigned to multiple actions | `navigation-flow.md` |
+| ID | Issue | Status |
+|----|-------|--------|
+| U-C1 | MAP button: 3 docs describe it 3 different ways | ✅ **FIXED** — Opens separate MAP Screen (not overlay cycle) |
+| U-C2 | F7 Reports screen: Listed but missing from command bar | ✅ **FIXED** — REMOVED — not in MOO1, F7 = Tech Screen |
+| U-C3 | Tech/Fleet "no command bar" but nav matrix allows F-keys | ✅ **FIXED** — Modernization: All F1-F7 screens switchable via F-keys |
+| U-C4 | Research: 6 simultaneous sliders vs one-at-a-time | ✅ **FIXED** — MOO1-style: 6 sliders + tech selection at start-of-turn |
+| U-C5 | Keyboard conflicts: G, R, F, D assigned to multiple actions | ✅ **FIXED** — Resolved: G=Grid, R=Range, F=Fleet cycle, D=Defense slider |
 
-### Species (5) — ✅ 3 RESOLVED
+### Species (5) — ✅ 5 RESOLVED (ALL)
 
 | ID | Issue | Status |
 |----|-------|--------|
 | SP-C1 | Budgies `Superior Pilots` wrong values | ✅ **FIXED** — Now +3 Defense AND +3 Initiative |
 | SP-C2 | Ferrets `Deadly Accuracy` 3-way conflict | ✅ **FIXED** — Set to +4 Attack Levels (no damage bonus) |
-| SP-C3 | 5 techs use invalid fields | 🔴 OPEN |
+| SP-C3 | 5 techs use invalid fields | ✅ **FIXED** — Removed invalid field names (`sociology`, `physics`, `biology`) from `race-stats-complete.md` |
 | SP-C4 | Hamsters missing from ai-personalities | ✅ **FIXED** — Added with Honorable Diplomat personality |
-| SP-C5 | 3 starting techs undefined | 🔴 OPEN |
+| SP-C5 | 3 starting techs undefined | ✅ **FIXED** — Renamed: `standard_missiles`→`nuclear_missile`, `standard_colony_base`→`colony_base`, `stealth_suit`→`cloaking_device` |
 
 ---
 
@@ -105,10 +105,10 @@ This document consolidates all critical and high-priority issues found during th
 - Assassination LeaderProtection not integrated
 - Double agent loyalty formula has no floor/ceiling
 
-### Combat (Notable)
-- `defense-systems.md` and `weapons-systems.md` are stale stubs — should be deleted
-- Tactical UI wireframe introduces mechanics not in design docs
-- "Hull", "Armor", "HP" used interchangeably with no distinction
+### Combat (3) — ✅ ALL RESOLVED
+- ~~`defense-systems.md` and `weapons-systems.md` are stale stubs~~ → ✅ DELETED (replaced by `*-complete.md` versions)
+- ~~Tactical UI wireframe introduces mechanics not in design docs~~ → ✅ FIXED teleporter range (now "unlimited" per combat-algorithm.md)
+- ~~"Hull", "Armor", "HP" used interchangeably~~ → ✅ FIXED added Terminology Glossary to combat-algorithm.md
 
 ### Mechanics (13)
 - Bio weapon kill-rate defined three different ways

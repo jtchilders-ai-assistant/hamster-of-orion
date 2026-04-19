@@ -407,7 +407,7 @@ When a missile token enters a ship’s point defense range, PD fires automatical
 │ Status: READY                                     │
 │                                                   │
 │ [TELEPORTER]   Energy: 50/100                    │
-│ Jump to any hex within 5 spaces                  │
+│ Jump to any hex (unlimited range)                │
 │ Cooldown: 3 turns                                │
 │ Status: RECHARGING (2 turns)                     │
 │                                                   │

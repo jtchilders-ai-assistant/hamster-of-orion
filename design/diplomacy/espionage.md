@@ -134,7 +134,7 @@ if AllSpiesFailTrigger:
 Every spy has an effectiveness rating that modifies all mission success chances:
 
 ```
-SpyEffectiveness = BaseEffectiveness + RacialBonus + SpyRollBonus + TechBonus - TargetSecurity
+SpyEffectiveness = (BaseEffectiveness + RacialBonus + SpyRollBonus + TechBonus - TargetSecurity) * racial_aggression_multiplier
 ```
 
 **Variables:**
@@ -143,6 +143,7 @@ SpyEffectiveness = BaseEffectiveness + RacialBonus + SpyRollBonus + TechBonus - 
 - `SpyRollBonus` = Flat bonus added directly to spy rolls (Chameleons only: +30, matches MOO1)
 - `TechBonus` = Computer tech level advantage × 2 (see Section 3)
 - `TargetSecurity` = Target empire's security level × 10 (see Section 4)
+- `racial_aggression_multiplier` = Per-race multiplier defined in Section 2.1 (Multiplier column). Chameleons: 1.60×, Ferrets: 1.10×, Rats: 1.00×, Hamsters: 1.00×, Mice: 1.00×, Budgies: 1.00×, Rabbits: 1.00×, Guinea Pigs: 1.00×, Hermit Crabs: 1.00×. Ants are excluded by `can_conduct_espionage: false` flag, so the multiplier never applies to them.
 
 **Example: Chameleon spy vs Hamster with moderate security**
 ```
@@ -150,8 +151,9 @@ RacialBonus = 60 (Chameleons percentage modifier)
 SpyRollBonus = 30 (Chameleons flat +30 to spy rolls, MOO1 mechanic)
 TechBonus = (15 - 12) × 2 = 6 (Chameleon tech level 15, Hamster 12)
 TargetSecurity = 3 × 10 = 30 (Security Level 3)
+racial_aggression_multiplier = 1.60 (Chameleons)
 
-SpyEffectiveness = 30 + 60 + 30 + 6 - 30 = 96
+SpyEffectiveness = (30 + 60 + 30 + 6 - 30) × 1.60 = 96 × 1.60 = 153.6 → 154 (capped to 95 by success clamping)
 ```
 
 ---
@@ -160,10 +162,10 @@ SpyEffectiveness = 30 + 60 + 30 + 6 - 30 = 96
 
 ### 2.1 Offensive Espionage Bonuses
 
-| Race | Espionage Bonus | Multiplier | Notes |
+| Race | Espionage Bonus | Aggression Multiplier (racial_aggression_multiplier) | Notes |
 |------|-----------------|------------|-------|
 | Chameleons | +60 | 1.60× | Masters of infiltration |
-| Ferrets | +10 | 1.10× | Natural hunters and stalkers |
+| Ferrets | +10 | 1.10× | Aggressive, predatory — their multiplier amplifies the base effectiveness
 | Rats | +0 | 1.00× | Psilons have no espionage bonus in MOO1 — pure researchers only |
 | Hamsters | +0 | 1.00× | Balanced baseline |
 | Mice | +0 | 1.00× | Cybernetic, but standard |
@@ -350,12 +352,13 @@ SuccessChance = min(95, max(5, 30 + (-20))) = 10%
 **Example 3: Ferret Sabotage vs Rabbits (Security Level 1)**
 ```
 BaseMissionSuccess = 40%
-SpyEffectiveness = 30 + 10 + 6 - 10 = 36
+SpyEffectiveness = (30 + 10 + 6 - 10) × 1.10 = 36 × 1.10 = 39.6 → 40
   BaseEffectiveness=30, FerretRacialBonus=+10, TechBonus=+6 (assume Ferrets 3 levels ahead),
   TargetSecurity = 1 × 10 = 10
+  racial_aggression_multiplier = 1.10 (Ferrets — aggressive, predatory hunters)
   Note: Rabbits' -5 DefenseBonus applies to DetectionChance (Section 4.2), NOT SpyEffectiveness.
 
-SuccessChance = min(95, max(5, 40 + 36)) = 76%
+SuccessChance = min(95, max(5, 40 + 40)) = 80%
 
 DetectionChance = 10 + (1 × 10) + (-5) + 0 = 15%
   (Rabbits have -5 RacialDefenseBonus — they are poor at catching spies)
@@ -817,7 +820,8 @@ function ResolveMission(spy, target, mission_type):
     tech_bonus = clamp(tech_bonus, -20, 20)
     target_security = target.security_level * 10
     
-    spy_effectiveness = 30 + racial_bonus + spy_roll_bonus + tech_bonus - target_security
+    racial_multiplier = GetRacialAggressionMultiplier(spy.empire.race)      // per Section 2.1
+    spy_effectiveness = (30 + racial_bonus + spy_roll_bonus + tech_bonus - target_security) * racial_multiplier
     
     // Step 2: Calculate success chance
     base_success = GetBaseMissionSuccess(mission_type)
@@ -1017,6 +1021,7 @@ function ResolveMission(spy, target, mission_type):
       "spy_roll_bonus": 30,
       "defensive_bonus": 30,
       "can_conduct_espionage": true,
+      "aggression_multiplier": 1.60,
       "special_abilities": ["sleeper_agents", "false_flag", "choose_tech_category"],
       "spy_cost_modifier": 0.50,
       "execution_chance": 0.10,
@@ -1027,6 +1032,7 @@ function ResolveMission(spy, target, mission_type):
       "offensive_bonus": 10,
       "defensive_bonus": 0,
       "can_conduct_espionage": true,
+      "aggression_multiplier": 1.10,
       "special_abilities": [],
       "spy_cost_modifier": 1.00,
       "execution_chance": 0.75
@@ -1036,6 +1042,7 @@ function ResolveMission(spy, target, mission_type):
       "offensive_bonus": 0,
       "defensive_bonus": 5,
       "can_conduct_espionage": true,
+      "aggression_multiplier": 1.00,
       "special_abilities": [],
       "spy_cost_modifier": 1.00,
       "execution_chance": 0.30,
@@ -1046,6 +1053,7 @@ function ResolveMission(spy, target, mission_type):
       "offensive_bonus": 0,
       "defensive_bonus": 0,
       "can_conduct_espionage": true,
+      "aggression_multiplier": 1.00,
       "special_abilities": [],
       "spy_cost_modifier": 1.00,
       "execution_chance": 0.25
@@ -1055,6 +1063,7 @@ function ResolveMission(spy, target, mission_type):
       "offensive_bonus": 0,
       "defensive_bonus": 10,
       "can_conduct_espionage": true,
+      "aggression_multiplier": 1.00,
       "special_abilities": ["cybernetic_surveillance"],
       "spy_cost_modifier": 1.00,
       "execution_chance": 0.40
@@ -1064,6 +1073,7 @@ function ResolveMission(spy, target, mission_type):
       "offensive_bonus": 0,
       "defensive_bonus": 0,
       "can_conduct_espionage": true,
+      "aggression_multiplier": 1.00,
       "special_abilities": [],
       "spy_cost_modifier": 1.00,
       "execution_chance": 0.60
@@ -1073,6 +1083,7 @@ function ResolveMission(spy, target, mission_type):
       "offensive_bonus": -5,
       "defensive_bonus": -5,
       "can_conduct_espionage": true,
+      "aggression_multiplier": 1.00,
       "special_abilities": [],
       "spy_cost_modifier": 1.00,
       "execution_chance": 0.20
@@ -1082,6 +1093,7 @@ function ResolveMission(spy, target, mission_type):
       "offensive_bonus": -10,
       "defensive_bonus": 0,
       "can_conduct_espionage": true,
+      "aggression_multiplier": 1.00,
       "special_abilities": [],
       "spy_cost_modifier": 1.00,
       "execution_chance": 0.90
@@ -1091,6 +1103,7 @@ function ResolveMission(spy, target, mission_type):
       "offensive_bonus": -15,
       "defensive_bonus": -10,
       "can_conduct_espionage": true,
+      "aggression_multiplier": 1.00,
       "special_abilities": [],
       "spy_cost_modifier": 1.00,
       "execution_chance": 0.50
@@ -1101,6 +1114,7 @@ function ResolveMission(spy, target, mission_type):
       "defensive_bonus": null,
       "can_conduct_espionage": false,
       "immune_to_espionage": true,
+      "aggression_multiplier": null,
       "special_abilities": ["hive_mind_espionage_isolation"],
       "spy_cost_modifier": null,
       "execution_chance": 1.00,
@@ -1247,8 +1261,9 @@ RacialBonus = 60    (Chameleon percentage modifier)
 SpyRollBonus = 30   (Chameleon flat +30 to spy rolls, MOO1 mechanic)
 TechBonus = (18 - 22) × 2 = -8
 TargetSecurity = 3 × 10 = 30
+racial_aggression_multiplier = 1.60 (Chameleons)
 
-SpyEffectiveness = 30 + 60 + 30 + (-8) - 30 = 82
+SpyEffectiveness = (30 + 60 + 30 + (-8) - 30) × 1.60 = 82 × 1.60 = 131.2 → 131
 
 Step 2: Success Chance
 BaseMissionSuccess = 30 (tech theft)
@@ -1330,12 +1345,13 @@ Result: Almost certainly fails, probably detected, spy likely dies.
 
 ---
 
-*Document Version: 1.3*
-*Last Updated: 2026-04-13*
+*Document Version: 1.4*
+*Last Updated: 2026-04-18*
 *Specification: spec-017 - Espionage Success Formulas*
 *Status: Complete*
 
 ### Changelog
-- **v1.3 (2026-04-13):** Added "HoO vs MOO1 Design Philosophy" section at top, documenting spy system as intentional HoO original design (% success formula vs MOO1 two-phase roll chart). Added Section 1.3 "All Spies Fail" catastrophic result (natural 100 on detection die = all infiltrated spies lose their next turn). Documented Frame job (Section 6.6) as HoO standalone mission type vs MOO1 Phase 2 critical success outcome.
+- **v1.4 (2026-04-18):** Added `racial_aggression_multiplier` to SpyEffectiveness formula (D-C5 fix). Ferrets now have 1.10× multiplier reflecting their predatory nature. Updated Section 1.2 formula and variables, Section 2.1 table header, Section 5.3 Ferret example, Section 11 pseudocode, Section 13.2 JSON (added `aggression_multiplier` field to all races), and Section 16 Example 1. Chameleons: 1.60×, Ferrets: 1.10×, all others: 1.00× (Ants: null).
+- **v1.3 (2026-04-13): Added "HoO vs MOO1 Design Philosophy" section at top, documenting spy system as intentional HoO original design (% success formula vs MOO1 two-phase roll chart). Added Section 1.3 "All Spies Fail" catastrophic result (natural 100 on detection die = all infiltrated spies lose their next turn). Documented Frame job (Section 6.6) as HoO standalone mission type vs MOO1 Phase 2 critical success outcome.
 - **v1.2 (2026-04-12):** Fixed Section 5.3 Example 3 (Ferret sabotage). `RacialDefenseBonus` is not subtracted from `SpyEffectiveness` — it belongs in `DetectionChance` (Section 4.2). Corrected calculation: SpyEffectiveness = 36 (not 31), SuccessChance = 76% (not 71%). Added explicit DetectionChance line to the example showing where the Rabbit -5 defense bonus is applied.
 - **v1.1 (2026-04-12):** Corrected Rats (Psilons) offensive espionage bonus: +5 → +0. Psilons have no espionage bonus in MOO1. Added Chameleon (Darlok) flat +30 spy roll bonus to formula, pseudocode, JSON, and worked examples. Updated Chameleon vs Chameleon edge case to reflect flat bonus stacking.
