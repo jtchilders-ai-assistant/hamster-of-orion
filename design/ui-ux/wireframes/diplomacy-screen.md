@@ -6,6 +6,11 @@
 **Canonical screen name:** Races Screen (F5) — see terminology note below  
 **Reference:** `main-screens.md` §7, `screen-inventory.md` §5
 
+**MOO1 Reference Screenshots:**
+- `../moo_screens/moo_races.png` — Main races list screen
+- `../moo_screens/moo_races_status.png` — Race status/relationship view
+- `../moo_screens/moo_races_report.png` — Intelligence report panel
+
 > ⚠️ **This is a stub wireframe.** The layout structure and subflows are defined here based on `main-screens.md` §7 ASCII layout and the MOO1 reference. The `command_menu/command_menu_races.md` file covers the command-bar button only, not this full screen. Full ASCII wireframes with exact sizing and all interaction states need to be developed.
 
 ---
