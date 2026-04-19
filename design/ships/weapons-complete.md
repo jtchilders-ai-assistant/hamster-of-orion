@@ -148,7 +148,7 @@ Biological weapons kill population without destroying infrastructure. They have 
 
 | Weapon | Tech Level (Planetology) | Kill Rate | Space | Cost | Max Pop Penalty |
 |--------|--------------------------|-----------|-------|------|-----------------|
-| Death Spores | 9 | 1M per combat round | 150 | 100 BC | -10% permanent |
+| Death Spores | 10 | 1M per combat round | 150 | 100 BC | -10% permanent |
 | Doom Virus | 25 | 2M per combat round | 200 | 200 BC | -25% permanent |
 | Bio Terminator | 33 | 3M per combat round | 250 | 300 BC | -50% permanent |
 

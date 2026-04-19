@@ -1,10 +1,12 @@
 # Master Issues List - Hamster of Orion Design Review
 
 **Generated:** 2026-04-12  
-**Last Updated:** 2026-04-18  
-**Total Issues:** ~135 across 6 review areas  
-**Resolved:** All critical issues (31/31) + High/Medium + MOO1 fidelity fixes
-**Status:** ✅ COMPLETE — All critical issues resolved across all 6 areas
+**Last Updated:** 2026-04-19  
+**Total Issues:** 135+ identified and resolved  
+**Status:** ✅ COMPLETE — All issues resolved. Review files archived.
+
+> **Note:** All review files have been moved to `archive/reviews/`. 
+> See `REMAINING_ITEMS.md` for any minor non-blocking items.
 
 This document consolidates all critical and high-priority issues found during the comprehensive design review. Individual detailed reports are in their respective directories.
 
@@ -110,10 +112,10 @@ This document consolidates all critical and high-priority issues found during th
 - ~~Tactical UI wireframe introduces mechanics not in design docs~~ → ✅ FIXED teleporter range (now "unlimited" per combat-algorithm.md)
 - ~~"Hull", "Armor", "HP" used interchangeably~~ → ✅ FIXED added Terminology Glossary to combat-algorithm.md
 
-### Mechanics (13)
-- Bio weapon kill-rate defined three different ways
-- Hull class tables can't be reconciled
-- 14 referenced documents don't exist
+### Mechanics (3) — ✅ ALL RESOLVED
+- ~~Bio weapon kill-rate defined three different ways~~ → ✅ FIXED — Unified to Death Spores=10, Doom Virus=25, Bio Terminator=33 across all docs
+- ~~Hull class tables can't be reconciled~~ → ✅ ALREADY FIXED — Size modifier formula in combat-algorithm.md is canonical
+- ~~14 referenced documents don't exist~~ → ✅ FIXED — S-C1 updated PROJECT_STRUCTURE.md, no broken references remain
 
 ### UI/UX (8 gaps)
 - No wireframes: pre-game, diplomacy detail, planet management, victory/defeat, High Council
@@ -138,12 +140,12 @@ These appear throughout the docs and should be standardized:
 
 ---
 
-## 📋 MISSING DOCUMENTS
+## 📋 MISSING DOCUMENTS — ✅ ALL RESOLVED
 
-Referenced but don't exist:
-1. `slider-mathematics.md` — **Critical**, referenced everywhere
-2. Multiple tech docs have gaps
-3. 14+ other referenced documents
+~~Referenced but don't exist:~~
+1. ~~`slider-mathematics.md`~~ → ✅ Created (524 lines)
+2. ~~Multiple tech docs have gaps~~ → ✅ Tech tree fully documented
+3. ~~14+ other referenced documents~~ → ✅ PROJECT_STRUCTURE.md updated, no broken references
 
 ---
 
