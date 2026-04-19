@@ -2,7 +2,7 @@
 
 ## Overview
 
-Complete data models for all game entities in Hamster of Orion. These structures are designed for use with Redux/Immer state management.
+Complete data models for all game entities in Hamster of Orion. These structures are pure TypeScript interfaces designed for use with immutable state patterns (compatible with Redux if migration is needed later).
 
 ---
 
@@ -935,4 +935,4 @@ type Timestamp = number;      // Unix timestamp
 
 ---
 
-All data structures optimized for Redux with Immer. Next: `rendering-pipeline.md` for graphics implementation.
+All data structures use immutable patterns. Next: `rendering-pipeline.md` for graphics implementation.

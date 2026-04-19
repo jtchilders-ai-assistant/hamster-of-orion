@@ -17,20 +17,21 @@ This roadmap breaks down Hamster of Orion development into manageable phases, ea
 ### Deliverables
 
 **Week 1: Project Setup**
-- [ ] Initialize React + Redux project
-- [ ] Configure Webpack/Vite build system
+- [ ] Initialize Vite + TypeScript project
+- [ ] Configure build system (vite.config.ts)
 - [ ] Set up ESLint, Prettier
-- [ ] Configure Jest for testing
-- [ ] Create folder structure
-- [ ] Set up Git repository + CI/CD
+- [ ] Configure Vitest for testing
+- [ ] Create folder structure (game/ vs ui/ separation)
+- [ ] Set up Git repository + GitHub Pages CI/CD
+- [ ] Add AI testing hooks (window.__HAMSTER_DEBUG__)
 
 **Week 2: Data Layer**
-- [ ] Implement Redux store structure
+- [ ] Implement Store class (Redux-compatible pattern)
 - [ ] Create all data models (TypeScript interfaces)
-- [ ] Implement state slices (galaxy, fleets, research, etc.)
-- [ ] Write unit tests for reducers
+- [ ] Implement action creators and reducers
+- [ ] Write unit tests for game logic
 - [ ] Implement save/load system (LocalStorage)
-- [ ] Add state persistence middleware
+- [ ] Add state persistence
 
 **Week 3: Game Engine Core**
 - [ ] Implement GameEngine class

@@ -2,7 +2,7 @@
 
 ## Overview
 
-Hamster of Orion uses HTML5 Canvas for the Galaxy Map and Tactical Combat, with SVG for UI elements. This document details the rendering architecture and implementation.
+Hamster of Orion uses HTML5 Canvas for the Galaxy Map and Tactical Combat, with HTML/CSS for UI panels. This document details the rendering architecture and implementation.
 
 ---
 
