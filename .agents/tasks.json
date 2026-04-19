@@ -240,7 +240,7 @@
       "id": "new-game-flow",
       "name": "New game setup flow",
       "type": "ui",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         "galaxy-generation",
         "race-data",

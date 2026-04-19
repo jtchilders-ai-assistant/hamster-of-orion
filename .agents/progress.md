@@ -229,3 +229,63 @@ Task: app-shell — Application shell and routing
 - All 6 screens implemented: Galaxy, Colonies, Fleets, Research, Diplomacy, Design ✓
 - No `any` types ✓
 - Committed & pushed
+
+## 2026-04-19 23:41 UTC — Orchestrator
+
+- **app-shell** verified ✓ (386/386 tests, typecheck clean)
+- **galaxy-map-canvas** → WORKING
+  - Dependencies met: app-shell ✓, galaxy-generation ✓
+  - Worker spawned: orion-worker-galaxy-map-canvas
+  - Output targets: src/ui/screens/GalaxyScreen.ts, src/ui/canvas/starmap.ts
+
+## 2026-04-19 18:46 CDT — Orchestrator Check-In
+
+**State recovered:** WORKING (stale, app-shell was done, galaxy-map-canvas was already implemented)
+
+**Completed:**
+- Detected galaxy-map-canvas + info-panel + command-bar all implemented in last worker run
+- Committed: `feat(galaxy-map-canvas): Star map canvas, info panel, SELECT_SYSTEM action`
+  - 855 line insertion across 8 files
+  - 411/411 tests passing
+- Pushed to main
+
+**Tasks now done:** scaffold, store, game-state-types, galaxy-generation, race-data, turn-system, production-system, population-growth, research-system, debug-hooks, app-shell, galaxy-map-canvas, info-panel, command-bar (14/17)
+
+**Remaining:**
+- new-game-flow (NEXT — spawning worker now)
+- save-load
+- integration-test
+
+**Spawning worker for:** new-game-flow
+
+## 2026-04-19 23:51 UTC — Orchestrator Check-In
+
+**State:** WORKING — new-game-flow
+
+**Worker status:** Active (runId: b309e298, running ~3min)
+- Partial files already committed: `src/game/actions/newGame.ts`, `test/game/actions/newGame.test.ts`
+- TypeScript error in newGame.ts line 55 (type assertion on availableTechs) — worker likely fixing
+- Missing: `src/ui/screens/NewGameScreen.ts` — worker is implementing it
+
+**Action:** No intervention needed. Waiting for worker to complete and set state=TESTING.
+
+## 2026-04-19 18:57 CDT — Verifier: new-game-flow APPROVED
+
+**Verification result:** APPROVED
+
+**Checks:**
+- TypeScript: PASS (0 errors)
+- Tests: PASS (428/428, including 17 new newGame tests)
+- Architecture: PASS — no DOM in `src/game/` files
+- Files created: NewGameScreen.ts, newGame.ts, newGame.test.ts
+- Files modified: reducer.ts, App.ts, state.ts
+
+**Acceptance criteria met:**
+- ✅ Galaxy size selection (small/medium/large/huge)
+- ✅ Race selection from races.json (10 races)
+- ✅ Emperor name entry (max 20 chars enforced in UI)
+- ✅ Home world name entry (max 20 chars)
+- ✅ Game starts with generated galaxy (generateGalaxy called in newGameReducer)
+- ✅ currentScreen transitions to 'galaxy'
+- ✅ AI empires count matches opponents setting
+- ✅ Player homeworld renamed to user input

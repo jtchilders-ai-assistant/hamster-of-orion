@@ -8,9 +8,10 @@
 import { Action } from './store';
 import { GameState, ScreenType } from './state';
 import { turnReducer } from './actions/turn';
+import { newGameReducer } from './actions/newGame';
 
 const VALID_SCREENS: ReadonlySet<string> = new Set<ScreenType>([
-  'menu', 'galaxy', 'planet', 'planet_list', 'fleet', 'research',
+  'menu', 'new_game', 'galaxy', 'planet', 'planet_list', 'fleet', 'research',
   'diplomacy', 'ship_design', 'reports', 'council', 'combat',
 ]);
 
@@ -53,6 +54,10 @@ export function rootReducer(state: GameState, action: Action): GameState {
   // Route to sub-reducers
   if (action.type === 'NEXT_TURN') {
     return turnReducer(state, action);
+  }
+
+  if (action.type === 'START_GAME') {
+    return newGameReducer(state, action);
   }
 
   // Unknown action — return unchanged state

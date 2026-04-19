@@ -23,6 +23,7 @@ export type GameSpeed = 'slow' | 'normal' | 'fast';
 export type VictoryType = 'domination' | 'discovery' | 'diplomatic' | 'survival' | 'transcendence';
 export type ScreenType =
   | 'menu'
+  | 'new_game'
   | 'galaxy'
   | 'planet'
   | 'planet_list'
