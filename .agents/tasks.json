@@ -189,7 +189,7 @@
       "id": "galaxy-map-canvas",
       "name": "Galaxy map canvas rendering",
       "type": "ui",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         "app-shell",
         "galaxy-generation"
@@ -207,7 +207,7 @@
       "id": "info-panel",
       "name": "Planet info panel",
       "type": "ui",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         "galaxy-map-canvas"
       ],
@@ -224,7 +224,7 @@
       "id": "command-bar",
       "name": "Command bar component",
       "type": "ui",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         "app-shell"
       ],

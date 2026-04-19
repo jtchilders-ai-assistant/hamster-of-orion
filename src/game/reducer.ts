@@ -35,6 +35,21 @@ export function rootReducer(state: GameState, action: Action): GameState {
     };
   }
 
+  // Star system selection
+  if (action.type === 'SELECT_SYSTEM') {
+    const { systemId } = action.payload as { systemId: string | null };
+    return {
+      ...state,
+      ui: {
+        ...state.ui,
+        selectedSystem: systemId,
+        // Clear sub-selections when switching systems
+        selectedPlanet: null,
+        selectedFleet: null,
+      },
+    };
+  }
+
   // Route to sub-reducers
   if (action.type === 'NEXT_TURN') {
     return turnReducer(state, action);

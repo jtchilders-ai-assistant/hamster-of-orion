@@ -1,25 +1,45 @@
 /**
- * Star map canvas component.
+ * Star map canvas component — wires canvas events to the store.
  * src/ui/components/StarMap.ts
+ *
+ * This component owns the <canvas> element and handles:
+ *   - Resize observation
+ *   - Click-to-select star
+ *   - Delegating all drawing to src/ui/canvas/starmap.ts helpers
  */
 
-import { GameState, StarType } from '../../game/state';
+import { GameState, EmpireId } from '../../game/state';
 import { Store } from '../../game/store';
-import { clearCanvas, drawStarfield, drawStar } from '../canvas/renderer';
+import { clearCanvas, drawStarfield } from '../canvas/renderer';
+import {
+  MapTransform,
+  getMapTransform,
+  galaxyToCanvas,
+  hitTestStar,
+  drawStarDot,
+  drawSelectionRing,
+  drawColonyRing,
+  drawStarLabel,
+  drawFleetIndicator,
+} from '../canvas/starmap';
 
-const STAR_COLORS: Record<StarType, string> = {
-  yellow: '#ffee88',
-  green:  '#88ff88',
-  red:    '#ff6644',
-  blue:   '#88aaff',
-  white:  '#ffffff',
-  purple: '#cc88ff',
-};
+// Empire color palette — indexed by empire ID (player = index 0)
+const EMPIRE_COLORS: readonly string[] = [
+  '#00ff88',  // Player: green
+  '#ff4444',  // AI 1: red
+  '#4444ff',  // AI 2: blue
+  '#ffaa00',  // AI 3: orange
+  '#ff00ff',  // AI 4: magenta
+  '#00ffff',  // AI 5: cyan
+];
 
 export class StarMap {
   private readonly canvas: HTMLCanvasElement;
   private readonly ctx: CanvasRenderingContext2D;
   private readonly store: Store<GameState>;
+
+  // Map from empire ID → display color (computed on first render)
+  private empireColorMap: Map<EmpireId, string> = new Map();
 
   constructor(canvas: HTMLCanvasElement, store: Store<GameState>) {
     this.canvas = canvas;
@@ -33,6 +53,8 @@ export class StarMap {
     this.resize();
     window.addEventListener('resize', () => this.resize());
   }
+
+  // ── Private ──────────────────────────────────────────────────────────────────
 
   private resize(): void {
     const rect = this.canvas.getBoundingClientRect();
@@ -50,76 +72,85 @@ export class StarMap {
       const mx = e.clientX - rect.left;
       const my = e.clientY - rect.top;
 
-      const { scaleX, scaleY, offsetX, offsetY } = this.getMapTransform(state);
+      const transform = this.buildTransform(state);
+      const systems = galaxy.systems.allIds.map((id) => galaxy.systems.byId[id]);
 
-      // Find closest system within click radius
-      let closestId: string | null = null;
-      let closestDist = 20; // pixels
-
-      for (const id of galaxy.systems.allIds) {
-        const sys = galaxy.systems.byId[id];
-        const sx = sys.coordinates.x * scaleX + offsetX;
-        const sy = sys.coordinates.y * scaleY + offsetY;
-        const d = Math.hypot(mx - sx, my - sy);
-        if (d < closestDist) {
-          closestDist = d;
-          closestId = id;
-        }
-      }
-
-      this.store.dispatch({ type: 'SELECT_SYSTEM', payload: { systemId: closestId } });
+      const clickedId = hitTestStar(mx, my, systems, transform, 20);
+      this.store.dispatch({ type: 'SELECT_SYSTEM', payload: { systemId: clickedId } });
     });
   }
 
-  private getMapTransform(state: GameState): { scaleX: number; scaleY: number; offsetX: number; offsetY: number } {
-    const w = this.canvas.width;
-    const h = this.canvas.height;
-    const gw = state.galaxy.width || 30;
-    const gh = state.galaxy.height || 30;
-    const padding = 40;
-
-    const scaleX = (w - padding * 2) / gw;
-    const scaleY = (h - padding * 2) / gh;
-    return { scaleX, scaleY, offsetX: padding, offsetY: padding };
+  private buildTransform(state: GameState): MapTransform {
+    return getMapTransform(
+      this.canvas.width,
+      this.canvas.height,
+      state.galaxy.width || 30,
+      state.galaxy.height || 30,
+    );
   }
+
+  private buildEmpireColorMap(state: GameState): void {
+    this.empireColorMap.clear();
+    const empireIds = state.empires.allIds;
+    empireIds.forEach((id, idx) => {
+      this.empireColorMap.set(id, EMPIRE_COLORS[idx % EMPIRE_COLORS.length]);
+    });
+  }
+
+  // ── Public ───────────────────────────────────────────────────────────────────
 
   render(state: GameState): void {
     const ctx = this.ctx;
+    const galaxy = state.galaxy;
 
     clearCanvas(ctx);
     drawStarfield(ctx, 300);
 
-    const galaxy = state.galaxy;
     if (!galaxy.systems.allIds.length) return;
 
-    const { scaleX, scaleY, offsetX, offsetY } = this.getMapTransform(state);
+    this.buildEmpireColorMap(state);
+    const transform = this.buildTransform(state);
     const selectedId = state.ui.selectedSystem;
 
-    // Draw selection ring
+    // ── Pass 1: Selection ring (drawn first so it appears behind star) ─────────
     if (selectedId && galaxy.systems.byId[selectedId]) {
       const sys = galaxy.systems.byId[selectedId];
-      const sx = sys.coordinates.x * scaleX + offsetX;
-      const sy = sys.coordinates.y * scaleY + offsetY;
-      ctx.strokeStyle = '#00aaff';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.arc(sx, sy, 12, 0, Math.PI * 2);
-      ctx.stroke();
+      const { x, y } = galaxyToCanvas(sys.coordinates, transform);
+      drawSelectionRing(ctx, x, y);
     }
 
-    // Draw stars
+    // ── Pass 2: Colony rings ───────────────────────────────────────────────────
     for (const id of galaxy.systems.allIds) {
       const sys = galaxy.systems.byId[id];
-      const sx = sys.coordinates.x * scaleX + offsetX;
-      const sy = sys.coordinates.y * scaleY + offsetY;
-      const color = STAR_COLORS[sys.starType] ?? '#ffffff';
-      drawStar(ctx, sx, sy, color);
+      if (!sys.ownerId) continue;
+      const { x, y } = galaxyToCanvas(sys.coordinates, transform);
+      const color = this.empireColorMap.get(sys.ownerId) ?? '#ffffff';
+      drawColonyRing(ctx, x, y, color);
+    }
 
-      // Label
-      ctx.fillStyle = '#c0d8f0';
-      ctx.font = '10px "Courier New"';
-      ctx.textAlign = 'center';
-      ctx.fillText(sys.name, sx, sy + 16);
+    // ── Pass 3: Stars ──────────────────────────────────────────────────────────
+    for (const id of galaxy.systems.allIds) {
+      const sys = galaxy.systems.byId[id];
+      const { x, y } = galaxyToCanvas(sys.coordinates, transform);
+      drawStarDot(ctx, x, y, sys.starType);
+    }
+
+    // ── Pass 4: Fleet indicators ───────────────────────────────────────────────
+    for (const id of galaxy.systems.allIds) {
+      const sys = galaxy.systems.byId[id];
+      if (!sys.fleetIds.length) continue;
+      const { x, y } = galaxyToCanvas(sys.coordinates, transform);
+      // Show a fleet indicator in the player's color for their fleets
+      const playerColor = this.empireColorMap.get(state.empires.playerId) ?? '#00ff88';
+      drawFleetIndicator(ctx, x, y, playerColor, 'right');
+    }
+
+    // ── Pass 5: Labels ─────────────────────────────────────────────────────────
+    for (const id of galaxy.systems.allIds) {
+      const sys = galaxy.systems.byId[id];
+      const { x, y } = galaxyToCanvas(sys.coordinates, transform);
+      const isSelected = id === selectedId;
+      drawStarLabel(ctx, x, y, sys.name, isSelected ? '#ffffff' : '#b8d0e8');
     }
   }
 }
