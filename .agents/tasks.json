@@ -120,7 +120,7 @@
       "id": "population-growth",
       "name": "Population growth system",
       "type": "code",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         "production-system"
       ],

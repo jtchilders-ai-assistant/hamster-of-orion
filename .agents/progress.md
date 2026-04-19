@@ -22,7 +22,7 @@ Completed 8 review and integration tasks from March 2026.
 | race-data | Race data | ⏳ Pending |
 | turn-system | Turn processing | ⏳ Pending |
 | production-system | Production/sliders | ✅ Done |
-| population-growth | Population growth | ⏳ Pending |
+| population-growth | Population growth | ✅ Done |
 | research-system | Research/tech | ⏳ Pending |
 | debug-hooks | Debug interface | ⏳ Pending |
 | app-shell | App shell/routing | ⏳ Pending |
@@ -137,3 +137,28 @@ Completed 8 review and integration tasks from March 2026.
 - TypeScript typecheck: PASS ✓
 - Tests: 224/224 passed (41 new production tests) ✓
 - Committed & pushed
+
+### [2026-04-19T22:56:19Z] Orchestrator Check
+- State: WORKING
+- Task: population-growth
+- Worker: running (population-growth-worker, ~4min elapsed)
+- Action: waiting for worker to complete
+## 2026-04-19T23:01:29Z - TESTING → VERIFYING
+- Task: population-growth
+- Tests: 266/266 passed, typecheck clean
+- Spawned verifier subagent
+
+## 2026-04-19T23:01:55Z - population-growth APPROVED & DONE
+- Verifier confirmed all acceptance criteria met
+- Logistic growth formula: pop × 0.10 × env_growth_mod × racial_mod × morale_mod × (1 - pop/max_pop) ✓
+- All environment tables implemented as lookup maps (no if/else) ✓
+- Racial bonuses: Rabbits 2×, HC ignore env (growth+capacity), Ants +25% cap+morale=1.0, Mice 0.5 food ✓
+- All 4 design doc worked examples validated in tests ✓
+- Difficulty modifiers (simple/easy/average/hard/impossible) for player+AI ✓
+- Fractional carry-over accumulation across turns ✓
+- No DOM imports in src/game/ ✓
+- No `any` types ✓
+- TypeScript typecheck: PASS ✓
+- Tests: 266/266 passed (42 new population tests) ✓
+- Committed & pushed
+

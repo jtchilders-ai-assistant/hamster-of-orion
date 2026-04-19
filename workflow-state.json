@@ -1,17 +1,15 @@
 {
   "state": "TESTING",
-  "current_task": "race-data",
+  "current_task": "population-growth",
   "worker_output": {
     "files_created": [
-      "src/game/systems/races.ts",
-      "test/game/systems/races.test.ts"
+      "src/game/systems/population.ts",
+      "test/game/systems/population.test.ts"
     ],
-    "files_modified": [
-      "src/data/races.json"
-    ],
+    "files_modified": [],
     "tests_added": [
-      "test/game/systems/races.test.ts (94 tests)"
+      "test/game/systems/population.test.ts (42 tests)"
     ],
-    "summary": "Replaced placeholder races.json stub with full data for all 10 races per design/species/race-stats-complete.md. Each race has: bonuses (production/research/food/growth/groundCombat/shipCombat/espionage/diplomacy), per-field research bonuses/penalties, canConductEspionage/immuneToEspionage flags (Ants: both set correctly), spyRollBonus (Chameleons: 30), specialAbilities, startingTechnologies (4 each), aiBehavior, and shipPrefix. Implemented races.ts with typed RaceDefinition interface and all formula functions from the design doc: applyRacialBonus, applyProductionBonus, applyResearchBonus, applyFieldResearchBonus (handles per-field bonuses/penalties and Rats allFields flag), applyGrowthBonus, applyGroundCombatBonus (with 10% minimum floor), applyShipAttackBonus/Defense (additive shipCombat/10 formula), applyEspionageBonus (Ants two-way isolation, Chameleons flat spy roll + percentage), startingRelationship, applyDiplomacyBonus, hasAbility/getAbility, and Mice-specific helpers (miceEffectiveRCLevel, miceFactoryProduction). No any types, no DOM. All 94 races tests pass; 162 total tests pass. TypeScript compiles clean."
+    "summary": "Implemented population growth system per design/economy/population-growth.md. All formulas use lookup tables (no hardcoded if/else chains). Core functions: calculateMaxPopulation (base_pop + terraforming + soil enrichment × env_capacity × racial_capacity; Hermit Crabs ignore env penalty, Ants +25% capacity), calculatePopulationGrowth (logistic growth with env/racial/morale modifiers, fractional carry-over, cloning bonus; Ants ignore morale, Hermit Crabs ignore env growth penalty), processFoodAndStarvation (food_required vs food_produced with env_fertility × racial_food_mod; Hermit Crabs skip food entirely, Mice need 0.5/colonist), calculateDifficultyGrowthModifier (5 difficulty levels for player/AI). Helper functions: getTerraformingBonus (highest unlocked tier, non-cumulative), getCloningBonus (0/2/5 flat per turn), calculateMoraleModifier (0.5 + morale/200). All 3 worked examples from design doc validated in tests (Hamsters on Terran, Rabbits on Jungle with cloning, Hermit Crabs on Radiated, Hamster starvation on Desert). No any types, no DOM. All 42 population tests pass; 266 total tests pass. TypeScript compiles clean."
   }
 }
