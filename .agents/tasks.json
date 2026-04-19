@@ -1,151 +1,255 @@
 {
-  "project": "hamster-of-orion-phase2",
-  "created": "2026-03-22",
-  "description": "Phase 2: Gap Analysis, Verification, and UI Specification",
+  "project": "hamster-of-orion-implementation",
+  "phase": "phase3-core-implementation",
+  "created": "2026-04-19",
+  "description": "Phase 3: Core game implementation in TypeScript",
   "tasks": [
     {
-      "id": "review-001",
-      "title": "Comprehensive Gap Analysis vs MOO1 Manual",
-      "description": "Compare ALL design documents against the original MOO1 manual PDF. Identify any missing mechanics, systems, or details. Create a gap report listing: 1) Missing systems entirely, 2) Incomplete specifications, 3) Deviations from MOO1 (intentional vs unintentional). Output: design/review/gap-analysis-manual.md",
-      "status": "done",
-      "priority": 1,
-      "output_file": "design/review/gap-analysis-manual.md"
+      "id": "scaffold",
+      "name": "Project scaffold",
+      "type": "setup",
+      "status": "pending",
+      "description": "Initialize Vite + TypeScript project with folder structure per ARCHITECTURE.md",
+      "output": "src/, package.json, vite.config.ts, tsconfig.json",
+      "acceptance": [
+        "npm install succeeds",
+        "npm run dev starts server on localhost:5173",
+        "src/game/ and src/ui/ folders exist",
+        "Basic index.html loads"
+      ]
     },
     {
-      "id": "review-002",
-      "title": "Gap Analysis vs StrategyWiki",
-      "description": "Fetch all StrategyWiki MOO1 pages and compare against our specifications. Focus on: formulas accuracy, tech tree completeness, combat mechanics, race abilities. Identify any discrepancies. Output: design/review/gap-analysis-wiki.md",
-      "status": "done",
-      "priority": 2,
-      "output_file": "design/review/gap-analysis-wiki.md"
+      "id": "store",
+      "name": "Store class implementation",
+      "type": "code",
+      "status": "pending",
+      "dependencies": ["scaffold"],
+      "description": "Implement Redux-compatible Store class per ARCHITECTURE.md",
+      "output": "src/game/store.ts",
+      "acceptance": [
+        "TypeScript compiles without errors",
+        "Store has getState(), dispatch(), subscribe() methods",
+        "Unit tests pass"
+      ]
     },
     {
-      "id": "review-003",
-      "title": "Cross-Reference Verification Report",
-      "description": "Create a verification matrix showing which MOO1 systems are covered by which design documents. Identify orphan systems (not documented) and duplicate coverage. Output: design/review/coverage-matrix.md",
-      "status": "done",
-      "priority": 3,
-      "output_file": "design/review/coverage-matrix.md"
+      "id": "game-state-types",
+      "name": "GameState type definitions",
+      "type": "code",
+      "status": "pending",
+      "dependencies": ["store"],
+      "description": "Define all TypeScript interfaces for game state per data-structures.md",
+      "output": "src/game/state.ts, src/game/types/",
+      "acceptance": [
+        "All interfaces from data-structures.md defined",
+        "No 'any' types used",
+        "Compiles without errors"
+      ]
     },
     {
-      "id": "review-004",
-      "title": "Consistency Check Across All Specs",
-      "description": "Review all specification files for internal consistency: same variable names, matching formulas, no contradictions. Create list of inconsistencies to fix. Output: design/review/consistency-report.md",
-      "status": "done",
-      "priority": 4,
-      "output_file": "design/review/consistency-report.md"
+      "id": "galaxy-generation",
+      "name": "Galaxy generation system",
+      "type": "code",
+      "status": "pending",
+      "dependencies": ["game-state-types"],
+      "description": "Implement galaxy generation per design/galaxy/generation-algorithm.md",
+      "output": "src/game/generators/galaxy.ts",
+      "acceptance": [
+        "Generates stars with correct distribution",
+        "Assigns planets with environment types",
+        "Places homeworlds for all races",
+        "Unit tests pass"
+      ]
     },
     {
-      "id": "ui-001",
-      "title": "UI Screen Inventory vs MOO1",
-      "description": "List ALL screens from the original MOO1 and compare to our UI docs. Identify missing screens or screens that need updates. Reference MOO1 manual and StrategyWiki. Output: design/ui-ux/screen-inventory.md",
-      "status": "done",
-      "priority": 5,
-      "output_file": "design/ui-ux/screen-inventory.md"
+      "id": "race-data",
+      "name": "Race data and bonuses",
+      "type": "code",
+      "status": "pending",
+      "dependencies": ["game-state-types"],
+      "description": "Implement race definitions per design/species/race-stats-complete.md",
+      "output": "src/data/races.json, src/game/systems/races.ts",
+      "acceptance": [
+        "All 10 races defined with correct bonuses",
+        "Field research bonuses implemented",
+        "Special abilities defined"
+      ]
     },
     {
-      "id": "ui-002",
-      "title": "Main Galaxy Map UI - ASCII Wireframe",
-      "description": "Create detailed ASCII wireframe for Galaxy Map matching MOO1 behavior. Include: star display, fleet indicators, selection mechanics, info panels, all buttons. Show multiple states (nothing selected, star selected, fleet selected). Output: design/ui-ux/wireframes/galaxy-map.md",
-      "status": "done",
-      "priority": 6,
-      "output_file": "design/ui-ux/wireframes/galaxy-map.md"
+      "id": "turn-system",
+      "name": "Turn processing system",
+      "type": "code",
+      "status": "pending",
+      "dependencies": ["game-state-types"],
+      "description": "Implement turn processing loop per design/technical/development-roadmap.md",
+      "output": "src/game/systems/turn.ts",
+      "acceptance": [
+        "nextTurn() advances game state",
+        "Calls production, growth, research systems",
+        "Unit tests pass"
+      ]
     },
     {
-      "id": "ui-003",
-      "title": "Planet Management UI - ASCII Wireframe",
-      "description": "Create detailed ASCII wireframe for Planet Management screen matching MOO1. Include: production sliders, population display, building queue, ship construction. Show slider interactions. Output: design/ui-ux/wireframes/planet-management.md",
-      "status": "done",
-      "priority": 7,
-      "output_file": "design/ui-ux/wireframes/planet-management.md"
+      "id": "production-system",
+      "name": "Production and sliders",
+      "type": "code",
+      "status": "pending",
+      "dependencies": ["turn-system"],
+      "description": "Implement production calculation per design/economy/slider-mathematics.md",
+      "output": "src/game/systems/production.ts",
+      "acceptance": [
+        "5 sliders sum to 100%",
+        "SHIP/DEF/IND/ECO/TECH calculations correct",
+        "Pollution and cleanup work",
+        "Unit tests pass"
+      ]
     },
     {
-      "id": "ui-004",
-      "title": "Fleet Command UI - ASCII Wireframe",
-      "description": "Create detailed ASCII wireframe for Fleet screen matching MOO1. Include: fleet list, ship counts, destination setting, rally points. Output: design/ui-ux/wireframes/fleet-command.md",
-      "status": "done",
-      "priority": 8,
-      "output_file": "design/ui-ux/wireframes/fleet-command.md"
+      "id": "population-growth",
+      "name": "Population growth system",
+      "type": "code",
+      "status": "pending",
+      "dependencies": ["production-system"],
+      "description": "Implement population growth per design/economy/population-growth.md",
+      "output": "src/game/systems/population.ts",
+      "acceptance": [
+        "Logistic growth formula implemented",
+        "Environment modifiers applied",
+        "Racial bonuses work",
+        "Unit tests pass"
+      ]
     },
     {
-      "id": "ui-005",
-      "title": "Research Tree UI - ASCII Wireframe",
-      "description": "Create detailed ASCII wireframe for Research screen matching MOO1. Show all 6 tech fields, current research, allocation sliders, tech details panel. Output: design/ui-ux/wireframes/research-tree.md",
-      "status": "done",
-      "priority": 9,
-      "output_file": "design/ui-ux/wireframes/research-tree.md"
+      "id": "research-system",
+      "name": "Research and technology",
+      "type": "code",
+      "status": "pending",
+      "dependencies": ["production-system"],
+      "description": "Implement research per design/technology/research-formulas.md",
+      "output": "src/game/systems/research.ts, src/data/technologies.json",
+      "acceptance": [
+        "RP generation from scientists",
+        "Tech cost calculation",
+        "Field allocation works",
+        "Unit tests pass"
+      ]
     },
     {
-      "id": "ui-006",
-      "title": "Ship Design UI - ASCII Wireframe",
-      "description": "Create detailed ASCII wireframe for Ship Design screen matching MOO1. Include: hull selection, component slots, weapon assignment, stats display, save/load designs. Output: design/ui-ux/wireframes/ship-design.md",
-      "status": "done",
-      "priority": 10,
-      "output_file": "design/ui-ux/wireframes/ship-design.md"
+      "id": "debug-hooks",
+      "name": "Debug interface for testing",
+      "type": "code",
+      "status": "pending",
+      "dependencies": ["store", "game-state-types"],
+      "description": "Implement window.__HAMSTER_DEBUG__ per ARCHITECTURE.md",
+      "output": "src/debug.ts",
+      "acceptance": [
+        "loadState() injects test state",
+        "getState() returns current state",
+        "dispatch() sends actions",
+        "Only enabled in dev mode"
+      ]
     },
     {
-      "id": "ui-007",
-      "title": "Diplomacy UI - ASCII Wireframe",
-      "description": "Create detailed ASCII wireframe for Diplomacy screen matching MOO1. Include: race relations, treaty options, audience request, trade agreements. Show different diplomatic states. Output: design/ui-ux/wireframes/diplomacy.md",
-      "status": "done",
-      "priority": 11,
-      "output_file": "design/ui-ux/wireframes/diplomacy.md"
+      "id": "app-shell",
+      "name": "Application shell and routing",
+      "type": "ui",
+      "status": "pending",
+      "dependencies": ["scaffold", "debug-hooks"],
+      "description": "Basic app shell with screen routing",
+      "output": "src/ui/app.ts, src/ui/screens/",
+      "acceptance": [
+        "Command bar renders",
+        "F-key navigation works",
+        "Screen switching works"
+      ]
     },
     {
-      "id": "ui-008",
-      "title": "Tactical Combat UI - ASCII Wireframe",
-      "description": "Create detailed ASCII wireframe for Combat screen matching MOO1. Include: hex/grid display, ship stacks, weapon firing, movement, retreat. Show turn phases. Output: design/ui-ux/wireframes/tactical-combat.md",
-      "status": "done",
-      "priority": 12,
-      "output_file": "design/ui-ux/wireframes/tactical-combat.md"
+      "id": "galaxy-map-canvas",
+      "name": "Galaxy map canvas rendering",
+      "type": "ui",
+      "status": "pending",
+      "dependencies": ["app-shell", "galaxy-generation"],
+      "description": "Render galaxy map per design/ui-ux/wireframes/galaxy-map.md",
+      "output": "src/ui/screens/GalaxyScreen.ts, src/ui/canvas/starmap.ts",
+      "acceptance": [
+        "Stars render at correct positions",
+        "Star colors match type",
+        "Click selection works",
+        "Info panel updates on selection"
+      ]
     },
     {
-      "id": "ui-009",
-      "title": "High Council UI - ASCII Wireframe",
-      "description": "Create detailed ASCII wireframe for Galactic Council screen matching MOO1. Include: voting display, candidate banners, vote tallies, speech/response. Output: design/ui-ux/wireframes/high-council.md",
-      "status": "done",
-      "priority": 13,
-      "output_file": "design/ui-ux/wireframes/high-council.md"
+      "id": "info-panel",
+      "name": "Planet info panel",
+      "type": "ui",
+      "status": "pending",
+      "dependencies": ["galaxy-map-canvas"],
+      "description": "Right-side info panel per wireframes",
+      "output": "src/ui/components/InfoPanel.ts",
+      "acceptance": [
+        "Shows planet stats",
+        "Shows production info",
+        "RELOC and TRANS buttons present",
+        "Updates on selection change"
+      ]
     },
     {
-      "id": "ui-010",
-      "title": "Reports & Statistics UI - ASCII Wireframe",
-      "description": "Create detailed ASCII wireframe for Reports screen matching MOO1. Include: empire comparison, graphs, military rankings, tech levels, production stats. Output: design/ui-ux/wireframes/reports.md",
-      "status": "done",
-      "priority": 14,
-      "output_file": "design/ui-ux/wireframes/reports.md"
+      "id": "command-bar",
+      "name": "Command bar component",
+      "type": "ui",
+      "status": "pending",
+      "dependencies": ["app-shell"],
+      "description": "Bottom command bar with 7 buttons + NEXT TURN",
+      "output": "src/ui/components/CommandBar.ts",
+      "acceptance": [
+        "All buttons render",
+        "F-key shortcuts work",
+        "NEXT TURN advances turn"
+      ]
     },
     {
-      "id": "ui-011",
-      "title": "UI Interaction Specification",
-      "description": "Document all UI interactions matching MOO1: click behaviors, keyboard shortcuts, slider mechanics, list navigation, context menus. Create interaction spec. Output: design/ui-ux/interaction-spec.md",
-      "status": "done",
-      "priority": 15,
-      "output_file": "design/ui-ux/interaction-spec.md"
+      "id": "new-game-flow",
+      "name": "New game setup flow",
+      "type": "ui",
+      "status": "pending",
+      "dependencies": ["galaxy-generation", "race-data", "app-shell"],
+      "description": "New game wizard per wireframes/new-game-setup.md",
+      "output": "src/ui/screens/NewGameScreen.ts",
+      "acceptance": [
+        "Galaxy size selection",
+        "Race selection",
+        "Name entry",
+        "Game starts with generated galaxy"
+      ]
     },
     {
-      "id": "ui-012",
-      "title": "UI State Transitions",
-      "description": "Document all screen transitions and modal behaviors matching MOO1. Include: screen flow diagram, popup triggers, confirmation dialogs, turn flow. Output: design/ui-ux/state-transitions.md",
-      "status": "done",
-      "priority": 16,
-      "output_file": "design/ui-ux/state-transitions.md"
+      "id": "save-load",
+      "name": "Save/load system",
+      "type": "code",
+      "status": "pending",
+      "dependencies": ["game-state-types"],
+      "description": "LocalStorage save/load",
+      "output": "src/game/persistence.ts",
+      "acceptance": [
+        "Save to localStorage",
+        "Load from localStorage",
+        "Export/import JSON file"
+      ]
     },
     {
-      "id": "fix-001",
-      "title": "Address Gap Analysis Findings",
-      "description": "Based on gap-analysis-manual.md and gap-analysis-wiki.md, create or update specification documents to fill identified gaps. Mark each gap as resolved. Output: design/review/gaps-resolved.md",
-      "status": "done",
-      "priority": 17,
-      "output_file": "design/review/gaps-resolved.md"
-    },
-    {
-      "id": "fix-002",
-      "title": "Resolve Consistency Issues",
-      "description": "Based on consistency-report.md, fix all identified inconsistencies across spec documents. Standardize variable names, correct formula conflicts. Output: design/review/consistency-resolved.md",
-      "status": "done",
-      "priority": 18,
-      "output_file": "design/review/consistency-resolved.md"
+      "id": "integration-test",
+      "name": "Integration test: full game loop",
+      "type": "test",
+      "status": "pending",
+      "dependencies": ["production-system", "population-growth", "research-system", "galaxy-map-canvas"],
+      "description": "End-to-end test of starting game and playing turns",
+      "output": "test/integration/game-loop.test.ts",
+      "acceptance": [
+        "Can start new game",
+        "Can click Next Turn multiple times",
+        "Production accumulates",
+        "Population grows"
+      ]
     }
   ]
 }
