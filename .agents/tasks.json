@@ -22,22 +22,26 @@
       "id": "store",
       "name": "Store class implementation",
       "type": "code",
-      "status": "pending",
-      "dependencies": ["scaffold"],
+      "dependencies": [
+        "scaffold"
+      ],
       "description": "Implement Redux-compatible Store class per ARCHITECTURE.md",
       "output": "src/game/store.ts",
       "acceptance": [
         "TypeScript compiles without errors",
         "Store has getState(), dispatch(), subscribe() methods",
         "Unit tests pass"
-      ]
+      ],
+      "status": "done"
     },
     {
       "id": "game-state-types",
       "name": "GameState type definitions",
       "type": "code",
       "status": "pending",
-      "dependencies": ["store"],
+      "dependencies": [
+        "store"
+      ],
       "description": "Define all TypeScript interfaces for game state per data-structures.md",
       "output": "src/game/state.ts, src/game/types/",
       "acceptance": [
@@ -51,7 +55,9 @@
       "name": "Galaxy generation system",
       "type": "code",
       "status": "pending",
-      "dependencies": ["game-state-types"],
+      "dependencies": [
+        "game-state-types"
+      ],
       "description": "Implement galaxy generation per design/galaxy/generation-algorithm.md",
       "output": "src/game/generators/galaxy.ts",
       "acceptance": [
@@ -66,7 +72,9 @@
       "name": "Race data and bonuses",
       "type": "code",
       "status": "pending",
-      "dependencies": ["game-state-types"],
+      "dependencies": [
+        "game-state-types"
+      ],
       "description": "Implement race definitions per design/species/race-stats-complete.md",
       "output": "src/data/races.json, src/game/systems/races.ts",
       "acceptance": [
@@ -80,7 +88,9 @@
       "name": "Turn processing system",
       "type": "code",
       "status": "pending",
-      "dependencies": ["game-state-types"],
+      "dependencies": [
+        "game-state-types"
+      ],
       "description": "Implement turn processing loop per design/technical/development-roadmap.md",
       "output": "src/game/systems/turn.ts",
       "acceptance": [
@@ -94,7 +104,9 @@
       "name": "Production and sliders",
       "type": "code",
       "status": "pending",
-      "dependencies": ["turn-system"],
+      "dependencies": [
+        "turn-system"
+      ],
       "description": "Implement production calculation per design/economy/slider-mathematics.md",
       "output": "src/game/systems/production.ts",
       "acceptance": [
@@ -109,7 +121,9 @@
       "name": "Population growth system",
       "type": "code",
       "status": "pending",
-      "dependencies": ["production-system"],
+      "dependencies": [
+        "production-system"
+      ],
       "description": "Implement population growth per design/economy/population-growth.md",
       "output": "src/game/systems/population.ts",
       "acceptance": [
@@ -124,7 +138,9 @@
       "name": "Research and technology",
       "type": "code",
       "status": "pending",
-      "dependencies": ["production-system"],
+      "dependencies": [
+        "production-system"
+      ],
       "description": "Implement research per design/technology/research-formulas.md",
       "output": "src/game/systems/research.ts, src/data/technologies.json",
       "acceptance": [
@@ -139,7 +155,10 @@
       "name": "Debug interface for testing",
       "type": "code",
       "status": "pending",
-      "dependencies": ["store", "game-state-types"],
+      "dependencies": [
+        "store",
+        "game-state-types"
+      ],
       "description": "Implement window.__HAMSTER_DEBUG__ per ARCHITECTURE.md",
       "output": "src/debug.ts",
       "acceptance": [
@@ -154,7 +173,10 @@
       "name": "Application shell and routing",
       "type": "ui",
       "status": "pending",
-      "dependencies": ["scaffold", "debug-hooks"],
+      "dependencies": [
+        "scaffold",
+        "debug-hooks"
+      ],
       "description": "Basic app shell with screen routing",
       "output": "src/ui/app.ts, src/ui/screens/",
       "acceptance": [
@@ -168,7 +190,10 @@
       "name": "Galaxy map canvas rendering",
       "type": "ui",
       "status": "pending",
-      "dependencies": ["app-shell", "galaxy-generation"],
+      "dependencies": [
+        "app-shell",
+        "galaxy-generation"
+      ],
       "description": "Render galaxy map per design/ui-ux/wireframes/galaxy-map.md",
       "output": "src/ui/screens/GalaxyScreen.ts, src/ui/canvas/starmap.ts",
       "acceptance": [
@@ -183,7 +208,9 @@
       "name": "Planet info panel",
       "type": "ui",
       "status": "pending",
-      "dependencies": ["galaxy-map-canvas"],
+      "dependencies": [
+        "galaxy-map-canvas"
+      ],
       "description": "Right-side info panel per wireframes",
       "output": "src/ui/components/InfoPanel.ts",
       "acceptance": [
@@ -198,7 +225,9 @@
       "name": "Command bar component",
       "type": "ui",
       "status": "pending",
-      "dependencies": ["app-shell"],
+      "dependencies": [
+        "app-shell"
+      ],
       "description": "Bottom command bar with 7 buttons + NEXT TURN",
       "output": "src/ui/components/CommandBar.ts",
       "acceptance": [
@@ -212,7 +241,11 @@
       "name": "New game setup flow",
       "type": "ui",
       "status": "pending",
-      "dependencies": ["galaxy-generation", "race-data", "app-shell"],
+      "dependencies": [
+        "galaxy-generation",
+        "race-data",
+        "app-shell"
+      ],
       "description": "New game wizard per wireframes/new-game-setup.md",
       "output": "src/ui/screens/NewGameScreen.ts",
       "acceptance": [
@@ -227,7 +260,9 @@
       "name": "Save/load system",
       "type": "code",
       "status": "pending",
-      "dependencies": ["game-state-types"],
+      "dependencies": [
+        "game-state-types"
+      ],
       "description": "LocalStorage save/load",
       "output": "src/game/persistence.ts",
       "acceptance": [
@@ -241,7 +276,12 @@
       "name": "Integration test: full game loop",
       "type": "test",
       "status": "pending",
-      "dependencies": ["production-system", "population-growth", "research-system", "galaxy-map-canvas"],
+      "dependencies": [
+        "production-system",
+        "population-growth",
+        "research-system",
+        "galaxy-map-canvas"
+      ],
       "description": "End-to-end test of starting game and playing turns",
       "output": "test/integration/game-loop.test.ts",
       "acceptance": [

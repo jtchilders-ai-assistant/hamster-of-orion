@@ -1,31 +1,27 @@
-# Current Task: scaffold
+# Current Task: store
 
-## Task ID: scaffold
-## Name: Project scaffold
-## Type: setup
+## Task ID: store
+## Name: Store class implementation
+## Type: code
 
 ## Description
-Initialize Vite + TypeScript project with folder structure per ARCHITECTURE.md
+Implement Redux-compatible Store class per ARCHITECTURE.md
 
-## Expected Output
-src/, package.json, vite.config.ts, tsconfig.json
+## Output Files
+- src/game/store.ts
 
 ## Acceptance Criteria
-- npm install succeeds
-- npm run dev starts server on localhost:5173
-- src/game/ and src/ui/ folders exist
-- Basic index.html loads
+- TypeScript compiles without errors
+- Store has getState(), dispatch(), subscribe() methods
+- Unit tests pass
 
-## Dependencies
-None
+## Dependencies (all complete)
+- scaffold ✅
+
+## Reference Docs
+- design/technical/ARCHITECTURE.md
+- design/technical/data-structures.md
+- src/game/state.ts (existing type definitions)
 
 ## Notes
-This is the first task — build the full directory structure as described in design/technical/ARCHITECTURE.md.
-Create a minimal working Vite + TypeScript app with all required folders:
-- src/game/ (pure TypeScript, no DOM)
-- src/ui/ (DOM/Canvas rendering)
-- src/data/ (static JSON)
-- test/ (Vitest unit tests)
-
-Set up package.json with scripts: dev, build, typecheck, test
-Use Vitest for testing.
+The scaffold already created a placeholder src/game/store.ts. Review and fully implement it with proper Redux-compatible Store class including getState(), dispatch(), and subscribe() methods. Write unit tests in test/game/store.test.ts.
