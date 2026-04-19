@@ -136,6 +136,9 @@ The right panel shows star/planet details at top, then colony stats, then curren
 │   ████████████░░          │  ← Progress bar
 │   Turns left: 1           │
 │                           │
+│   ─────────────────       │
+│   [RELOC]     [TRANS]     │  ← Action buttons
+│                           │
 └───────────────────────────┘
 ```
 
@@ -144,6 +147,8 @@ The right panel shows star/planet details at top, then colony stats, then curren
 - Population shown as current value vs. max (e.g., "15 / 100")
 - Factories, Missile Bases, Shield level, Waste % all listed
 - Current production item + progress bar + turns remaining
+- **RELOC button** — Sets rally point for newly built ships (see State 1c)
+- **TRANS button** — Opens population transfer interface (see State 1d)
 
 ---
 
@@ -204,6 +209,107 @@ When factories reach the cap (5× population), the factory line shows "MAX" and 
 │   Turns left: 1           │
 └───────────────────────────┘
 ```
+
+---
+
+### State 1c: Ship Relocation (RELOC Button)
+
+**Reference screenshots:** `moo_galaxy_planet_reloc1.png`, `moo_galaxy_planet_reloc2.png`
+
+When the player clicks the **RELOC** button on a colony's info panel, they enter "relocation mode" to set a rally point for newly built ships. This designates where ships constructed at this planet will automatically travel to after completion.
+
+**Behavior:**
+1. Click RELOC button on colony info panel
+2. Galaxy map enters destination selection mode (cursor changes)
+3. Valid destinations highlight (your other colonies, or friendly systems)
+4. Click a destination star to set as rally point
+5. A route line appears from origin to rally point
+6. All ships built at this colony automatically travel to the rally point
+
+```
+┌───────────────────────────┐
+│                           │
+│   ORION                   │
+│   ══════════════════      │
+│                           │
+│   SELECT RELOCATION       │  ← Mode indicator
+│   DESTINATION             │
+│                           │
+│   Click a star system     │
+│   to set as rally point   │
+│   for new ships.          │
+│                           │
+│   Current rally point:    │
+│   VEGA                    │  ← Shows current destination (or "None")
+│                           │
+│   ─────────────────       │
+│   [CLEAR]     [CANCEL]    │  ← Clear removes rally point
+│                           │
+└───────────────────────────┘
+```
+
+**After selecting destination:**
+- Info panel returns to normal colony view
+- A small indicator shows rally point is set (e.g., arrow icon or "Rally: VEGA")
+- Ships built here auto-deploy to the rally system each turn they complete
+
+**Notes:**
+- Rally point persists until manually changed or cleared
+- Can set rally point to any explored star (not just colonies)
+- Ships still need fuel range to reach the rally point
+- If rally point is out of range for a ship design, ship stays at origin
+
+---
+
+### State 1d: Population Transfer (TRANS Button)
+
+**Reference screenshot:** `moo_galaxy_planet_trans.png`
+
+When the player clicks the **TRANS** button on a colony's info panel, they can transfer population from this planet to another colony. This uses transport ships to move colonists.
+
+**Behavior:**
+1. Click TRANS button on colony info panel
+2. Panel shows transfer interface with destination selection
+3. Select destination colony from list or click on map
+4. Set number of population units to transfer (slider or +/- buttons)
+5. Confirm transfer — transports are dispatched
+
+```
+┌───────────────────────────┐
+│                           │
+│   POPULATION TRANSFER     │  ← Mode header
+│   ══════════════════      │
+│                           │
+│   From: ORION             │  ← Source planet
+│   Pop:  85 / 100          │
+│                           │
+│   To:   [Select dest...]  │  ← Dropdown or click map
+│                           │
+│   Transfer amount:        │
+│   [◄] █████░░░░░░ [►]  10  │  ← Slider + current value
+│                           │
+│   Travel time: 3 turns    │  ← Based on distance
+│                           │
+│   ─────────────────       │
+│   [SEND]      [CANCEL]    │
+│                           │
+└───────────────────────────┘
+```
+
+**Transfer mechanics (from `economy/population-growth.md`):**
+- Each transport ship carries 1 million colonists
+- Transports are automatically created (no ship design needed)
+- Transfer cost: 1 BC per population unit transported
+- Transports travel at warp speed based on best available engine
+- Population is removed from source immediately
+- Population arrives at destination after travel time
+- Transports are vulnerable to interception (like colony ships)
+
+**Constraints:**
+- Cannot transfer below 1 population (must keep at least 1 colonist)
+- Cannot transfer to enemy planets
+- Cannot transfer to uncolonized planets (use colony ships instead)
+- **Rabbits special:** Can auto-transfer overflow population (unique ability)
 
 ---
 
