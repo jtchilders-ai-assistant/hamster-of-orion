@@ -137,7 +137,7 @@
       "id": "research-system",
       "name": "Research and technology",
       "type": "code",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         "production-system"
       ],

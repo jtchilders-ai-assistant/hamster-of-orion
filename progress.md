@@ -13,3 +13,11 @@
 **Task:** Population growth system (`src/game/systems/population.ts`)
 **Previous:** production-system ✅ (224 tests, verified)
 **Next pending tasks ready:** research-system, debug-hooks
+
+## 2026-04-19 23:06 UTC — Starting research-system
+- State: IDLE → WORKING
+- Task: research-system (Research and technology)
+- Dependencies met: production-system ✅
+- Design doc: design/technology/research-formulas.md
+- Output: src/game/systems/research.ts, src/data/technologies.json
+- Spawning worker agent...
