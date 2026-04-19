@@ -172,7 +172,7 @@
       "id": "app-shell",
       "name": "Application shell and routing",
       "type": "ui",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         "scaffold",
         "debug-hooks"

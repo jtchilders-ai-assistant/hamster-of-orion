@@ -206,3 +206,26 @@ Completed 8 review and integration tasks from March 2026.
 - TypeScript typecheck: PASS ✓
 - Tests: 386/386 passed (19 new debug tests) ✓
 - Committed & pushed
+=== 2026-04-19T23:31:49Z ===
+ORCHESTRATOR: Starting task app-shell (Application shell and routing)
+State: IDLE → WORKING | Spawning worker...
+Worker spawned: agent:main:subagent:112197b4-b64e-4693-85f5-e954762181d3
+Task: app-shell — Application shell and routing
+
+## 2026-04-19T23:36:33Z - app-shell tests PASSED
+- typecheck: clean
+- tests: 386 passed (10 files)
+- state: → VERIFYING, spawning verifier
+
+
+## 2026-04-19T23:37:00Z - app-shell VERIFIED & APPROVED
+- TypeScript typecheck: PASS (zero errors)
+- Tests: 386/386 passed (10 files)
+- Architecture: src/game/ has zero DOM imports ✓
+- Acceptance criteria:
+  1. Command bar renders — CommandBar component with persistent #command-bar ✓
+  2. F-key navigation — F1–F6, F10 all mapped and wired via keydown listener ✓
+  3. Screen switching — App.onStateChange() hides old screen, shows new screen ✓
+- All 6 screens implemented: Galaxy, Colonies, Fleets, Research, Diplomacy, Design ✓
+- No `any` types ✓
+- Committed & pushed

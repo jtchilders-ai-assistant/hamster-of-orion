@@ -11,28 +11,15 @@
       <!-- Galaxy Screen -->
       <div id="galaxy-screen" class="screen active">
         <canvas id="star-map"></canvas>
-
         <div id="info-panel" class="panel">
           <p>Select a star system</p>
         </div>
-
-        <div id="command-bar">
-          <button data-screen="game" data-testid="cmd-game">GAME</button>
-          <button data-screen="design" data-testid="cmd-design">DESIGN</button>
-          <button data-screen="fleet" data-testid="cmd-fleet">FLEET</button>
-          <button data-screen="research" data-testid="cmd-research">RESEARCH</button>
-          <button data-screen="races" data-testid="cmd-races">RACES</button>
-          <button data-screen="planets" data-testid="cmd-planets">PLANETS</button>
-          <button id="next-turn" data-testid="next-turn">NEXT TURN</button>
-        </div>
-
-        <div id="status-bar">
-          <span data-testid="turn-display">Turn: 1</span>
-          <span data-testid="year-display">Year: 2500</span>
-          <span data-testid="credits-display">BC: 0</span>
-          <span data-testid="research-display">RP: 0/turn</span>
-        </div>
       </div>
+
+      <!-- Other screens injected by App at runtime -->
+
+      <!-- Command bar wrapper — App appends/reuses #command-bar here -->
+      <div id="command-bar-wrapper"></div>
     </div>
 
     <script type="module" src="/main.ts"></script>

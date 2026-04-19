@@ -6,13 +6,33 @@
  */
 
 import { Action } from './store';
-import { GameState } from './state';
+import { GameState, ScreenType } from './state';
 import { turnReducer } from './actions/turn';
+
+const VALID_SCREENS: ReadonlySet<string> = new Set<ScreenType>([
+  'menu', 'galaxy', 'planet', 'planet_list', 'fleet', 'research',
+  'diplomacy', 'ship_design', 'reports', 'council', 'combat',
+]);
 
 export function rootReducer(state: GameState, action: Action): GameState {
   // Special: LOAD_STATE replaces entire state (used for debug injection)
   if (action.type === 'LOAD_STATE') {
     return action.payload as GameState;
+  }
+
+  // Screen navigation
+  if (action.type === 'NAVIGATE') {
+    const screen = (action.payload as { screen: string }).screen;
+    if (!VALID_SCREENS.has(screen)) return state;
+    return {
+      ...state,
+      currentScreen: screen as ScreenType,
+      ui: {
+        ...state.ui,
+        previousScreen: state.currentScreen,
+        currentScreen: screen as ScreenType,
+      },
+    };
   }
 
   // Route to sub-reducers

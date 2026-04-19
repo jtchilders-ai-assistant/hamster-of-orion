@@ -39,6 +39,8 @@ html, body {
 #app {
   width: 100%;
   height: 100%;
+  display: flex;
+  flex-direction: column;
   position: relative;
 }
 
@@ -47,9 +49,13 @@ html, body {
 .screen {
   display: none;
   width: 100%;
-  height: 100%;
+  flex: 1;
+  min-height: 0;
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: var(--command-bar-height);
 }
 
 .screen.active {
@@ -67,6 +73,47 @@ html, body {
 
 #galaxy-screen.active {
   display: flex;
+}
+
+/* ── Placeholder / Stub Screens ── */
+
+.screen-header {
+  background: var(--color-bg-panel);
+  border-bottom: 1px solid var(--color-border);
+  padding: 12px 16px;
+}
+
+.screen-header h1 {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  letter-spacing: 3px;
+}
+
+.screen-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.placeholder-screen {
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.placeholder-label {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  color: var(--color-text-dim);
+}
+
+.placeholder-hint {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--color-accent-dim);
 }
 
 #star-map {
@@ -87,11 +134,10 @@ html, body {
   flex-direction: column;
   gap: 8px;
   overflow-y: auto;
-  /* Leave room for command bar and status bar */
-  height: calc(100% - var(--command-bar-height) - var(--status-bar-height));
   position: absolute;
   right: 0;
   top: 0;
+  bottom: 0;
 }
 
 .panel h2 {
@@ -134,71 +180,113 @@ html, body {
   color: #fff;
 }
 
-/* ── Command Bar ── */
+/* ── Command Bar Wrapper ── */
 
-#command-bar {
-  position: absolute;
-  bottom: var(--status-bar-height);
-  left: 0;
-  right: var(--panel-width);
-  height: var(--command-bar-height);
-  background: var(--color-bg-panel);
-  border-top: 1px solid var(--color-border);
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 0 8px;
-}
-
-#command-bar button {
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
-  color: var(--color-text);
-  padding: 6px 12px;
-  cursor: pointer;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  text-transform: uppercase;
-  transition: background 0.15s, border-color 0.15s;
-}
-
-#command-bar button:hover {
-  background: var(--color-accent-dim);
-  border-color: var(--color-accent);
-  color: #fff;
-}
-
-#next-turn {
-  margin-left: auto;
-  background: var(--color-accent-dim) !important;
-  border-color: var(--color-accent) !important;
-  color: #fff !important;
-  font-weight: bold;
-}
-
-#next-turn:hover {
-  background: var(--color-accent) !important;
-}
-
-/* ── Status Bar ── */
-
-#status-bar {
+#command-bar-wrapper {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  height: var(--status-bar-height);
-  background: #060e1a;
-  border-top: 1px solid var(--color-border);
+  z-index: 100;
+}
+
+/* ── Command Bar ── */
+
+#command-bar {
+  width: 100%;
+  height: var(--command-bar-height);
+  background: var(--color-bg-panel);
+  border-top: 2px solid var(--color-border);
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+}
+
+.cmd-nav-btn,
+#next-turn {
+  background: var(--color-bg);
+  border: none;
+  border-right: 1px solid var(--color-border);
+  color: var(--color-text);
+  padding: 4px 10px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  transition: background 0.12s, color 0.12s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  min-width: 60px;
+}
+
+.cmd-label {
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+.cmd-fkey {
+  font-size: 9px;
+  color: var(--color-text-dim);
+}
+
+.cmd-nav-btn:hover,
+#next-turn:hover {
+  background: var(--color-accent-dim);
+  color: #fff;
+}
+
+.cmd-nav-btn:hover .cmd-fkey,
+#next-turn:hover .cmd-fkey {
+  color: #aaddff;
+}
+
+.cmd-nav-btn.active {
+  background: var(--color-accent-dim);
+  border-bottom: 2px solid var(--color-accent);
+  color: #fff;
+}
+
+.cmd-nav-btn.active .cmd-fkey {
+  color: var(--color-accent);
+}
+
+.cmd-spacer {
+  flex: 1;
+}
+
+/* ── Status Bar (embedded in command bar) ── */
+
+#status-bar {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 16px;
   padding: 0 12px;
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 11px;
   color: var(--color-text-dim);
+  border-right: 1px solid var(--color-border);
 }
 
 #status-bar span {
   color: var(--color-text);
+}
+
+/* ── Next Turn Button ── */
+
+#next-turn {
+  background: var(--color-accent-dim);
+  border-color: var(--color-accent);
+  color: #fff;
+  font-weight: bold;
+  min-width: 90px;
+  border-right: none;
+  border-left: 2px solid var(--color-accent);
+}
+
+#next-turn:hover {
+  background: var(--color-accent);
 }
