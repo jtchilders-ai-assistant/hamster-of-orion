@@ -1,0 +1,336 @@
+{
+  "events": [
+    {
+      "id": "cosmic_blob",
+      "name": "Cosmic Blob",
+      "type": "monster",
+      "category": "space_monsters",
+      "probability": 0.08,
+      "weight": 8,
+      "min_turn": 50,
+      "description": "A massive single-celled organism drifts through space, consuming everything in its path.",
+      "target_type": "owned_system",
+      "effects": {
+        "type": "spawn_monster",
+        "monster_id": "cosmic_blob",
+        "target": "owned_system"
+      }
+    },
+    {
+      "id": "crystal_horror",
+      "name": "Crystal Horror",
+      "type": "monster",
+      "category": "space_monsters",
+      "probability": 0.06,
+      "weight": 6,
+      "min_turn": 75,
+      "description": "A crystalline entity reflects beam weapon energy back at attackers.",
+      "target_type": "owned_system",
+      "effects": {
+        "type": "spawn_monster",
+        "monster_id": "crystal_horror",
+        "target": "owned_system"
+      }
+    },
+    {
+      "id": "void_wyrm",
+      "name": "Void Wyrm",
+      "type": "monster",
+      "category": "space_monsters",
+      "probability": 0.04,
+      "weight": 4,
+      "min_turn": 100,
+      "description": "An ancient predator guards a treasure hoard of Ancient One technology.",
+      "target_type": "random_location",
+      "effects": {
+        "type": "spawn_monster",
+        "monster_id": "void_wyrm",
+        "target": "random_location"
+      }
+    },
+    {
+      "id": "ancient_derelict",
+      "name": "Ancient Derelict",
+      "type": "discovery",
+      "category": "discoveries",
+      "probability": 0.12,
+      "weight": 12,
+      "min_turn": 20,
+      "description": "An abandoned spacecraft from the Ancient Ones drifts silently in the void.",
+      "target_type": "owned_system",
+      "effects": {
+        "type": "discovery_choice",
+        "options": [
+          { "id": "salvage", "label": "Salvage for Parts", "outcomes": [{ "probability": 1.0, "effect": "bc_gain", "min": 200, "max": 800 }] },
+          { "id": "board", "label": "Board and Explore", "outcomes": [
+            { "probability": 0.60, "effect": "tech_discovery" },
+            { "probability": 0.25, "effect": "nothing" },
+            { "probability": 0.15, "effect": "trap", "casualty_type": "crew" }
+          ]}
+        ]
+      }
+    },
+    {
+      "id": "fertile_planet",
+      "name": "Fertile Planet",
+      "type": "discovery",
+      "category": "discoveries",
+      "probability": 0.10,
+      "weight": 10,
+      "min_turn": 30,
+      "description": "Unusual biological activity makes this world exceptionally hospitable to life.",
+      "target_type": "owned_colony",
+      "galaxy_requirement": "has_multiple_colonies",
+      "effects": {
+        "type": "planet_modifier",
+        "permanent": { "max_population_modifier": 1.25 },
+        "temporary": { "population_growth_modifier": 1.5, "duration_turns": 10 }
+      }
+    },
+    {
+      "id": "mineral_rich_planet",
+      "name": "Mineral-Rich Planet",
+      "type": "discovery",
+      "category": "discoveries",
+      "probability": 0.10,
+      "weight": 10,
+      "min_turn": 30,
+      "description": "Deep mineral surveys reveal vast untapped deposits beneath the surface.",
+      "target_type": "owned_colony",
+      "galaxy_requirement": "has_colonies",
+      "effects": {
+        "type": "planet_modifier",
+        "permanent": { "production_modifier": 1.25 }
+      }
+    },
+    {
+      "id": "plague",
+      "name": "Plague",
+      "type": "disaster",
+      "category": "disasters",
+      "probability": 0.10,
+      "weight": 10,
+      "min_turn": 40,
+      "description": "A virulent disease spreads through the colony, claiming lives by the millions.",
+      "target_type": "owned_colony",
+      "galaxy_requirement": "has_colonies",
+      "duration_turns": { "min": 3, "max": 5 },
+      "effects": {
+        "type": "plague",
+        "population_loss_percent_per_turn": { "min": 10, "max": 20 },
+        "spread_chance_per_turn": 0.25
+      }
+    },
+    {
+      "id": "comet",
+      "name": "Comet",
+      "type": "disaster",
+      "category": "disasters",
+      "probability": 0.06,
+      "weight": 6,
+      "min_turn": 60,
+      "description": "A massive comet is on collision course with one of your worlds. Deploy your fleet to intercept!",
+      "target_type": "owned_colony",
+      "galaxy_requirement": "has_colonies",
+      "duration_turns": 5,
+      "effects": {
+        "type": "comet",
+        "warning_turns": 5,
+        "comet_hp": 1000,
+        "if_not_intercepted": { "colony_destroyed": true }
+      }
+    },
+    {
+      "id": "earthquake",
+      "name": "Earthquake",
+      "type": "disaster",
+      "category": "disasters",
+      "probability": 0.08,
+      "weight": 8,
+      "min_turn": 25,
+      "description": "Massive seismic activity devastates industrial zones and populated areas.",
+      "target_type": "owned_colony",
+      "galaxy_requirement": "has_factories",
+      "effects": {
+        "type": "instant_damage",
+        "factories_destroyed": { "min": 10, "max": 30 },
+        "population_killed_percent": { "min": 5, "max": 15 }
+      }
+    },
+    {
+      "id": "industrial_accident",
+      "name": "Industrial Accident",
+      "type": "disaster",
+      "category": "disasters",
+      "probability": 0.10,
+      "weight": 10,
+      "min_turn": 20,
+      "description": "A catastrophic failure at the industrial complex causes widespread damage and contamination.",
+      "target_type": "owned_colony",
+      "galaxy_requirement": "has_factories",
+      "effects": {
+        "type": "instant_damage",
+        "factories_destroyed": { "min": 10, "max": 25 },
+        "pollution_added": { "min": 50, "max": 100 },
+        "population_killed_percent": { "min": 1, "max": 5 }
+      }
+    },
+    {
+      "id": "computer_virus",
+      "name": "Computer Virus",
+      "type": "disaster",
+      "category": "disasters",
+      "probability": 0.08,
+      "weight": 8,
+      "min_turn": 50,
+      "description": "A malicious program has infiltrated your empire's computer networks, disrupting research and production.",
+      "target_type": "empire_wide",
+      "effects": {
+        "type": "empire_debuff",
+        "research_output_modifier": 0.75,
+        "production_modifier": 0.90,
+        "duration_turns": { "min": 5, "max": 10 }
+      }
+    },
+    {
+      "id": "depleted_planet",
+      "name": "Depleted Planet",
+      "type": "disaster",
+      "category": "disasters",
+      "probability": 0.06,
+      "weight": 6,
+      "min_turn": 80,
+      "description": "Decades of intensive mining have exhausted the easily accessible mineral deposits.",
+      "target_type": "owned_colony",
+      "galaxy_requirement": "has_factories",
+      "effects": {
+        "type": "planet_modifier",
+        "permanent": { "resource_level_downgrade": 1, "production_modifier": 0.75 }
+      }
+    },
+    {
+      "id": "supernova",
+      "name": "Supernova",
+      "type": "disaster",
+      "category": "disasters",
+      "probability": 0.02,
+      "weight": 2,
+      "min_turn": 100,
+      "description": "The star is entering catastrophic collapse. All worlds in this system will be destroyed!",
+      "target_type": "owned_system",
+      "duration_turns": 5,
+      "effects": {
+        "type": "supernova",
+        "warning_turns": 5,
+        "on_detonation": {
+          "all_planets_destroyed": true,
+          "ships_in_system_destroyed": true,
+          "permanently_uninhabitable": true
+        }
+      }
+    },
+    {
+      "id": "diplomatic_blunder",
+      "name": "Diplomatic Blunder",
+      "type": "diplomatic",
+      "category": "diplomatic",
+      "probability": 0.08,
+      "weight": 8,
+      "min_turn": 30,
+      "description": "A cultural misunderstanding has caused offense to a foreign power.",
+      "target_type": "contacted_empire",
+      "galaxy_requirement": "has_enemy_contact",
+      "effects": {
+        "type": "diplomatic_penalty",
+        "diplomacy_points_change": { "min": -40, "max": -20 }
+      }
+    },
+    {
+      "id": "piracy",
+      "name": "Space Pirates",
+      "type": "diplomatic",
+      "category": "diplomatic",
+      "probability": 0.10,
+      "weight": 10,
+      "min_turn": 40,
+      "description": "A fleet of renegade ships preys upon your shipping lanes and remote colonies.",
+      "target_type": "owned_system",
+      "galaxy_requirement": "has_colonies",
+      "effects": {
+        "type": "piracy",
+        "trade_income_modifier": { "min": 0.75, "max": 0.90 },
+        "bc_raid_per_turn": { "min": 50, "max": 200 }
+      }
+    },
+    {
+      "id": "rebellion",
+      "name": "Rebellion",
+      "type": "diplomatic",
+      "category": "diplomatic",
+      "probability": 0.06,
+      "weight": 6,
+      "min_turn": 60,
+      "description": "The population has risen up against your rule. Loyalty must be restored or the colony will be lost.",
+      "target_type": "owned_colony",
+      "galaxy_requirement": "has_colonies",
+      "duration_turns": 10,
+      "effects": {
+        "type": "rebellion",
+        "income_production": 0,
+        "research_production": 0,
+        "ship_production": 0
+      }
+    },
+    {
+      "id": "donation",
+      "name": "Donation",
+      "type": "opportunity",
+      "category": "opportunities",
+      "probability": 0.08,
+      "weight": 8,
+      "min_turn": 15,
+      "description": "A wealthy citizen has bequeathed their fortune to the empire's treasury.",
+      "target_type": "empire",
+      "effects": {
+        "type": "bc_gain",
+        "min": 100,
+        "max": 500
+      }
+    },
+    {
+      "id": "scientist_recruitment",
+      "name": "Scientist Recruitment",
+      "type": "opportunity",
+      "category": "opportunities",
+      "probability": 0.06,
+      "weight": 6,
+      "min_turn": 40,
+      "description": "A brilliant researcher seeks to join your scientific community.",
+      "target_type": "empire",
+      "effects": {
+        "type": "research_bonus",
+        "percent_min": 10,
+        "percent_max": 25,
+        "duration_turns": { "min": 20, "max": 50 }
+      }
+    },
+    {
+      "id": "leader_emergence",
+      "name": "Leader Emergence",
+      "type": "opportunity",
+      "category": "opportunities",
+      "probability": 0.04,
+      "weight": 4,
+      "min_turn": 50,
+      "description": "An inspiring figure has emerged to rally your people to greater heights.",
+      "target_type": "empire",
+      "effects": {
+        "type": "empire_wide_bonus",
+        "morale_modifier": 1.10,
+        "production_modifier": 1.05,
+        "diplomacy_bonus": 10,
+        "duration_turns": { "min": 15, "max": 30 }
+      }
+    }
+  ]
+}

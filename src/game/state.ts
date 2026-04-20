@@ -427,7 +427,8 @@ export interface ResearchState {
 // ── Diplomacy ─────────────────────────────────────────────────────────────────
 
 export interface TreatyTerms {
-  tradeIncome?: { toEmpireA: number; toEmpireB: number };
+  /** Fixed base income per turn (used by trade treaties, before ramp-up). */
+  tradeIncome?: number;
   researchBonus?: number;
   mustDefend?: boolean;
   mustJoinWars?: boolean;
@@ -444,6 +445,8 @@ export interface Treaty {
   terms: TreatyTerms;
   isActive: boolean;
   canBreak: boolean;
+  /** Turns since a trade agreement was signed (for ramp-up calculation). */
+  tradeRampTurns?: number;
 }
 
 export interface DiplomaticEvent {
@@ -508,8 +511,14 @@ export interface Empire {
   fleets: FleetId[];
   shipDesigns: ShipDesignId[];
 
+  scannerTechLevel: number;  // 0 = basic, +1 per upgrade; used for sensor range
+
   research: ResearchState;
   relations: Record<EmpireId, DiplomaticRelations>;
+
+  // Exploration state
+  exploredSystems: SystemId[];  // Systems the empire has visited/discovered
+  visibleSystems: SystemId[];   // Systems currently visible (explored + in sensor range)
 
   isDefeated: boolean;
   defeatedTurn: number | null;
