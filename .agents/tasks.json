@@ -303,7 +303,8 @@
       "id": "starting-fleets",
       "name": "Starting fleets per race",
       "type": "data",
-      "status": "pending",
+      "status": "done",
+      "completed_at": "2026-04-20T02:45:00Z",
       "dependencies": [
         "ship-components-data"
       ],
