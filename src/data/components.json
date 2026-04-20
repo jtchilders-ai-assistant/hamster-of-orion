@@ -60,6 +60,9 @@
     { "id": "mauler_device", "name": "Mauler Device", "techLevel": 48, "category": "weapon", "subtype": "beam", "size": 10, "cost": 55, "effect": { "damageMin": 20, "damageMax": 100, "range": 2, "attacksPerRound": 1, "interceptable": false, "note": "100% accuracy" } },
     { "id": "plasma_torpedo", "name": "Plasma Torpedo", "techLevel": 50, "category": "weapon", "subtype": "torpedo", "size": 12, "cost": 65, "effect": { "damage": 150, "interceptable": false, "damagePerHexPenalty": 15, "note": "-15 damage per hex traveled" } },
     { "id": "mauler_pistol", "name": "Mauler Pistol", "techLevel": 50, "category": "weapon", "subtype": "ground", "size": 0, "cost": 0, "designAddition": true, "effect": { "groundCombatBonus": 35 } },
+    { "id": "death_spores", "name": "Death Spores", "techLevel": 10, "category": "weapon", "subtype": "biological", "size": 150, "cost": 100, "effect": { "populationKillRate": 1000000, "maxPopReduction": 0.10, "diplomaticPenalty": -100 } },
+    { "id": "doom_virus", "name": "Doom Virus", "techLevel": 25, "category": "weapon", "subtype": "biological", "size": 200, "cost": 200, "effect": { "populationKillRate": 2000000, "maxPopReduction": 0.25, "diplomaticPenalty": -100 } },
+    { "id": "bio_terminator", "name": "Bio Terminator", "techLevel": 33, "category": "weapon", "subtype": "biological", "size": 250, "cost": 300, "effect": { "populationKillRate": 3000000, "maxPopReduction": 0.50, "diplomaticPenalty": -100 } },
 
 
     
@@ -181,6 +184,9 @@
     { "id": "planetary_shield_5", "name": "Planetary Shield V", "techLevel": 12, "category": "special", "size": 0, "cost": 500, "effect": { "bombardmentAbsorption": 5, "buildCost": 500, "maintenance": 5, "note": "Planetary installation, not a ship component" } },
     { "id": "planetary_shield_10", "name": "Planetary Shield X", "techLevel": 22, "category": "special", "size": 0, "cost": 1000, "effect": { "bombardmentAbsorption": 10, "buildCost": 1000, "maintenance": 10, "note": "Planetary installation, not a ship component" } },
     { "id": "planetary_shield_15", "name": "Planetary Shield XV", "techLevel": 32, "category": "special", "size": 0, "cost": 2000, "effect": { "bombardmentAbsorption": 15, "buildCost": 2000, "maintenance": 15, "note": "Planetary installation, not a ship component" } },
-    { "id": "planetary_shield_20", "name": "Planetary Shield XX", "techLevel": 42, "category": "special", "size": 0, "cost": 4000, "effect": { "bombardmentAbsorption": 20, "buildCost": 4000, "maintenance": 20, "note": "Planetary installation, not a ship component" } }
+    { "id": "planetary_shield_20", "name": "Planetary Shield XX", "techLevel": 42, "category": "special", "size": 0, "cost": 4000, "effect": { "bombardmentAbsorption": 20, "buildCost": 4000, "maintenance": 20, "note": "Planetary installation, not a ship component" } },
+    { "id": "death_spores", "name": "Death Spores", "techLevel": 25, "category": "weapon", "subtype": "bomb", "size": 3, "cost": 15, "effect": { "killsPopulation": true, "populationKillMin": 2, "populationKillMax": 4, "interceptable": false, "note": "Biological weapon, kills population not buildings" } },
+    { "id": "doom_virus", "name": "Doom Virus", "techLevel": 35, "category": "weapon", "subtype": "bomb", "size": 4, "cost": 20, "effect": { "killsPopulation": true, "populationKillMin": 4, "populationKillMax": 8, "interceptable": false, "note": "Biological weapon, kills population not buildings" } },
+    { "id": "bio_terminator", "name": "Bio Terminator", "techLevel": 45, "category": "weapon", "subtype": "bomb", "size": 5, "cost": 30, "effect": { "killsPopulation": true, "populationKillMin": 8, "populationKillMax": 16, "interceptable": false, "note": "Biological weapon, destroys all organic life" } }
   ]
 }

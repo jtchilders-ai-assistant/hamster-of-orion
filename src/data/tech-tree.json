@@ -1,0 +1,2325 @@
+{
+  "technologies": [
+    {
+      "id": "laser_tech",
+      "name": "Laser",
+      "field": "weapons",
+      "tier": 1,
+      "cost": 50,
+      "unlocks": [
+        "laser"
+      ],
+      "description": "Basic laser beam weapon. 1-4 damage, range 1. Universal starting weapon."
+    },
+    {
+      "id": "heavy_laser_tech",
+      "name": "Heavy Lasers",
+      "field": "weapons",
+      "tier": 1,
+      "cost": 50,
+      "unlocks": [
+        "heavy_laser"
+      ],
+      "description": "Heavy laser variant. 1-7 damage, range 2."
+    },
+    {
+      "id": "nuclear_missile_tech",
+      "name": "Nuclear Missile",
+      "field": "weapons",
+      "tier": 1,
+      "cost": 50,
+      "unlocks": [
+        "nuclear_missile"
+      ],
+      "description": "Basic missile. 4 damage, speed 2, +1 attack rating. Universal starting weapon."
+    },
+    {
+      "id": "hand_lasers_tech",
+      "name": "Hand Lasers",
+      "field": "weapons",
+      "tier": 1,
+      "cost": 50,
+      "unlocks": [
+        "hand_lasers"
+      ],
+      "description": "Sidearm lasers for ground troops. +5 ground combat bonus."
+    },
+    {
+      "id": "nuclear_bomb_tech",
+      "name": "Nuclear Bomb",
+      "field": "weapons",
+      "tier": 1,
+      "cost": 50,
+      "unlocks": [
+        "nuclear_bomb"
+      ],
+      "description": "Nuclear planetary bombardment weapon. 3-12 damage."
+    },
+    {
+      "id": "hyper_v_rockets_tech",
+      "name": "Hyper-V Rockets",
+      "field": "weapons",
+      "tier": 2,
+      "cost": 80,
+      "unlocks": [
+        "hyper_v_rocket"
+      ],
+      "description": "Improved rocket missile. 6 damage, speed 3, +1 attack rating."
+    },
+    {
+      "id": "gatling_laser_tech",
+      "name": "Gatling Laser",
+      "field": "weapons",
+      "tier": 2,
+      "cost": 80,
+      "unlocks": [
+        "gatling_laser"
+      ],
+      "description": "Rapid-fire laser. 1-4 damage \u00d7 4 attacks per round."
+    },
+    {
+      "id": "anti_missile_rockets_tech",
+      "name": "Anti-Missile Rockets",
+      "field": "weapons",
+      "tier": 2,
+      "cost": 80,
+      "unlocks": [
+        "anti_missile_rockets"
+      ],
+      "description": "Point defense system. Destroys 40% of incoming missiles (\u22121% per missile tech level)."
+    },
+    {
+      "id": "neutron_pellet_gun_tech",
+      "name": "Neutron Pellet Gun",
+      "field": "weapons",
+      "tier": 2,
+      "cost": 80,
+      "unlocks": [
+        "neutron_pellet_gun"
+      ],
+      "description": "Armor-piercing kinetic weapon. 2-5 damage, range 1."
+    },
+    {
+      "id": "hyper_x_rockets_tech",
+      "name": "Hyper-X Rockets",
+      "field": "weapons",
+      "tier": 3,
+      "cost": 150,
+      "unlocks": [
+        "hyper_x_rocket"
+      ],
+      "description": "Advanced rocket missile. 8 damage, speed 4, +1 attack rating."
+    },
+    {
+      "id": "fusion_bomb_tech",
+      "name": "Fusion Bomb",
+      "field": "weapons",
+      "tier": 3,
+      "cost": 150,
+      "unlocks": [
+        "fusion_bomb"
+      ],
+      "description": "Fusion planetary bombardment weapon. 5-20 damage."
+    },
+    {
+      "id": "ion_cannon_tech",
+      "name": "Ion Cannon",
+      "field": "weapons",
+      "tier": 4,
+      "cost": 250,
+      "unlocks": [
+        "ion_cannon"
+      ],
+      "description": "Energy weapon that halves enemy shields. 3-8 damage, range 1."
+    },
+    {
+      "id": "heavy_ion_cannon_tech",
+      "name": "Heavy Ion Cannon",
+      "field": "weapons",
+      "tier": 4,
+      "cost": 250,
+      "unlocks": [
+        "heavy_ion_cannon"
+      ],
+      "description": "Heavy shield-halving weapon. 3-15 damage, range 2."
+    },
+    {
+      "id": "scatter_pack_v_tech",
+      "name": "Scatter Pack V",
+      "field": "weapons",
+      "tier": 4,
+      "cost": 250,
+      "unlocks": [
+        "scatter_pack_v"
+      ],
+      "description": "MIRV missile with 5 warheads \u00d7 6 damage each."
+    },
+    {
+      "id": "gatling_laser_rifle_tech",
+      "name": "Gatling Laser Rifle",
+      "field": "weapons",
+      "tier": 4,
+      "cost": 250,
+      "unlocks": [
+        "gatling_laser_rifle"
+      ],
+      "description": "Rapid-fire infantry weapon. +10 ground combat bonus."
+    },
+    {
+      "id": "mass_driver_tech",
+      "name": "Mass Driver",
+      "field": "weapons",
+      "tier": 4,
+      "cost": 250,
+      "unlocks": [
+        "mass_driver"
+      ],
+      "description": "Electromagnetic mass driver. 5-8 damage, ignores 50% of shields."
+    },
+    {
+      "id": "merculite_missiles_tech",
+      "name": "Merculite Missiles",
+      "field": "weapons",
+      "tier": 4,
+      "cost": 250,
+      "unlocks": [
+        "merculite_missile"
+      ],
+      "description": "Mid-tier tracking missile. 10 damage, speed 4, +2 attack rating."
+    },
+    {
+      "id": "neutron_blaster_tech",
+      "name": "Neutron Blaster",
+      "field": "weapons",
+      "tier": 5,
+      "cost": 500,
+      "unlocks": [
+        "neutron_blaster"
+      ],
+      "description": "Crew-killing neutron weapon. 3-12 damage, range 1."
+    },
+    {
+      "id": "heavy_neutron_blaster_tech",
+      "name": "Heavy Neutron Blaster",
+      "field": "weapons",
+      "tier": 5,
+      "cost": 500,
+      "unlocks": [
+        "heavy_neutron_blaster"
+      ],
+      "description": "Heavy crew-killing neutron weapon. 3-24 damage, range 2."
+    },
+    {
+      "id": "graviton_beam_tech",
+      "name": "Graviton Beam",
+      "field": "weapons",
+      "tier": 5,
+      "cost": 500,
+      "unlocks": [
+        "graviton_beam"
+      ],
+      "description": "Long-range graviton weapon. 1-15 damage, range 3."
+    },
+    {
+      "id": "stinger_missiles_tech",
+      "name": "Stinger Missiles",
+      "field": "weapons",
+      "tier": 6,
+      "cost": 800,
+      "unlocks": [
+        "stinger_missile"
+      ],
+      "description": "High-accuracy tracking missile. 15 damage, speed 4.5, +3 attack rating."
+    },
+    {
+      "id": "hard_beam_tech",
+      "name": "Hard Beam",
+      "field": "weapons",
+      "tier": 6,
+      "cost": 800,
+      "unlocks": [
+        "hard_beam"
+      ],
+      "description": "No range-damage penalty beam. 8-12 damage, range 4."
+    },
+    {
+      "id": "fusion_beam_tech",
+      "name": "Fusion Beam",
+      "field": "weapons",
+      "tier": 6,
+      "cost": 800,
+      "unlocks": [
+        "fusion_beam"
+      ],
+      "description": "Powerful fusion energy beam. 4-16 damage, range 2."
+    },
+    {
+      "id": "anti_matter_bomb_tech",
+      "name": "Anti-Matter Bomb",
+      "field": "weapons",
+      "tier": 6,
+      "cost": 800,
+      "unlocks": [
+        "anti_matter_bomb"
+      ],
+      "description": "Anti-matter bombardment weapon. 10-40 damage."
+    },
+    {
+      "id": "heavy_fusion_beam_tech",
+      "name": "Heavy Fusion Beam",
+      "field": "weapons",
+      "tier": 6,
+      "cost": 800,
+      "unlocks": [
+        "heavy_fusion_beam"
+      ],
+      "description": "Heavy fusion beam variant. 4-30 damage, range 2."
+    },
+    {
+      "id": "ion_stream_projector_tech",
+      "name": "Ion Stream Projector",
+      "field": "weapons",
+      "tier": 7,
+      "cost": 1500,
+      "unlocks": [
+        "ion_stream_projector"
+      ],
+      "description": "Deals 20% of target's current HP as damage. Ignores armor class."
+    },
+    {
+      "id": "omega_v_bomb_tech",
+      "name": "Omega-V Bomb",
+      "field": "weapons",
+      "tier": 7,
+      "cost": 1500,
+      "unlocks": [
+        "omega_v_bomb"
+      ],
+      "description": "Devastating orbital bombardment weapon. 20-50 damage."
+    },
+    {
+      "id": "anti_matter_torpedoes_tech",
+      "name": "Anti-Matter Torpedoes",
+      "field": "weapons",
+      "tier": 7,
+      "cost": 1500,
+      "unlocks": [
+        "anti_matter_torpedo"
+      ],
+      "description": "Heavy anti-matter torpedo. 30 damage, cannot be intercepted."
+    },
+    {
+      "id": "fusion_rifle_tech",
+      "name": "Fusion Rifle",
+      "field": "weapons",
+      "tier": 8,
+      "cost": 2500,
+      "unlocks": [
+        "fusion_rifle"
+      ],
+      "description": "Advanced infantry fusion weapon. +20 ground combat bonus."
+    },
+    {
+      "id": "megabolt_cannon_tech",
+      "name": "Megabolt Cannon",
+      "field": "weapons",
+      "tier": 8,
+      "cost": 2500,
+      "unlocks": [
+        "megabolt_cannon"
+      ],
+      "description": "Chain-lightning cannon. 2-20 damage, arcs to up to 4 ships."
+    },
+    {
+      "id": "phasor_tech",
+      "name": "Phasor",
+      "field": "weapons",
+      "tier": 8,
+      "cost": 2500,
+      "unlocks": [
+        "phasor"
+      ],
+      "description": "Long-range precision energy weapon. 5-20 damage, range 4."
+    },
+    {
+      "id": "scatter_pack_vii_tech",
+      "name": "Scatter Pack VII",
+      "field": "weapons",
+      "tier": 8,
+      "cost": 2500,
+      "unlocks": [
+        "scatter_pack_vii"
+      ],
+      "description": "MIRV missile with 7 warheads \u00d7 10 damage each."
+    },
+    {
+      "id": "auto_blaster_tech",
+      "name": "Auto-Blaster",
+      "field": "weapons",
+      "tier": 9,
+      "cost": 4000,
+      "unlocks": [
+        "auto_blaster"
+      ],
+      "description": "Rapid-fire auto-targeting blaster. 4-16 damage \u00d7 3 attacks per round."
+    },
+    {
+      "id": "pulson_missiles_tech",
+      "name": "Pulson Missiles",
+      "field": "weapons",
+      "tier": 9,
+      "cost": 4000,
+      "unlocks": [
+        "pulson_missile"
+      ],
+      "description": "High-speed tracking missile. 20 damage, speed 5, +4 attack rating."
+    },
+    {
+      "id": "heavy_phasor_tech",
+      "name": "Heavy Phasor",
+      "field": "weapons",
+      "tier": 9,
+      "cost": 4000,
+      "unlocks": [
+        "heavy_phasor"
+      ],
+      "description": "Heavy phasor variant. 10-40 damage, range 4."
+    },
+    {
+      "id": "tachyon_beam_tech",
+      "name": "Tachyon Beam",
+      "field": "weapons",
+      "tier": 9,
+      "cost": 4000,
+      "unlocks": [
+        "tachyon_beam"
+      ],
+      "description": "Extreme-range tachyon weapon. 1-25 damage, range 6."
+    },
+    {
+      "id": "hand_phasors_tech",
+      "name": "Hand Phasors",
+      "field": "weapons",
+      "tier": 10,
+      "cost": 6000,
+      "unlocks": [
+        "hand_phasors"
+      ],
+      "description": "Advanced sidearm phasor. +25 ground combat bonus."
+    },
+    {
+      "id": "gauss_autocannon_tech",
+      "name": "Gauss Autocannon",
+      "field": "weapons",
+      "tier": 10,
+      "cost": 6000,
+      "unlocks": [
+        "gauss_autocannon"
+      ],
+      "description": "Rapid-fire gauss cannon. 7-10 damage \u00d7 4 attacks per round."
+    },
+    {
+      "id": "particle_beam_tech",
+      "name": "Particle Beam",
+      "field": "weapons",
+      "tier": 10,
+      "cost": 6000,
+      "unlocks": [
+        "particle_beam"
+      ],
+      "description": "High-energy particle beam. 10-20 damage, range 3."
+    },
+    {
+      "id": "hercular_missiles_tech",
+      "name": "Hercular Missiles",
+      "field": "weapons",
+      "tier": 11,
+      "cost": 8000,
+      "unlocks": [
+        "hercular_missile"
+      ],
+      "description": "Elite tracking missile. 25 damage, speed 5, +5 attack rating."
+    },
+    {
+      "id": "plasma_cannon_tech",
+      "name": "Plasma Cannon",
+      "field": "weapons",
+      "tier": 11,
+      "cost": 8000,
+      "unlocks": [
+        "plasma_cannon"
+      ],
+      "description": "Superheated plasma weapon. 6-30 damage, deals \u00d7 2 damage to shields."
+    },
+    {
+      "id": "disruptor_tech",
+      "name": "Disruptor",
+      "field": "weapons",
+      "tier": 11,
+      "cost": 8000,
+      "unlocks": [
+        "disruptor"
+      ],
+      "description": "Matter-disruption beam. 10-40 damage, range 2."
+    },
+    {
+      "id": "pulse_phasor_tech",
+      "name": "Pulse Phasor",
+      "field": "weapons",
+      "tier": 12,
+      "cost": 10000,
+      "unlocks": [
+        "pulse_phasor"
+      ],
+      "description": "Rapid-fire phasor. 5-20 damage \u00d7 3 attacks per round, range 4."
+    },
+    {
+      "id": "neutronium_bomb_tech",
+      "name": "Neutronium Bomb",
+      "field": "weapons",
+      "tier": 12,
+      "cost": 10000,
+      "unlocks": [
+        "neutronium_bomb"
+      ],
+      "description": "Ultra-dense orbital bombardment weapon. 40-70 damage."
+    },
+    {
+      "id": "hellfire_torpedo_tech",
+      "name": "Hellfire Torpedoes",
+      "field": "weapons",
+      "tier": 12,
+      "cost": 10000,
+      "unlocks": [
+        "hellfire_torpedo"
+      ],
+      "description": "Multi-burst heavy torpedo. 4 attacks \u00d7 25 damage each, cannot be intercepted."
+    },
+    {
+      "id": "zeon_missiles_tech",
+      "name": "Zeon Missiles",
+      "field": "weapons",
+      "tier": 12,
+      "cost": 10000,
+      "unlocks": [
+        "zeon_missile"
+      ],
+      "description": "Elite fast-tracking missile. 30 damage, speed 6, +7 attack rating."
+    },
+    {
+      "id": "plasma_rifle_tech",
+      "name": "Plasma Rifle",
+      "field": "weapons",
+      "tier": 13,
+      "cost": 14000,
+      "unlocks": [
+        "plasma_rifle"
+      ],
+      "description": "Elite plasma infantry weapon. +30 ground combat bonus."
+    },
+    {
+      "id": "proton_torpedo_tech",
+      "name": "Proton Torpedo",
+      "field": "weapons",
+      "tier": 13,
+      "cost": 14000,
+      "unlocks": [
+        "proton_torpedo"
+      ],
+      "description": "Heavy proton torpedo. 75 damage, cannot be intercepted."
+    },
+    {
+      "id": "scatter_pack_x_tech",
+      "name": "Scatter Pack X",
+      "field": "weapons",
+      "tier": 13,
+      "cost": 14000,
+      "unlocks": [
+        "scatter_pack_x"
+      ],
+      "description": "Ultimate MIRV missile with 10 warheads \u00d7 15 damage each."
+    },
+    {
+      "id": "tri_focus_plasma_cannon_tech",
+      "name": "Tri-Focus Plasma Cannon",
+      "field": "weapons",
+      "tier": 14,
+      "cost": 18000,
+      "unlocks": [
+        "tri_focus_plasma_cannon"
+      ],
+      "description": "Triple-focused plasma weapon. 20-50 damage."
+    },
+    {
+      "id": "death_ray_tech",
+      "name": "Death Ray",
+      "field": "weapons",
+      "tier": 14,
+      "cost": 18000,
+      "unlocks": [
+        "death_ray"
+      ],
+      "description": "Devastating energy weapon. 200-1000 damage, ignores shields, instantly destroys small ships."
+    },
+    {
+      "id": "stellar_converter_tech",
+      "name": "Stellar Converter",
+      "field": "weapons",
+      "tier": 14,
+      "cost": 18000,
+      "unlocks": [
+        "stellar_converter"
+      ],
+      "description": "Planet-destroying weapon of mass destruction. 10-35 damage \u00d7 4 attacks."
+    },
+    {
+      "id": "neutron_stream_projector_tech",
+      "name": "Neutron Stream Projector",
+      "field": "weapons",
+      "tier": 15,
+      "cost": 24000,
+      "unlocks": [
+        "neutron_stream_projector"
+      ],
+      "description": "Deals 40% of target's current HP as damage. Upgraded Ion Stream Projector."
+    },
+    {
+      "id": "mauler_device_tech",
+      "name": "Mauler Device",
+      "field": "weapons",
+      "tier": 15,
+      "cost": 24000,
+      "unlocks": [
+        "mauler_device"
+      ],
+      "description": "Ultimate precision beam. 20-100 damage, 100% accuracy."
+    },
+    {
+      "id": "plasma_torpedo_tech",
+      "name": "Plasma Torpedo",
+      "field": "weapons",
+      "tier": 16,
+      "cost": 30000,
+      "unlocks": [
+        "plasma_torpedo"
+      ],
+      "description": "Ultimate torpedo. 150 damage (\u221215 per hex traveled), cannot be intercepted."
+    },
+    {
+      "id": "mauler_pistol_tech",
+      "name": "Mauler Pistol",
+      "field": "weapons",
+      "tier": 16,
+      "cost": 30000,
+      "unlocks": [
+        "mauler_pistol"
+      ],
+      "description": "Ultimate infantry sidearm. +35 ground combat bonus."
+    },
+    {
+      "id": "retro_engines_tech",
+      "name": "Retro Engines",
+      "field": "propulsion",
+      "tier": 1,
+      "cost": 50,
+      "unlocks": [
+        "retro_engines"
+      ],
+      "description": "Basic interstellar engines. Warp 1, Combat 1, Maneuver 1. Universal starting propulsion."
+    },
+    {
+      "id": "standard_fuel_cells_tech",
+      "name": "Standard Fuel Cells",
+      "field": "propulsion",
+      "tier": 1,
+      "cost": 50,
+      "unlocks": [
+        "standard_fuel_cells"
+      ],
+      "description": "Basic fuel cells. Range 4 parsecs."
+    },
+    {
+      "id": "range_fuel_cells_tech",
+      "name": "Range Fuel Cells",
+      "field": "propulsion",
+      "tier": 1,
+      "cost": 50,
+      "unlocks": [
+        "range_fuel_cells"
+      ],
+      "description": "Extended fuel cells. Range 5 parsecs."
+    },
+    {
+      "id": "deuterium_fuel_tech",
+      "name": "Deuterium Fuel Cells",
+      "field": "propulsion",
+      "tier": 2,
+      "cost": 80,
+      "unlocks": [
+        "deuterium_fuel_cells"
+      ],
+      "description": "Deuterium-based fuel cells. Range 6 parsecs."
+    },
+    {
+      "id": "nuclear_engines_tech",
+      "name": "Nuclear Engines",
+      "field": "propulsion",
+      "tier": 2,
+      "cost": 80,
+      "unlocks": [
+        "nuclear_engines"
+      ],
+      "description": "Nuclear fission engines. Warp 2, Combat 2, Maneuver 1."
+    },
+    {
+      "id": "reserve_fuel_tanks_tech",
+      "name": "Reserve Fuel Tanks",
+      "field": "propulsion",
+      "tier": 2,
+      "cost": 80,
+      "unlocks": [
+        "reserve_fuel_tanks"
+      ],
+      "description": "Supplemental fuel tank. +3 additional range (ship component)."
+    },
+    {
+      "id": "inertial_stabilizer_tech",
+      "name": "Inertial Stabilizer",
+      "field": "propulsion",
+      "tier": 3,
+      "cost": 150,
+      "unlocks": [
+        "inertial_stabilizer"
+      ],
+      "description": "Combat stabilizer. +2 Defense, +2 Initiative in combat."
+    },
+    {
+      "id": "sub_light_drives_tech",
+      "name": "Sub-Light Drives",
+      "field": "propulsion",
+      "tier": 3,
+      "cost": 150,
+      "unlocks": [
+        "sub_light_drives"
+      ],
+      "description": "Improved drives for better combat maneuvering. Warp 2, Combat 3, Maneuver 2."
+    },
+    {
+      "id": "dotomite_crystals_tech",
+      "name": "Dotomite Crystals",
+      "field": "propulsion",
+      "tier": 4,
+      "cost": 250,
+      "unlocks": [
+        "dotomite_crystals"
+      ],
+      "description": "Crystal-matrix fuel cells. Range 7 parsecs."
+    },
+    {
+      "id": "extended_reserve_tanks_tech",
+      "name": "Extended Reserve Tanks",
+      "field": "propulsion",
+      "tier": 4,
+      "cost": 250,
+      "unlocks": [
+        "extended_reserve_tanks"
+      ],
+      "description": "Large auxiliary fuel tanks. +5 additional range (ship component)."
+    },
+    {
+      "id": "energy_pulsar_tech",
+      "name": "Energy Pulsar",
+      "field": "propulsion",
+      "tier": 4,
+      "cost": 250,
+      "unlocks": [
+        "energy_pulsar"
+      ],
+      "description": "Area-effect energy burst. 5 damage to all adjacent ships + 1 per 2 firing ships. Indiscriminate."
+    },
+    {
+      "id": "fusion_drives_tech",
+      "name": "Fusion Drives",
+      "field": "propulsion",
+      "tier": 5,
+      "cost": 500,
+      "unlocks": [
+        "fusion_drives"
+      ],
+      "description": "Fusion-powered engines. Warp 3, Combat 3, Maneuver 2."
+    },
+    {
+      "id": "uridium_fuel_tech",
+      "name": "Uridium Fuel Cells",
+      "field": "propulsion",
+      "tier": 5,
+      "cost": 500,
+      "unlocks": [
+        "uridium_fuel_cells"
+      ],
+      "description": "High-energy uridium fuel cells. Range 8 parsecs."
+    },
+    {
+      "id": "warp_dissipator_tech",
+      "name": "Warp Dissipator",
+      "field": "propulsion",
+      "tier": 5,
+      "cost": 500,
+      "unlocks": [
+        "warp_dissipator"
+      ],
+      "description": "Warp field suppressor. Prevents all enemy fleet retreat from combat zone."
+    },
+    {
+      "id": "reajax_fuel_tech",
+      "name": "Reajax II Fuel Cells",
+      "field": "propulsion",
+      "tier": 6,
+      "cost": 800,
+      "unlocks": [
+        "reajax_ii_fuel_cells"
+      ],
+      "description": "High-capacity Reajax fuel cells. Range 9 parsecs."
+    },
+    {
+      "id": "impulse_drives_tech",
+      "name": "Impulse Drives",
+      "field": "propulsion",
+      "tier": 6,
+      "cost": 800,
+      "unlocks": [
+        "impulse_drives"
+      ],
+      "description": "Advanced impulse engines. Warp 3, Combat 4, Maneuver 2."
+    },
+    {
+      "id": "star_gates_tech",
+      "name": "Intergalactic Star Gates",
+      "field": "propulsion",
+      "tier": 7,
+      "cost": 1500,
+      "unlocks": [
+        "intergalactic_star_gates"
+      ],
+      "description": "Instantaneous travel infrastructure. Ships travel to any owned colony in 1 turn. Build cost: 3,000 BC."
+    },
+    {
+      "id": "trilithium_crystals_tech",
+      "name": "Trilithium Crystals",
+      "field": "propulsion",
+      "tier": 7,
+      "cost": 1500,
+      "unlocks": [
+        "trilithium_crystals"
+      ],
+      "description": "Ultra-dense trilithium fuel. Range 10 parsecs."
+    },
+    {
+      "id": "ion_drives_tech",
+      "name": "Ion Drives",
+      "field": "propulsion",
+      "tier": 7,
+      "cost": 1500,
+      "unlocks": [
+        "ion_drives"
+      ],
+      "description": "Ion propulsion engines. Warp 4, Combat 4, Maneuver 3."
+    },
+    {
+      "id": "high_energy_focus_tech",
+      "name": "High Energy Focus",
+      "field": "propulsion",
+      "tier": 8,
+      "cost": 2500,
+      "unlocks": [
+        "high_energy_focus"
+      ],
+      "description": "Combat energy focusing system. +2 Initiative, +1 Attack rating."
+    },
+    {
+      "id": "antimatter_drives_tech",
+      "name": "Antimatter Drives",
+      "field": "propulsion",
+      "tier": 8,
+      "cost": 2500,
+      "unlocks": [
+        "antimatter_drives"
+      ],
+      "description": "Antimatter annihilation engines. Warp 5, Combat 5, Maneuver 3."
+    },
+    {
+      "id": "iridium_fuel_tech",
+      "name": "Iridium Fuel Cells",
+      "field": "propulsion",
+      "tier": 9,
+      "cost": 4000,
+      "unlocks": [
+        "iridium_fuel_cells"
+      ],
+      "description": "Maximum conventional fuel cells. Range 11 parsecs."
+    },
+    {
+      "id": "subspace_teleporter_tech",
+      "name": "Sub-Space Teleporter",
+      "field": "propulsion",
+      "tier": 9,
+      "cost": 4000,
+      "unlocks": [
+        "sub_space_teleporter"
+      ],
+      "description": "Instantaneous combat teleportation. Teleport to any hex in combat."
+    },
+    {
+      "id": "ionic_pulsar_tech",
+      "name": "Ionic Pulsar",
+      "field": "propulsion",
+      "tier": 9,
+      "cost": 4000,
+      "unlocks": [
+        "ionic_pulsar"
+      ],
+      "description": "Heavy area-effect ion burst. 10 damage to all adjacent ships + 1 per 2 firing ships. Indiscriminate."
+    },
+    {
+      "id": "thorium_cells_tech",
+      "name": "Thorium Cells",
+      "field": "propulsion",
+      "tier": 10,
+      "cost": 6000,
+      "unlocks": [
+        "thorium_cells"
+      ],
+      "description": "Infinite-range thorium fuel cells. Unlimited range, eliminates logistics constraints."
+    },
+    {
+      "id": "interphased_drives_tech",
+      "name": "Interphased Drives",
+      "field": "propulsion",
+      "tier": 10,
+      "cost": 6000,
+      "unlocks": [
+        "interphased_drives"
+      ],
+      "description": "Interphased propulsion. Warp 6, Combat 6, Maneuver 4."
+    },
+    {
+      "id": "subspace_interdictor_tech",
+      "name": "Sub-Space Interdictor",
+      "field": "propulsion",
+      "tier": 10,
+      "cost": 6000,
+      "unlocks": [
+        "sub_space_interdictor"
+      ],
+      "description": "Nullifies Sub-Space Teleporters in all systems containing owned planets."
+    },
+    {
+      "id": "combat_transporters_tech",
+      "name": "Combat Transporters",
+      "field": "propulsion",
+      "tier": 11,
+      "cost": 8000,
+      "unlocks": [
+        "combat_transporters"
+      ],
+      "description": "Short-range combat transporters. Board and capture enemy ships in battle."
+    },
+    {
+      "id": "inertial_nullifier_tech",
+      "name": "Inertial Nullifier",
+      "field": "propulsion",
+      "tier": 11,
+      "cost": 8000,
+      "unlocks": [
+        "inertial_nullifier"
+      ],
+      "description": "Inertia-canceling field. +4 Defense, +4 Initiative in combat."
+    },
+    {
+      "id": "hyperdrives_tech",
+      "name": "Hyperdrives",
+      "field": "propulsion",
+      "tier": 12,
+      "cost": 10000,
+      "unlocks": [
+        "hyperdrives"
+      ],
+      "description": "Hyperspace propulsion. Warp 7, Combat 7, Maneuver 4."
+    },
+    {
+      "id": "displacement_device_tech",
+      "name": "Displacement Device",
+      "field": "propulsion",
+      "tier": 12,
+      "cost": 10000,
+      "unlocks": [
+        "displacement_device"
+      ],
+      "description": "Probabilistic displacement field. 33% chance to avoid any incoming hit."
+    },
+    {
+      "id": "hyper_x_drives_tech",
+      "name": "Hyper-X Drives",
+      "field": "propulsion",
+      "tier": 13,
+      "cost": 14000,
+      "unlocks": [
+        "hyper_x_drives"
+      ],
+      "description": "Advanced hyperdrive. Warp 8, Combat 8, Maneuver 5."
+    },
+    {
+      "id": "hyperspace_flux_tech",
+      "name": "Hyper-Space Flux",
+      "field": "propulsion",
+      "tier": 13,
+      "cost": 14000,
+      "unlocks": [],
+      "description": "Empire-wide speed enhancement. All ships gain +1 speed."
+    },
+    {
+      "id": "temporal_drive_tech",
+      "name": "Temporal Drive",
+      "field": "propulsion",
+      "tier": 14,
+      "cost": 18000,
+      "unlocks": [
+        "temporal_drive"
+      ],
+      "description": "Temporal distortion engines. Warp 9, Combat 9, Maneuver 6. Ultimate propulsion."
+    },
+    {
+      "id": "titanium_armor_tech",
+      "name": "Titanium Armor",
+      "field": "construction",
+      "tier": 1,
+      "cost": 50,
+      "unlocks": [
+        "titanium_armor"
+      ],
+      "description": "Standard titanium hull plating. Base HP (1.0\u00d7), no ground combat bonus. Universal starting armor."
+    },
+    {
+      "id": "standard_construction_tech",
+      "name": "Standard Construction",
+      "field": "construction",
+      "tier": 1,
+      "cost": 50,
+      "unlocks": [],
+      "description": "Standard factory construction methods. Factory cost: 10 BC each."
+    },
+    {
+      "id": "industrial_tech_9",
+      "name": "Industrial Tech 9",
+      "field": "construction",
+      "tier": 1,
+      "cost": 50,
+      "unlocks": [],
+      "description": "Improved industrial efficiency. Factory cost reduced to 9 BC."
+    },
+    {
+      "id": "reduced_waste_80_tech",
+      "name": "Reduced Industrial Waste 80%",
+      "field": "construction",
+      "tier": 2,
+      "cost": 80,
+      "unlocks": [],
+      "description": "Early pollution control. Factories produce only 80% normal waste."
+    },
+    {
+      "id": "industrial_tech_8",
+      "name": "Industrial Tech 8",
+      "field": "construction",
+      "tier": 2,
+      "cost": 80,
+      "unlocks": [],
+      "description": "Improved factory efficiency. Factory cost reduced to 8 BC."
+    },
+    {
+      "id": "duralloy_armor_tech",
+      "name": "Duralloy Armor",
+      "field": "construction",
+      "tier": 3,
+      "cost": 150,
+      "unlocks": [
+        "duralloy_armor"
+      ],
+      "description": "Duralloy composite armor. HP \u00d7 1.5, +5 ground combat bonus."
+    },
+    {
+      "id": "battle_suits_tech",
+      "name": "Battle Suits",
+      "field": "construction",
+      "tier": 3,
+      "cost": 150,
+      "unlocks": [
+        "battle_suits"
+      ],
+      "description": "Powered infantry combat suits. +10 ground combat bonus."
+    },
+    {
+      "id": "industrial_tech_7",
+      "name": "Industrial Tech 7",
+      "field": "construction",
+      "tier": 4,
+      "cost": 250,
+      "unlocks": [],
+      "description": "Advanced industrial processes. Factory cost reduced to 7 BC."
+    },
+    {
+      "id": "automated_repair_tech",
+      "name": "Automated Repair Unit",
+      "field": "construction",
+      "tier": 4,
+      "cost": 250,
+      "unlocks": [
+        "automated_repair_unit"
+      ],
+      "description": "In-combat repair nanobots. Restores 15% HP per combat turn."
+    },
+    {
+      "id": "improved_hull_space_tech",
+      "name": "Improved Hull Space",
+      "field": "construction",
+      "tier": 4,
+      "cost": 250,
+      "unlocks": [],
+      "description": "Hull redesign for better component capacity. +20% hull space for all ship sizes."
+    },
+    {
+      "id": "reduced_waste_60_tech",
+      "name": "Reduced Industrial Waste 60%",
+      "field": "construction",
+      "tier": 4,
+      "cost": 250,
+      "unlocks": [],
+      "description": "Improved pollution controls. Factories produce only 60% normal waste."
+    },
+    {
+      "id": "zortrium_armor_tech",
+      "name": "Zortrium Armor",
+      "field": "construction",
+      "tier": 5,
+      "cost": 500,
+      "unlocks": [
+        "zortrium_armor"
+      ],
+      "description": "Zortrium crystal armor plating. HP \u00d7 2.0, +10 ground combat bonus."
+    },
+    {
+      "id": "industrial_tech_6",
+      "name": "Industrial Tech 6",
+      "field": "construction",
+      "tier": 5,
+      "cost": 500,
+      "unlocks": [],
+      "description": "Efficient factory design. Factory cost reduced to 6 BC."
+    },
+    {
+      "id": "advanced_hull_space_tech",
+      "name": "Advanced Hull Space",
+      "field": "construction",
+      "tier": 6,
+      "cost": 800,
+      "unlocks": [],
+      "description": "Advanced hull engineering. +40% hull space for all ship sizes."
+    },
+    {
+      "id": "industrial_tech_5",
+      "name": "Industrial Tech 5",
+      "field": "construction",
+      "tier": 6,
+      "cost": 800,
+      "unlocks": [],
+      "description": "Mass-production optimization. Factory cost reduced to 5 BC."
+    },
+    {
+      "id": "armored_exoskeleton_tech",
+      "name": "Armored Exoskeleton",
+      "field": "construction",
+      "tier": 7,
+      "cost": 1500,
+      "unlocks": [
+        "armored_exoskeleton"
+      ],
+      "description": "Powered exoskeleton armor. +20 ground combat bonus."
+    },
+    {
+      "id": "andrium_armor_tech",
+      "name": "Andrium Armor",
+      "field": "construction",
+      "tier": 7,
+      "cost": 1500,
+      "unlocks": [
+        "andrium_armor"
+      ],
+      "description": "Andrium alloy armor. HP \u00d7 2.5, +15 ground combat bonus."
+    },
+    {
+      "id": "reduced_waste_40_tech",
+      "name": "Reduced Industrial Waste 40%",
+      "field": "construction",
+      "tier": 7,
+      "cost": 1500,
+      "unlocks": [],
+      "description": "Advanced pollution controls. Factories produce only 40% normal waste."
+    },
+    {
+      "id": "industrial_tech_4",
+      "name": "Industrial Tech 4",
+      "field": "construction",
+      "tier": 8,
+      "cost": 2500,
+      "unlocks": [],
+      "description": "Robotic assembly lines. Factory cost reduced to 4 BC."
+    },
+    {
+      "id": "superior_hull_space_tech",
+      "name": "Superior Hull Space",
+      "field": "construction",
+      "tier": 8,
+      "cost": 2500,
+      "unlocks": [],
+      "description": "Superior hull design. +60% hull space for all ship sizes."
+    },
+    {
+      "id": "industrial_tech_3",
+      "name": "Industrial Tech 3",
+      "field": "construction",
+      "tier": 9,
+      "cost": 4000,
+      "unlocks": [],
+      "description": "Nano-fabrication processes. Factory cost reduced to 3 BC."
+    },
+    {
+      "id": "tritanium_armor_tech",
+      "name": "Tritanium Armor",
+      "field": "construction",
+      "tier": 9,
+      "cost": 4000,
+      "unlocks": [
+        "tritanium_armor"
+      ],
+      "description": "Tritanium composite armor. HP \u00d7 3.0, +20 ground combat bonus."
+    },
+    {
+      "id": "reduced_waste_20_tech",
+      "name": "Reduced Industrial Waste 20%",
+      "field": "construction",
+      "tier": 10,
+      "cost": 6000,
+      "unlocks": [],
+      "description": "Near-clean production. Factories produce only 20% normal waste."
+    },
+    {
+      "id": "advanced_damage_control_tech",
+      "name": "Advanced Damage Control",
+      "field": "construction",
+      "tier": 10,
+      "cost": 6000,
+      "unlocks": [
+        "advanced_damage_control"
+      ],
+      "description": "Advanced in-combat repair system. Restores 30% HP per combat turn."
+    },
+    {
+      "id": "industrial_tech_2",
+      "name": "Industrial Tech 2",
+      "field": "construction",
+      "tier": 10,
+      "cost": 6000,
+      "unlocks": [],
+      "description": "Automated micro-fabrication. Factory cost reduced to 2 BC."
+    },
+    {
+      "id": "maximum_hull_space_tech",
+      "name": "Maximum Hull Space",
+      "field": "construction",
+      "tier": 11,
+      "cost": 8000,
+      "unlocks": [],
+      "description": "Ultimate hull configuration. +80% hull space for all ship sizes."
+    },
+    {
+      "id": "powered_armor_tech",
+      "name": "Powered Armor",
+      "field": "construction",
+      "tier": 11,
+      "cost": 8000,
+      "unlocks": [
+        "powered_armor"
+      ],
+      "description": "Full powered assault armor. +30 ground combat bonus. Replaces Armored Exoskeleton."
+    },
+    {
+      "id": "adamantium_armor_tech",
+      "name": "Adamantium Armor",
+      "field": "construction",
+      "tier": 11,
+      "cost": 8000,
+      "unlocks": [
+        "adamantium_armor"
+      ],
+      "description": "Adamantium super-alloy armor. HP \u00d7 3.5, +25 ground combat bonus."
+    },
+    {
+      "id": "waste_elimination_tech",
+      "name": "Industrial Waste Elimination",
+      "field": "construction",
+      "tier": 12,
+      "cost": 10000,
+      "unlocks": [],
+      "description": "Zero-emission factory technology. Factories produce 0% waste."
+    },
+    {
+      "id": "neutronium_armor_tech",
+      "name": "Neutronium Armor",
+      "field": "construction",
+      "tier": 13,
+      "cost": 14000,
+      "unlocks": [
+        "neutronium_armor"
+      ],
+      "description": "Ultra-dense neutronium armor. HP \u00d7 4.0, +30 ground combat bonus. Ultimate armor."
+    },
+    {
+      "id": "battle_computer_1_tech",
+      "name": "Battle Computer I",
+      "field": "computers",
+      "tier": 1,
+      "cost": 50,
+      "unlocks": [
+        "battle_computer_1"
+      ],
+      "description": "Basic combat targeting computer. +1 Attack Rating. Universal starting computer."
+    },
+    {
+      "id": "robotic_controls_2_tech",
+      "name": "Robotic Controls II",
+      "field": "computers",
+      "tier": 1,
+      "cost": 50,
+      "unlocks": [],
+      "description": "Basic robotic factory control. 2 factories per population unit."
+    },
+    {
+      "id": "battle_scanner_tech",
+      "name": "Battle Scanner",
+      "field": "computers",
+      "tier": 1,
+      "cost": 50,
+      "unlocks": [
+        "battle_scanner"
+      ],
+      "description": "Advanced combat sensor suite. +3 Initiative, +1 targeting bonus, reveals enemy stats."
+    },
+    {
+      "id": "deep_space_scanner_tech",
+      "name": "Deep Space Scanner",
+      "field": "computers",
+      "tier": 1,
+      "cost": 50,
+      "unlocks": [
+        "deep_space_scanner"
+      ],
+      "description": "Deep-space colony detection. Colony detect range: 5 parsecs, ship detect: 1 parsec."
+    },
+    {
+      "id": "battle_computer_2_tech",
+      "name": "Battle Computer II",
+      "field": "computers",
+      "tier": 2,
+      "cost": 80,
+      "unlocks": [
+        "battle_computer_2"
+      ],
+      "description": "Improved combat computer. +2 Attack Rating.",
+      "prerequisite": "battle_computer_1_tech"
+    },
+    {
+      "id": "ecm_jammer_1_tech",
+      "name": "ECM Jammer I",
+      "field": "computers",
+      "tier": 2,
+      "cost": 80,
+      "unlocks": [
+        "ecm_jammer_1"
+      ],
+      "description": "Electronic countermeasures. +1 Missile Defense Rating."
+    },
+    {
+      "id": "robotic_controls_3_tech",
+      "name": "Robotic Controls III",
+      "field": "computers",
+      "tier": 2,
+      "cost": 80,
+      "unlocks": [],
+      "description": "Advanced robotic control. 3 factories per population unit.",
+      "prerequisite": "robotic_controls_2_tech"
+    },
+    {
+      "id": "battle_computer_3_tech",
+      "name": "Battle Computer III",
+      "field": "computers",
+      "tier": 3,
+      "cost": 150,
+      "unlocks": [
+        "battle_computer_3"
+      ],
+      "description": "Enhanced targeting matrix. +3 Attack Rating.",
+      "prerequisite": "battle_computer_2_tech"
+    },
+    {
+      "id": "ecm_jammer_2_tech",
+      "name": "ECM Jammer II",
+      "field": "computers",
+      "tier": 3,
+      "cost": 150,
+      "unlocks": [
+        "ecm_jammer_2"
+      ],
+      "description": "Improved ECM system. +2 Missile Defense Rating.",
+      "prerequisite": "ecm_jammer_1_tech"
+    },
+    {
+      "id": "battle_computer_4_tech",
+      "name": "Battle Computer IV",
+      "field": "computers",
+      "tier": 4,
+      "cost": 250,
+      "unlocks": [
+        "battle_computer_4"
+      ],
+      "description": "Superior combat computer. +4 Attack Rating.",
+      "prerequisite": "battle_computer_3_tech"
+    },
+    {
+      "id": "ecm_jammer_3_tech",
+      "name": "ECM Jammer III",
+      "field": "computers",
+      "tier": 4,
+      "cost": 250,
+      "unlocks": [
+        "ecm_jammer_3"
+      ],
+      "description": "Advanced ECM suite. +3 Missile Defense Rating.",
+      "prerequisite": "ecm_jammer_2_tech"
+    },
+    {
+      "id": "improved_scanner_tech",
+      "name": "Improved Space Scanner",
+      "field": "computers",
+      "tier": 4,
+      "cost": 250,
+      "unlocks": [
+        "improved_space_scanner"
+      ],
+      "description": "Long-range scanner with ETA data. Colony: 7, Ship: 2 parsec range.",
+      "prerequisite": "deep_space_scanner_tech"
+    },
+    {
+      "id": "ecm_jammer_4_tech",
+      "name": "ECM Jammer IV",
+      "field": "computers",
+      "tier": 5,
+      "cost": 500,
+      "unlocks": [
+        "ecm_jammer_4"
+      ],
+      "description": "High-grade ECM. +4 Missile Defense Rating.",
+      "prerequisite": "ecm_jammer_3_tech"
+    },
+    {
+      "id": "robotic_controls_4_tech",
+      "name": "Robotic Controls IV",
+      "field": "computers",
+      "tier": 5,
+      "cost": 500,
+      "unlocks": [],
+      "description": "Superior robotic automation. 4 factories per population unit.",
+      "prerequisite": "robotic_controls_3_tech"
+    },
+    {
+      "id": "battle_computer_5_tech",
+      "name": "Battle Computer V",
+      "field": "computers",
+      "tier": 6,
+      "cost": 800,
+      "unlocks": [
+        "battle_computer_5"
+      ],
+      "description": "Advanced targeting AI. +5 Attack Rating.",
+      "prerequisite": "battle_computer_4_tech"
+    },
+    {
+      "id": "ecm_jammer_5_tech",
+      "name": "ECM Jammer V",
+      "field": "computers",
+      "tier": 6,
+      "cost": 800,
+      "unlocks": [
+        "ecm_jammer_5"
+      ],
+      "description": "Advanced missile ECM. +5 Missile Defense Rating.",
+      "prerequisite": "ecm_jammer_4_tech"
+    },
+    {
+      "id": "advanced_scanner_tech",
+      "name": "Advanced Space Scanner",
+      "field": "computers",
+      "tier": 6,
+      "cost": 800,
+      "unlocks": [
+        "advanced_space_scanner"
+      ],
+      "description": "Advanced reconnaissance scanner. Colony: 9, Ship: 3 parsec range, reveals planet stats.",
+      "prerequisite": "improved_scanner_tech"
+    },
+    {
+      "id": "battle_computer_6_tech",
+      "name": "Battle Computer VI",
+      "field": "computers",
+      "tier": 7,
+      "cost": 1500,
+      "unlocks": [
+        "battle_computer_6"
+      ],
+      "description": "Elite combat computer. +6 Attack Rating.",
+      "prerequisite": "battle_computer_5_tech"
+    },
+    {
+      "id": "ecm_jammer_6_tech",
+      "name": "ECM Jammer VI",
+      "field": "computers",
+      "tier": 7,
+      "cost": 1500,
+      "unlocks": [
+        "ecm_jammer_6"
+      ],
+      "description": "Elite missile ECM. +6 Missile Defense Rating.",
+      "prerequisite": "ecm_jammer_5_tech"
+    },
+    {
+      "id": "robotic_controls_5_tech",
+      "name": "Robotic Controls V",
+      "field": "computers",
+      "tier": 7,
+      "cost": 1500,
+      "unlocks": [],
+      "description": "Near-fully automated factories. 5 factories per population unit.",
+      "prerequisite": "robotic_controls_4_tech"
+    },
+    {
+      "id": "battle_computer_7_tech",
+      "name": "Battle Computer VII",
+      "field": "computers",
+      "tier": 8,
+      "cost": 2500,
+      "unlocks": [
+        "battle_computer_7"
+      ],
+      "description": "Superior targeting matrix. +7 Attack Rating.",
+      "prerequisite": "battle_computer_6_tech"
+    },
+    {
+      "id": "ecm_jammer_7_tech",
+      "name": "ECM Jammer VII",
+      "field": "computers",
+      "tier": 9,
+      "cost": 4000,
+      "unlocks": [
+        "ecm_jammer_7"
+      ],
+      "description": "Superior ECM system. +7 Missile Defense Rating.",
+      "prerequisite": "ecm_jammer_6_tech"
+    },
+    {
+      "id": "hyperspace_comm_tech",
+      "name": "Hyperspace Communications",
+      "field": "computers",
+      "tier": 9,
+      "cost": 4000,
+      "unlocks": [
+        "hyperspace_communications"
+      ],
+      "description": "Faster-than-light fleet communications. Reroute fleets currently in transit."
+    },
+    {
+      "id": "subspace_scanner_tech",
+      "name": "Subspace Scanner",
+      "field": "computers",
+      "tier": 9,
+      "cost": 4000,
+      "unlocks": [
+        "subspace_scanner"
+      ],
+      "description": "Subspace detection array. Colony: 12, Ship: 4 parsec range.",
+      "prerequisite": "advanced_scanner_tech"
+    },
+    {
+      "id": "battle_computer_8_tech",
+      "name": "Battle Computer VIII",
+      "field": "computers",
+      "tier": 10,
+      "cost": 6000,
+      "unlocks": [
+        "battle_computer_8"
+      ],
+      "description": "Expert targeting system. +8 Attack Rating.",
+      "prerequisite": "battle_computer_7_tech"
+    },
+    {
+      "id": "ecm_jammer_8_tech",
+      "name": "ECM Jammer VIII",
+      "field": "computers",
+      "tier": 10,
+      "cost": 6000,
+      "unlocks": [
+        "ecm_jammer_8"
+      ],
+      "description": "Expert ECM defense. +8 Missile Defense Rating.",
+      "prerequisite": "ecm_jammer_7_tech"
+    },
+    {
+      "id": "robotic_controls_6_tech",
+      "name": "Robotic Controls VI",
+      "field": "computers",
+      "tier": 10,
+      "cost": 6000,
+      "unlocks": [],
+      "description": "Fully automated factory systems. 6 factories per population unit.",
+      "prerequisite": "robotic_controls_5_tech"
+    },
+    {
+      "id": "battle_computer_9_tech",
+      "name": "Battle Computer IX",
+      "field": "computers",
+      "tier": 11,
+      "cost": 8000,
+      "unlocks": [
+        "battle_computer_9"
+      ],
+      "description": "Master targeting AI. +9 Attack Rating.",
+      "prerequisite": "battle_computer_8_tech"
+    },
+    {
+      "id": "ecm_jammer_9_tech",
+      "name": "ECM Jammer IX",
+      "field": "computers",
+      "tier": 11,
+      "cost": 8000,
+      "unlocks": [
+        "ecm_jammer_9"
+      ],
+      "description": "Master ECM suite. +9 Missile Defense Rating.",
+      "prerequisite": "ecm_jammer_8_tech"
+    },
+    {
+      "id": "battle_computer_10_tech",
+      "name": "Battle Computer X",
+      "field": "computers",
+      "tier": 12,
+      "cost": 10000,
+      "unlocks": [
+        "battle_computer_10"
+      ],
+      "description": "Near-perfect targeting computer. +10 Attack Rating.",
+      "prerequisite": "battle_computer_9_tech"
+    },
+    {
+      "id": "hyper_scanner_tech",
+      "name": "Hyper Scanner",
+      "field": "computers",
+      "tier": 12,
+      "cost": 10000,
+      "unlocks": [
+        "hyper_scanner"
+      ],
+      "description": "Ultimate sensor array. Colony: 15, Ship: 5 parsec range, detects cloaked ships.",
+      "prerequisite": "subspace_scanner_tech"
+    },
+    {
+      "id": "oracle_interface_tech",
+      "name": "Oracle Interface",
+      "field": "computers",
+      "tier": 12,
+      "cost": 10000,
+      "unlocks": [
+        "oracle_interface"
+      ],
+      "description": "Quantum targeting oracle. All weapons become armor-piercing."
+    },
+    {
+      "id": "ecm_jammer_10_tech",
+      "name": "ECM Jammer X",
+      "field": "computers",
+      "tier": 13,
+      "cost": 14000,
+      "unlocks": [
+        "ecm_jammer_10"
+      ],
+      "description": "Ultimate ECM defense. +10 Missile Defense Rating. Missiles rarely hit.",
+      "prerequisite": "ecm_jammer_9_tech"
+    },
+    {
+      "id": "robotic_controls_7_tech",
+      "name": "Robotic Controls VII",
+      "field": "computers",
+      "tier": 13,
+      "cost": 14000,
+      "unlocks": [],
+      "description": "Ultimate factory automation. 7 factories per population unit.",
+      "prerequisite": "robotic_controls_6_tech"
+    },
+    {
+      "id": "tech_nullifier_tech",
+      "name": "Technology Nullifier",
+      "field": "computers",
+      "tier": 13,
+      "cost": 14000,
+      "unlocks": [
+        "tech_nullifier"
+      ],
+      "description": "Electronic warfare weapon. Reduces target's attack rating by 2-6 for the combat."
+    },
+    {
+      "id": "battle_computer_11_tech",
+      "name": "Battle Computer XI",
+      "field": "computers",
+      "tier": 14,
+      "cost": 18000,
+      "unlocks": [
+        "battle_computer_11"
+      ],
+      "description": "Ultimate combat computer. +11 Attack Rating. Near-perfect accuracy.",
+      "prerequisite": "battle_computer_10_tech"
+    },
+    {
+      "id": "quantum_computer_tech",
+      "name": "Quantum Computer",
+      "field": "computers",
+      "tier": 14,
+      "cost": 18000,
+      "unlocks": [
+        "quantum_computer"
+      ],
+      "description": "Quantum processing targeting and tactics. +3 Attack Rating, +3 Initiative."
+    },
+    {
+      "id": "deflector_1_tech",
+      "name": "Class I Deflector Shield",
+      "field": "force_fields",
+      "tier": 1,
+      "cost": 50,
+      "unlocks": [
+        "shield_class_1"
+      ],
+      "description": "Basic energy shield. Absorbs 1 damage per hit. Universal starting shield."
+    },
+    {
+      "id": "deflector_2_tech",
+      "name": "Class II Deflector Shield",
+      "field": "force_fields",
+      "tier": 2,
+      "cost": 80,
+      "unlocks": [
+        "shield_class_2"
+      ],
+      "description": "Improved deflector shield. Absorbs 2 damage per hit.",
+      "prerequisite": "deflector_1_tech"
+    },
+    {
+      "id": "personal_deflector_tech",
+      "name": "Personal Deflector Shield",
+      "field": "force_fields",
+      "tier": 3,
+      "cost": 150,
+      "unlocks": [
+        "personal_deflector"
+      ],
+      "description": "Personal force field for infantry. +10 ground combat bonus."
+    },
+    {
+      "id": "deflector_3_tech",
+      "name": "Class III Deflector Shield",
+      "field": "force_fields",
+      "tier": 3,
+      "cost": 150,
+      "unlocks": [
+        "shield_class_3"
+      ],
+      "description": "Reinforced deflector shield. Absorbs 3 damage per hit. Negates nuclear missiles.",
+      "prerequisite": "deflector_2_tech"
+    },
+    {
+      "id": "planetary_5_tech",
+      "name": "Planetary Shield V",
+      "field": "force_fields",
+      "tier": 4,
+      "cost": 300,
+      "unlocks": [
+        "planetary_shield_5"
+      ],
+      "description": "Planetary defense shield. Absorbs 5 bombardment damage. Build cost: 500 BC, maintenance: 5 BC/turn."
+    },
+    {
+      "id": "deflector_4_tech",
+      "name": "Class IV Deflector Shield",
+      "field": "force_fields",
+      "tier": 4,
+      "cost": 300,
+      "unlocks": [
+        "shield_class_4"
+      ],
+      "description": "Heavy deflector shield. Absorbs 4 damage per hit.",
+      "prerequisite": "deflector_3_tech"
+    },
+    {
+      "id": "repulsor_beam_tech",
+      "name": "Repulsor Beam",
+      "field": "force_fields",
+      "tier": 5,
+      "cost": 500,
+      "unlocks": [
+        "repulsor_beam"
+      ],
+      "description": "Repulsion field projector. Pushes enemy ships 2 hexes away. Counters short-range builds."
+    },
+    {
+      "id": "deflector_5_tech",
+      "name": "Class V Deflector Shield",
+      "field": "force_fields",
+      "tier": 5,
+      "cost": 500,
+      "unlocks": [
+        "shield_class_5"
+      ],
+      "description": "Reinforced shield. Absorbs 5 damage per hit. Negates most tier 1-2 weapons.",
+      "prerequisite": "deflector_4_tech"
+    },
+    {
+      "id": "personal_absorption_tech",
+      "name": "Personal Absorption Shield",
+      "field": "force_fields",
+      "tier": 6,
+      "cost": 1000,
+      "unlocks": [
+        "personal_absorption"
+      ],
+      "description": "Advanced personal energy shield. +20 ground combat bonus.",
+      "prerequisite": "personal_deflector_tech"
+    },
+    {
+      "id": "planetary_10_tech",
+      "name": "Planetary Shield X",
+      "field": "force_fields",
+      "tier": 6,
+      "cost": 1000,
+      "unlocks": [
+        "planetary_shield_10"
+      ],
+      "description": "Fortress-class planetary shield. Absorbs 10 bombardment damage. Build cost: 1,000 BC.",
+      "prerequisite": "planetary_5_tech"
+    },
+    {
+      "id": "deflector_6_tech",
+      "name": "Class VI Deflector Shield",
+      "field": "force_fields",
+      "tier": 6,
+      "cost": 1000,
+      "unlocks": [
+        "shield_class_6"
+      ],
+      "description": "Heavy energy shield. Absorbs 6 damage per hit.",
+      "prerequisite": "deflector_5_tech"
+    },
+    {
+      "id": "deflector_8_tech",
+      "name": "Class VIII Deflector Shield",
+      "field": "force_fields",
+      "tier": 7,
+      "cost": 1500,
+      "unlocks": [
+        "shield_class_8"
+      ],
+      "description": "Advanced heavy shield. Absorbs 8 damage per hit.",
+      "prerequisite": "deflector_6_tech"
+    },
+    {
+      "id": "cloaking_device_tech",
+      "name": "Cloaking Device",
+      "field": "force_fields",
+      "tier": 7,
+      "cost": 1500,
+      "unlocks": [
+        "cloaking_device"
+      ],
+      "description": "Stealth field generator. +5 Defense, invisible to targeting until firing."
+    },
+    {
+      "id": "deflector_7_tech",
+      "name": "Class VII Deflector Shield",
+      "field": "force_fields",
+      "tier": 7,
+      "cost": 1500,
+      "unlocks": [
+        "shield_class_7"
+      ],
+      "description": "Reinforced heavy shield. Absorbs 7 damage per hit.",
+      "prerequisite": "deflector_6_tech"
+    },
+    {
+      "id": "zyro_shield_tech",
+      "name": "Zyro Shield",
+      "field": "force_fields",
+      "tier": 8,
+      "cost": 3000,
+      "unlocks": [
+        "zyro_shield"
+      ],
+      "description": "Missile intercept field. 75% chance to destroy incoming missiles (\u22121% per missile tech level)."
+    },
+    {
+      "id": "planetary_15_tech",
+      "name": "Planetary Shield XV",
+      "field": "force_fields",
+      "tier": 8,
+      "cost": 3000,
+      "unlocks": [
+        "planetary_shield_15"
+      ],
+      "description": "Bastion-class planetary shield. Absorbs 15 bombardment damage. Build cost: 2,000 BC.",
+      "prerequisite": "planetary_10_tech"
+    },
+    {
+      "id": "deflector_9_tech",
+      "name": "Class IX Deflector Shield",
+      "field": "force_fields",
+      "tier": 8,
+      "cost": 3000,
+      "unlocks": [
+        "shield_class_9"
+      ],
+      "description": "Superheavy energy shield. Absorbs 9 damage per hit.",
+      "prerequisite": "deflector_8_tech"
+    },
+    {
+      "id": "deflector_10_tech",
+      "name": "Class X Deflector Shield",
+      "field": "force_fields",
+      "tier": 9,
+      "cost": 5000,
+      "unlocks": [
+        "shield_class_10"
+      ],
+      "description": "Capital-class shield. Absorbs 10 damage per hit.",
+      "prerequisite": "deflector_9_tech"
+    },
+    {
+      "id": "stasis_field_tech",
+      "name": "Stasis Field",
+      "field": "force_fields",
+      "tier": 9,
+      "cost": 5000,
+      "unlocks": [
+        "stasis_field"
+      ],
+      "description": "Temporal stasis projector. Completely disables a target ship for 1 combat round. 100% success."
+    },
+    {
+      "id": "personal_barrier_tech",
+      "name": "Personal Barrier Shield",
+      "field": "force_fields",
+      "tier": 9,
+      "cost": 5000,
+      "unlocks": [
+        "personal_barrier"
+      ],
+      "description": "Ultimate personal energy barrier. +30 ground combat bonus.",
+      "prerequisite": "personal_absorption_tech"
+    },
+    {
+      "id": "deflector_11_tech",
+      "name": "Class XI Deflector Shield",
+      "field": "force_fields",
+      "tier": 10,
+      "cost": 8000,
+      "unlocks": [
+        "shield_class_11"
+      ],
+      "description": "Fortress-grade shield. Absorbs 11 damage per hit.",
+      "prerequisite": "deflector_10_tech"
+    },
+    {
+      "id": "planetary_20_tech",
+      "name": "Planetary Shield XX",
+      "field": "force_fields",
+      "tier": 10,
+      "cost": 8000,
+      "unlocks": [
+        "planetary_shield_20"
+      ],
+      "description": "Impregnable planetary fortress shield. Absorbs 20 bombardment damage. Build cost: 4,000 BC.",
+      "prerequisite": "planetary_15_tech"
+    },
+    {
+      "id": "black_hole_generator_tech",
+      "name": "Black Hole Generator",
+      "field": "force_fields",
+      "tier": 11,
+      "cost": 12000,
+      "unlocks": [
+        "black_hole_generator"
+      ],
+      "description": "Singularity weapon. Destroys 25-100% of enemy ship stack (\u22122% per shield class). Huge-hull only, 3-turn cooldown."
+    },
+    {
+      "id": "deflector_12_tech",
+      "name": "Class XII Deflector Shield",
+      "field": "force_fields",
+      "tier": 11,
+      "cost": 12000,
+      "unlocks": [
+        "shield_class_12"
+      ],
+      "description": "Ultimate defense shield. Absorbs 12 damage per hit.",
+      "prerequisite": "deflector_11_tech"
+    },
+    {
+      "id": "lightning_shield_tech",
+      "name": "Lightning Shield",
+      "field": "force_fields",
+      "tier": 11,
+      "cost": 12000,
+      "unlocks": [
+        "lightning_shield"
+      ],
+      "description": "Lightning intercept field. 100% chance to destroy incoming missiles (\u22121% per missile tech level).",
+      "prerequisite": "zyro_shield_tech"
+    },
+    {
+      "id": "deflector_13_tech",
+      "name": "Class XIII Deflector Shield",
+      "field": "force_fields",
+      "tier": 12,
+      "cost": 18000,
+      "unlocks": [
+        "shield_class_13"
+      ],
+      "description": "Legendary defense shield. Absorbs 13 damage per hit.",
+      "prerequisite": "deflector_12_tech"
+    },
+    {
+      "id": "deflector_14_tech",
+      "name": "Class XIV Deflector Shield",
+      "field": "force_fields",
+      "tier": 13,
+      "cost": 30000,
+      "unlocks": [
+        "shield_class_14"
+      ],
+      "description": "Supreme defense shield. Absorbs 14 damage per hit.",
+      "prerequisite": "deflector_13_tech"
+    },
+    {
+      "id": "deflector_15_tech",
+      "name": "Class XV Deflector Shield",
+      "field": "force_fields",
+      "tier": 14,
+      "cost": 50000,
+      "unlocks": [
+        "shield_class_15"
+      ],
+      "description": "Ultimate shield technology. Absorbs 15 damage per hit. The pinnacle of defensive shielding.",
+      "prerequisite": "deflector_14_tech"
+    },
+    {
+      "id": "ecological_restoration_tech",
+      "name": "Ecological Restoration",
+      "field": "planetology",
+      "tier": 1,
+      "cost": 0,
+      "unlocks": [],
+      "description": "Baseline pollution cleanup. Eliminates 2 waste per 1 BC spent. Universal starting technology."
+    },
+    {
+      "id": "improved_terraforming_10_tech",
+      "name": "Improved Terraforming +10",
+      "field": "planetology",
+      "tier": 2,
+      "cost": 60,
+      "unlocks": [],
+      "description": "Early terraforming technology. Increases max population capacity by +10M (5 BC per million)."
+    },
+    {
+      "id": "controlled_barren_tech",
+      "name": "Controlled Barren Environment",
+      "field": "planetology",
+      "tier": 2,
+      "cost": 140,
+      "unlocks": [],
+      "description": "Colony habitation tech for barren worlds. Unlocks colonization of barren planets."
+    },
+    {
+      "id": "improved_eco_restoration_tech",
+      "name": "Improved Eco Restoration",
+      "field": "planetology",
+      "tier": 3,
+      "cost": 400,
+      "unlocks": [],
+      "description": "Improved pollution cleanup. Eliminates 3 waste per 1 BC spent.",
+      "prerequisite": "ecological_restoration_tech"
+    },
+    {
+      "id": "controlled_tundra_tech",
+      "name": "Controlled Tundra Environment",
+      "field": "planetology",
+      "tier": 3,
+      "cost": 570,
+      "unlocks": [],
+      "description": "Colony habitation tech for frozen worlds. Unlocks colonization of tundra planets.",
+      "prerequisite": "controlled_barren_tech"
+    },
+    {
+      "id": "improved_terraforming_20_tech",
+      "name": "Improved Terraforming +20",
+      "field": "planetology",
+      "tier": 4,
+      "cost": 570,
+      "unlocks": [],
+      "description": "Advanced terraforming. Increases max population capacity by +20M (5 BC per million).",
+      "prerequisite": "improved_terraforming_10_tech"
+    },
+    {
+      "id": "controlled_dead_tech",
+      "name": "Controlled Dead Environment",
+      "field": "planetology",
+      "tier": 4,
+      "cost": 1290,
+      "unlocks": [],
+      "description": "Colony habitation for airless dead worlds. Unlocks colonization of dead planets.",
+      "prerequisite": "controlled_tundra_tech"
+    },
+    {
+      "id": "death_spores_tech",
+      "name": "Death Spores",
+      "field": "planetology",
+      "tier": 4,
+      "cost": 1600,
+      "unlocks": [
+        "death_spores"
+      ],
+      "description": "Biological weapon. Kills 1 million population per combat round. \u221210% permanent max pop reduction."
+    },
+    {
+      "id": "controlled_inferno_tech",
+      "name": "Controlled Inferno Environment",
+      "field": "planetology",
+      "tier": 5,
+      "cost": 2300,
+      "unlocks": [],
+      "description": "Colony habitation for volcanic worlds. Unlocks colonization of inferno planets.",
+      "prerequisite": "controlled_dead_tech"
+    },
+    {
+      "id": "enhanced_eco_restoration_tech",
+      "name": "Enhanced Eco Restoration",
+      "field": "planetology",
+      "tier": 5,
+      "cost": 2700,
+      "unlocks": [],
+      "description": "Enhanced pollution cleanup. Eliminates 5 waste per 1 BC spent.",
+      "prerequisite": "improved_eco_restoration_tech"
+    },
+    {
+      "id": "improved_terraforming_30_tech",
+      "name": "Improved Terraforming +30",
+      "field": "planetology",
+      "tier": 5,
+      "cost": 2300,
+      "unlocks": [],
+      "description": "Significant terraforming advance. Increases max population capacity by +30M (4 BC per million).",
+      "prerequisite": "improved_terraforming_20_tech"
+    },
+    {
+      "id": "controlled_toxic_tech",
+      "name": "Controlled Toxic Environment",
+      "field": "planetology",
+      "tier": 5,
+      "cost": 3600,
+      "unlocks": [],
+      "description": "Colony habitation for corrosive worlds. Unlocks colonization of toxic planets.",
+      "prerequisite": "controlled_inferno_tech"
+    },
+    {
+      "id": "soil_enrichment_tech",
+      "name": "Soil Enrichment",
+      "field": "planetology",
+      "tier": 6,
+      "cost": 4090,
+      "unlocks": [],
+      "description": "Planetary soil enhancement. Permanently increases a planet's max pop by +25 (one-time 150 BC per planet)."
+    },
+    {
+      "id": "bio_toxin_antidote_tech",
+      "name": "Bio Toxin Antidote",
+      "field": "planetology",
+      "tier": 6,
+      "cost": 4620,
+      "unlocks": [],
+      "description": "Biological defense. Reduces casualties from bio weapon attacks by 1 million per attack."
+    },
+    {
+      "id": "controlled_radiated_tech",
+      "name": "Controlled Radiated Environment",
+      "field": "planetology",
+      "tier": 6,
+      "cost": 5180,
+      "unlocks": [],
+      "description": "Colony habitation for radiated worlds. Unlocks colonization of radiated planets \u2014 the most hostile environment.",
+      "prerequisite": "controlled_toxic_tech"
+    },
+    {
+      "id": "improved_terraforming_40_tech",
+      "name": "Improved Terraforming +40",
+      "field": "planetology",
+      "tier": 7,
+      "cost": 4090,
+      "unlocks": [],
+      "description": "Major terraforming capability. Increases max population capacity by +40M (4 BC per million).",
+      "prerequisite": "improved_terraforming_30_tech"
+    },
+    {
+      "id": "cloning_tech",
+      "name": "Cloning",
+      "field": "planetology",
+      "tier": 7,
+      "cost": 7050,
+      "unlocks": [],
+      "description": "Bio-engineered population growth. Grow 1 million colonists per 10 BC spent per turn."
+    },
+    {
+      "id": "atmospheric_terraforming_tech",
+      "name": "Atmospheric Terraforming",
+      "field": "planetology",
+      "tier": 7,
+      "cost": 7740,
+      "unlocks": [],
+      "description": "Atmospheric conversion technology. Converts hostile planets to standard environment (200 BC one-time). Normalizes population growth to 1.0\u00d7."
+    },
+    {
+      "id": "advanced_eco_restoration_tech",
+      "name": "Advanced Eco Restoration",
+      "field": "planetology",
+      "tier": 8,
+      "cost": 9210,
+      "unlocks": [],
+      "description": "Advanced pollution cleanup. Eliminates 10 waste per 1 BC spent.",
+      "prerequisite": "enhanced_eco_restoration_tech"
+    },
+    {
+      "id": "improved_terraforming_60_tech",
+      "name": "Improved Terraforming +60",
+      "field": "planetology",
+      "tier": 8,
+      "cost": 9210,
+      "unlocks": [],
+      "description": "Large-scale terraforming. Increases max population capacity by +60M (3 BC per million).",
+      "prerequisite": "improved_terraforming_40_tech"
+    },
+    {
+      "id": "doom_virus_tech",
+      "name": "Doom Virus",
+      "field": "planetology",
+      "tier": 8,
+      "cost": 11660,
+      "unlocks": [
+        "doom_virus"
+      ],
+      "description": "Advanced biological weapon. Kills 2 million population per combat round. \u221225% permanent max pop reduction.",
+      "prerequisite": "death_spores_tech"
+    },
+    {
+      "id": "advanced_soil_enrichment_tech",
+      "name": "Advanced Soil Enrichment",
+      "field": "planetology",
+      "tier": 9,
+      "cost": 14400,
+      "unlocks": [],
+      "description": "Advanced soil enhancement. Permanently increases a planet's max pop by +50 (one-time 300 BC per planet). Replaces basic enrichment.",
+      "prerequisite": "soil_enrichment_tech"
+    },
+    {
+      "id": "complete_eco_restoration_tech",
+      "name": "Complete Eco Restoration",
+      "field": "planetology",
+      "tier": 9,
+      "cost": 18490,
+      "unlocks": [],
+      "description": "Near-complete pollution cleanup. Eliminates 20 waste per 1 BC spent.",
+      "prerequisite": "advanced_eco_restoration_tech"
+    },
+    {
+      "id": "improved_terraforming_80_tech",
+      "name": "Improved Terraforming +80",
+      "field": "planetology",
+      "tier": 10,
+      "cost": 20730,
+      "unlocks": [],
+      "description": "Massive terraforming capability. Increases max population capacity by +80M (2 BC per million).",
+      "prerequisite": "improved_terraforming_60_tech"
+    },
+    {
+      "id": "universal_antidote_tech",
+      "name": "Universal Antidote",
+      "field": "planetology",
+      "tier": 10,
+      "cost": 20730,
+      "unlocks": [],
+      "description": "Universal biological defense. Reduces bio casualties by 2 million per attack. Near-immunity to most bio weapons.",
+      "prerequisite": "bio_toxin_antidote_tech"
+    },
+    {
+      "id": "bio_terminator_tech",
+      "name": "Bio Terminator",
+      "field": "planetology",
+      "tier": 10,
+      "cost": 25600,
+      "unlocks": [
+        "bio_terminator"
+      ],
+      "description": "Ultimate biological weapon. Kills 3 million population per combat round. \u221250% permanent max pop reduction.",
+      "prerequisite": "doom_virus_tech"
+    },
+    {
+      "id": "advanced_cloning_tech",
+      "name": "Advanced Cloning",
+      "field": "planetology",
+      "tier": 11,
+      "cost": 28220,
+      "unlocks": [],
+      "description": "Accelerated bio-engineering. Grow 1 million colonists per 5 BC per turn. Twice as efficient as basic cloning.",
+      "prerequisite": "cloning_tech"
+    },
+    {
+      "id": "improved_terraforming_100_tech",
+      "name": "Improved Terraforming +100",
+      "field": "planetology",
+      "tier": 12,
+      "cost": 40000,
+      "unlocks": [],
+      "description": "Extreme terraforming technology. Increases max population capacity by +100M (2 BC per million).",
+      "prerequisite": "improved_terraforming_80_tech"
+    },
+    {
+      "id": "complete_terraforming_tech",
+      "name": "Complete Terraforming +120",
+      "field": "planetology",
+      "tier": 13,
+      "cost": 78400,
+      "unlocks": [],
+      "description": "Ultimate terraforming mastery. Increases max population capacity by +120M. The pinnacle of planetary engineering.",
+      "prerequisite": "improved_terraforming_100_tech"
+    }
+  ]
+}
