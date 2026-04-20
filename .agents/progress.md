@@ -80,3 +80,25 @@
 - Pushed to origin/main
 
 ### Status: Phase 4B COMPLETE
+
+## 2026-04-20 20:05 UTC — Phase 4B: Additional Systems Complete
+
+### Completed Tasks (28 total)
+1. **treaties** — 6 treaty types, proposals, breaking penalties, trade ramp-up (519 lines)
+2. **high-council** — Galactic High Council, vote shares, 2/3 majority diplomatic victory (380 lines)
+3. **fog-of-war** — Exploration, sensor range, colony auto-reveal, fleet visibility (225 lines)
+4. **random-events** — 19 event types, seeded RNG, notification dispatch (481 lines + 336 lines event data)
+5. **victory-conditions** — Diplomatic, military, conquest victory checking (205 lines)
+6. **espionage** — 6 spy mission types, probability calculation, mission processing (362 lines)
+7. **ground-combat** — Planetary invasion, troop transport, bombardment, combat resolution (245 lines)
+8. **ai-diplomacy** — AI personality-based diplomatic decision making (444 lines)
+9. **ai-research** — AI research priority selection based on personality and strategy (222 lines)
+
+### Verification
+- Typecheck: PASS
+- Tests: 1007/1007 pass (up from 753, +254 new tests)
+- No `any` types in src/game/
+- No DOM in src/game/
+- Pushed to origin/main
+
+### Status: Phase 4B COMPLETE
