@@ -269,7 +269,8 @@
       "id": "buildings-data",
       "name": "Buildings JSON data",
       "type": "data",
-      "status": "pending",
+      "status": "done",
+      "completed_at": "2026-04-20T02:44:00Z",
       "description": "Create buildings JSON from design/planets/buildings.md. Include factories, planetary shields, missile bases, terraforming, soil enrichment, etc. Each building needs: id, name, category, techRequired, cost, maintenance, effects.",
       "output": "src/data/buildings.json",
       "acceptance": [
