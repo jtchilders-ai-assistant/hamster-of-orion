@@ -151,33 +151,35 @@ describe('rollRandomEvents', () => {
   });
 
   it('respects difficulty multiplier — impossible fires with higher threshold than easy', () => {
-    // Verify by forcing the RNG to return a value between easy and impossible thresholds.
-    // Easy: eventChance = 0.13 * 0.75 = 0.0975
-    // Impossible: eventChance = 0.13 * 1.5 = 0.195
-    // A roll of 0.15 is >= 0.0975 (easy skips) but < 0.195 (impossible fires).
-    const between = () => 0.15;
+    // At turn 100:
+    //   base = min(0.03 + 100*0.001, 0.15) = 0.13
+    //   easy threshold      = 0.13 * 0.75  = 0.0975
+    //   impossible threshold = 0.13 * 1.5   = 0.195
+    // A probe value of 0.10 sits between the two:
+    //   easy: 0.10 >= 0.0975  → NO event fires
+    //   impossible: 0.10 < 0.195  → event CAN fire (if eligible pool not empty)
+    const probe = 0.10;
+    const probeRng = () => probe;
 
     const easyState = makeTestState({ turn: 100, difficulty: 'easy' });
     const impossibleState = makeTestState({ turn: 100, difficulty: 'impossible' });
 
-    // Easy: first call returns 0.15 >= 0.0975 → no event
-    const easyResult = rollRandomEvents(easyState, between);
-    // Impossible: first call returns 0.15 < 0.195 → may produce an event
-    // (depends on eligible pool; we just verify the different behaviour)
-    const impossibleResult = rollRandomEvents(impossibleState, () => 0.15);
-
-    // Easy must NOT fire (0.15 >= easy threshold)
+    // Easy must not fire at this probe value
+    const easyResult = rollRandomEvents(easyState, probeRng);
     expect(easyResult).toHaveLength(0);
-    // Impossible CAN fire — but at minimum its threshold is higher,
-    // so it should fire when given a low-enough value
-    const impossibleFires = rollRandomEvents(impossibleState, () => 0.01);
-    expect(impossibleFires.length).toBeGreaterThanOrEqual(0); // eligible pool may be empty
-    // Confirm a low rng value that fires for impossible doesn't fire for easy
-    const easyLow = rollRandomEvents(easyState, () => 0.10);
-    // 0.10 >= 0.0975, so easy should not fire
-    expect(easyLow).toHaveLength(0);
-    // Suppress unused variable lint for impossibleResult
-    expect(impossibleResult.length).toBeGreaterThanOrEqual(0);
+
+    // Impossible passes the threshold check and enters the selection phase.
+    // With a colonised planet the eligible pool contains donation (min_turn 15).
+    // The subsequent category/event rolls use the same rng, so the result
+    // may be 0 or 1 event — what matters is the threshold was crossed.
+    // We verify via a trivially-low probe that always crosses both thresholds:
+    const trivialRng = () => 0.001;
+    const impossibleFires = rollRandomEvents(impossibleState, trivialRng);
+    expect(impossibleFires.length).toBe(1);
+
+    // And the same trivial probe on easy also fires (it also crosses 0.0975)
+    const easyFires = rollRandomEvents(easyState, trivialRng);
+    expect(easyFires.length).toBe(1);
   });
 });
 
