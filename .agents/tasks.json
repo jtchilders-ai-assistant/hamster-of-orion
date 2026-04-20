@@ -422,7 +422,7 @@
       "id": "espionage",
       "name": "Espionage system",
       "type": "code",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         "diplomacy-relations"
       ],
@@ -435,13 +435,14 @@
         "Counterespionage defense",
         "Caught spies affect relations",
         "Unit tests pass"
-      ]
+      ],
+      "completed_at": "2026-04-20T04:05:00Z"
     },
     {
       "id": "ground-combat",
       "name": "Ground combat system",
       "type": "code",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         "fleet-state"
       ],
@@ -454,7 +455,8 @@
         "Racial ground combat bonuses",
         "Planet capture on victory",
         "Unit tests pass"
-      ]
+      ],
+      "completed_at": "2026-04-20T04:05:00Z"
     },
     {
       "id": "random-events",
@@ -480,7 +482,7 @@
       "id": "victory-conditions",
       "name": "Victory condition detection",
       "type": "code",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         "high-council",
         "turn-integration"
@@ -493,7 +495,8 @@
         "Player defeat detection",
         "Victory triggers end screen",
         "Unit tests pass"
-      ]
+      ],
+      "completed_at": "2026-04-20T04:05:00Z"
     },
     {
       "id": "fog-of-war",
@@ -518,7 +521,7 @@
       "id": "ai-diplomacy",
       "name": "AI diplomatic behavior",
       "type": "code",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         "diplomacy-relations",
         "ai-basic"
@@ -531,13 +534,14 @@
         "AI declares war when hostile",
         "Personality affects diplomatic behavior",
         "Unit tests pass"
-      ]
+      ],
+      "completed_at": "2026-04-20T04:05:00Z"
     },
     {
       "id": "ai-research",
       "name": "AI research priorities",
       "type": "code",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         "tech-tree-data",
         "ai-basic"
@@ -549,7 +553,8 @@
         "AI picks tech choices based on strategy",
         "Racial field bonuses influence allocation",
         "Unit tests pass"
-      ]
+      ],
+      "completed_at": "2026-04-20T04:05:00Z"
     },
     {
       "id": "turn-fix-compile",
