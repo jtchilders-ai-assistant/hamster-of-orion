@@ -225,6 +225,12 @@ export interface Planet {
   isGaia: boolean;
   hasArtifacts: boolean;
 
+  // Shipyard construction state
+  /** The design currently being built at this planet's shipyard (null = nothing queued). */
+  currentDesignId: ShipDesignId | null;
+  /** BC accumulated toward the current ship design this turn and prior turns. */
+  shipyardProgress: number;
+
   // Galaxy generation metadata
   resourceLevel: ResourceLevel;
   researchMultiplier: number;

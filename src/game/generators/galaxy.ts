@@ -1001,6 +1001,8 @@ function attemptGalaxyGeneration(
       isPoor: planet.resources === 'ultra_poor' || planet.resources === 'poor',
       isGaia: planet.environment === 'gaia',
       hasArtifacts: isArtifacts,
+      currentDesignId: null,
+      shipyardProgress: 0,
       resourceLevel: planet.resources,
       researchMultiplier: planet.researchMultiplier,
       startingPopulation: planet.startingPopulation,
