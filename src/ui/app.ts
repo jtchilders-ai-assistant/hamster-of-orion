@@ -64,7 +64,8 @@ export class App {
     // Subscribe to state changes
     store.subscribe((state) => this.onStateChange(state));
 
-    // Initial render
+    // Show and render initial screen
+    this.screens.get(this.currentScreen)?.show();
     this.onStateChange(store.getState());
   }
 

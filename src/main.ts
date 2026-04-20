@@ -7,28 +7,15 @@ import { Store } from './game/store';
 import { GameState } from './game/state';
 import { rootReducer } from './game/reducer';
 import { initialState } from './game/initialState';
-import { generateGalaxy } from './game/generators/galaxy';
 import { App } from './ui/app';
 import { initDebugHooks } from './debug';
 
 console.log('🐹 Hamster of Orion — Initializing...');
 
-// Generate initial galaxy
-const genResult = generateGalaxy({
-  size: 'medium',
-  shape: 'spiral',
-  seed: 42,
-  playerCount: 4,
-});
-
+// Start at new-game screen (no galaxy generated yet)
 const startingState: GameState = {
   ...initialState,
-  galaxy: genResult.galaxy,
-  planets: {
-    byId: genResult.planets,
-    allIds: genResult.planetIds,
-  },
-  currentScreen: 'galaxy',
+  currentScreen: 'new_game',
 };
 
 // Create store
