@@ -259,7 +259,7 @@
       "id": "save-load",
       "name": "Save/load system",
       "type": "code",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         "game-state-types"
       ],

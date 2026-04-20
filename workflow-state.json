@@ -1,22 +1,16 @@
 {
   "state": "TESTING",
-  "current_task": "galaxy-map-canvas",
+  "current_task": "save-load",
   "worker_output": {
     "files_created": [
-      "src/ui/canvas/starmap.ts",
-      "test/ui/starmap.test.ts",
-      "test/game/actions/selectSystem.test.ts"
+      "src/game/persistence.ts",
+      "src/ui/persistence.ts",
+      "test/game/persistence.test.ts"
     ],
-    "files_modified": [
-      "src/ui/screens/GalaxyScreen.ts",
-      "src/ui/components/StarMap.ts",
-      "src/ui/components/InfoPanel.ts",
-      "src/game/reducer.ts"
-    ],
+    "files_modified": [],
     "tests_added": [
-      "test/ui/starmap.test.ts",
-      "test/game/actions/selectSystem.test.ts"
+      "test/game/persistence.test.ts"
     ],
-    "summary": "Implemented galaxy map canvas rendering per design/ui-ux/wireframes/galaxy-map.md. Key changes: (1) src/ui/canvas/starmap.ts: New file with pure canvas drawing helpers — STAR_COLORS palette (all 6 star types), getMapTransform() (maps galaxy coords→pixels with padding), galaxyToCanvas(), hitTestStar() (click detection with radius), drawStarDot() (colored glow+core), drawSelectionRing() (dual-ring highlight), drawColonyRing() (empire-colored ownership ring), drawStarLabel(), drawFleetIndicator(). All functions are pure — no DOM queries, no store access. (2) src/ui/components/StarMap.ts: Refactored to use starmap.ts helpers. Now renders in 5 passes: selection ring → colony rings → star dots → fleet indicators → labels. Empire colors computed from empires.allIds order. Uses hitTestStar() for click detection. Dispatches SELECT_SYSTEM action. (3) src/ui/components/InfoPanel.ts: Full MOO1-accurate info panel with 4 states: empty (nothing selected), unexplored star, uncolonized planet (with size/type/specials), your colony (pop/factories/bases/shield/waste + production progress bar with block chars), enemy colony (empire name + estimated stats). (4) src/game/reducer.ts: Added SELECT_SYSTEM handler — sets ui.selectedSystem, clears ui.selectedPlanet and ui.selectedFleet on selection change. (5) src/ui/screens/GalaxyScreen.ts: Upgraded to proper full-screen view — auto-creates canvas if missing from HTML, applies .galaxy-screen class. All 4 acceptance criteria met: stars render at correct positions, star colors match spectral types, click selection dispatches SELECT_SYSTEM and highlights selected star, info panel updates on selection showing selected star data. TypeCheck: 0 errors. Tests: 411 passed (25 new)."
+    "summary": "Implemented the full save/load persistence system. (1) src/game/persistence.ts: Pure functions — serializeState() wraps GameState in a versioned SaveEnvelope (version + savedAt timestamp + state) and JSON-serializes it; deserializeState() parses + validates the envelope and returns GameState | null (null on bad JSON, missing fields, or wrong version); saveGame() / loadGame() read-write to localStorage key 'hamster-of-orion-save', silently swallowing any storage errors; deleteSave() removes the key; hasSave() checks for key existence. All error paths return null or no-op — never throw. SaveEnvelope interface and isSaveEnvelope type guard ensure no `any` types. (2) src/ui/persistence.ts: DOM helpers — exportSaveFile() creates a Blob, attaches a hidden <a> with download attr, clicks it, then revokes the object URL after 1 s; importSaveFile() returns Promise<GameState | null> — opens a file picker via <input type=file>, reads the selected .json with FileReader, passes text to deserializeState(), resolves null on cancel or error (cancel detected via window focus + 300 ms grace period). (3) test/game/persistence.test.ts: 20 unit tests covering serializeState (produces valid JSON, correct envelope shape, savedAt timestamp range), deserializeState (round-trip, empty string, invalid JSON, missing fields, wrong version, raw state object), and the localStorage integration suite for saveGame / loadGame / deleteSave / hasSave using vi.stubGlobal to mock localStorage. All 449 tests pass (0 typecheck errors)."
   }
 }
