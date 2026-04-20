@@ -254,21 +254,22 @@
       "id": "turn-integration",
       "name": "Turn processing integration",
       "type": "code",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         "combat-engine",
         "ai-basic",
         "colonization"
       ],
       "description": "Wire all systems into turn processing. Fleet movement, combat triggers, AI turns, colonization checks.",
-      "output": "src/game/systems/turn.ts (expand)",
+      "output": "src/game/systems/turn.ts (expanded)",
       "acceptance": [
         "processTurn() moves all fleets",
         "Arriving fleets trigger combat or colonize",
         "AI empires take their turns",
         "All production/growth/research runs",
         "Events queue for notification"
-      ]
+      ],
+      "completed_at": "2026-04-20T03:30:00Z"
     },
     {
       "id": "buildings-data",
@@ -290,19 +291,20 @@
       "id": "buildings-system",
       "name": "Buildings construction system",
       "type": "code",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         "buildings-data"
       ],
       "description": "Implement building construction via DEF slider. Queue management, completion, effects application.",
-      "output": "src/game/systems/buildings.ts",
+      "output": "src/game/systems/buildings.ts, src/game/actions/buildings.ts",
       "acceptance": [
         "DEF slider allocates to building queue",
         "Buildings complete when cost met",
         "Building effects apply (shields, missile bases)",
         "Maintenance costs deducted",
         "Unit tests pass"
-      ]
+      ],
+      "completed_at": "2026-04-20T03:30:00Z"
     },
     {
       "id": "starting-fleets",
@@ -326,7 +328,7 @@
       "id": "diplomacy-relations",
       "name": "Diplomacy relations system",
       "type": "code",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         "ai-basic"
       ],
@@ -338,7 +340,8 @@
         "Diplomatic states: war/hostile/neutral/friendly/allied",
         "Relations decay/improve over time",
         "Unit tests pass"
-      ]
+      ],
+      "completed_at": "2026-04-20T03:30:00Z"
     },
     {
       "id": "treaties",

@@ -639,3 +639,63 @@ describe('processTurn — purity and immutability', () => {
     expect(state.turn).toBe(10);
   });
 });
+
+// ── New integration tests covering wired systems ───────────────────────────────
+
+describe('processTurn — empire income wiring', () => {
+  it('credits increase by creditPerTurn each turn', () => {
+    const empire = makeEmpire('empire1', { credits: 50, creditPerTurn: 30 });
+    const state = makeMinimalState(0, [], [empire]);
+    const next = processTurn(state);
+    expect(next.empires.byId['empire1'].credits).toBe(80);
+  });
+
+  it('income does not apply to defeated empires', () => {
+    const empire = makeEmpire('empire1', {
+      credits: 50,
+      creditPerTurn: 30,
+      isDefeated: true,
+      defeatedTurn: 1,
+    });
+    const state = makeMinimalState(0, [], [empire]);
+    const next = processTurn(state);
+    expect(next.empires.byId['empire1'].credits).toBe(50);
+  });
+});
+
+describe('processTurn — research wiring', () => {
+  it('researchPoints accumulate after each turn with colonised planets', () => {
+    const planet = makePlanet('p1', {
+      population: 80,
+      production: { ship: 0, defense: 0, industry: 0, ecology: 0, research: 100 },
+    });
+    const empire = makeEmpire('empire1', { planets: ['p1'] });
+    const state = makeMinimalState(0, [planet], [empire]);
+
+    const next = processTurn(state);
+    const nextEmpire = next.empires.byId['empire1'];
+
+    // 80 pop at 100% research produces non-zero RP
+    expect(nextEmpire.research.researchPoints).toBeGreaterThan(0);
+    expect(nextEmpire.research.researchPerTurn).toBeGreaterThan(0);
+  });
+
+  it('researchPerTurn is 0 for empires with no colonised planets', () => {
+    const empire = makeEmpire('empire1', { planets: [] });
+    const state = makeMinimalState(0, [], [empire]);
+
+    const next = processTurn(state);
+    // No planets → no RP
+    expect(next.empires.byId['empire1'].research.researchPerTurn).toBe(0);
+  });
+});
+
+describe('processTurn — turn counter and year', () => {
+  it('always satisfies year === 2500 + turn after processTurn', () => {
+    let state = makeMinimalState(0);
+    for (let i = 0; i < 5; i++) {
+      state = processTurn(state);
+      expect(state.year).toBe(2500 + state.turn);
+    }
+  });
+});
