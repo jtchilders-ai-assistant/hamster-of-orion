@@ -453,6 +453,16 @@ export interface DiplomaticEvent {
   description: string;
 }
 
+/** A temporary modifier applied to a diplomatic relation (e.g., after an attack). */
+export interface RelationModifier {
+  /** Human-readable reason for the modifier. */
+  reason: string;
+  /** Change in relation value; added to running total each turn. */
+  amount: number;
+  /** Turn at which this modifier expires (undefined = permanent). */
+  expiresAtTurn?: number;
+}
+
 export interface DiplomaticRelations {
   empireA: EmpireId;
   empireB: EmpireId;
@@ -462,6 +472,8 @@ export interface DiplomaticRelations {
   events: DiplomaticEvent[];
   warStartTurn: number | null;
   lastContact: number;
+  /** Pending modifiers applied to the relation value. */
+  modifiers: RelationModifier[];
 }
 
 export interface CouncilVote {

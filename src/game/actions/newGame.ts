@@ -81,6 +81,7 @@ function buildRelations(
       events: [],
       warStartTurn: null,
       lastContact: isPlayer ? 1 : -1,
+      modifiers: [],
     };
   }
   return relations;
