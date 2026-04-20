@@ -1,294 +1,235 @@
 {
   "project": "hamster-of-orion-implementation",
-  "phase": "phase3-core-implementation",
+  "phase": "phase4a-core-interactivity",
   "created": "2026-04-19",
-  "description": "Phase 3: Core game implementation in TypeScript",
+  "description": "Phase 4A: Core interactivity - planet management, ships, fleets, combat",
   "tasks": [
     {
-      "id": "scaffold",
-      "name": "Project scaffold",
-      "type": "setup",
-      "status": "done",
-      "description": "Initialize Vite + TypeScript project with folder structure per ARCHITECTURE.md",
-      "output": "src/, package.json, vite.config.ts, tsconfig.json",
-      "acceptance": [
-        "npm install succeeds",
-        "npm run dev starts server on localhost:5173",
-        "src/game/ and src/ui/ folders exist",
-        "Basic index.html loads"
-      ]
-    },
-    {
-      "id": "store",
-      "name": "Store class implementation",
-      "type": "code",
-      "dependencies": [
-        "scaffold"
-      ],
-      "description": "Implement Redux-compatible Store class per ARCHITECTURE.md",
-      "output": "src/game/store.ts",
-      "acceptance": [
-        "TypeScript compiles without errors",
-        "Store has getState(), dispatch(), subscribe() methods",
-        "Unit tests pass"
-      ],
-      "status": "done"
-    },
-    {
-      "id": "game-state-types",
-      "name": "GameState type definitions",
-      "type": "code",
-      "status": "done",
-      "dependencies": [
-        "store"
-      ],
-      "description": "Define all TypeScript interfaces for game state per data-structures.md",
-      "output": "src/game/state.ts, src/game/types/",
-      "acceptance": [
-        "All interfaces from data-structures.md defined",
-        "No 'any' types used",
-        "Compiles without errors"
-      ]
-    },
-    {
-      "id": "galaxy-generation",
-      "name": "Galaxy generation system",
-      "type": "code",
-      "status": "done",
-      "dependencies": [
-        "game-state-types"
-      ],
-      "description": "Implement galaxy generation per design/galaxy/generation-algorithm.md",
-      "output": "src/game/generators/galaxy.ts",
-      "acceptance": [
-        "Generates stars with correct distribution",
-        "Assigns planets with environment types",
-        "Places homeworlds for all races",
-        "Unit tests pass"
-      ]
-    },
-    {
-      "id": "race-data",
-      "name": "Race data and bonuses",
-      "type": "code",
-      "status": "done",
-      "dependencies": [
-        "game-state-types"
-      ],
-      "description": "Implement race definitions per design/species/race-stats-complete.md",
-      "output": "src/data/races.json, src/game/systems/races.ts",
-      "acceptance": [
-        "All 10 races defined with correct bonuses",
-        "Field research bonuses implemented",
-        "Special abilities defined"
-      ]
-    },
-    {
-      "id": "turn-system",
-      "name": "Turn processing system",
-      "type": "code",
-      "status": "done",
-      "dependencies": [
-        "game-state-types"
-      ],
-      "description": "Implement turn processing loop per design/technical/development-roadmap.md",
-      "output": "src/game/systems/turn.ts",
-      "acceptance": [
-        "nextTurn() advances game state",
-        "Calls production, growth, research systems",
-        "Unit tests pass"
-      ]
-    },
-    {
-      "id": "production-system",
-      "name": "Production and sliders",
-      "type": "code",
-      "status": "done",
-      "dependencies": [
-        "turn-system"
-      ],
-      "description": "Implement production calculation per design/economy/slider-mathematics.md",
-      "output": "src/game/systems/production.ts",
-      "acceptance": [
-        "5 sliders sum to 100%",
-        "SHIP/DEF/IND/ECO/TECH calculations correct",
-        "Pollution and cleanup work",
-        "Unit tests pass"
-      ]
-    },
-    {
-      "id": "population-growth",
-      "name": "Population growth system",
-      "type": "code",
-      "status": "done",
-      "dependencies": [
-        "production-system"
-      ],
-      "description": "Implement population growth per design/economy/population-growth.md",
-      "output": "src/game/systems/population.ts",
-      "acceptance": [
-        "Logistic growth formula implemented",
-        "Environment modifiers applied",
-        "Racial bonuses work",
-        "Unit tests pass"
-      ]
-    },
-    {
-      "id": "research-system",
-      "name": "Research and technology",
-      "type": "code",
-      "status": "done",
-      "dependencies": [
-        "production-system"
-      ],
-      "description": "Implement research per design/technology/research-formulas.md",
-      "output": "src/game/systems/research.ts, src/data/technologies.json",
-      "acceptance": [
-        "RP generation from scientists",
-        "Tech cost calculation",
-        "Field allocation works",
-        "Unit tests pass"
-      ]
-    },
-    {
-      "id": "debug-hooks",
-      "name": "Debug interface for testing",
-      "type": "code",
-      "status": "done",
-      "dependencies": [
-        "store",
-        "game-state-types"
-      ],
-      "description": "Implement window.__HAMSTER_DEBUG__ per ARCHITECTURE.md",
-      "output": "src/debug.ts",
-      "acceptance": [
-        "loadState() injects test state",
-        "getState() returns current state",
-        "dispatch() sends actions",
-        "Only enabled in dev mode"
-      ]
-    },
-    {
-      "id": "app-shell",
-      "name": "Application shell and routing",
+      "id": "planet-screen",
+      "name": "Planet management screen",
       "type": "ui",
-      "status": "done",
-      "dependencies": [
-        "scaffold",
-        "debug-hooks"
-      ],
-      "description": "Basic app shell with screen routing",
-      "output": "src/ui/app.ts, src/ui/screens/",
+      "status": "pending",
+      "description": "Full planet screen with production sliders (SHIP/DEF/IND/ECO/TECH). Reference design/ui-ux/wireframes/planet-management.md and design/economy/slider-mathematics.md. Sliders must sum to 100%, show current allocation, and dispatch actions to update state.",
+      "output": "src/ui/screens/PlanetScreen.ts",
       "acceptance": [
-        "Command bar renders",
-        "F-key navigation works",
-        "Screen switching works"
+        "5 sliders render with current values",
+        "Dragging slider updates allocation",
+        "Sliders auto-rebalance to sum 100%",
+        "Shows production output preview",
+        "Accessible from galaxy map planet click"
       ]
     },
     {
-      "id": "galaxy-map-canvas",
-      "name": "Galaxy map canvas rendering",
-      "type": "ui",
-      "status": "done",
-      "dependencies": [
-        "app-shell",
-        "galaxy-generation"
-      ],
-      "description": "Render galaxy map per design/ui-ux/wireframes/galaxy-map.md",
-      "output": "src/ui/screens/GalaxyScreen.ts, src/ui/canvas/starmap.ts",
+      "id": "ship-components-data",
+      "name": "Ship components JSON data",
+      "type": "data",
+      "status": "pending",
+      "description": "Create comprehensive ship components JSON from design docs. Include weapons (design/technology/weapons.md), armor/shields (force-fields.md), engines (propulsion.md), computers, and specials. Each component needs: id, name, techLevel, size, cost, and type-specific stats.",
+      "output": "src/data/components.json",
       "acceptance": [
-        "Stars render at correct positions",
-        "Star colors match type",
-        "Click selection works",
-        "Info panel updates on selection"
+        "All weapon types from weapons.md included",
+        "All armor types with HP multipliers",
+        "All shield classes (I-XV)",
+        "All engine types with warp/combat speed",
+        "All special systems",
+        "Valid JSON, types match state.ts"
       ]
     },
     {
-      "id": "info-panel",
-      "name": "Planet info panel",
-      "type": "ui",
-      "status": "done",
-      "dependencies": [
-        "galaxy-map-canvas"
-      ],
-      "description": "Right-side info panel per wireframes",
-      "output": "src/ui/components/InfoPanel.ts",
-      "acceptance": [
-        "Shows planet stats",
-        "Shows production info",
-        "RELOC and TRANS buttons present",
-        "Updates on selection change"
-      ]
-    },
-    {
-      "id": "command-bar",
-      "name": "Command bar component",
-      "type": "ui",
-      "status": "done",
-      "dependencies": [
-        "app-shell"
-      ],
-      "description": "Bottom command bar with 7 buttons + NEXT TURN",
-      "output": "src/ui/components/CommandBar.ts",
-      "acceptance": [
-        "All buttons render",
-        "F-key shortcuts work",
-        "NEXT TURN advances turn"
-      ]
-    },
-    {
-      "id": "new-game-flow",
-      "name": "New game setup flow",
-      "type": "ui",
-      "status": "done",
-      "dependencies": [
-        "galaxy-generation",
-        "race-data",
-        "app-shell"
-      ],
-      "description": "New game wizard per wireframes/new-game-setup.md",
-      "output": "src/ui/screens/NewGameScreen.ts",
-      "acceptance": [
-        "Galaxy size selection",
-        "Race selection",
-        "Name entry",
-        "Game starts with generated galaxy"
-      ]
-    },
-    {
-      "id": "save-load",
-      "name": "Save/load system",
+      "id": "ship-designer-logic",
+      "name": "Ship designer game logic",
       "type": "code",
-      "status": "done",
-      "dependencies": [
-        "game-state-types"
-      ],
-      "description": "LocalStorage save/load",
-      "output": "src/game/persistence.ts",
+      "status": "pending",
+      "dependencies": ["ship-components-data"],
+      "description": "Implement ship design validation and cost calculation in src/game/. Reference design/ships/ship-design.md. Validate hull space, calculate costs, check tech requirements.",
+      "output": "src/game/systems/shipDesign.ts",
       "acceptance": [
-        "Save to localStorage",
-        "Load from localStorage",
-        "Export/import JSON file"
+        "validateDesign() checks hull space limits",
+        "calculateDesignCost() returns BC cost",
+        "checkTechRequirements() validates all components unlocked",
+        "No DOM imports",
+        "Unit tests pass"
       ]
     },
     {
-      "id": "integration-test",
-      "name": "Integration test: full game loop",
-      "type": "test",
-      "status": "done",
-      "dependencies": [
-        "production-system",
-        "population-growth",
-        "research-system",
-        "galaxy-map-canvas"
-      ],
-      "description": "End-to-end test of starting game and playing turns",
-      "output": "test/integration/game-loop.test.ts",
+      "id": "ship-designer-ui",
+      "name": "Ship designer UI screen",
+      "type": "ui",
+      "status": "pending",
+      "dependencies": ["ship-designer-logic"],
+      "description": "Full ship designer screen per design/ui-ux/wireframes/ship-design.md. Hull selection, component slots, stats preview, save design.",
+      "output": "src/ui/screens/DesignScreen.ts (replace stub)",
       "acceptance": [
-        "Can start new game",
-        "Can click Next Turn multiple times",
-        "Production accumulates",
-        "Population grows"
+        "Hull size selector (Small/Medium/Large/Huge)",
+        "Component slots for weapons, armor, shields, engine, specials",
+        "Shows remaining space and total cost",
+        "Save design button creates ShipDesign in state",
+        "Load existing designs"
+      ]
+    },
+    {
+      "id": "ship-construction",
+      "name": "Ship construction system",
+      "type": "code",
+      "status": "pending",
+      "dependencies": ["ship-designer-logic"],
+      "description": "Add ship construction to production system. When SHIP slider > 0, accumulate BC toward current ship design. When complete, spawn ship at planet. Reference design/economy/ship-costs.md.",
+      "output": "src/game/systems/shipConstruction.ts, src/game/actions/ship.ts",
+      "acceptance": [
+        "SHIP slider allocates production to shipyard",
+        "Progress accumulates across turns",
+        "Ship spawns when cost met",
+        "Ship added to planet's local fleet",
+        "Unit tests pass"
+      ]
+    },
+    {
+      "id": "fleet-state",
+      "name": "Fleet state and actions",
+      "type": "code",
+      "status": "pending",
+      "dependencies": ["ship-construction"],
+      "description": "Expand fleet state management. Fleets contain ships, have location, destination, ETA. Actions for move, merge, split, scrap.",
+      "output": "src/game/systems/fleet.ts (expand), src/game/actions/fleet.ts (expand)",
+      "acceptance": [
+        "Fleet has ships[], location, destination, eta",
+        "moveFleet() sets destination and calculates ETA",
+        "Turn processing moves fleets toward destination",
+        "mergeFleets() combines two fleets",
+        "splitFleet() divides ships",
+        "Unit tests pass"
+      ]
+    },
+    {
+      "id": "fleet-ui",
+      "name": "Fleet management UI",
+      "type": "ui",
+      "status": "pending",
+      "dependencies": ["fleet-state"],
+      "description": "Fleet screen showing all fleets, their composition, destinations. Allow selecting fleet and setting destination on galaxy map.",
+      "output": "src/ui/screens/FleetsScreen.ts (replace stub)",
+      "acceptance": [
+        "Lists all player fleets with location",
+        "Shows ship counts per fleet",
+        "Shows destination and ETA if moving",
+        "Can select fleet on galaxy map",
+        "Right-click destination sends fleet"
+      ]
+    },
+    {
+      "id": "colonization",
+      "name": "Colony ship and colonization",
+      "type": "code",
+      "status": "pending",
+      "dependencies": ["fleet-state"],
+      "description": "Colony ship special: when fleet with colony ship reaches uncolonized habitable planet, option to colonize. Colony ship consumed, planet becomes colony.",
+      "output": "src/game/systems/colonization.ts",
+      "acceptance": [
+        "Colony Ship is special ship type",
+        "Arriving at uncolonized planet triggers colonize option",
+        "Colonizing consumes colony ship",
+        "New colony has starting population and factories",
+        "Planet added to empire",
+        "Unit tests pass"
+      ]
+    },
+    {
+      "id": "tech-tree-data",
+      "name": "Full technology tree JSON",
+      "type": "data",
+      "status": "pending",
+      "description": "Complete all 6 tech fields from design docs: weapons.md, propulsion.md, construction.md, computers.md, force-fields.md, planetology.md. Each tech needs: id, name, field, tier, cost, unlocks[], description.",
+      "output": "src/data/tech-tree.json",
+      "acceptance": [
+        "All 6 fields represented",
+        "Tiers 1-16 with correct costs",
+        "Unlocks reference component IDs",
+        "150+ technologies total",
+        "Valid JSON"
+      ]
+    },
+    {
+      "id": "research-ui",
+      "name": "Research screen UI",
+      "type": "ui",
+      "status": "pending",
+      "dependencies": ["tech-tree-data"],
+      "description": "Research screen per design/ui-ux/wireframes/research-tree.md. Shows 6 fields, current research per field, RP allocation sliders, tech choices.",
+      "output": "src/ui/screens/ResearchScreen.ts (replace stub)",
+      "acceptance": [
+        "6 tech fields displayed",
+        "Current tech and progress per field",
+        "RP allocation sliders (sum to 100%)",
+        "When tech completes, show choices (2-3 techs)",
+        "Tech details on hover/click"
+      ]
+    },
+    {
+      "id": "combat-engine",
+      "name": "Tactical combat engine",
+      "type": "code",
+      "status": "pending",
+      "dependencies": ["ship-components-data"],
+      "description": "Combat resolution engine per design/ships/combat-algorithm.md. Hex grid, initiative, movement, firing, damage resolution. Start with auto-resolve; manual control later.",
+      "output": "src/game/systems/combat.ts",
+      "acceptance": [
+        "initiateCombat() creates combat state",
+        "processRound() handles one combat round",
+        "Damage formula matches MOO1 (50 + (atk-def)*10)%",
+        "Shields absorb before HP",
+        "Combat ends when one side eliminated or retreats",
+        "Returns victor and losses",
+        "Unit tests pass"
+      ]
+    },
+    {
+      "id": "combat-ui",
+      "name": "Tactical combat UI",
+      "type": "ui",
+      "status": "pending",
+      "dependencies": ["combat-engine"],
+      "description": "Combat screen with hex grid, ship positions, firing. Auto-resolve button + manual controls.",
+      "output": "src/ui/screens/CombatScreen.ts",
+      "acceptance": [
+        "Hex grid renders",
+        "Ships displayed at positions",
+        "Auto-resolve button runs combat to completion",
+        "Shows combat log/results",
+        "Return to galaxy map after combat"
+      ]
+    },
+    {
+      "id": "ai-basic",
+      "name": "Basic AI opponent",
+      "type": "code",
+      "status": "pending",
+      "dependencies": ["fleet-state", "colonization"],
+      "description": "Basic AI that manages production, builds ships, expands to nearby planets. Reference design/species/ai-archetypes.md for personality types.",
+      "output": "src/game/ai/AIEmpire.ts, src/game/ai/strategies.ts",
+      "acceptance": [
+        "AI sets production sliders",
+        "AI builds colony ships early game",
+        "AI colonizes nearby planets",
+        "AI builds military ships",
+        "AI sends fleets to attack if at war",
+        "No DOM imports",
+        "Unit tests pass"
+      ]
+    },
+    {
+      "id": "turn-integration",
+      "name": "Turn processing integration",
+      "type": "code",
+      "status": "pending",
+      "dependencies": ["combat-engine", "ai-basic", "colonization"],
+      "description": "Wire all systems into turn processing. Fleet movement, combat triggers, AI turns, colonization checks.",
+      "output": "src/game/systems/turn.ts (expand)",
+      "acceptance": [
+        "processTurn() moves all fleets",
+        "Arriving fleets trigger combat or colonize",
+        "AI empires take their turns",
+        "All production/growth/research runs",
+        "Events queue for notification"
       ]
     }
   ]
