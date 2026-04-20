@@ -322,7 +322,7 @@ export function foilMission(state: GameState, missionId: string): GameState {
  * This is a pure state transform — side-effects (notifications, UI) live
  * outside this module.
  */
-export function applyMissionEffect(state: GameState, mission: SpyMission): GameState {
+export function applyMissionEffect(state: GameState, _mission: SpyMission): GameState {
   // The reward is already stamped on the mission.
   // Downstream reducers (production, diplomacy, research) will read spyMissions
   // to process completed-mission rewards each turn.
