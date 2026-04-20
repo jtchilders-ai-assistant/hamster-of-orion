@@ -1,67 +1,25 @@
-# Current Task: ship-construction
+# Task: Basic AI opponent (`ai-basic`)
 
-## Task ID
-ship-construction
-
-## Name
-Ship construction system
+## Dependencies
+- ✅ `fleet-state` — Fleet state and actions
+- ✅ `colonization` — Colony ship and colonization
 
 ## Description
-Add ship construction to production system. When SHIP slider > 0, accumulate BC toward current ship design. When complete, spawn ship at planet. Reference design/economy/ship-costs.md if it exists.
-
-## Key References
-- `src/game/systems/shipDesign.ts` — calculateDesignCost() for ship costs
-- `src/game/systems/production.ts` — existing production system
-- `src/game/state.ts` — GameState, Planet, Fleet types
-- `design/economy/slider-mathematics.md` — SHIP slider allocation
+Basic AI that manages production, builds ships, expands to nearby planets. Reference design/species/ai-archetypes.md for personality types.
 
 ## Output
-- `src/game/systems/shipConstruction.ts`
-- `src/game/actions/ship.ts`
+`src/game/ai/AIEmpire.ts`, `src/game/ai/strategies.ts`
 
 ## Acceptance Criteria
-1. SHIP slider allocates production to shipyard (use existing SHIP allocation from production)
-2. Progress accumulates across turns (carry over fractional BC)
-3. Ship spawns when cost met (create ship entity)
-4. Ship added to planet's local fleet (or create new fleet if none exists)
-5. Unit tests pass — no DOM imports in src/game/
+- [ ] AI sets production sliders
+- [ ] AI builds colony ships early game
+- [ ] AI colonizes nearby planets
+- [ ] AI builds military ships
+- [ ] AI sends fleets to attack if at war
+- [ ] No DOM imports
+- [ ] Unit tests pass
 
-## Implementation Notes
-- Each planet should track: `currentDesignId`, `shipyardProgress` (BC accumulated)
-- When `shipyardProgress >= designCost`, spawn ship and reset progress (with overflow carry-over)
-- Need a `Ship` interface in state.ts if it doesn't exist:
-  ```typescript
-  interface Ship {
-    id: string;
-    designId: string;
-    hp: number;
-    maxHp: number;
-  }
-  ```
-- Need to add ships to Fleet. Fleet should have `ships: Ship[]`
-- Wire into turn processing: after production calculates SHIP BC, add to shipyardProgress
-
-## Tests Required
-Create `test/game/systems/shipConstruction.test.ts`:
-- Accumulates BC from SHIP allocation across turns
-- Spawns ship when progress >= cost
-- Overflow carries to next ship
-- Ship has correct HP based on design
-- Ship added to planet's fleet
-- No ship spawned if no design selected
-- Multiple ships if enough production
-
-## Output on Completion
-Update `workflow-state.json`:
-```json
-{
-  "state": "TESTING",
-  "current_task": "ship-construction",
-  "worker_output": {
-    "files_created": ["src/game/systems/shipConstruction.ts", "src/game/actions/ship.ts", "test/game/systems/shipConstruction.test.ts"],
-    "files_modified": ["src/game/state.ts"],
-    "tests_added": ["test/game/systems/shipConstruction.test.ts"],
-    "summary": "..."
-  }
-}
-```
+## Notes
+- Dependencies `fleet-state` and `colonization` are both completed
+- `fleet-state` provides fleet management primitives
+- `colonization` provides colony ship mechanics

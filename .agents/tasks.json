@@ -232,7 +232,7 @@
       "id": "ai-basic",
       "name": "Basic AI opponent",
       "type": "code",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         "fleet-state",
         "colonization"
@@ -247,7 +247,8 @@
         "AI sends fleets to attack if at war",
         "No DOM imports",
         "Unit tests pass"
-      ]
+      ],
+      "completed_at": "2026-04-20T03:30:00Z"
     },
     {
       "id": "turn-integration",

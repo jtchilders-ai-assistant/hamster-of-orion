@@ -551,3 +551,36 @@ Replaced stub `src/ui/screens/DesignScreen.ts` with full MOO1-accurate ship desi
 ## Phase 4A Progress
 Completed: planet-screen, ship-components-data, ship-designer-logic, ship-designer-ui, ship-construction, fleet-state, fleet-ui, colonization, tech-tree-data, research-ui, combat-engine, combat-ui, buildings-data, starting-fleets
 Remaining: ai-basic, turn-integration
+
+---
+
+## 2026-04-20T03:11 UTC — ai-basic DONE (tests pass, awaiting verification)
+- Worker completed (Sonnet retry succeeded; Qwen worker killed after concurrent completion)
+- TypeScript typecheck: PASS (0 errors)
+- Tests: 753/753 passed (31 new AI tests + 722 existing)
+- Files created:
+  - src/game/ai/AIEmpire.ts (283 lines) — Empire AI class with production slider management, ship building, colonization, military operations
+  - src/game/ai/strategies.ts (441 lines) — AI decision-making: build orders, colonization targets, attack decisions
+  - src/game/ai/ai-personalities.ts (275 lines) — AI personality archetypes per species design doc
+  - test/game/ai/AIEmpire.test.ts (840 lines) — 31 unit tests covering all acceptance criteria
+- Acceptance criteria:
+  - ✅ AI sets production sliders
+  - ✅ AI builds colony ships early game
+  - ✅ AI colonizes nearby planets
+  - ✅ AI builds military ships
+  - ✅ AI sends fleets to attack if at war
+  - ✅ No DOM imports
+  - ✅ Unit tests pass
+- Next: verification step, then commit & mark DONE
+- State: TESTING → spawning verifier
+
+## 2026-04-20T03:30 UTC — ai-basic VERIFIED & APPROVED
+- Verifier: all checks passed
+  - TypeScript typecheck: PASS (0 errors)
+  - Tests: 753/753 passed
+  - No DOM imports in src/game/ai/
+  - All 6 acceptance criteria confirmed met
+- Minor style note: `!planet.isColonized === false` in strategies.ts is a confusing double-negative (functionally correct); flagged for future refactor
+- Task status → done
+- workflow-state → IDLE
+- Git commit: next step
