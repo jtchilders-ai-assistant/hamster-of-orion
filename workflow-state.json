@@ -1,9 +1,9 @@
 {
-  "state": "TESTING",
+  "state": "IDLE",
   "phase": "phase4a-core-interactivity",
-  "current_task": "ai-basic",
-  "last_completed": "combat-ui",
+  "current_task": null,
+  "last_completed": "turn-fix-compile",
   "started_at": "2026-04-20T02:41:00Z",
-  "verified_at": "2026-04-20T02:04:00Z",
-  "orchestrator_note": "ai-basic task completed. 753 tests pass, typecheck clean. Moving to verification."
+  "verified_at": "2026-04-20T03:30:00Z",
+  "orchestrator_note": "turn-fix-compile task approved. Commander.ts fixed with Store<GameState>, typecheck clean, all 753 tests pass. Ready for next task."
 }

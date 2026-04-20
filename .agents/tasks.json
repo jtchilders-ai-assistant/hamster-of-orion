@@ -543,6 +543,15 @@
         "Racial field bonuses influence allocation",
         "Unit tests pass"
       ]
+    },
+    {
+      "id": "turn-fix-compile",
+      "name": "Fix Turn Integration \u2014 Wiring & Compilation",
+      "type": "fix",
+      "status": "done",
+      "description": "Rename Commander.tsx to .ts, fix constructor to accept Store, remove TurnSummary imports, wire main.ts.",
+      "output": "src/ui/components/Commander.ts",
+      "completed_at": "2026-04-20T03:30:00Z"
     }
   ]
 }
