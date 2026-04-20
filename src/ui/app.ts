@@ -120,7 +120,7 @@ export class App {
       ['fleet',       new FleetsScreen(fleetsEl)],
       ['research',    new ResearchScreen(researchEl)],
       ['diplomacy',   new DiplomacyScreen(diplomacyEl)],
-      ['ship_design', new DesignScreen(designEl)],
+      ['ship_design', new DesignScreen(designEl, store)],
     ]);
   }
 

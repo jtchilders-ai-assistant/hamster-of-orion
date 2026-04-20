@@ -1,16 +1,12 @@
 {
   "state": "TESTING",
-  "current_task": "save-load",
+  "current_task": "starting-fleets",
   "worker_output": {
     "files_created": [
-      "src/game/persistence.ts",
-      "src/ui/persistence.ts",
-      "test/game/persistence.test.ts"
+      "src/data/starting-fleets.json"
     ],
     "files_modified": [],
-    "tests_added": [
-      "test/game/persistence.test.ts"
-    ],
-    "summary": "Implemented the full save/load persistence system. (1) src/game/persistence.ts: Pure functions — serializeState() wraps GameState in a versioned SaveEnvelope (version + savedAt timestamp + state) and JSON-serializes it; deserializeState() parses + validates the envelope and returns GameState | null (null on bad JSON, missing fields, or wrong version); saveGame() / loadGame() read-write to localStorage key 'hamster-of-orion-save', silently swallowing any storage errors; deleteSave() removes the key; hasSave() checks for key existence. All error paths return null or no-op — never throw. SaveEnvelope interface and isSaveEnvelope type guard ensure no `any` types. (2) src/ui/persistence.ts: DOM helpers — exportSaveFile() creates a Blob, attaches a hidden <a> with download attr, clicks it, then revokes the object URL after 1 s; importSaveFile() returns Promise<GameState | null> — opens a file picker via <input type=file>, reads the selected .json with FileReader, passes text to deserializeState(), resolves null on cancel or error (cancel detected via window focus + 300 ms grace period). (3) test/game/persistence.test.ts: 20 unit tests covering serializeState (produces valid JSON, correct envelope shape, savedAt timestamp range), deserializeState (round-trip, empty string, invalid JSON, missing fields, wrong version, raw state object), and the localStorage integration suite for saveGame / loadGame / deleteSave / hasSave using vi.stubGlobal to mock localStorage. All 449 tests pass (0 typecheck errors)."
+    "tests_added": [],
+    "summary": "Created src/data/starting-fleets.json with starting ship designs and fleet compositions for all 10 races. Each race has 3 ship designs (colony, scout/utility, combat) and a starting fleet of 5-7 ships. Colony ships are included for every race. All ship designs use only each race's starting technologies from races.json. Notable design decisions: Rabbits get 2 colony ships (matching exponential_growth + expansion playstyle); Chameleons have cloaking_device on scouts (it's a starting tech — massive early intelligence advantage); Budgies use ion_drives (warp 4) giving the fastest starting fleet; Guinea Pigs start with the strongest pure combat fleet; Ferrets use battle_scanner synergy with first_strike ability; Ants/Guinea Pigs use retro_engines as baseline (no engine in starting techs). All 695 existing tests pass."
   }
 }

@@ -1,0 +1,585 @@
+{
+  "version": 1,
+  "_note": "Starting ship designs and fleet compositions for each race. Ships use only starting technologies. Colony ships enable early expansion. All races begin with 1 colony ship + race-specific combat ships.",
+  "shipSizes": {
+    "small":  { "baseHp": 25,  "spaceUnits": 50  },
+    "medium": { "baseHp": 60,  "spaceUnits": 100 },
+    "large":  { "baseHp": 125, "spaceUnits": 200 },
+    "huge":   { "baseHp": 250, "spaceUnits": 500 }
+  },
+  "races": [
+    {
+      "raceId": "hamsters",
+      "shipPrefix": "HSS",
+      "_startingTechs": ["nuclear_engines", "controlled_environment", "nuclear_missile", "titanium_armor"],
+      "shipDesigns": [
+        {
+          "id": "hamsters_colony_ship",
+          "name": "Colony Ship",
+          "size": "huge",
+          "role": "colony",
+          "components": {
+            "engine": "nuclear_engines",
+            "armor": "titanium_armor",
+            "fuel": "standard_fuel_cells",
+            "specials": ["colony_pod"]
+          },
+          "weapons": [],
+          "_note": "Unarmed colony ship. nuclear_engines for warp 2, titanium_armor for baseline HP."
+        },
+        {
+          "id": "hamsters_scout",
+          "name": "Scout",
+          "size": "small",
+          "role": "scout",
+          "components": {
+            "engine": "nuclear_engines",
+            "armor": "titanium_armor",
+            "fuel": "standard_fuel_cells"
+          },
+          "weapons": [],
+          "_note": "Fast unarmed scout for galaxy exploration."
+        },
+        {
+          "id": "hamsters_frigate",
+          "name": "Diplomat-class Frigate",
+          "size": "small",
+          "role": "combat",
+          "components": {
+            "engine": "nuclear_engines",
+            "armor": "titanium_armor",
+            "fuel": "standard_fuel_cells"
+          },
+          "weapons": [
+            { "componentId": "nuclear_missile", "count": 2 }
+          ],
+          "_note": "Light missile frigate. Uses nuclear_missile (starting tech). Balanced early combat ship fitting Hamster diplomat archetype."
+        }
+      ],
+      "startingFleet": [
+        { "designId": "hamsters_colony_ship", "count": 1 },
+        { "designId": "hamsters_scout",       "count": 2 },
+        { "designId": "hamsters_frigate",     "count": 2 }
+      ]
+    },
+
+    {
+      "raceId": "ants",
+      "shipPrefix": "CAS",
+      "_startingTechs": ["retro_engines", "automated_factory", "mass_driver", "reinforced_hull"],
+      "shipDesigns": [
+        {
+          "id": "ants_colony_ship",
+          "name": "Colony Ship",
+          "size": "huge",
+          "role": "colony",
+          "components": {
+            "engine": "retro_engines",
+            "armor": "reinforced_hull",
+            "fuel": "standard_fuel_cells",
+            "specials": ["colony_pod"]
+          },
+          "weapons": [],
+          "_note": "Slow (warp 1) but sturdy colony ship using reinforced_hull for extra HP."
+        },
+        {
+          "id": "ants_worker_frigate",
+          "name": "Worker-class Frigate",
+          "size": "small",
+          "role": "combat",
+          "components": {
+            "engine": "retro_engines",
+            "armor": "reinforced_hull",
+            "fuel": "standard_fuel_cells"
+          },
+          "weapons": [
+            { "componentId": "mass_driver", "count": 1 }
+          ],
+          "_note": "Mass driver armed frigate. mass_driver is a starting tech for Ants. Expendable swarm unit for the Collective."
+        },
+        {
+          "id": "ants_drone_destroyer",
+          "name": "Drone-class Destroyer",
+          "size": "medium",
+          "role": "combat",
+          "components": {
+            "engine": "retro_engines",
+            "armor": "reinforced_hull",
+            "fuel": "standard_fuel_cells"
+          },
+          "weapons": [
+            { "componentId": "mass_driver", "count": 2 }
+          ],
+          "_note": "Heavier assault ship. Two mass drivers for sustained bombardment. Slow but powerful for the hive's war machine."
+        }
+      ],
+      "startingFleet": [
+        { "designId": "ants_colony_ship",     "count": 1 },
+        { "designId": "ants_worker_frigate",  "count": 3 },
+        { "designId": "ants_drone_destroyer", "count": 1 }
+      ]
+    },
+
+    {
+      "raceId": "mice",
+      "shipPrefix": "MCS",
+      "_startingTechs": ["nuclear_engines", "automated_repair", "battle_computer_1", "robotic_controls_3"],
+      "shipDesigns": [
+        {
+          "id": "mice_colony_ship",
+          "name": "Colony Ship",
+          "size": "huge",
+          "role": "colony",
+          "components": {
+            "engine": "nuclear_engines",
+            "armor": "titanium_armor",
+            "fuel": "standard_fuel_cells",
+            "specials": ["colony_pod", "automated_repair"]
+          },
+          "weapons": [],
+          "_note": "Colony ship with automated repair for durability in transit. Mice get titanium_armor as universal baseline."
+        },
+        {
+          "id": "mice_automated_scout",
+          "name": "Automated Scout",
+          "size": "small",
+          "role": "scout",
+          "components": {
+            "engine": "nuclear_engines",
+            "armor": "titanium_armor",
+            "fuel": "standard_fuel_cells",
+            "computer": "battle_computer_1"
+          },
+          "weapons": [],
+          "_note": "Unmanned scout with battle computer for targeting. Fast exploration unit."
+        },
+        {
+          "id": "mice_precision_frigate",
+          "name": "Precision-class Frigate",
+          "size": "small",
+          "role": "combat",
+          "components": {
+            "engine": "nuclear_engines",
+            "armor": "titanium_armor",
+            "fuel": "standard_fuel_cells",
+            "computer": "battle_computer_1",
+            "specials": ["automated_repair"]
+          },
+          "weapons": [
+            { "componentId": "laser", "count": 2 }
+          ],
+          "_note": "Combat frigate with battle computer for accuracy bonus and automated repair for self-sufficiency. Laser is universal baseline weapon. Reflects Mice tech focus."
+        }
+      ],
+      "startingFleet": [
+        { "designId": "mice_colony_ship",        "count": 1 },
+        { "designId": "mice_automated_scout",    "count": 2 },
+        { "designId": "mice_precision_frigate",  "count": 2 }
+      ]
+    },
+
+    {
+      "raceId": "rats",
+      "shipPrefix": "RSS",
+      "_startingTechs": ["nuclear_engines", "deep_space_scanner", "research_lab", "colony_base"],
+      "shipDesigns": [
+        {
+          "id": "rats_colony_ship",
+          "name": "Colony Ship",
+          "size": "huge",
+          "role": "colony",
+          "components": {
+            "engine": "nuclear_engines",
+            "armor": "titanium_armor",
+            "fuel": "standard_fuel_cells",
+            "specials": ["colony_pod"]
+          },
+          "weapons": [],
+          "_note": "Standard colony ship. Rats prioritize expansion to build research networks quickly."
+        },
+        {
+          "id": "rats_research_scout",
+          "name": "Research Scout",
+          "size": "small",
+          "role": "scout",
+          "components": {
+            "engine": "nuclear_engines",
+            "armor": "titanium_armor",
+            "fuel": "standard_fuel_cells",
+            "specials": ["deep_space_scanner"]
+          },
+          "weapons": [],
+          "_note": "Scout equipped with deep space scanner for extended detection range. Rats want information early."
+        },
+        {
+          "id": "rats_surveyor",
+          "name": "Surveyor-class Frigate",
+          "size": "small",
+          "role": "combat",
+          "components": {
+            "engine": "nuclear_engines",
+            "armor": "titanium_armor",
+            "fuel": "standard_fuel_cells",
+            "specials": ["deep_space_scanner"]
+          },
+          "weapons": [
+            { "componentId": "laser", "count": 2 }
+          ],
+          "_note": "Light defensive frigate with scanner. Rats are pacifist technologists; minimal armament, maximal awareness."
+        }
+      ],
+      "startingFleet": [
+        { "designId": "rats_colony_ship",    "count": 1 },
+        { "designId": "rats_research_scout", "count": 3 },
+        { "designId": "rats_surveyor",       "count": 1 }
+      ]
+    },
+
+    {
+      "raceId": "rabbits",
+      "shipPrefix": "RCS",
+      "_startingTechs": ["retro_engines", "colony_ship", "hyper_v_rockets", "standard_fuel_cells"],
+      "shipDesigns": [
+        {
+          "id": "rabbits_colony_ship",
+          "name": "Colony Ship",
+          "size": "huge",
+          "role": "colony",
+          "components": {
+            "engine": "retro_engines",
+            "armor": "titanium_armor",
+            "fuel": "standard_fuel_cells",
+            "specials": ["colony_pod"]
+          },
+          "weapons": [],
+          "_note": "Rabbits have colony_ship as a starting tech — they're born to expand. Extra colony ships in fleet."
+        },
+        {
+          "id": "rabbits_warren_scout",
+          "name": "Warren Scout",
+          "size": "small",
+          "role": "scout",
+          "components": {
+            "engine": "retro_engines",
+            "armor": "titanium_armor",
+            "fuel": "standard_fuel_cells"
+          },
+          "weapons": [],
+          "_note": "Cheap fast scout to find new colonizable worlds."
+        },
+        {
+          "id": "rabbits_swarm_frigate",
+          "name": "Swarm-class Frigate",
+          "size": "small",
+          "role": "combat",
+          "components": {
+            "engine": "retro_engines",
+            "armor": "titanium_armor",
+            "fuel": "standard_fuel_cells"
+          },
+          "weapons": [
+            { "componentId": "hyper_v_rocket", "count": 2 }
+          ],
+          "_note": "Cheap missile frigate armed with hyper-v rockets (starting tech). Fits swarm_tactics ability — many cheap ships. Rabbits trade quality for quantity."
+        }
+      ],
+      "startingFleet": [
+        { "designId": "rabbits_colony_ship",    "count": 2 },
+        { "designId": "rabbits_warren_scout",   "count": 2 },
+        { "designId": "rabbits_swarm_frigate",  "count": 3 }
+      ],
+      "_note": "Rabbits get 2 colony ships at start to immediately begin multi-planet expansion — matching their exponential growth playstyle."
+    },
+
+    {
+      "raceId": "hermit_crabs",
+      "shipPrefix": "HCS",
+      "_startingTechs": ["nuclear_engines", "controlled_environment", "duralloy_armor", "automated_factory"],
+      "shipDesigns": [
+        {
+          "id": "hermit_crabs_colony_ship",
+          "name": "Colony Ship",
+          "size": "huge",
+          "role": "colony",
+          "components": {
+            "engine": "nuclear_engines",
+            "armor": "duralloy_armor",
+            "fuel": "standard_fuel_cells",
+            "specials": ["colony_pod"]
+          },
+          "weapons": [],
+          "_note": "Heavily armored colony ship with duralloy_armor (starting tech gives +50% HP). Hermit Crabs colonize hostile worlds without penalty."
+        },
+        {
+          "id": "hermit_crabs_fortress_scout",
+          "name": "Shell Scout",
+          "size": "small",
+          "role": "scout",
+          "components": {
+            "engine": "nuclear_engines",
+            "armor": "duralloy_armor",
+            "fuel": "standard_fuel_cells"
+          },
+          "weapons": [],
+          "_note": "Armored scout. Even scouts are tough with duralloy."
+        },
+        {
+          "id": "hermit_crabs_carapace_frigate",
+          "name": "Carapace-class Frigate",
+          "size": "medium",
+          "role": "combat",
+          "components": {
+            "engine": "nuclear_engines",
+            "armor": "duralloy_armor",
+            "fuel": "standard_fuel_cells"
+          },
+          "weapons": [
+            { "componentId": "laser", "count": 2 }
+          ],
+          "_note": "Well-armored medium ship with laser armament. Hermit Crabs favor durability over speed — slow but nearly indestructible."
+        }
+      ],
+      "startingFleet": [
+        { "designId": "hermit_crabs_colony_ship",       "count": 1 },
+        { "designId": "hermit_crabs_fortress_scout",    "count": 2 },
+        { "designId": "hermit_crabs_carapace_frigate",  "count": 2 }
+      ]
+    },
+
+    {
+      "raceId": "guinea_pigs",
+      "shipPrefix": "GPS",
+      "_startingTechs": ["hyper_v_rockets", "reinforced_hull", "hand_lasers", "duralloy_armor"],
+      "shipDesigns": [
+        {
+          "id": "guinea_pigs_colony_ship",
+          "name": "Colony Ship",
+          "size": "huge",
+          "role": "colony",
+          "components": {
+            "engine": "retro_engines",
+            "armor": "duralloy_armor",
+            "fuel": "standard_fuel_cells",
+            "specials": ["colony_pod", "reinforced_hull"]
+          },
+          "weapons": [],
+          "_note": "Guinea Pigs have no engine in starting tech. Use retro_engines (universal baseline). Reinforced hull and duralloy armor make it very sturdy."
+        },
+        {
+          "id": "guinea_pigs_assault_frigate",
+          "name": "Assault-class Frigate",
+          "size": "small",
+          "role": "combat",
+          "components": {
+            "engine": "retro_engines",
+            "armor": "duralloy_armor",
+            "fuel": "standard_fuel_cells",
+            "specials": ["reinforced_hull"]
+          },
+          "weapons": [
+            { "componentId": "hyper_v_rocket", "count": 2 }
+          ],
+          "_note": "Heavy assault frigate with hyper-v rockets and reinforced hull. Guinea Pigs are aggressive warriors — even their ships are built to take punishment."
+        },
+        {
+          "id": "guinea_pigs_war_destroyer",
+          "name": "War-class Destroyer",
+          "size": "medium",
+          "role": "combat",
+          "components": {
+            "engine": "retro_engines",
+            "armor": "duralloy_armor",
+            "fuel": "standard_fuel_cells",
+            "specials": ["reinforced_hull"]
+          },
+          "weapons": [
+            { "componentId": "hyper_v_rocket", "count": 3 }
+          ],
+          "_note": "Heavily armored destroyer. Maximum hyper-v rocket loadout. Slow but devastating — perfect for the war-focused Guinea Pig playstyle."
+        }
+      ],
+      "startingFleet": [
+        { "designId": "guinea_pigs_colony_ship",     "count": 1 },
+        { "designId": "guinea_pigs_assault_frigate", "count": 3 },
+        { "designId": "guinea_pigs_war_destroyer",   "count": 1 }
+      ],
+      "_note": "Guinea Pigs start with a stronger military fleet than other races, reflecting their aggressive_expansionist archetype. Ground combat bonuses apply when ships deliver troops."
+    },
+
+    {
+      "raceId": "ferrets",
+      "shipPrefix": "FHS",
+      "_startingTechs": ["nuclear_engines", "laser_cannon", "battle_scanner", "class_1_shield"],
+      "shipDesigns": [
+        {
+          "id": "ferrets_colony_ship",
+          "name": "Colony Ship",
+          "size": "huge",
+          "role": "colony",
+          "components": {
+            "engine": "nuclear_engines",
+            "armor": "titanium_armor",
+            "fuel": "standard_fuel_cells",
+            "specials": ["colony_pod"]
+          },
+          "weapons": [],
+          "_note": "Fast colony ship using nuclear_engines (warp 2). Ferrets want to claim planets quickly before others do."
+        },
+        {
+          "id": "ferrets_stalker_scout",
+          "name": "Stalker Scout",
+          "size": "small",
+          "role": "scout",
+          "components": {
+            "engine": "nuclear_engines",
+            "armor": "titanium_armor",
+            "fuel": "standard_fuel_cells",
+            "specials": ["battle_scanner"]
+          },
+          "weapons": [],
+          "_note": "Fast scout with battle scanner for +3 initiative and +1 attack rating. Ferrets want to see the enemy first."
+        },
+        {
+          "id": "ferrets_hunter_frigate",
+          "name": "Hunter-class Frigate",
+          "size": "small",
+          "role": "combat",
+          "components": {
+            "engine": "nuclear_engines",
+            "armor": "titanium_armor",
+            "fuel": "standard_fuel_cells",
+            "shield": "class_1_shield",
+            "specials": ["battle_scanner"]
+          },
+          "weapons": [
+            { "componentId": "laser_cannon", "count": 2 }
+          ],
+          "_note": "Armed with laser cannons + shield + battle scanner. Battle scanner gives first strike initiative advantage, synergizing with Ferrets' deadly_accuracy and first_strike abilities."
+        }
+      ],
+      "startingFleet": [
+        { "designId": "ferrets_colony_ship",    "count": 1 },
+        { "designId": "ferrets_stalker_scout",  "count": 2 },
+        { "designId": "ferrets_hunter_frigate", "count": 3 }
+      ],
+      "_note": "Ferrets get a stronger combat fleet to reflect their blood_enemies_all starting relations — they need to defend immediately. first_strike and deadly_accuracy make even small ships dangerous."
+    },
+
+    {
+      "raceId": "budgies",
+      "shipPrefix": "FAS",
+      "_startingTechs": ["ion_drives", "battle_computer_1", "fusion_bomb", "class_1_shield"],
+      "shipDesigns": [
+        {
+          "id": "budgies_colony_ship",
+          "name": "Colony Ship",
+          "size": "huge",
+          "role": "colony",
+          "components": {
+            "engine": "ion_drives",
+            "armor": "titanium_armor",
+            "fuel": "standard_fuel_cells",
+            "specials": ["colony_pod"]
+          },
+          "weapons": [],
+          "_note": "Fastest starting colony ship of all races — ion_drives give warp 4. Budgies' movementRangeBonus of +1 further extends range. Excellent early expansion."
+        },
+        {
+          "id": "budgies_interceptor_scout",
+          "name": "Interceptor Scout",
+          "size": "small",
+          "role": "scout",
+          "components": {
+            "engine": "ion_drives",
+            "armor": "titanium_armor",
+            "fuel": "standard_fuel_cells",
+            "shield": "class_1_shield"
+          },
+          "weapons": [],
+          "_note": "Ultra-fast scout with shield. Ion drives + Budgie movement bonus = exceptional range. Superior pilots ability adds +3 initiative and +20% evasion."
+        },
+        {
+          "id": "budgies_wing_frigate",
+          "name": "Wing-class Frigate",
+          "size": "small",
+          "role": "combat",
+          "components": {
+            "engine": "ion_drives",
+            "armor": "titanium_armor",
+            "fuel": "standard_fuel_cells",
+            "computer": "battle_computer_1",
+            "shield": "class_1_shield"
+          },
+          "weapons": [
+            { "componentId": "fusion_bomb", "count": 1 }
+          ],
+          "_note": "Fast attack frigate with fusion bomb. Battle computer + Budgie accuracy. Shield + superior_pilots evasion make this exceptionally hard to hit for a small ship. Fusion bomb is effective against planetary defenses."
+        }
+      ],
+      "startingFleet": [
+        { "designId": "budgies_colony_ship",       "count": 1 },
+        { "designId": "budgies_interceptor_scout", "count": 3 },
+        { "designId": "budgies_wing_frigate",      "count": 2 }
+      ],
+      "_note": "Budgies have the best mobility of all starting fleets (ion_drives + movement bonus). superior_pilots ability applies to all ships. Emphasis on small fast ships to leverage dogfighter bonus."
+    },
+
+    {
+      "raceId": "chameleons",
+      "shipPrefix": "CSS",
+      "_startingTechs": ["hyper_x_rockets", "ecm_jammer_1", "cloaking_device", "battle_scanner"],
+      "shipDesigns": [
+        {
+          "id": "chameleons_colony_ship",
+          "name": "Colony Ship",
+          "size": "huge",
+          "role": "colony",
+          "components": {
+            "engine": "nuclear_engines",
+            "armor": "titanium_armor",
+            "fuel": "standard_fuel_cells",
+            "specials": ["colony_pod"]
+          },
+          "weapons": [],
+          "_note": "Chameleons have no engine in their starting tech list; use retro/nuclear as baseline. Colony ship is unmodified — espionage focus means less military investment early."
+        },
+        {
+          "id": "chameleons_shadow_scout",
+          "name": "Shadow Scout",
+          "size": "small",
+          "role": "scout",
+          "components": {
+            "engine": "nuclear_engines",
+            "armor": "titanium_armor",
+            "fuel": "standard_fuel_cells",
+            "specials": ["cloaking_device", "battle_scanner"]
+          },
+          "weapons": [],
+          "_note": "Cloaked scout with battle scanner. cloaking_device (starting tech!) is a massive early-game advantage — invisible scouts can map the entire galaxy undetected. Signature Chameleon opening move."
+        },
+        {
+          "id": "chameleons_veil_frigate",
+          "name": "Veil-class Frigate",
+          "size": "medium",
+          "role": "combat",
+          "components": {
+            "engine": "nuclear_engines",
+            "armor": "titanium_armor",
+            "fuel": "standard_fuel_cells",
+            "specials": ["cloaking_device", "ecm_jammer_1", "battle_scanner"]
+          },
+          "weapons": [
+            { "componentId": "hyper_x_rocket", "count": 2 }
+          ],
+          "_note": "Cloaked missile ship with ECM jammer. hyper_x_rockets (damage 8, fast) strike from stealth for devastating alpha strikes. ECM jammer protects against return missile fire. ecm_jammer_1 and cloaking_device are both starting techs."
+        }
+      ],
+      "startingFleet": [
+        { "designId": "chameleons_colony_ship",   "count": 1 },
+        { "designId": "chameleons_shadow_scout",  "count": 3 },
+        { "designId": "chameleons_veil_frigate",  "count": 1 }
+      ],
+      "_note": "Chameleons have the strongest intelligence-gathering start: multiple cloaked scouts plus a cloaked combat ship. Their blood_enemies_all-equivalent starting relations (Unease) means stealth is a survival necessity, not a luxury."
+    }
+  ]
+}

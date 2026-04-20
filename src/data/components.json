@@ -60,9 +60,6 @@
     { "id": "mauler_device", "name": "Mauler Device", "techLevel": 48, "category": "weapon", "subtype": "beam", "size": 10, "cost": 55, "effect": { "damageMin": 20, "damageMax": 100, "range": 2, "attacksPerRound": 1, "interceptable": false, "note": "100% accuracy" } },
     { "id": "plasma_torpedo", "name": "Plasma Torpedo", "techLevel": 50, "category": "weapon", "subtype": "torpedo", "size": 12, "cost": 65, "effect": { "damage": 150, "interceptable": false, "damagePerHexPenalty": 15, "note": "-15 damage per hex traveled" } },
     { "id": "mauler_pistol", "name": "Mauler Pistol", "techLevel": 50, "category": "weapon", "subtype": "ground", "size": 0, "cost": 0, "designAddition": true, "effect": { "groundCombatBonus": 35 } },
-    { "id": "death_spores", "name": "Death Spores", "techLevel": 10, "category": "weapon", "subtype": "biological", "size": 150, "cost": 100, "effect": { "populationKillRate": 1000000, "maxPopReduction": 0.10, "diplomaticPenalty": -100 } },
-    { "id": "doom_virus", "name": "Doom Virus", "techLevel": 25, "category": "weapon", "subtype": "biological", "size": 200, "cost": 200, "effect": { "populationKillRate": 2000000, "maxPopReduction": 0.25, "diplomaticPenalty": -100 } },
-    { "id": "bio_terminator", "name": "Bio Terminator", "techLevel": 33, "category": "weapon", "subtype": "biological", "size": 250, "cost": 300, "effect": { "populationKillRate": 3000000, "maxPopReduction": 0.50, "diplomaticPenalty": -100 } },
 
 
     

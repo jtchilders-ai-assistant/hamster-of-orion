@@ -251,6 +251,7 @@ export function applyShipConstruction(
       shipIds: [],
       systemId: planet.systemId,
       destination: null,
+      eta: 0,
       route: [],
       movementPoints: 0,
       maxMovement: 0,

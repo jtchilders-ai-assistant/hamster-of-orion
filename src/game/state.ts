@@ -280,6 +280,7 @@ export interface Fleet {
   systemId: SystemId;
 
   destination: SystemId | null;
+  eta: number;            // turns until arrival (0 = not moving or arrived)
   route: SystemId[];
   movementPoints: number;
   maxMovement: number;
