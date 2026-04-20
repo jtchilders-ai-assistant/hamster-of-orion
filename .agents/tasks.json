@@ -347,19 +347,20 @@
       "id": "treaties",
       "name": "Treaty system",
       "type": "code",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         "diplomacy-relations"
       ],
       "description": "Implement treaties: peace, non-aggression, trade, research, alliance. Reference design/diplomacy/treaties.md.",
-      "output": "src/game/systems/treaties.ts",
+      "output": "src/game/systems/treaties.ts (519 lines)",
       "acceptance": [
         "6 treaty types implemented",
         "Treaty proposal and acceptance",
         "Treaty effects applied (trade income, etc)",
         "Treaty breaking penalties",
         "Unit tests pass"
-      ]
+      ],
+      "completed_at": "2026-04-20T03:41:00Z"
     },
     {
       "id": "diplomacy-ui",
@@ -383,12 +384,12 @@
       "id": "high-council",
       "name": "Galactic High Council",
       "type": "code",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         "diplomacy-relations"
       ],
       "description": "Implement High Council elections per design/diplomacy/high-council.md. Vote share based on population, diplomatic victory condition.",
-      "output": "src/game/systems/council.ts",
+      "output": "src/game/systems/council.ts (380 lines)",
       "acceptance": [
         "Council convenes every 25 turns",
         "Vote share = population percentage",
@@ -396,7 +397,8 @@
         "AI voting based on relations",
         "Abstain option for player",
         "Unit tests pass"
-      ]
+      ],
+      "completed_at": "2026-04-20T03:41:00Z"
     },
     {
       "id": "council-ui",
@@ -458,12 +460,12 @@
       "id": "random-events",
       "name": "Random events system",
       "type": "code",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         "turn-integration"
       ],
       "description": "Implement random events per design/game-mechanics/random-events.md. Space monsters, plagues, discoveries, diplomatic incidents.",
-      "output": "src/game/systems/events.ts, src/data/events.json",
+      "output": "src/game/systems/events.ts (481 lines), src/data/events.json (19 events)",
       "acceptance": [
         "Events trigger randomly each turn",
         "15+ event types from design",
@@ -471,7 +473,8 @@
         "Planet events (plague, bounty)",
         "Event effects applied",
         "Unit tests pass"
-      ]
+      ],
+      "completed_at": "2026-04-20T03:41:00Z"
     },
     {
       "id": "victory-conditions",
@@ -496,19 +499,20 @@
       "id": "fog-of-war",
       "name": "Fog of war system",
       "type": "code",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         "fleet-state"
       ],
       "description": "Implement exploration and sensor range. Unknown systems hidden, explored systems remembered, sensor range reveals fleet movements.",
-      "output": "src/game/systems/fogOfWar.ts",
+      "output": "src/game/systems/fogOfWar.ts (225 lines)",
       "acceptance": [
         "Unexplored systems show as unknown",
         "Visiting system reveals it permanently",
         "Sensor range from colonies/fleets",
         "Enemy fleets visible in sensor range",
         "Unit tests pass"
-      ]
+      ],
+      "completed_at": "2026-04-20T03:41:00Z"
     },
     {
       "id": "ai-diplomacy",

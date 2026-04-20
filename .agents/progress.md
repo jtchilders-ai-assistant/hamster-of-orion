@@ -63,3 +63,20 @@
 - Pushed to origin/main
 
 ### Status: Phase 4A COMPLETE
+
+## 2026-04-20 19:40 UTC — Phase 4B: Additional Systems
+
+### Completed
+1. **treaties** — 6 treaty types (peace, non_aggression, trade, research, alliance, war), proposals, breaking penalties, trade ramp-up (519 lines)
+2. **high-council** — Galactic High Council, vote shares by population, 2/3 majority for diplomatic victory, AI voting (380 lines)
+3. **fog-of-war** — Exploration, sensor range (1 + scannerTechLevel), colony auto-reveal, fleet visibility (225 lines)
+4. **random-events** — 19 event types from design doc (space monsters, plagues, discoveries), seeded RNG, notification dispatch (481 lines + 336 lines event data)
+
+### Verification
+- Typecheck: PASS
+- Tests: 927/927 pass (up from 753, +174 new tests total)
+- No `any` types in src/game/
+- No DOM in src/game/
+- Pushed to origin/main
+
+### Status: Phase 4B COMPLETE
