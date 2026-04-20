@@ -51,6 +51,65 @@ export function rootReducer(state: GameState, action: Action): GameState {
     };
   }
 
+  // Planet selection — navigates to planet screen
+  if (action.type === 'SELECT_PLANET') {
+    const { planetId } = action.payload as { planetId: string | null };
+    return {
+      ...state,
+      currentScreen: 'planet' as const,
+      ui: {
+        ...state.ui,
+        selectedPlanet: planetId,
+        previousScreen: state.currentScreen,
+        currentScreen: 'planet' as const,
+      },
+    };
+  }
+
+  // Production slider update
+  if (action.type === 'UPDATE_PRODUCTION') {
+    const { planetId, sliders } = action.payload as {
+      planetId: string;
+      sliders: Partial<{
+        ship: number;
+        defense: number;
+        industry: number;
+        ecology: number;
+        research: number;
+      }>;
+    };
+
+    const planet = state.planets.byId[planetId];
+    if (!planet) return state;
+
+    const updated = {
+      ...planet,
+      production: {
+        ship:     sliders.ship     ?? planet.production.ship,
+        defense:  sliders.defense  ?? planet.production.defense,
+        industry: sliders.industry ?? planet.production.industry,
+        ecology:  sliders.ecology  ?? planet.production.ecology,
+        research: sliders.research ?? planet.production.research,
+      },
+    };
+
+    return {
+      ...state,
+      planets: {
+        ...state.planets,
+        byId: { ...state.planets.byId, [planetId]: updated },
+      },
+    };
+  }
+
+  // Lock / unlock slider flags (stored as ui hints; no planet state change needed)
+  // These are purely UI-side; PlanetScreen tracks them locally.
+  // We handle them here to keep the store as single source of truth if needed later.
+  if (action.type === 'LOCK_SLIDER' || action.type === 'UNLOCK_SLIDER') {
+    // No persistent state change for now — PlanetScreen manages lock state internally.
+    return state;
+  }
+
   // Route to sub-reducers
   if (action.type === 'NEXT_TURN') {
     return turnReducer(state, action);

@@ -7,11 +7,15 @@
  */
 
 import { GameState, StarSystem, Planet, EmpireId } from '../../game/state';
+import { Store, Action } from '../../game/store';
+import { selectPlanet } from '../../game/actions/colony';
 
 export class InfoPanel {
   private readonly element: HTMLElement;
+  private store: Store<GameState> | null = null;
 
-  constructor(container: HTMLElement) {
+  constructor(container: HTMLElement, store?: Store<GameState>) {
+    this.store = store ?? null;
     const existing = container.querySelector<HTMLElement>('#info-panel');
     if (existing) {
       this.element = existing;
@@ -51,6 +55,7 @@ export class InfoPanel {
 
     if (playerPlanets.length > 0 && primaryPlanet) {
       this.element.innerHTML = this.renderYourColony(state, system, primaryPlanet);
+      this.bindManageButton();
     } else if (aiPlanets.length > 0 && primaryPlanet) {
       const ownerId = primaryPlanet.ownerId as EmpireId;
       const ownerEmpire = state.empires.byId[ownerId];
@@ -148,6 +153,8 @@ export class InfoPanel {
         </div>
         <div class="info-divider"></div>
         ${currentBuild ? this.renderProduction(currentBuild) : '<div class="info-note">Nothing producing</div>'}
+        <div class="info-divider"></div>
+        <button class="btn-manage-colony" data-planet-id="${planet.id}">MANAGE COLONY</button>
       </div>
     `;
   }
@@ -188,6 +195,20 @@ export class InfoPanel {
       <div class="info-progress-bar" aria-label="Production progress ${Math.round(progress * 100)}%">${progressBar}</div>
       <div class="info-row">Turns left: <span>${build.turnsRemaining}</span></div>
     `;
+  }
+
+  // ── Button binding ─────────────────────────────────────────────────────────
+
+  private bindManageButton(): void {
+    const btn = this.element.querySelector<HTMLButtonElement>('.btn-manage-colony');
+    if (!btn || !this.store) return;
+
+    btn.addEventListener('click', () => {
+      const planetId = btn.dataset.planetId;
+      if (planetId) {
+        this.store!.dispatch(selectPlanet(planetId) as Action);
+      }
+    });
   }
 
   // ── Helpers ────────────────────────────────────────────────────────────────

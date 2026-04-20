@@ -15,6 +15,7 @@ import { ResearchScreen } from './screens/ResearchScreen';
 import { DiplomacyScreen } from './screens/DiplomacyScreen';
 import { DesignScreen } from './screens/DesignScreen';
 import { NewGameScreen } from './screens/NewGameScreen';
+import { PlanetScreen } from './screens/PlanetScreen';
 import { CommandBar } from './components/CommandBar';
 
 // ── F-key → Screen mapping (matches MOO1 command bar layout) ─────────────────
@@ -104,6 +105,7 @@ export class App {
       ?? this.makeScreenContainer(root, 'galaxy-screen');
 
     const coloniesEl   = this.makeScreenContainer(root, 'colonies-screen');
+    const planetEl     = this.makeScreenContainer(root, 'planet-screen');
     const fleetsEl     = this.makeScreenContainer(root, 'fleets-screen');
     const researchEl   = this.makeScreenContainer(root, 'research-screen');
     const diplomacyEl  = this.makeScreenContainer(root, 'diplomacy-screen');
@@ -113,6 +115,7 @@ export class App {
     return new Map<ScreenType, Screen>([
       ['new_game',    new NewGameScreen(newGameEl, store)],
       ['galaxy',      new GalaxyScreen(galaxyEl, store)],
+      ['planet',      new PlanetScreen(planetEl, store)],
       ['planet_list', new ColoniesScreen(coloniesEl)],
       ['fleet',       new FleetsScreen(fleetsEl)],
       ['research',    new ResearchScreen(researchEl)],

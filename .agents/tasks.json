@@ -8,7 +8,7 @@
       "id": "planet-screen",
       "name": "Planet management screen",
       "type": "ui",
-      "status": "pending",
+      "status": "done",
       "description": "Full planet screen with production sliders (SHIP/DEF/IND/ECO/TECH). Reference design/ui-ux/wireframes/planet-management.md and design/economy/slider-mathematics.md. Sliders must sum to 100%, show current allocation, and dispatch actions to update state.",
       "output": "src/ui/screens/PlanetScreen.ts",
       "acceptance": [
@@ -17,7 +17,8 @@
         "Sliders auto-rebalance to sum 100%",
         "Shows production output preview",
         "Accessible from galaxy map planet click"
-      ]
+      ],
+      "completed_at": "2026-04-20T02:22:00Z"
     },
     {
       "id": "ship-components-data",
@@ -40,7 +41,9 @@
       "name": "Ship designer game logic",
       "type": "code",
       "status": "pending",
-      "dependencies": ["ship-components-data"],
+      "dependencies": [
+        "ship-components-data"
+      ],
       "description": "Implement ship design validation and cost calculation in src/game/. Reference design/ships/ship-design.md. Validate hull space, calculate costs, check tech requirements.",
       "output": "src/game/systems/shipDesign.ts",
       "acceptance": [
@@ -56,7 +59,9 @@
       "name": "Ship designer UI screen",
       "type": "ui",
       "status": "pending",
-      "dependencies": ["ship-designer-logic"],
+      "dependencies": [
+        "ship-designer-logic"
+      ],
       "description": "Full ship designer screen per design/ui-ux/wireframes/ship-design.md. Hull selection, component slots, stats preview, save design.",
       "output": "src/ui/screens/DesignScreen.ts (replace stub)",
       "acceptance": [
@@ -72,7 +77,9 @@
       "name": "Ship construction system",
       "type": "code",
       "status": "pending",
-      "dependencies": ["ship-designer-logic"],
+      "dependencies": [
+        "ship-designer-logic"
+      ],
       "description": "Add ship construction to production system. When SHIP slider > 0, accumulate BC toward current ship design. When complete, spawn ship at planet. Reference design/economy/ship-costs.md.",
       "output": "src/game/systems/shipConstruction.ts, src/game/actions/ship.ts",
       "acceptance": [
@@ -88,7 +95,9 @@
       "name": "Fleet state and actions",
       "type": "code",
       "status": "pending",
-      "dependencies": ["ship-construction"],
+      "dependencies": [
+        "ship-construction"
+      ],
       "description": "Expand fleet state management. Fleets contain ships, have location, destination, ETA. Actions for move, merge, split, scrap.",
       "output": "src/game/systems/fleet.ts (expand), src/game/actions/fleet.ts (expand)",
       "acceptance": [
@@ -105,7 +114,9 @@
       "name": "Fleet management UI",
       "type": "ui",
       "status": "pending",
-      "dependencies": ["fleet-state"],
+      "dependencies": [
+        "fleet-state"
+      ],
       "description": "Fleet screen showing all fleets, their composition, destinations. Allow selecting fleet and setting destination on galaxy map.",
       "output": "src/ui/screens/FleetsScreen.ts (replace stub)",
       "acceptance": [
@@ -121,7 +132,9 @@
       "name": "Colony ship and colonization",
       "type": "code",
       "status": "pending",
-      "dependencies": ["fleet-state"],
+      "dependencies": [
+        "fleet-state"
+      ],
       "description": "Colony ship special: when fleet with colony ship reaches uncolonized habitable planet, option to colonize. Colony ship consumed, planet becomes colony.",
       "output": "src/game/systems/colonization.ts",
       "acceptance": [
@@ -153,7 +166,9 @@
       "name": "Research screen UI",
       "type": "ui",
       "status": "pending",
-      "dependencies": ["tech-tree-data"],
+      "dependencies": [
+        "tech-tree-data"
+      ],
       "description": "Research screen per design/ui-ux/wireframes/research-tree.md. Shows 6 fields, current research per field, RP allocation sliders, tech choices.",
       "output": "src/ui/screens/ResearchScreen.ts (replace stub)",
       "acceptance": [
@@ -169,7 +184,9 @@
       "name": "Tactical combat engine",
       "type": "code",
       "status": "pending",
-      "dependencies": ["ship-components-data"],
+      "dependencies": [
+        "ship-components-data"
+      ],
       "description": "Combat resolution engine per design/ships/combat-algorithm.md. Hex grid, initiative, movement, firing, damage resolution. Start with auto-resolve; manual control later.",
       "output": "src/game/systems/combat.ts",
       "acceptance": [
@@ -187,7 +204,9 @@
       "name": "Tactical combat UI",
       "type": "ui",
       "status": "pending",
-      "dependencies": ["combat-engine"],
+      "dependencies": [
+        "combat-engine"
+      ],
       "description": "Combat screen with hex grid, ship positions, firing. Auto-resolve button + manual controls.",
       "output": "src/ui/screens/CombatScreen.ts",
       "acceptance": [
@@ -203,7 +222,10 @@
       "name": "Basic AI opponent",
       "type": "code",
       "status": "pending",
-      "dependencies": ["fleet-state", "colonization"],
+      "dependencies": [
+        "fleet-state",
+        "colonization"
+      ],
       "description": "Basic AI that manages production, builds ships, expands to nearby planets. Reference design/species/ai-archetypes.md for personality types.",
       "output": "src/game/ai/AIEmpire.ts, src/game/ai/strategies.ts",
       "acceptance": [
@@ -221,7 +243,11 @@
       "name": "Turn processing integration",
       "type": "code",
       "status": "pending",
-      "dependencies": ["combat-engine", "ai-basic", "colonization"],
+      "dependencies": [
+        "combat-engine",
+        "ai-basic",
+        "colonization"
+      ],
       "description": "Wire all systems into turn processing. Fleet movement, combat triggers, AI turns, colonization checks.",
       "output": "src/game/systems/turn.ts (expand)",
       "acceptance": [

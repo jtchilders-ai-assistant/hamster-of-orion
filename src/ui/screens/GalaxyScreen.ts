@@ -33,7 +33,7 @@ export class GalaxyScreen {
     const canvas = this.resolveCanvas(container);
 
     // Resolve or create the info panel element
-    this.infoPanel = new InfoPanel(container);
+    this.infoPanel = new InfoPanel(container, store);
 
     // Star map handles canvas rendering and dispatches SELECT_SYSTEM on click
     this.starMap = new StarMap(canvas, store);
