@@ -20,7 +20,7 @@ export type CombatId = string;
 
 export type DifficultyLevel = 'easy' | 'normal' | 'hard' | 'impossible' | 'custom';
 export type GameSpeed = 'slow' | 'normal' | 'fast';
-export type VictoryType = 'domination' | 'discovery' | 'diplomatic' | 'survival' | 'transcendence';
+export type VictoryType = 'diplomatic' | 'military' | 'conquest';
 export type ScreenType =
   | 'menu'
   | 'new_game'
