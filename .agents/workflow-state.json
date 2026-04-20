@@ -2,8 +2,8 @@
   "state": "IDLE",
   "phase": "complete",
   "current_task": null,
-  "last_completed": "council-ui",
-  "last_verified_at": "2026-04-20T06:56:00Z",
+  "last_completed": "turn-fix-compile",
+  "last_verified_at": "2026-04-20T07:17:00Z",
   "verification_result": {
     "status": "approved",
     "tested_at": "2026-04-20T06:56:00Z",
