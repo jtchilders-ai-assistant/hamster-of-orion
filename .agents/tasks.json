@@ -366,7 +366,7 @@
       "id": "diplomacy-ui",
       "name": "Diplomacy screen UI",
       "type": "ui",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         "treaties"
       ],
@@ -378,7 +378,8 @@
         "Treaty proposal interface",
         "Active treaties displayed",
         "Declare war option"
-      ]
+      ],
+      "completed_at": "2026-04-20T01:09:00Z"
     },
     {
       "id": "high-council",
@@ -404,7 +405,7 @@
       "id": "council-ui",
       "name": "High Council UI",
       "type": "ui",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         "high-council"
       ],
@@ -416,7 +417,8 @@
         "Cast vote / abstain buttons",
         "Results display",
         "Victory screen if won"
-      ]
+      ],
+      "completed_at": "2026-04-20T01:09:00Z"
     },
     {
       "id": "espionage",
