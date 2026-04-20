@@ -402,3 +402,27 @@ Disabling orchestrator cron job.
 - Hull specs: Small 25/6, Medium 70/36, Large 280/200, Huge 1400/1200
 - Miniaturization: halves space per tech tier above requirement
 - Spawning parallel workers: ship-designer-ui, ship-construction, combat-engine, tech-tree-data
+
+## 2026-04-20T02:36 UTC — Orchestrator check (state: WORKING)
+- 3 parallel workers already active: ship-construction (2m41s), combat-engine (2m19s), tech-tree-data (1m58s)
+- ship-designer-ui was missing from parallel batch — task file created and worker spawned
+- Full parallel set now: ship-construction, combat-engine, tech-tree-data, ship-designer-ui
+- Waiting for workers to complete → will run tests → verify → commit each task
+
+## 2026-04-20T02:37 UTC — combat-engine DONE
+- Committed: 7a35e53
+- 33 new combat tests
+- MOO1 hit formula: 50 + (atk-def)×5, clamped 5-95%
+- Shield absorption, armor piercing, retreat mechanics
+- autoResolveCombat() runs to completion
+
+## 2026-04-20T02:37 UTC — ship-construction DONE
+- Committed: 1598237
+- Ship interface, shipyardProgress tracking
+- BC accumulation from SHIP slider
+- Spawns ships when progress >= cost with overflow carry-over
+- 639/639 tests passing
+
+## Active workers
+- ship-designer-ui (running ~1m)
+- tech-tree-data (running ~4m)

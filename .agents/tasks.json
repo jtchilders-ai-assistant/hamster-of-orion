@@ -78,7 +78,8 @@
       "id": "ship-construction",
       "name": "Ship construction system",
       "type": "code",
-      "status": "pending",
+      "status": "done",
+      "completed_at": "2026-04-20T02:37:00Z",
       "dependencies": [
         "ship-designer-logic"
       ],
@@ -185,7 +186,8 @@
       "id": "combat-engine",
       "name": "Tactical combat engine",
       "type": "code",
-      "status": "pending",
+      "status": "done",
+      "completed_at": "2026-04-20T02:37:00Z",
       "dependencies": [
         "ship-components-data"
       ],

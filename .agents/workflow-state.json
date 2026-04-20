@@ -2,7 +2,13 @@
   "state": "WORKING",
   "phase": "phase4a-core-interactivity",
   "current_task": "ship-construction",
-  "parallel_tasks": ["ship-construction", "combat-engine", "tech-tree-data"],
+  "parallel_tasks": [
+    "ship-construction",
+    "combat-engine",
+    "tech-tree-data",
+    "ship-designer-ui"
+  ],
   "last_completed": "ship-designer-logic",
-  "started_at": "2026-04-20T02:33:00Z"
+  "started_at": "2026-04-20T02:33:00Z",
+  "orchestrator_note": "ship-designer-ui was missing from parallel batch; spawned at 2026-04-20T02:36 UTC"
 }
