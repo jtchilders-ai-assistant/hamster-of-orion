@@ -119,6 +119,66 @@ export function rootReducer(state: GameState, action: Action): GameState {
     return newGameReducer(state, action);
   }
 
+  // ── Ship Design CRUD ─────────────────────────────────────────────────────
+
+  if (action.type === 'ADD_SHIP_DESIGN') {
+    const design = (action.payload as { design: import('./state').ShipDesign }).design;
+    const empireId = state.empires.playerId;
+    const empire = state.empires.byId[empireId];
+    if (!empire) return state;
+
+    return {
+      ...state,
+      shipDesigns: {
+        byId: { ...state.shipDesigns.byId, [design.id]: design },
+        allIds: state.shipDesigns.allIds.includes(design.id)
+          ? state.shipDesigns.allIds
+          : [...state.shipDesigns.allIds, design.id],
+      },
+      empires: {
+        ...state.empires,
+        byId: {
+          ...state.empires.byId,
+          [empireId]: {
+            ...empire,
+            shipDesigns: empire.shipDesigns.includes(design.id)
+              ? empire.shipDesigns
+              : [...empire.shipDesigns, design.id],
+          },
+        },
+      },
+    };
+  }
+
+  if (action.type === 'DELETE_SHIP_DESIGN') {
+    const { designId } = action.payload as { designId: string };
+    const empireId = state.empires.playerId;
+    const empire = state.empires.byId[empireId];
+
+    const newById = { ...state.shipDesigns.byId };
+    delete newById[designId];
+
+    return {
+      ...state,
+      shipDesigns: {
+        byId: newById,
+        allIds: state.shipDesigns.allIds.filter((id) => id !== designId),
+      },
+      empires: empire
+        ? {
+            ...state.empires,
+            byId: {
+              ...state.empires.byId,
+              [empireId]: {
+                ...empire,
+                shipDesigns: empire.shipDesigns.filter((id) => id !== designId),
+              },
+            },
+          }
+        : state.empires,
+    };
+  }
+
   // Unknown action — return unchanged state
   return state;
 }

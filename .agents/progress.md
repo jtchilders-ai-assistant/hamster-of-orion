@@ -426,3 +426,14 @@ Disabling orchestrator cron job.
 ## Active workers
 - ship-designer-ui (running ~1m)
 - tech-tree-data (running ~4m)
+
+## 2026-04-20T02:40 UTC — tech-tree-data DONE
+- Worker timed out but implementation was complete
+- Orchestrator fixed missing bio weapons (death_spores, doom_virus, bio_terminator)
+- Committed: 3db975b
+- 214 technologies across 6 fields
+- 25 new tech-tree tests, 664/664 total passing
+
+## Active workers
+- ship-designer-ui (~3m running)
+- fleet-state (just spawned)

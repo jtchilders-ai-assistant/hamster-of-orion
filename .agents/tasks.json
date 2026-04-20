@@ -153,7 +153,8 @@
       "id": "tech-tree-data",
       "name": "Full technology tree JSON",
       "type": "data",
-      "status": "pending",
+      "status": "done",
+      "completed_at": "2026-04-20T02:40:00Z",
       "description": "Complete all 6 tech fields from design docs: weapons.md, propulsion.md, construction.md, computers.md, force-fields.md, planetology.md. Each tech needs: id, name, field, tier, cost, unlocks[], description.",
       "output": "src/data/tech-tree.json",
       "acceptance": [
