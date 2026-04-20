@@ -1,20 +1,19 @@
 {
-  "state": "IDLE",
+  "state": "WORKING",
   "phase": "phase4a-core-interactivity",
-  "current_task": null,
+  "current_task": "buildings-system",
   "last_completed": "turn-fix-compile",
   "verified_at": "2026-04-20T03:30:00Z",
+  "parallel_tasks": [
+    "buildings-system",
+    "diplomacy-relations"
+  ],
   "verification_result": {
     "status": "approved",
     "verified_at": "2026-04-20T03:30:00Z",
     "tests_passed": true,
     "typecheck_passed": true,
-    "notes": "turn-fix-compile approved. Commander.ts properly wired with Store<GameState>, no JSX artifacts, no any types. TurnSummary integrated into Commander. 753/753 tests pass, typecheck clean. Minor code style note in strategies.ts line ~226."
+    "notes": "turn-fix-compile approved. Commander.ts properly wired with Store<GameState>, no JSX artifacts, no any types. TurnSummary integrated into Commander. 753/753 tests pass, typecheck clean."
   },
-  "test_result": {
-    "tests_passed": true,
-    "typecheck_passed": true,
-    "test_count": 753,
-    "checked_at": "2026-04-20T03:30:00Z"
-  }
+  "started_at": "2026-04-20T03:06:00Z"
 }
