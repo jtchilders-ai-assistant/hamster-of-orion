@@ -128,3 +128,7 @@
 ## 2026-04-20 00:41 UTC — Stale timeout check
 
 `hamster-ai-diplomacy` timed out, but ai-diplomacy (`b2ad2b9`) and ai-research (`7dfe6f2`) already committed. No code changes needed. 28 tasks done, 2 remaining (UI). Tests: 1007/1007. Typecheck: clean.
+
+## 2026-04-20 00:50 UTC — Final stale timeout check
+
+All three late subagent timeouts (hamster-ground-combat, hamster-ai-diplomacy, hamster-ai-research) were stale — their work was already committed on main. 28 logic tasks done, 2 UI tasks remaining (diplomacy-ui, council-ui). Tests: 1007/1007. Typecheck: clean.
