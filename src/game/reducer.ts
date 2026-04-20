@@ -66,6 +66,18 @@ export function rootReducer(state: GameState, action: Action): GameState {
     };
   }
 
+  // Fleet selection
+  if (action.type === 'SELECT_FLEET') {
+    const { fleetId } = action.payload as { fleetId: string | null };
+    return {
+      ...state,
+      ui: {
+        ...state.ui,
+        selectedFleet: fleetId,
+      },
+    };
+  }
+
   // Production slider update
   if (action.type === 'UPDATE_PRODUCTION') {
     const { planetId, sliders } = action.payload as {

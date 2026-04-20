@@ -168,6 +168,8 @@ export interface SpecialEffect {
   buildCost?: number;
   /** Per-turn maintenance cost */
   maintenance?: number;
+  /** Whether this component enables colonization of habitable planets (consumed on use) */
+  canColonize?: boolean;
   /** HP regenerated per turn (%) */
   repairPerTurn?: number;
   /** Hull space bonus multiplier (e.g. 0.2 = +20%) */
