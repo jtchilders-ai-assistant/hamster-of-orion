@@ -60,7 +60,8 @@
       "id": "ship-designer-ui",
       "name": "Ship designer UI screen",
       "type": "ui",
-      "status": "pending",
+      "status": "done",
+      "completed_at": "2026-04-20T02:44:00Z",
       "dependencies": [
         "ship-designer-logic"
       ],
@@ -97,7 +98,8 @@
       "id": "fleet-state",
       "name": "Fleet state and actions",
       "type": "code",
-      "status": "pending",
+      "status": "done",
+      "completed_at": "2026-04-20T02:44:00Z",
       "dependencies": [
         "ship-construction"
       ],

@@ -513,3 +513,23 @@ Replaced stub `src/ui/screens/DesignScreen.ts` with full MOO1-accurate ship desi
 - Verify design save/load/delete cycle
 - Test miniaturization when tech advances
 
+
+## 2026-04-20T02:44 UTC — ship-designer-ui DONE
+- Worker timed out but implementation complete (1199 lines)
+- Full MOO1-accurate ship designer with hull selector, component slots, save/load
+- Committed: f86a398
+
+## 2026-04-20T02:44 UTC — fleet-state DONE
+- Fleet movement with ETA calculation
+- mergeFleets(), splitFleet()
+- 31 new fleet tests
+- Committed: f86a398
+
+## Also committed:
+- buildings.json, starting-fleets.json (data files)
+- Fixed eta field in shipConstruction.ts
+- 695/695 tests passing
+
+## Active workers
+- colonization (just spawned)
+- fleet-ui (just spawned)
