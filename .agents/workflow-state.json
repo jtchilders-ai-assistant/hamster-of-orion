@@ -1,7 +1,7 @@
 {
   "state": "TESTING",
   "phase": "phase4a-core-interactivity",
-  "current_task": "buildings-data",
+  "current_task": "combat-ui",
   "parallel_tasks": [
     "ship-designer-ui",
     "fleet-state",
@@ -10,13 +10,13 @@
     "buildings-data",
     "starting-fleets"
   ],
-  "last_completed": "tech-tree-data",
+  "last_completed": "combat-ui",
   "started_at": "2026-04-20T02:41:00Z",
   "orchestrator_note": "6 workers running in parallel at 2026-04-20T02:41 UTC",
   "worker_output": {
-    "files_created": ["src/data/buildings.json"],
-    "files_modified": [".agents/workflow-state.json"],
+    "files_created": ["src/ui/screens/CombatScreen.ts"],
+    "files_modified": ["src/ui/app.ts"],
     "tests_added": [],
-    "summary": "Created buildings.json with 33 entries covering all MOO1 planetary infrastructure types: factories, missile bases, all 4 planetary shield tiers (V/X/XV/XX), star gate, 8 terraforming levels (+10 through +120), atmospheric terraforming, soil enrichment (basic + advanced), 3 ecology restoration tiers, 6 robotic controls upgrades (II-VII), 5 waste reduction tiers + elimination, and standard construction. All entries include techRequired (matching tech-tree.json IDs), cost, maintenance, and effects matching design docs. Empire-wide upgrades (robotic controls, waste reduction) correctly noted as scope:empire with builtVia:tech_unlock. All 695 existing tests pass."
+    "summary": "Implemented CombatScreen (src/ui/screens/CombatScreen.ts) with: (1) flat-top hex grid canvas (15×11) rendering all ships with HP bars and side labels; (2) initiative strip showing all ships sorted by speed with HP bars, side color coding, and click-to-select; (3) NEXT ROUND button that steps processRound() one turn at a time; (4) AUTO-RESOLVE button that calls autoResolveCombat() synchronously and shows results; (5) combat log panel (reverse chronological, color-coded by hit/miss/end); (6) selected-ship detail panel showing HP, shields, attack/defense ratings, weapons list; (7) combat results overlay with attacker/defender losses, survivors, replay/return buttons; (8) RETURN TO GALAXY MAP dispatches NAVIGATE action. Registered in app.ts as 'combat' screen. Also fixed pre-existing bug: ResearchScreen was constructed without its required store argument in app.ts. All 695 existing tests pass, typecheck clean."
   }
 }

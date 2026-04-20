@@ -171,7 +171,8 @@
       "id": "research-ui",
       "name": "Research screen UI",
       "type": "ui",
-      "status": "pending",
+      "status": "done",
+      "completed_at": "2026-04-20T02:47:00Z",
       "dependencies": [
         "tech-tree-data"
       ],
@@ -210,7 +211,8 @@
       "id": "combat-ui",
       "name": "Tactical combat UI",
       "type": "ui",
-      "status": "pending",
+      "status": "done",
+      "completed_at": "2026-04-20T02:47:00Z",
       "dependencies": [
         "combat-engine"
       ],
