@@ -584,3 +584,32 @@ Remaining: ai-basic, turn-integration
 - Task status → done
 - workflow-state → IDLE
 - Git commit: next step
+
+## 2026-04-20 03:41 UTC — turn-integration started
+- Task: Turn processing integration
+- Dependencies verified: combat-engine, ai-basic, colonization all done
+- Worker spawned (subagent run)
+- **2026-04-20T03:47:16Z**: Started  worker (run: ac07d4a6)
+- **2026-04-20T03:47:21Z**: Started turn-integration worker (run: ac07d4a6)
+
+## 2026-04-20T03:12 UTC — Phase 4A Status Check
+
+### Completed Tasks (14/14 core):
+✅ planet-screen, ship-components-data, ship-designer-logic, ship-designer-ui
+✅ ship-construction, fleet-state, fleet-ui, colonization
+✅ tech-tree-data, research-ui, combat-engine, combat-ui
+✅ buildings-data, starting-fleets, ai-basic
+
+### Remaining Phase 4A:
+- turn-integration (AI+combat+colonization wiring into processTurn)
+
+### Beyond Phase 4A (Phase 4B+):
+- buildings-system, diplomacy-relations, treaties, diplomacy-ui
+- high-council, council-ui, espionage, ground-combat
+- random-events, victory-conditions, fog-of-war
+- ai-diplomacy, ai-research
+
+### Stats:
+- 753/753 tests passing
+- TypeScript: clean
+- ~25 commits since phase started

@@ -1,7 +1,7 @@
 {
-  "state": "IDLE",
+  "state": "WORKING",
   "phase": "phase4a-core-interactivity",
-  "current_task": null,
+  "current_task": "turn-integration",
   "last_completed": "ai-basic",
   "verified_at": "2026-04-20T03:30:00Z",
   "verification_result": {
@@ -9,6 +9,6 @@
     "verified_at": "2026-04-20T03:30:00Z",
     "tests_passed": true,
     "typecheck_passed": true,
-    "notes": "All acceptance criteria met. 753/753 tests pass. No DOM imports in src/game/ai/. Production sliders, colony ship building, colonization, military builds, and fleet attack dispatch all verified. Minor code style note: strategies.ts line ~226 uses confusing double-negative (!planet.isColonized === false) — functionally correct but should be refactored to (planet.isColonized) in a follow-up."
+    "notes": "All acceptance criteria met. 753/753 tests pass. No DOM imports in src/game/ai/. Minor code style note: strategies.ts line ~226 uses confusing double-negative (!planet.isColonized === false) — functionally correct but should be refactored to (planet.isColonized) in a follow-up."
   }
 }
