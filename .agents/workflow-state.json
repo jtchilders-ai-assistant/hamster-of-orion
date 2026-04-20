@@ -1,7 +1,8 @@
 {
   "state": "WORKING",
   "phase": "phase4a-core-interactivity",
-  "current_task": "ship-designer-logic",
-  "last_completed": "ship-components-data",
-  "started_at": "2026-04-20T02:29:00Z"
+  "current_task": "ship-construction",
+  "parallel_tasks": ["ship-construction", "combat-engine", "tech-tree-data"],
+  "last_completed": "ship-designer-logic",
+  "started_at": "2026-04-20T02:33:00Z"
 }

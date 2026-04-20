@@ -390,3 +390,15 @@ Disabling orchestrator cron job.
   - test/data/components.test.ts (45 tests)
 - All 7 categories: weapons (54), armor (7), shields (15), engines (11), computers (20), fuel (11), specials (35)
 - Next task: ship-designer-logic
+
+## 2026-04-20T02:32 UTC — ship-designer-logic DONE
+- Worker completed in ~3m
+- TypeScript typecheck: PASS (0 errors)
+- Tests: 578/578 passed (46 new shipDesign tests)
+- Committed: 97ce7e8
+- Files created:
+  - src/game/systems/shipDesign.ts (validateDesign, calculateDesignCost, checkTechRequirements, miniaturizedSize)
+  - test/game/systems/shipDesign.test.ts (46 tests)
+- Hull specs: Small 25/6, Medium 70/36, Large 280/200, Huge 1400/1200
+- Miniaturization: halves space per tech tier above requirement
+- Spawning parallel workers: ship-designer-ui, ship-construction, combat-engine, tech-tree-data

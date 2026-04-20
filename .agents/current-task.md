@@ -1,76 +1,66 @@
-# Current Task: ship-designer-logic
+# Current Task: ship-construction
 
 ## Task ID
-ship-designer-logic
+ship-construction
 
 ## Name
-Ship designer game logic
+Ship construction system
 
 ## Description
-Implement ship design validation and cost calculation in src/game/. Reference design/ships/ship-design.md. Validate hull space, calculate costs, check tech requirements.
+Add ship construction to production system. When SHIP slider > 0, accumulate BC toward current ship design. When complete, spawn ship at planet. Reference design/economy/ship-costs.md if it exists.
 
 ## Key References
-- `design/ships/ship-design.md` — ship design spec, hull sizes, space formulas
-- `src/data/components.json` — all ship components with size, cost, techLevel
-- `src/game/types/shipComponents.ts` — component type definitions
-- `src/game/state.ts` — ShipDesign type (if exists, or add it)
+- `src/game/systems/shipDesign.ts` — calculateDesignCost() for ship costs
+- `src/game/systems/production.ts` — existing production system
+- `src/game/state.ts` — GameState, Planet, Fleet types
+- `design/economy/slider-mathematics.md` — SHIP slider allocation
 
 ## Output
-`src/game/systems/shipDesign.ts`
+- `src/game/systems/shipConstruction.ts`
+- `src/game/actions/ship.ts`
 
 ## Acceptance Criteria
-1. `validateDesign(design: ShipDesign, techs: TechId[]): ValidationResult` — checks hull space limits
-2. `calculateDesignCost(design: ShipDesign): number` — returns BC cost
-3. `checkTechRequirements(design: ShipDesign, techs: TechId[]): boolean` — validates all components unlocked
-4. No DOM imports in src/game/
-5. Unit tests pass (test/game/systems/shipDesign.test.ts)
-
-## Hull Sizes (from MOO1)
-| Hull | Base Space | Base Cost |
-|------|------------|-----------|
-| Small | 25 | 6 |
-| Medium | 100 | 36 |
-| Large | 400 | 200 |
-| Huge | 1600 | 1200 |
+1. SHIP slider allocates production to shipyard (use existing SHIP allocation from production)
+2. Progress accumulates across turns (carry over fractional BC)
+3. Ship spawns when cost met (create ship entity)
+4. Ship added to planet's local fleet (or create new fleet if none exists)
+5. Unit tests pass — no DOM imports in src/game/
 
 ## Implementation Notes
-- Import components from `src/data/components.json`
-- Import types from `src/game/types/shipComponents.ts`
-- If `ShipDesign` type doesn't exist in state.ts, add it:
+- Each planet should track: `currentDesignId`, `shipyardProgress` (BC accumulated)
+- When `shipyardProgress >= designCost`, spawn ship and reset progress (with overflow carry-over)
+- Need a `Ship` interface in state.ts if it doesn't exist:
   ```typescript
-  interface ShipDesign {
+  interface Ship {
     id: string;
-    name: string;
-    hullSize: 'small' | 'medium' | 'large' | 'huge';
-    components: string[];  // component IDs from components.json
-    autoRepair?: boolean;
-    // computed fields:
-    totalSpace: number;
-    totalCost: number;
+    designId: string;
+    hp: number;
+    maxHp: number;
   }
   ```
-- Consider miniaturization: components may be smaller based on tech level
-- Use the component size and cost from components.json
+- Need to add ships to Fleet. Fleet should have `ships: Ship[]`
+- Wire into turn processing: after production calculates SHIP BC, add to shipyardProgress
 
 ## Tests Required
-Create `test/game/systems/shipDesign.test.ts`:
-- validateDesign returns valid for design within space limit
-- validateDesign returns invalid with error for over-space design
-- calculateDesignCost sums component costs + hull base cost
-- checkTechRequirements returns true when all component techs unlocked
-- checkTechRequirements returns false when missing required tech
-- Edge cases: empty design, single component, max components
+Create `test/game/systems/shipConstruction.test.ts`:
+- Accumulates BC from SHIP allocation across turns
+- Spawns ship when progress >= cost
+- Overflow carries to next ship
+- Ship has correct HP based on design
+- Ship added to planet's fleet
+- No ship spawned if no design selected
+- Multiple ships if enough production
 
 ## Output on Completion
 Update `workflow-state.json`:
 ```json
 {
   "state": "TESTING",
-  "current_task": "ship-designer-logic",
+  "current_task": "ship-construction",
   "worker_output": {
-    "files_created": ["src/game/systems/shipDesign.ts", "test/game/systems/shipDesign.test.ts"],
+    "files_created": ["src/game/systems/shipConstruction.ts", "src/game/actions/ship.ts", "test/game/systems/shipConstruction.test.ts"],
     "files_modified": ["src/game/state.ts"],
-    "tests_added": ["test/game/systems/shipDesign.test.ts"],
+    "tests_added": ["test/game/systems/shipConstruction.test.ts"],
     "summary": "..."
   }
 }

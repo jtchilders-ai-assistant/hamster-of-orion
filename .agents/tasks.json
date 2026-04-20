@@ -41,7 +41,8 @@
       "id": "ship-designer-logic",
       "name": "Ship designer game logic",
       "type": "code",
-      "status": "pending",
+      "status": "done",
+      "completed_at": "2026-04-20T02:32:00Z",
       "dependencies": [
         "ship-components-data"
       ],
