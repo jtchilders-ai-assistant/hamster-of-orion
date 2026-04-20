@@ -38,3 +38,10 @@
 - Selected task: **buildings-system** (DEF slider → missile bases, shields, star gates)
 - Dependencies met: buildings-data ✅
 - Spawned worker at 2026-04-20T03:06Z
+
+## 2026-04-20 00:17 CST — Phase 4A Core COMPLETE
+- All 3 core tasks done: turn-integration, buildings-system, diplomacy-relations
+- 753/753 tests pass, typecheck clean
+- Phase 4A core interactivity verified and committed
+- Remaining pending tasks belong to Phase 4A continuation (treaties, diplomacy-ui, high-council, council-ui, espionage, ground-combat, random-events, victory-conditions, fog-of-war, ai-diplomacy, ai-research)
+- Phase 4A core cron disabled — next phase will need its own orchestrator
