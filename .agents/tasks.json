@@ -258,6 +258,247 @@
         "All production/growth/research runs",
         "Events queue for notification"
       ]
+    },
+    {
+      "id": "buildings-data",
+      "name": "Buildings JSON data",
+      "type": "data",
+      "status": "pending",
+      "description": "Create buildings JSON from design/planets/buildings.md. Include factories, planetary shields, missile bases, terraforming, soil enrichment, etc. Each building needs: id, name, category, techRequired, cost, maintenance, effects.",
+      "output": "src/data/buildings.json",
+      "acceptance": [
+        "All building types from design docs",
+        "Correct tech requirements",
+        "Cost and maintenance values",
+        "Effects match design specs",
+        "Valid JSON"
+      ]
+    },
+    {
+      "id": "buildings-system",
+      "name": "Buildings construction system",
+      "type": "code",
+      "status": "pending",
+      "dependencies": ["buildings-data"],
+      "description": "Implement building construction via DEF slider. Queue management, completion, effects application.",
+      "output": "src/game/systems/buildings.ts",
+      "acceptance": [
+        "DEF slider allocates to building queue",
+        "Buildings complete when cost met",
+        "Building effects apply (shields, missile bases)",
+        "Maintenance costs deducted",
+        "Unit tests pass"
+      ]
+    },
+    {
+      "id": "starting-fleets",
+      "name": "Starting fleets per race",
+      "type": "data",
+      "status": "pending",
+      "dependencies": ["ship-components-data"],
+      "description": "Define starting ship designs and fleets for each race. Reference design/species/race-stats-complete.md for starting techs.",
+      "output": "src/data/starting-fleets.json",
+      "acceptance": [
+        "Each race has starting ship designs",
+        "Starting fleet composition defined",
+        "Ships use only starting techs",
+        "Colony ship included for expansion"
+      ]
+    },
+    {
+      "id": "diplomacy-relations",
+      "name": "Diplomacy relations system",
+      "type": "code",
+      "status": "pending",
+      "dependencies": ["ai-basic"],
+      "description": "Implement diplomatic relations between empires. Reference design/diplomacy/relations-system.md. Track relations value, modifiers, diplomatic state.",
+      "output": "src/game/systems/diplomacy.ts",
+      "acceptance": [
+        "Relations tracked per empire pair",
+        "Modifiers affect relations (attacks, treaties, trade)",
+        "Diplomatic states: war/hostile/neutral/friendly/allied",
+        "Relations decay/improve over time",
+        "Unit tests pass"
+      ]
+    },
+    {
+      "id": "treaties",
+      "name": "Treaty system",
+      "type": "code",
+      "status": "pending",
+      "dependencies": ["diplomacy-relations"],
+      "description": "Implement treaties: peace, non-aggression, trade, research, alliance. Reference design/diplomacy/treaties.md.",
+      "output": "src/game/systems/treaties.ts",
+      "acceptance": [
+        "6 treaty types implemented",
+        "Treaty proposal and acceptance",
+        "Treaty effects applied (trade income, etc)",
+        "Treaty breaking penalties",
+        "Unit tests pass"
+      ]
+    },
+    {
+      "id": "diplomacy-ui",
+      "name": "Diplomacy screen UI",
+      "type": "ui",
+      "status": "pending",
+      "dependencies": ["treaties"],
+      "description": "Diplomacy screen per design/ui-ux/wireframes/diplomacy-screen.md. Show relations, propose treaties, request audience.",
+      "output": "src/ui/screens/DiplomacyScreen.ts (replace stub)",
+      "acceptance": [
+        "Lists all known empires",
+        "Shows relation status per empire",
+        "Treaty proposal interface",
+        "Active treaties displayed",
+        "Declare war option"
+      ]
+    },
+    {
+      "id": "high-council",
+      "name": "Galactic High Council",
+      "type": "code",
+      "status": "pending",
+      "dependencies": ["diplomacy-relations"],
+      "description": "Implement High Council elections per design/diplomacy/high-council.md. Vote share based on population, diplomatic victory condition.",
+      "output": "src/game/systems/council.ts",
+      "acceptance": [
+        "Council convenes every 25 turns",
+        "Vote share = population percentage",
+        "2/3 majority = diplomatic victory",
+        "AI voting based on relations",
+        "Abstain option for player",
+        "Unit tests pass"
+      ]
+    },
+    {
+      "id": "council-ui",
+      "name": "High Council UI",
+      "type": "ui",
+      "status": "pending",
+      "dependencies": ["high-council"],
+      "description": "Council election screen per design/ui-ux/wireframes/high-council.md. Show candidates, vote tallies, cast vote.",
+      "output": "src/ui/screens/CouncilScreen.ts",
+      "acceptance": [
+        "Shows two candidates",
+        "Vote share percentages",
+        "Cast vote / abstain buttons",
+        "Results display",
+        "Victory screen if won"
+      ]
+    },
+    {
+      "id": "espionage",
+      "name": "Espionage system",
+      "type": "code",
+      "status": "pending",
+      "dependencies": ["diplomacy-relations"],
+      "description": "Implement spy missions per design/diplomacy/espionage.md. Steal tech, sabotage, incite rebellion.",
+      "output": "src/game/systems/espionage.ts",
+      "acceptance": [
+        "Spy allocation via spending",
+        "6 mission types",
+        "Success/failure based on spy levels",
+        "Counterespionage defense",
+        "Caught spies affect relations",
+        "Unit tests pass"
+      ]
+    },
+    {
+      "id": "ground-combat",
+      "name": "Ground combat system",
+      "type": "code",
+      "status": "pending",
+      "dependencies": ["fleet-state"],
+      "description": "Implement planetary invasion per design/ships/ground-combat.md. Troop transports, ground combat resolution, planet capture.",
+      "output": "src/game/systems/groundCombat.ts",
+      "acceptance": [
+        "Transports carry troops",
+        "Bombardment phase (optional)",
+        "Ground combat rolls",
+        "Racial ground combat bonuses",
+        "Planet capture on victory",
+        "Unit tests pass"
+      ]
+    },
+    {
+      "id": "random-events",
+      "name": "Random events system",
+      "type": "code",
+      "status": "pending",
+      "dependencies": ["turn-integration"],
+      "description": "Implement random events per design/game-mechanics/random-events.md. Space monsters, plagues, discoveries, diplomatic incidents.",
+      "output": "src/game/systems/events.ts, src/data/events.json",
+      "acceptance": [
+        "Events trigger randomly each turn",
+        "15+ event types from design",
+        "Space monsters (Amoeba, Crystal, Dragon)",
+        "Planet events (plague, bounty)",
+        "Event effects applied",
+        "Unit tests pass"
+      ]
+    },
+    {
+      "id": "victory-conditions",
+      "name": "Victory condition detection",
+      "type": "code",
+      "status": "pending",
+      "dependencies": ["high-council", "turn-integration"],
+      "description": "Detect victory conditions: domination (last empire), diplomatic (council vote), conquest (eliminate player). Show victory/defeat screen.",
+      "output": "src/game/systems/victory.ts",
+      "acceptance": [
+        "Domination: detect when one empire remains",
+        "Diplomatic: detect council election win",
+        "Player defeat detection",
+        "Victory triggers end screen",
+        "Unit tests pass"
+      ]
+    },
+    {
+      "id": "fog-of-war",
+      "name": "Fog of war system",
+      "type": "code",
+      "status": "pending",
+      "dependencies": ["fleet-state"],
+      "description": "Implement exploration and sensor range. Unknown systems hidden, explored systems remembered, sensor range reveals fleet movements.",
+      "output": "src/game/systems/fogOfWar.ts",
+      "acceptance": [
+        "Unexplored systems show as unknown",
+        "Visiting system reveals it permanently",
+        "Sensor range from colonies/fleets",
+        "Enemy fleets visible in sensor range",
+        "Unit tests pass"
+      ]
+    },
+    {
+      "id": "ai-diplomacy",
+      "name": "AI diplomatic behavior",
+      "type": "code",
+      "status": "pending",
+      "dependencies": ["diplomacy-relations", "ai-basic"],
+      "description": "Expand AI to handle diplomacy. Propose treaties, respond to proposals, declare war based on personality.",
+      "output": "src/game/ai/diplomacyAI.ts",
+      "acceptance": [
+        "AI proposes treaties based on relations",
+        "AI accepts/rejects proposals",
+        "AI declares war when hostile",
+        "Personality affects diplomatic behavior",
+        "Unit tests pass"
+      ]
+    },
+    {
+      "id": "ai-research",
+      "name": "AI research priorities",
+      "type": "code",
+      "status": "pending",
+      "dependencies": ["tech-tree-data", "ai-basic"],
+      "description": "AI selects research priorities based on personality and situation. Allocates RP across fields.",
+      "output": "src/game/ai/researchAI.ts",
+      "acceptance": [
+        "AI allocates RP to 6 fields",
+        "AI picks tech choices based on strategy",
+        "Racial field bonuses influence allocation",
+        "Unit tests pass"
+      ]
     }
   ]
 }

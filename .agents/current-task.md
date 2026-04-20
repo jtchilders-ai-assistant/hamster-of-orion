@@ -1,58 +1,76 @@
-# Current Task: ship-components-data
+# Current Task: ship-designer-logic
 
 ## Task ID
-ship-components-data
+ship-designer-logic
 
 ## Name
-Ship components JSON data
+Ship designer game logic
 
 ## Description
-Create comprehensive ship components JSON from design docs. Include weapons (design/technology/weapons.md), armor/shields (force-fields.md), engines (propulsion.md), computers, and specials. Each component needs: id, name, techLevel, size, cost, and type-specific stats.
+Implement ship design validation and cost calculation in src/game/. Reference design/ships/ship-design.md. Validate hull space, calculate costs, check tech requirements.
 
 ## Key References
-- `design/technology/weapons.md` — weapon stats, tech levels, damage values
-- `design/technology/force-fields.md` — armor and shield types and stats
-- `design/technology/propulsion.md` — engine types, warp and combat speeds
-- `src/game/state.ts` — existing types (ShipComponent or similar)
-- `design/ships/ship-design.md` — overall ship design spec (if it exists)
+- `design/ships/ship-design.md` — ship design spec, hull sizes, space formulas
+- `src/data/components.json` — all ship components with size, cost, techLevel
+- `src/game/types/shipComponents.ts` — component type definitions
+- `src/game/state.ts` — ShipDesign type (if exists, or add it)
 
 ## Output
-`src/data/components.json`
+`src/game/systems/shipDesign.ts`
 
 ## Acceptance Criteria
-1. All weapon types from weapons.md included (with damage, range, techLevel, size, cost)
-2. All armor types with HP multipliers
-3. All shield classes (I-XV) with deflection values
-4. All engine types with warp speed and combat speed
-5. All special systems (cloaking, scanner, colony ship module, etc.)
-6. Valid JSON that TypeScript can import/validate; types must match what state.ts or ship design expects
+1. `validateDesign(design: ShipDesign, techs: TechId[]): ValidationResult` — checks hull space limits
+2. `calculateDesignCost(design: ShipDesign): number` — returns BC cost
+3. `checkTechRequirements(design: ShipDesign, techs: TechId[]): boolean` — validates all components unlocked
+4. No DOM imports in src/game/
+5. Unit tests pass (test/game/systems/shipDesign.test.ts)
+
+## Hull Sizes (from MOO1)
+| Hull | Base Space | Base Cost |
+|------|------------|-----------|
+| Small | 25 | 6 |
+| Medium | 100 | 36 |
+| Large | 400 | 200 |
+| Huge | 1600 | 1200 |
 
 ## Implementation Notes
-- If `ShipComponent` type doesn't exist in `src/game/state.ts`, define it in `src/game/state.ts` or a new `src/game/types/shipComponents.ts`
-- The JSON structure should match the TypeScript type exactly so it can be imported with a type assertion
-- Organize by category: weapons, armor, shields, engines, specials
-- Include a top-level schema: `{ version: 1, components: ShipComponent[] }`
-- If design docs don't exist for a category, use canonical MOO1 values from memory (this is a Masters of Orion 1 clone)
+- Import components from `src/data/components.json`
+- Import types from `src/game/types/shipComponents.ts`
+- If `ShipDesign` type doesn't exist in state.ts, add it:
+  ```typescript
+  interface ShipDesign {
+    id: string;
+    name: string;
+    hullSize: 'small' | 'medium' | 'large' | 'huge';
+    components: string[];  // component IDs from components.json
+    autoRepair?: boolean;
+    // computed fields:
+    totalSpace: number;
+    totalCost: number;
+  }
+  ```
+- Consider miniaturization: components may be smaller based on tech level
+- Use the component size and cost from components.json
 
 ## Tests Required
-Create `test/data/components.test.ts`:
-- Validate JSON loads without errors
-- Assert all expected categories are present and non-empty
-- Assert required fields (id, name, techLevel, size, cost) present on every component
-- Assert at least one component per category (weapon, armor, shield, engine)
-- Assert all techLevels are integers 1-10
-- Assert no duplicate IDs
+Create `test/game/systems/shipDesign.test.ts`:
+- validateDesign returns valid for design within space limit
+- validateDesign returns invalid with error for over-space design
+- calculateDesignCost sums component costs + hull base cost
+- checkTechRequirements returns true when all component techs unlocked
+- checkTechRequirements returns false when missing required tech
+- Edge cases: empty design, single component, max components
 
 ## Output on Completion
 Update `workflow-state.json`:
 ```json
 {
   "state": "TESTING",
-  "current_task": "ship-components-data",
+  "current_task": "ship-designer-logic",
   "worker_output": {
-    "files_created": ["src/data/components.json", "..."],
-    "files_modified": ["..."],
-    "tests_added": ["test/data/components.test.ts"],
+    "files_created": ["src/game/systems/shipDesign.ts", "test/game/systems/shipDesign.test.ts"],
+    "files_modified": ["src/game/state.ts"],
+    "tests_added": ["test/game/systems/shipDesign.test.ts"],
     "summary": "..."
   }
 }
