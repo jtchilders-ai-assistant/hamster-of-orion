@@ -202,15 +202,17 @@ function getDiplomaticStateFromValue(
 /**
  * Compute the trade income ramp multiplier.
  *
- * Follows the cube-root curve from design/diplomacy/treaties.md:
- *   - Turn 1  → ~3 %
+ * Uses the linear ramp from design/diplomacy/treaties.md:
+ *   TradeIncome = BaseTradeIncome × (TradeTurnProgress / TRADE_RAMP_TURNS)
+ *
+ *   - Turn 1  → ~3.3 %
  *   - Turn 10 → ~33 %
  *   - Turn 30 → 100 %
  */
 export function tradeRampMultiplier(turnsActive: number): number {
   if (turnsActive <= 0) return 0;
   const capped = Math.min(turnsActive, TRADE_RAMP_TURNS);
-  return Math.cbrt(capped / TRADE_RAMP_TURNS);
+  return capped / TRADE_RAMP_TURNS;
 }
 
 /**

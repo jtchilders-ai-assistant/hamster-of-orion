@@ -29,7 +29,7 @@ function makeEmpire(
   id: string,
   relations: Record<string, DiplomaticRelations> = {},
   raceId = 'rats',
-  creditPerTurn = 100,
+  creditPerTurn = 200,
 ): Empire {
   return {
     id,
@@ -63,10 +63,14 @@ function makeEmpire(
   };
 }
 
-function makeState(empireIds: string[], turn = 1): GameState {
+function makeState(
+  empireIds: string[],
+  turn = 1,
+  creditPerTurn = 200,
+): GameState {
   const byId: Record<string, Empire> = {};
   for (const id of empireIds) {
-    byId[id] = makeEmpire(id);
+    byId[id] = makeEmpire(id, {}, 'rats', creditPerTurn);
   }
 
   return {
@@ -151,8 +155,12 @@ function makeState(empireIds: string[], turn = 1): GameState {
 }
 
 /** Convenience: initialise a state with relations for the given empires. */
-function makeInitedState(empireIds: string[], turn = 1): GameState {
-  return initializeRelations(makeState(empireIds, turn));
+function makeInitedState(
+  empireIds: string[],
+  turn = 1,
+  creditPerTurn = 200,
+): GameState {
+  return initializeRelations(makeState(empireIds, turn, creditPerTurn));
 }
 
 // ── Tests: tradeRampMultiplier ────────────────────────────────────────────────
@@ -177,8 +185,8 @@ describe('tradeRampMultiplier', () => {
   });
 
   it('matches design doc ~3% at turn 1', () => {
-    // cbrt(1/30) ≈ 0.0322
-    expect(tradeRampMultiplier(1)).toBeCloseTo(0.032, 2);
+    // Linear ramp: 1/30 ≈ 0.0333
+    expect(tradeRampMultiplier(1)).toBeCloseTo(1 / TRADE_RAMP_TURNS, 5);
   });
 
   it('matches design doc ~33% at turn 10', () => {
