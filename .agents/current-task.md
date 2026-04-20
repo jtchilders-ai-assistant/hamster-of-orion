@@ -1,33 +1,45 @@
-# Current Task: save-load
+# Current Task: integration-test
 
-## Task ID
-save-load
-
-## Task Name
-Save/load system
+## Task Details
+- **ID:** integration-test
+- **Name:** Integration test: full game loop
+- **Type:** test
+- **Output:** test/integration/game-loop.test.ts
 
 ## Description
-Implement a LocalStorage-based save/load system for the full GameState. Also support export/import via JSON file download/upload.
-
-## Output File
-`src/game/persistence.ts`
+End-to-end test of starting game and playing turns. Write integration tests that exercise the full game loop through the game logic layer (pure functions, no DOM).
 
 ## Acceptance Criteria
-1. Save full GameState to localStorage (key: `hamster-of-orion-save`)
-2. Load GameState from localStorage (return null if not found or parse error)
-3. Export GameState as a downloadable JSON file (UI helper — can live in src/ui/)
-4. Import GameState from a JSON file upload (UI helper — can live in src/ui/)
+1. Can start new game
+2. Can click Next Turn multiple times
+3. Production accumulates
+4. Population grows
 
-## Architecture Notes
-- `src/game/persistence.ts` — pure functions: `saveGame(state: GameState): void`, `loadGame(): GameState | null`, `serializeState(state: GameState): string`, `deserializeState(json: string): GameState | null`
-- UI helpers (file download/upload) go in `src/ui/persistence.ts` since they touch DOM/window
-- No `any` types — use proper TypeScript
-- Write unit tests for the pure functions in `src/game/persistence.ts` (mock localStorage)
+## Implementation Notes
+- Tests should live in `test/integration/game-loop.test.ts`
+- Use the store and existing systems (production, population-growth, research, turn-system)
+- These are integration tests — test the full pipeline: new game → turns → verify state changes
+- No DOM access — test via the game logic layer only (src/game/)
+- Check `src/game/` for existing systems: store.ts, actions/, systems/
+- Review `design/` docs for expected formulas and behaviors
 
-## Dependencies
-- game-state-types (done)
+## Dependencies (all done)
+- production-system ✅
+- population-growth ✅
+- research-system ✅
+- galaxy-map-canvas ✅
 
-## Integration
-- Wire save/load actions into the store/reducer if needed
-- Optionally add SAVE_GAME / LOAD_GAME actions to the reducer
-- The command bar or a dedicated menu button can trigger save/load (not required for this task — just the core persistence module)
+## Completion
+When done, update `.agents/workflow-state.json`:
+```json
+{
+  "state": "TESTING",
+  "current_task": "integration-test",
+  "worker_output": {
+    "files_created": ["test/integration/game-loop.test.ts"],
+    "files_modified": [],
+    "tests_added": ["test/integration/game-loop.test.ts"],
+    "summary": "..."
+  }
+}
+```

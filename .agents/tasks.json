@@ -275,7 +275,7 @@
       "id": "integration-test",
       "name": "Integration test: full game loop",
       "type": "test",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         "production-system",
         "population-growth",

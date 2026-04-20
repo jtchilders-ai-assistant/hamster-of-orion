@@ -308,3 +308,23 @@ Task: app-shell — Application shell and routing
 - ✅ Export GameState as downloadable JSON file (`exportSaveFile` in src/ui/persistence.ts)
 - ✅ Import GameState from JSON file upload (`importSaveFile` in src/ui/persistence.ts)
 - ✅ Bonus: `deleteSave()`, `hasSave()`, versioned save envelope, graceful quota/error handling
+2026-04-20T00:11:38Z [ORCHESTRATOR] Starting task: integration-test (Integration test: full game loop)
+
+## 2026-04-19 19:16 - TESTING → VERIFYING
+
+- Task: integration-test
+- Typecheck: clean
+- Tests: 479/479 passed (15 files)
+- Spawned verifier subagent: agent:main:subagent:8deb8339-e4b8-44d3-b32f-bc7e44973fb4
+
+## 2026-04-19T19:17 CDT - integration-test APPROVED & DONE
+- Verifier confirmed all acceptance criteria met
+- 30 integration tests covering full game loop (no DOM)
+- Criterion 1 — Can start new game: screen transitions, galaxy created, empires set up, homeworld named, deterministic by seed ✓
+- Criterion 2 — Next Turn multiple times: turn/year increment, 50-turn stress, no mutation, empire/planet counts stable ✓
+- Criterion 3 — Production accumulates: positive base production, factories non-negative, consistent calculateBaseProduction ✓
+- Criterion 4 — Population grows: positive initial pop, grows below cap, never exceeds maxPopulation, stable over 30 turns ✓
+- Plus full scenario tests: year=2500+turn formula, store subscriber notifications ✓
+- TypeScript typecheck: PASS ✓
+- Tests: 479/479 passed (15 files) ✓
+- Architecture: no DOM imports in src/game/ ✓
