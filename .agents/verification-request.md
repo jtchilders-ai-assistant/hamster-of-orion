@@ -1,15 +1,25 @@
-# Verification Request
+# Verification Request: turn-fix-compile
 
-## Task
-- **ID**: ui-007
-- **Title**: Diplomacy UI - ASCII Wireframe
-- **Output File**: design/ui-ux/wireframes/diplomacy.md
+**Task ID:** turn-fix-compile
+**Phase:** phase4a-core-interactivity
+**Type:** fix
+**Completed at:** 2026-04-20T03:30:00Z
 
-## Requirements to Verify
-1. Detailed ASCII wireframe for Diplomacy screen matching MOO1
-2. Include: race relations, treaty options, audience request, trade agreements
-3. Show different diplomatic states
-4. Proper formatting and completeness
+## Description
 
-## Reference
-Check against MOO1 diplomacy mechanics and existing wireframe patterns in the project.
+Fix Turn Integration — Wiring & Compilation.
+
+## Acceptance Criteria
+
+1. Commander.tsx renamed to Commander.ts
+2. Constructor accepts Store
+3. TurnSummary imports removed
+4. main.ts properly wired
+
+## Worker Output
+
+**File created:** `src/ui/components/Commander.ts`
+
+## Notes
+
+Worker session b6c42f11 completed. Typecheck: clean. All 1007 tests pass across 35 test files.

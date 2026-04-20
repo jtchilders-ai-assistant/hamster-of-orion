@@ -70,3 +70,16 @@
 - Next task selected: ship-components-data (Ship components JSON data)
 - No dependencies — ready to start
 - Worker spawning...
+
+## 2026-04-20T06:00:00Z — VERIFIED: turn-fix-compile ✅
+
+- Task: turn-fix-compile (Fix Turn Integration — Wiring & Compilation)
+- **Status:** APPROVED
+- Acceptance Criteria:
+  1. ✅ Commander.tsx renamed to Commander.ts (old file removed)
+  2. ✅ Constructor accepts `Store<GameState>` parameter
+  3. ✅ No TurnSummary imports in file
+  4. ✅ main.ts properly wired: imports Commander, creates store, passes to new Commander()
+- Tests: 1007/1007 pass, typecheck clean
+- Committed in: f4359be (feat(ui): add Commander controller with turn summary overlay)
+- Verified by: Verifier Agent
