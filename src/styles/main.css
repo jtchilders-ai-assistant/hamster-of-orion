@@ -290,3 +290,259 @@ html, body {
 #next-turn:hover {
   background: var(--color-accent);
 }
+
+/* ── Fleets Screen ── */
+
+.fleets-screen {
+  flex-direction: column;
+}
+
+.fleets-body {
+  flex-direction: row;
+  overflow: hidden;
+}
+
+.fleets-list-panel {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.fleets-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.fleets-table th {
+  text-align: left;
+  padding: 6px 8px;
+  color: var(--color-accent);
+  border-bottom: 1px solid var(--color-border);
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.fleets-table td {
+  padding: 5px 8px;
+  color: var(--color-text);
+  border-bottom: 1px solid rgba(26, 58, 92, 0.4);
+}
+
+.fleets-table tbody tr.fleet-row {
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.fleets-table tbody tr.fleet-row:hover {
+  background: rgba(0, 170, 255, 0.08);
+}
+
+.fleets-table tbody tr.fleet-row.selected {
+  background: rgba(0, 170, 255, 0.18);
+}
+
+.fleet-indicator {
+  color: var(--color-accent);
+  width: 16px;
+  font-size: 10px;
+}
+
+.fleet-empty {
+  text-align: center;
+  color: var(--color-text-dim);
+  padding: 24px !important;
+  font-style: italic;
+}
+
+/* ── Fleet Detail Panel ── */
+
+.fleets-detail-panel {
+  width: 340px;
+  background: var(--color-bg-panel);
+  border-left: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.fleet-detail-info {
+  padding: 12px;
+  border-bottom: 1px solid var(--color-border);
+  min-height: 110px;
+}
+
+.fleet-detail-placeholder {
+  color: var(--color-text-dim);
+  font-style: italic;
+  text-align: center;
+  margin-top: 24px;
+}
+
+.fleet-detail-name {
+  font-family: var(--font-mono);
+  color: var(--color-accent);
+  font-size: 15px;
+  margin-bottom: 6px;
+}
+
+.fleet-detail-loc,
+.fleet-detail-ships,
+.fleet-detail-exp {
+  font-size: 12px;
+  color: var(--color-text);
+  margin: 2px 0;
+}
+
+.fleet-status {
+  font-size: 12px;
+  color: #ffaa00;
+  margin: 4px 0;
+}
+
+.fleet-status.fleet-idle {
+  color: var(--color-text-dim);
+}
+
+/* ── Fleet Mini-Map ── */
+
+.fleet-mini-map-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  min-height: 180px;
+}
+
+.fleet-mini-map {
+  flex: 1;
+  width: 100%;
+  cursor: crosshair;
+  display: block;
+}
+
+.fleet-mini-map-hint {
+  font-size: 10px;
+  color: var(--color-text-dim);
+  text-align: center;
+  padding: 2px 0;
+  font-style: italic;
+}
+
+/* ── Fleet Action Buttons ── */
+
+.fleet-actions {
+  display: flex;
+  gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--color-border);
+}
+
+.fleet-actions .btn {
+  flex: 1;
+  font-size: 12px;
+  padding: 6px 8px;
+  background: var(--color-bg-panel);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.fleet-actions .btn:hover:not(:disabled) {
+  background: rgba(0, 170, 255, 0.12);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.fleet-actions .btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* ── Split Modal ── */
+
+.fleet-split-modal {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.fleet-split-modal.hidden {
+  display: none;
+}
+
+.fleet-split-modal-inner {
+  background: var(--color-bg-panel);
+  border: 1px solid var(--color-accent);
+  padding: 20px;
+  min-width: 320px;
+  max-width: 480px;
+  max-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.fleet-split-modal-inner h3 {
+  font-family: var(--font-mono);
+  color: var(--color-accent);
+  font-size: 14px;
+  letter-spacing: 2px;
+}
+
+.fleet-split-ship-list {
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fleet-split-ship-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text);
+  font-size: 13px;
+  padding: 3px 0;
+  cursor: pointer;
+}
+
+.fleet-split-actions {
+  display: flex;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--color-border);
+}
+
+.fleet-split-actions .btn {
+  flex: 1;
+  font-size: 12px;
+  padding: 6px 8px;
+  background: var(--color-bg-panel);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.fleet-split-actions .btn:hover:not(:disabled) {
+  background: rgba(0, 170, 255, 0.12);
+  border-color: var(--color-accent);
+}
+
+.fleet-split-actions .btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
