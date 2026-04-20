@@ -250,6 +250,7 @@ export function applyShipConstruction(
       ownerId,
       shipIds: [],
       systemId: planet.systemId,
+      troops: 0,
       destination: null,
       eta: 0,
       route: [],

@@ -356,6 +356,7 @@ export function splitFleet(
     ownerId: fleet.ownerId,
     shipIds: [...shipIds],
     systemId: fleet.systemId,
+    troops: 0,
     destination: null,
     eta: 0,
     route: [],

@@ -1,17 +1,16 @@
 {
-  "state": "COMPLETE",
-  "phase": "phase4a-core-interactivity",
-  "current_task": "none",
-  "last_completed": "parallel-tasks",
-  "verified_at": "2026-04-20T04:14:00Z",
-  "verification_result": {
-    "status": "approved",
-    "verified_at": "2026-04-20T04:14:00Z",
-    "tests_passed": true,
-    "test_count": 753,
-    "typecheck_passed": true,
-    "notes": "Phase 4A core complete. All 753 tests pass, typecheck clean. Three parallel tasks completed: turn-integration, buildings-system, diplomacy-relations. diplomacy.ts created (257 lines), state.ts updated with RelationModifier, newGame.ts fixed."
+  "phase": "4A",
+  "phaseName": "Turn Fix & Compile",
+  "state": "VERIFYING",
+  "workerSession": "agent:main:subagent:b6c42f11-cb0d-4be2-8b40-7131376f5aa0",
+  "lastCheckedAt": "2026-04-20T04:56:00Z",
+  "typecheckStatus": "PASS",
+  "testStatus": "PASS",
+  "testResults": {
+    "files": 35,
+    "tests": 1007,
+    "passed": 1007,
+    "failed": 0
   },
-  "started_at": "2026-04-20T03:06:00Z",
-  "completed_at": "2026-04-20T04:14:00Z"
+  "notes": "Worker session timed out after ~15 min but project compiles clean. Fixed unused imports in groundCombat.ts. All typecheck + tests green."
 }
