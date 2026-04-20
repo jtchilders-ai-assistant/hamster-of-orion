@@ -997,6 +997,8 @@ function attemptGalaxyGeneration(
       missileBases: 0,
       maxMissileBases: 10,
       planetaryShield: 0,
+      groundAttack: 1,
+      groundDefense: 1,
       isRich: planet.resources === 'rich' || planet.resources === 'ultra_rich',
       isPoor: planet.resources === 'ultra_poor' || planet.resources === 'poor',
       isGaia: planet.environment === 'gaia',

@@ -59,6 +59,28 @@ export type ExperienceLevel = 'green' | 'regular' | 'veteran' | 'elite' | 'legen
 export type TechField = 'weapons' | 'propulsion' | 'construction' | 'computers' | 'force_fields' | 'biotechnology';
 
 export type DiplomaticState = 'war' | 'unfriendly' | 'neutral' | 'friendly' | 'allied';
+// ── Espionage ─────────────────────────────────────────────────────────────────
+
+export type MissionType =
+  | 'sabotage'
+  | 'theft'
+  | 'propaganda'
+  | 'infiltration'
+  | 'assassination'
+  | 'intelligence_gathering';
+
+export interface SpyMission {
+  id: string;
+  type: MissionType;
+  senderId: EmpireId;
+  targetId: EmpireId;
+  startTurn: number;
+  durationTurns: number;
+  successProbability: number; // 0-1
+  status: 'active' | 'completed' | 'foiled';
+  reward?: { type: string; value: number };
+}
+
 export type TreatyType = 'peace' | 'non_aggression' | 'trade' | 'research' | 'military_alliance' | 'defensive_pact';
 
 export type CombatPhase = 'initiative' | 'movement' | 'firing' | 'special' | 'resolution';
@@ -220,6 +242,11 @@ export interface Planet {
   maxMissileBases: number;
   planetaryShield: number;
 
+  /** Base ground attack factor (modified by race bonuses). */
+  groundAttack: number;
+  /** Base ground defense factor (modified by race bonuses). */
+  groundDefense: number;
+
   isRich: boolean;
   isPoor: boolean;
   isGaia: boolean;
@@ -278,6 +305,9 @@ export interface Fleet {
 
   shipIds: ShipId[];
   systemId: SystemId;
+
+  /** Troops on board for ground combat / planetary invasion. */
+  troops: number;
 
   destination: SystemId | null;
   eta: number;            // turns until arrival (0 = not moving or arrived)
@@ -512,6 +542,8 @@ export interface Empire {
   shipDesigns: ShipDesignId[];
 
   scannerTechLevel: number;  // 0 = basic, +1 per upgrade; used for sensor range
+  computerTechLevel: number; // 0 = basic, +1 per upgrade; used for espionage calculations
+  securityLevel: number;     // 0-10; how much this empire spends on internal security
 
   research: ResearchState;
   relations: Record<EmpireId, DiplomaticRelations>;
@@ -732,6 +764,8 @@ export interface GameState {
 
   victoryCondition: VictoryType | null;
   defeatedTurn: number | null;
+  isGameOver: boolean;
+  victoryResult: { winnerId: EmpireId; type: VictoryType; description: string } | null;
 
   createdAt: number;
   lastPlayed: number;
@@ -775,6 +809,8 @@ export interface GameState {
   aiEmpires: Record<EmpireId, AIEmpire>;
 
   highCouncil: HighCouncil | null;
+
+  spyMissions: SpyMission[];
 
   ui: UIState;
 }
