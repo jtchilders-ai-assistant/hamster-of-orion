@@ -27,8 +27,8 @@ export const DECAY_RATE = 0.02;
 
 /** Threshold below which the relation is "war". */
 export const STATE_WAR_THRESHOLD = -50;
-/** Threshold above which the relation is "unfriendly". */
-export const STATE_UNFRIENDLY_THRESHOLD = -1;
+/** Threshold at or below which the relation is "unfriendly" (range: -50 to -1). */
+export const STATE_UNFRIENDLY_THRESHOLD = 0;
 /** Threshold above which the relation is "friendly". */
 export const STATE_FRIENDLY_THRESHOLD = 49;
 /** Threshold above which the relation is "allied". */
@@ -83,42 +83,17 @@ export function initializeRelations(state: GameState): GameState {
   const turn = state.turn;
   const empiresCopy: Record<EmpireId, Empire> = {};
 
+  // Build a fresh neutral relation for every ordered pair (A, B) where A ≠ B.
   for (const empireId of empires) {
     const empire = state.empires.byId[empireId];
     const relations: Record<EmpireId, DiplomaticRelations> = {};
 
     for (const otherId of empires) {
       if (otherId === empireId) continue;
-      // Only create one direction per pair — the other empire will hold the
-      // matching entry. We create it here symmetrically so lookups always
-      // succeed.
-      if (empireId < otherId) {
-        relations[otherId] = makeNeutralRelation(empireId, otherId, turn);
-        // We'll overwrite the reverse copy during the other empire's loop,
-        // but we fill it now for completeness (the loop will replace it with
-        // a fresh object — same values, same semantics).
-      }
+      relations[otherId] = makeNeutralRelation(empireId, otherId, turn);
     }
 
     empiresCopy[empireId] = { ...empire, relations };
-  }
-
-  // Second pass: fill in the "reverse" entries (A→B where B already holds A→B).
-  // After the first pass, each pair {A,B} has A.relations[B] populated but
-  // B.relations[A] might be missing or have stale data from initial generation.
-  // Re-emit symmetric entries to keep both sides consistent.
-  for (const empireId of empires) {
-    const newRelations: Record<EmpireId, DiplomaticRelations> = {
-      ...state.empires.byId[empireId].relations,
-    };
-    for (const otherId of empires) {
-      if (otherId === empireId) continue;
-      const existing = newRelations[otherId];
-      if (!existing) {
-        newRelations[otherId] = makeNeutralRelation(empireId, otherId, turn);
-      }
-    }
-    empiresCopy[empireId] = { ...state.empires.byId[empireId], relations: newRelations };
   }
 
   return {
