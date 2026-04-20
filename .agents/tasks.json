@@ -436,7 +436,7 @@
         "Caught spies affect relations",
         "Unit tests pass"
       ],
-      "completed_at": "2026-04-20T04:05:00Z"
+      "completed_at": "2026-04-20T04:21:00Z"
     },
     {
       "id": "ground-combat",
@@ -456,7 +456,7 @@
         "Planet capture on victory",
         "Unit tests pass"
       ],
-      "completed_at": "2026-04-20T04:05:00Z"
+      "completed_at": "2026-04-20T04:21:00Z"
     },
     {
       "id": "random-events",
@@ -496,7 +496,7 @@
         "Victory triggers end screen",
         "Unit tests pass"
       ],
-      "completed_at": "2026-04-20T04:05:00Z"
+      "completed_at": "2026-04-20T04:21:00Z"
     },
     {
       "id": "fog-of-war",
@@ -535,7 +535,7 @@
         "Personality affects diplomatic behavior",
         "Unit tests pass"
       ],
-      "completed_at": "2026-04-20T04:05:00Z"
+      "completed_at": "2026-04-20T04:21:00Z"
     },
     {
       "id": "ai-research",
@@ -554,7 +554,7 @@
         "Racial field bonuses influence allocation",
         "Unit tests pass"
       ],
-      "completed_at": "2026-04-20T04:05:00Z"
+      "completed_at": "2026-04-20T04:21:00Z"
     },
     {
       "id": "turn-fix-compile",
