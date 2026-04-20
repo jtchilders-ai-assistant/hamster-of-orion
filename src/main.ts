@@ -7,7 +7,7 @@ import { Store } from './game/store';
 import { GameState } from './game/state';
 import { rootReducer } from './game/reducer';
 import { initialState } from './game/initialState';
-import { App } from './ui/app';
+import { Commander } from './ui/components/Commander';
 import { initDebugHooks } from './debug';
 
 console.log('🐹 Hamster of Orion — Initializing...');
@@ -25,6 +25,6 @@ const store = new Store<GameState>(rootReducer, startingState);
 initDebugHooks(store);
 
 // Start UI
-new App(store);
+new Commander(document.getElementById('app')!, store);
 
 console.log('✅ Hamster of Orion — Ready!');
