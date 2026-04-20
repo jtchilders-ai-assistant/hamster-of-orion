@@ -24,7 +24,8 @@
       "id": "ship-components-data",
       "name": "Ship components JSON data",
       "type": "data",
-      "status": "pending",
+      "status": "done",
+      "completed_at": "2026-04-20T02:28:00Z",
       "description": "Create comprehensive ship components JSON from design docs. Include weapons (design/technology/weapons.md), armor/shields (force-fields.md), engines (propulsion.md), computers, and specials. Each component needs: id, name, techLevel, size, cost, and type-specific stats.",
       "output": "src/data/components.json",
       "acceptance": [

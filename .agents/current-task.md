@@ -1,91 +1,58 @@
-# Current Task: planet-screen
+# Current Task: ship-components-data
 
 ## Task ID
-planet-screen
+ship-components-data
 
 ## Name
-Planet management screen
+Ship components JSON data
 
 ## Description
-Implement `src/ui/screens/PlanetScreen.ts` — a full planet management screen with the 5 production sliders (SHIP / DEF / IND / ECO / TECH).
+Create comprehensive ship components JSON from design docs. Include weapons (design/technology/weapons.md), armor/shields (force-fields.md), engines (propulsion.md), computers, and specials. Each component needs: id, name, techLevel, size, cost, and type-specific stats.
 
 ## Key References
-- `design/economy/slider-mathematics.md` — formulas, rebalancing algorithm, locking mechanics
-- `design/ui-ux/wireframes/moo1-reference-wireframes.md` — MOO1 galaxy map right-panel wireframe shows slider layout
-- `src/game/state.ts` — `Planet`, `PlanetProduction`, `UIState` types
-- `src/game/actions/colony.ts` — `updateProduction(planetId, sliders)` action
-- `src/game/systems/production.ts` — `calculateProduction` for preview numbers
-- `src/ui/screens/ColoniesScreen.ts` — reference for existing screen pattern
-
-## Acceptance Criteria
-1. 5 sliders render with current values from planet's `production` state (ship/defense/industry/ecology/research)
-2. Dragging/interacting with a slider updates the allocation
-3. Sliders auto-rebalance so they always sum to 100% (use the algorithm from slider-mathematics.md §7)
-4. Shows production output preview (net BC, RP, factory construction progress)
-5. Accessible from galaxy map: when a planet is selected (`ui.selectedPlanet` is set), this screen is shown; clicking a planet on the galaxy map should set `ui.currentScreen = 'planet'` and `ui.selectedPlanet = planetId`
-
-## Implementation Details
-
-### File to create
-`src/ui/screens/PlanetScreen.ts`
-
-### May also need to modify
-- `src/game/actions/colony.ts` — if slider actions need to be extended (e.g., add `lockSlider` action)
-- `src/game/store.ts` — handle `UPDATE_PRODUCTION` and any new actions in reducer
-- `src/ui/screens/GalaxyScreen.ts` — wire up planet click to navigate to PlanetScreen
-
-### Slider Rebalance Algorithm (from slider-mathematics.md §7)
-```
-When player adjusts slider X to new_value:
-  delta = new_value - old_value
-  adjustable = all unlocked sliders EXCEPT X
-  if no adjustable → reject (need at least one unlocked)
-  total_adjustable = sum of adjustable values
-  for each adjustable slider s:
-    if total_adjustable > 0:
-      s.value -= delta * (s.value / total_adjustable)
-    else:
-      s.value -= delta / len(adjustable)
-    s.value = max(0, s.value)
-  # Fix rounding: ensure sum == 100
-  remainder = 100 - sum(all slider values)
-  adjustable[-1].value += remainder
-```
-
-### Production Preview
-Use `calculateProduction` (or a simplified version) to show:
-- Net BC/turn
-- Scientists (TECH slider population × base RP)
-- IND progress toward next factory
-
-### Slider Labels
-```
-SHIP  → Shipbuilding (BC allocated to current build queue)
-DEF   → Defense (missile bases & shields)
-IND   → Industry (factory construction)
-ECO   → Ecology (cleanup, growth, terraforming)
-TECH  → Research (diverts population to science)
-```
-
-## Tests Required
-Create `test/ui/PlanetScreen.test.ts` (or if pure logic extracted, `test/game/systems/sliderRebalance.test.ts`):
-- Test rebalance when one slider is adjusted
-- Test rebalance with a locked slider
-- Test that sum always == 100 after rebalance
-- Test rejection when only one unlocked slider exists
-
-Extract the rebalance logic as a pure function in `src/game/systems/production.ts` or `src/game/utils/sliders.ts` so it can be unit tested without DOM.
+- `design/technology/weapons.md` — weapon stats, tech levels, damage values
+- `design/technology/force-fields.md` — armor and shield types and stats
+- `design/technology/propulsion.md` — engine types, warp and combat speeds
+- `src/game/state.ts` — existing types (ShipComponent or similar)
+- `design/ships/ship-design.md` — overall ship design spec (if it exists)
 
 ## Output
-When complete, update `workflow-state.json`:
+`src/data/components.json`
+
+## Acceptance Criteria
+1. All weapon types from weapons.md included (with damage, range, techLevel, size, cost)
+2. All armor types with HP multipliers
+3. All shield classes (I-XV) with deflection values
+4. All engine types with warp speed and combat speed
+5. All special systems (cloaking, scanner, colony ship module, etc.)
+6. Valid JSON that TypeScript can import/validate; types must match what state.ts or ship design expects
+
+## Implementation Notes
+- If `ShipComponent` type doesn't exist in `src/game/state.ts`, define it in `src/game/state.ts` or a new `src/game/types/shipComponents.ts`
+- The JSON structure should match the TypeScript type exactly so it can be imported with a type assertion
+- Organize by category: weapons, armor, shields, engines, specials
+- Include a top-level schema: `{ version: 1, components: ShipComponent[] }`
+- If design docs don't exist for a category, use canonical MOO1 values from memory (this is a Masters of Orion 1 clone)
+
+## Tests Required
+Create `test/data/components.test.ts`:
+- Validate JSON loads without errors
+- Assert all expected categories are present and non-empty
+- Assert required fields (id, name, techLevel, size, cost) present on every component
+- Assert at least one component per category (weapon, armor, shield, engine)
+- Assert all techLevels are integers 1-10
+- Assert no duplicate IDs
+
+## Output on Completion
+Update `workflow-state.json`:
 ```json
 {
   "state": "TESTING",
-  "current_task": "planet-screen",
+  "current_task": "ship-components-data",
   "worker_output": {
-    "files_created": ["src/ui/screens/PlanetScreen.ts", "..."],
+    "files_created": ["src/data/components.json", "..."],
     "files_modified": ["..."],
-    "tests_added": ["test/..."],
+    "tests_added": ["test/data/components.test.ts"],
     "summary": "..."
   }
 }
