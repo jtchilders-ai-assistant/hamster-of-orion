@@ -105,6 +105,8 @@ function buildPlayerEmpire(
     fleets: [],
     shipDesigns: [],
     scannerTechLevel: 0,
+    computerTechLevel: 0,
+    securityLevel: 0,
     exploredSystems: [],
     visibleSystems: [],
     research: emptyResearchState(),
@@ -132,6 +134,8 @@ function buildAIEmpire(
     fleets: [],
     shipDesigns: [],
     scannerTechLevel: 0,
+    computerTechLevel: 0,
+    securityLevel: 0,
     exploredSystems: [],
     visibleSystems: [],
     research: emptyResearchState(),
@@ -304,6 +308,8 @@ export function newGameReducer(state: GameState, action: Action): GameState {
     aiEmpires: aiEmpireStates,
 
     highCouncil: null,
+
+    spyMissions: [],
 
     ui: {
       ...initialState.ui,

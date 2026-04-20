@@ -64,6 +64,8 @@ export const initialState: GameState = {
 
   victoryCondition: null,
   defeatedTurn: null,
+  isGameOver: false,
+  victoryResult: null,
 
   createdAt: Date.now(),
   lastPlayed: Date.now(),
@@ -110,6 +112,8 @@ export const initialState: GameState = {
   aiEmpires: {},
 
   highCouncil: null,
+
+  spyMissions: [],
 
   ui: defaultUI,
 };
