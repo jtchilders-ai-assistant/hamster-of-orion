@@ -118,7 +118,8 @@
       "id": "fleet-ui",
       "name": "Fleet management UI",
       "type": "ui",
-      "status": "pending",
+      "status": "done",
+      "completed_at": "2026-04-20T02:50:00Z",
       "dependencies": [
         "fleet-state"
       ],
@@ -136,7 +137,8 @@
       "id": "colonization",
       "name": "Colony ship and colonization",
       "type": "code",
-      "status": "pending",
+      "status": "done",
+      "completed_at": "2026-04-20T02:49:00Z",
       "dependencies": [
         "fleet-state"
       ],
