@@ -509,6 +509,9 @@ export interface DiplomaticRelations {
   lastContact: number;
   /** Pending modifiers applied to the relation value. */
   modifiers: RelationModifier[];
+  /** Incoming treaty proposals from other empires (for the player to accept/reject). */
+  incomingProposals: Array<{ type: TreatyType; fromEmpireId: EmpireId; proposedTurn: number }>;
+
 }
 
 export interface CouncilVote {

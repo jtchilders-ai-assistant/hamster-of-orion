@@ -183,7 +183,7 @@ export class DiplomacyScreen {
       : '<li class="no-treaties">None</li>';
 
     // Incoming proposals for this empire (criterion #5)
-    const proposalsHtml = this.renderIncomingProposals();
+    const proposalsHtml = this.renderIncomingProposals(state);
 
     // Relation history log (criterion #7)
     const historyHtml = this.renderHistory(relation);
@@ -329,7 +329,7 @@ export class DiplomacyScreen {
         return true;
       })
       .map(t => {
-        const disabled = relValue < t.minRelation ? ' disabled title="Requires +${t.minRelation} relations"' : '';
+        const disabled = relValue < t.minRelation ? ` disabled title="Requires +${t.minRelation} relations"` : '';
         return `<option value="${t.type}"${disabled}>${t.label} (req: +${t.minRelation})</option>`;
       })
       .join('');
@@ -345,17 +345,41 @@ export class DiplomacyScreen {
 
   // ── Incoming proposals (criterion #5) ───────────────────────────────────
 
-  private renderIncomingProposals(): string {
-    // Incoming proposals are tracked per-player in DiplomaticRelations.incomingProposals
-    // Since we're in the player's perspective, scan player.relations for proposals TO the player
-    // For this UI, we look at player.relations for proposals received from the target empire
-    // In a full implementation, the backend populates player.relations[target].incomingProposals
+  private renderIncomingProposals(state: GameState): string {
+    const player = state.empires.byId[state.empires.playerId];
+    const selectedEmpireId = this.selectedEmpireId;
+    if (!selectedEmpireId) return '<p class="no-proposals">No pending proposals</p>';
+    const rel = player.relations[selectedEmpireId];
+    const proposals = rel?.incomingProposals || [];
 
-    // We'll render the section and let the event system handle actual proposal data
-    // The design docs indicate proposals are displayed in the audience panel
-    return `
-      <p class="no-proposals">No pending proposals</p>
-    `;
+    if (proposals.length === 0) {
+      return '<p class="no-proposals">No pending proposals</p>';
+    }
+
+    const treatyNames: Record<string, string> = {
+      peace: 'Peace Treaty',
+      non_aggression: 'Non-Aggression Pact',
+      trade: 'Trade Agreement',
+      research: 'Research Pact',
+      military_alliance: 'Military Alliance',
+      defensive_pact: 'Defensive Pact',
+    };
+
+    const proposalRows = proposals.map((p: { type: string; fromEmpireId: EmpireId }) => {
+      const name = treatyNames[p.type] || p.type;
+      const fromEmpire = state.empires.byId[p.fromEmpireId];
+      const fromName = fromEmpire ? fromEmpire.name : 'Unknown';
+      return `
+        <div class="proposal-item">
+          <span>${name} from ${fromName}</span>
+          <div class="proposal-actions">
+            <button class="proposal-accept-btn" data-target="${p.fromEmpireId}" data-type="${p.type}">Accept</button>
+            <button class="proposal-reject-btn" data-target="${p.fromEmpireId}" data-type="${p.type}">Reject</button>
+          </div>
+        </div>`;
+    });
+
+    return `<div class="incoming-proposals">${proposalRows.join('\n')}</div>`;
   }
 
   private dispatchProposalResponse(targetId: string, type: string, response: 'accept' | 'reject'): void {

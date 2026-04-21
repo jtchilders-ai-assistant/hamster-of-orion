@@ -82,6 +82,7 @@ function buildRelations(
       warStartTurn: null,
       lastContact: isPlayer ? 1 : -1,
       modifiers: [],
+      incomingProposals: [],
     };
   }
   return relations;

@@ -68,6 +68,7 @@ function makeNeutralRelation(
     warStartTurn: null,
     lastContact: currentTurn,
     modifiers: [],
+    incomingProposals: [],
   };
 }
 

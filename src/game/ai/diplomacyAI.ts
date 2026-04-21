@@ -506,23 +506,46 @@ function applyProposeTreaty(
     canBreak: type !== 'peace',
   };
 
+  const target = state.empires.byId[targetId];
+  const targetRel = target?.relations[empireId];
+
+  // When the target is the player (or any empire), populate their incomingProposals
+  // so the DiplomacyScreen can display Accept/Reject buttons.
+  const updatedById: Record<EmpireId, typeof empire> = {
+    ...state.empires.byId,
+    [empireId]: {
+      ...empire,
+      relations: {
+        ...empire.relations,
+        [targetId]: {
+          ...rel,
+          treaties: [...rel.treaties, newTreaty],
+        },
+      },
+    },
+  };
+
+  if (target && targetRel) {
+    updatedById[targetId] = {
+      ...target,
+      relations: {
+        ...target.relations,
+        [empireId]: {
+          ...targetRel,
+          incomingProposals: [
+            ...(targetRel.incomingProposals ?? []),
+            { type: type, fromEmpireId: empireId, proposedTurn: state.turn },
+          ],
+        },
+      },
+    };
+  }
+
   return {
     ...state,
     empires: {
       ...state.empires,
-      byId: {
-        ...state.empires.byId,
-        [empireId]: {
-          ...empire,
-          relations: {
-            ...empire.relations,
-            [targetId]: {
-              ...rel,
-              treaties: [...rel.treaties, newTreaty],
-            },
-          },
-        },
-      },
+      byId: updatedById,
     },
   };
 }

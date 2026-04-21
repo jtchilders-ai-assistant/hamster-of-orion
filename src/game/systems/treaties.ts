@@ -88,6 +88,7 @@ function cloneRelation(rel: DiplomaticRelations): DiplomaticRelations {
     treaties: [...rel.treaties],
     events: [...rel.events],
     modifiers: [...rel.modifiers],
+    incomingProposals: [...rel.incomingProposals],
   };
 }
 
@@ -291,7 +292,29 @@ export function proposeTreaty(
     const filtered = rel.treaties.filter(
       t => !(t.type === type && !t.isActive),
     );
-    return { ...rel, treaties: [...filtered, treaty] };
+    const updated = { ...rel, treaties: [...filtered, treaty] };
+
+    // If the target is the player and the proposer is not (AI → player),
+    // also record the proposal in incomingProposals so the UI can render it.
+    if (proposerId !== targetId) {
+      const proposer = state.empires.byId[proposerId];
+      const target = state.empires.byId[targetId];
+      if (target?.isPlayer && proposer) {
+        // Check if this empire already has a pending proposal of this type from
+        // the same empire to avoid duplicates
+        const alreadyExists = updated.incomingProposals.some(
+          p => p.type === type && p.fromEmpireId === proposerId,
+        );
+        if (!alreadyExists) {
+          updated.incomingProposals = [
+            ...updated.incomingProposals,
+            { type, fromEmpireId: proposerId, proposedTurn: state.turn },
+          ];
+        }
+      }
+    }
+
+    return updated;
   });
 }
 
@@ -339,7 +362,83 @@ export function acceptTreaty(
     next = nudgeRelation(next, idB, idA, relationBonus);
   }
 
+  // Clear the proposal from incomingProposals (for both sides, in case both proposed)
+  for (const accepterId of [empireAId, empireBId]) {
+    const otherId = accepterId === empireAId ? empireBId : empireAId;
+    const accepter = next.empires.byId[accepterId];
+    if (accepter?.relations[otherId]?.incomingProposals?.length) {
+      const updated = { ...accepter.relations[otherId] };
+      updated.incomingProposals = updated.incomingProposals.filter(
+        p => !(p.fromEmpireId === otherId && p.type === type)
+      );
+      next = {
+        ...next,
+        empires: {
+          ...next.empires,
+          byId: {
+            ...next.empires.byId,
+            [accepterId]: {
+              ...accepter,
+              relations: {
+                ...accepter.relations,
+                [otherId]: updated,
+              },
+            },
+          },
+        },
+      };
+    }
+  }
+
   return next;
+}
+
+/**
+ * Reject an incoming treaty proposal.
+ *
+ * Removes the proposal from the target's incomingProposals array and
+ * removes the pending (inactive) treaty from the relations.
+ */
+export function rejectProposal(
+  state: GameState,
+  rejecterId: EmpireId,
+  proposerId: EmpireId,
+  type: TreatyType,
+): GameState {
+  const [idA, idB] = canonicalPair(rejecterId, proposerId);
+  const rel = getRelation(state, idA, idB);
+  if (!rel) return state;
+
+  // Remove from incomingProposals
+  const rejecter = state.empires.byId[rejecterId];
+  if (rejecter?.relations[proposerId]) {
+    const updated = { ...rejecter.relations[proposerId] };
+    updated.incomingProposals = updated.incomingProposals.filter(
+      p => !(p.fromEmpireId === proposerId && p.type === type)
+    );
+    state = {
+      ...state,
+      empires: {
+        ...state.empires,
+        byId: {
+          ...state.empires.byId,
+          [rejecterId]: {
+            ...rejecter,
+            relations: {
+              ...rejecter.relations,
+              [proposerId]: updated,
+            },
+          },
+        },
+      },
+    };
+  }
+
+  // Remove pending treaty from bilateral relations
+  return updateBilateral(state, idA, idB, r => ({
+    ...r,
+    treaties: r.treaties.filter(t => !(t.type === type && !t.isActive)),
+  }));
 }
 
 /**
