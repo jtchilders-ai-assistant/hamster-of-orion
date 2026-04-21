@@ -23,20 +23,34 @@ import { TurnSummaryScreen } from './screens/TurnSummaryScreen';
 import { VictoryScreen } from './screens/VictoryScreen';
 import { SaveLoadScreen } from './screens/SaveLoadScreen';
 import { GroundCombatScreen } from './screens/GroundCombatScreen';
+import { ReportsScreen } from './screens/ReportsScreen';
 
-// ── F-key → Screen mapping (matches MOO1 command bar layout) ─────────────────
+// ── F-key → Screen mapping ────────────────────────────────────────────────────
+// Canonical source: design/ui-ux/interaction-spec.md §2.1 (Global Shortcuts)
+// and design/ui-ux/navigation-flow.md §9.
+//
+// F7  = Reports   (statistics/graphs)
+// F8  = Council   (only when High Council is in session; no-op otherwise)
+// F10 intentionally omitted — ESC is the sole Game Menu trigger.
 
 const F_KEY_MAP: Readonly<Record<string, ScreenType>> = {
-  F1:  'galaxy',       // MAP
-  F2:  'planet_list',  // PLANETS
-  F3:  'fleet',        // FLEET
-  F4:  'research',     // TECH
-  F5:  'diplomacy',    // RACES
-  F6:  'ship_design',  // DESIGN
-  F7:  'council',      // HIGH COUNCIL
-  F8:  'save_load',    // SAVE/LOAD
-  F10: 'menu',         // GAME (save/quit)
+  F1: 'galaxy',       // Galaxy Map (central hub)
+  F2: 'planet_list',  // Planets / colony management
+  F3: 'fleet',        // Fleet screen
+  F4: 'research',     // Technology / research tree
+  F5: 'diplomacy',    // Races / diplomatic relations
+  F6: 'ship_design',  // Ship design lab
+  F7: 'reports',      // Empire reports & statistics
+  F8: 'council',      // High Council (active when council is in session)
 };
+
+// Screens that block F-key navigation (true modals).
+// While on these screens, F1–F8 do nothing to prevent accidental navigation.
+const MODAL_SCREENS: ReadonlySet<ScreenType> = new Set([
+  'combat',
+  'ground_combat',
+  'turn_summary',
+]);
 
 // ── Screen interface ──────────────────────────────────────────────────────────
 
@@ -130,6 +144,8 @@ export class App {
     const victoryEl        = this.makeScreenContainer(root, 'victory-screen');
     const victory          = new VictoryScreen(victoryEl, store);
 
+    const reportsEl = this.makeScreenContainer(root, 'reports-screen');
+
     return new Map<ScreenType, Screen>([
       ['new_game',         new NewGameScreen(newGameEl, store)],
       ['galaxy',           new GalaxyScreen(galaxyEl, store)],
@@ -139,6 +155,7 @@ export class App {
       ['research',         new ResearchScreen(researchEl, store)],
       ['diplomacy',        new DiplomacyScreen(diplomacyEl)],
       ['ship_design',      new DesignScreen(designEl, store)],
+      ['reports',          new ReportsScreen(reportsEl, store)],
       ['combat',           new CombatScreen(combatEl, store)],
       ['ground_combat',    new GroundCombatScreen(groundCombatEl, store)],
       ['council',          new CouncilScreen(councilEl)],

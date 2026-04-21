@@ -353,6 +353,55 @@ export function rootReducer(state: GameState, action: Action): GameState {
     }
   }
 
+  // ── Camera pan ─────────────────────────────────────────────────────────────
+  //
+  // Dispatched by the keyboard handler (arrow keys) to scroll the galaxy map.
+  // Payload: { dx: number; dy: number }  (pixel offsets in galaxy-coord space)
+
+  if (action.type === 'PAN_CAMERA') {
+    const { dx, dy } = action.payload as { dx: number; dy: number };
+    return {
+      ...state,
+      ui: {
+        ...state.ui,
+        camera: {
+          ...state.ui.camera,
+          x: state.ui.camera.x + dx,
+          y: state.ui.camera.y + dy,
+        },
+      },
+    };
+  }
+
+  // ── Camera zoom ───────────────────────────────────────────────────────────
+  //
+  // Dispatched by the keyboard handler (+/-/0 keys) to zoom the galaxy map.
+  // Payload: { delta: number } — positive = zoom in, negative = zoom out.
+  // Pass delta=0 to reset zoom to 1.0.
+
+  if (action.type === 'ZOOM_CAMERA') {
+    const { delta } = action.payload as { delta: number };
+    const ZOOM_MIN = 0.25;
+    const ZOOM_MAX = 4.0;
+    const newZoom =
+      delta === 0
+        ? 1.0
+        : Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, state.ui.camera.zoom + delta));
+    return {
+      ...state,
+      ui: {
+        ...state.ui,
+        camera: {
+          ...state.ui.camera,
+          zoom: newZoom,
+          // Reset pan offset when resetting zoom so the view re-centres
+          x: delta === 0 ? 0 : state.ui.camera.x,
+          y: delta === 0 ? 0 : state.ui.camera.y,
+        },
+      },
+    };
+  }
+
   // Unknown action — return unchanged state
   return state;
 }

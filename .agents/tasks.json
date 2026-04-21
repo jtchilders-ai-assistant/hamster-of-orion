@@ -289,13 +289,18 @@
                 "Play again button starts new game",
                 "Credits/about section"
             ],
-            "dependencies": []
+            "dependencies": [],
+            "verified_by": "Verifier Agent",
+            "verification_date": "2026-04-21",
+            "design_compliance": {
+                "victory-conditions.md": "Conquest and Diplomatic victory types implemented correctly. Wireframe missing (pre-existing gap)."
+            }
         },
         {
             "id": "hotkey-navigation",
             "name": "Keyboard hotkeys (F1-F8)",
             "type": "ui",
-            "status": "pending",
+            "status": "done",
             "description": "Implement keyboard navigation. F1=Galaxy, F2=Colonies, F3=Fleets, F4=Design, F5=Research, F6=Diplomacy, F7=Council, F8=Save. Also arrow keys for map pan.",
             "designDocs": [
                 "design/ui-ux/navigation-flow.md"
