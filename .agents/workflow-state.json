@@ -2,11 +2,11 @@
   "state": "IDLE",
   "current_task": null,
   "phase": "phase4b-ui-integration",
-  "last_completed": "council-screen-ui",
-  "last_check": "2026-04-21T12:54:00Z",
+  "last_completed": "espionage-ui",
+  "last_check": "2026-04-21T13:18:00Z",
   "verifier_result": {
     "status": "approved",
-    "notes": "CouncilScreen.ts (314 lines) implements all criteria. Worker timed out; orchestrator verified typecheck passes. Shows empires with vote shares, council leader, voting UI when council convenes, diplomatic victory trigger. Tests: 1256/1256 pass."
+    "notes": "EspionagePanel.ts (600+ lines) created. Worker v1 failed (gateway), v2 timed out but completed implementation. Shows spy allocation, mission selector, success probability, counter-espionage events. Tests: 1256/1256 pass."
   },
-  "notes": "Phase 4B task 10/16 complete. Next: espionage-ui"
+  "notes": "Phase 4B task 11/16 complete. Next: ground-combat-ui"
 }

@@ -231,7 +231,7 @@
       "id": "espionage-ui",
       "name": "Espionage UI",
       "type": "ui",
-      "status": "pending",
+      "status": "done",
       "description": "Create espionage interface. Show spy allocation per empire, mission selection, and results. Integrate with diplomacy screen.",
       "designDocs": [
         "design/ui-ux/spy-network-ui.md",

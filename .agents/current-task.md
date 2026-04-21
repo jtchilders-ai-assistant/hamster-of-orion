@@ -1,29 +1,23 @@
-# Current Task: High Council screen UI
+# Current Task: Espionage UI
 
-**ID**: council-screen-ui
+**ID**: espionage-ui
 **Type**: ui
-**Output**: src/ui/screens/CouncilScreen.ts
+**Output**: src/ui/components/EspionagePanel.ts
 
 ## Description
-Create CouncilScreen showing Galactic High Council. Display vote shares, current leader, and voting UI when council convenes.
+Create espionage interface. Show spy allocation per empire, mission selection, and results. Integrate with diplomacy screen.
 
 ## Design Documents (MUST READ)
-- design/ui-ux/wireframes/council-screen.md — Council screen layout, vote display, voting UI
-- design/diplomacy/high-council.md — Council mechanics, vote calculation, victory condition
+- design/ui-ux/spy-network-ui.md — spy allocation UI, mission selection interface
+- design/diplomacy/espionage.md — espionage mechanics, mission types, success formulas
 
 ## Acceptance Criteria
-1. Shows all empires with vote share %
-2. Vote share based on population
-3. Current council leader highlighted
-4. When council convenes: voting UI
-5. Vote for self or another empire
-6. Shows vote results and winner
-7. Diplomatic victory triggers if 2/3 votes
+1. Shows spy count per target empire
+2. Slider to allocate spies
+3. Mission type selector (sabotage, steal tech, etc)
+4. Shows success probability
+5. Results display when mission completes
+6. Shows counter-espionage events
 
 ## Dependencies
-- None (all dependencies completed)
-
-## Notes
-- This is task 10/16 in Phase 4B
-- Follow existing screen patterns (ResearchScreen, DiplomacyScreen)
-- Hook into F7 hotkey per navigation-flow.md
+- None (no blocking dependencies)

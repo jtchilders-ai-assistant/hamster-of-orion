@@ -1,3 +1,22 @@
+## 2026-04-21 13:18 UTC — Task: espionage-ui
+- **Status**: Completed ✓
+- **Implementation**: EspionagePanel.ts (600+ lines) created
+- **Worker**: v1 failed (gateway), v2 timed out but completed
+- **Tests**: 1256/1256 pass
+- **Commit**: pending
+
+## 2026-04-21 12:57 UTC — Task: espionage-ui
+- **Status**: Started
+- **Design Docs**: spy-network-ui.md, espionage.md
+- **Worker**: Spawned (label: worker-espionage-ui, model: warpcore/Qwen)
+- **Phase**: 4B UI Integration — task 11/16
+
+## 2026-04-21 12:54 UTC — Task: council-screen-ui
+- **Status**: Completed ✓
+- **Tests**: typecheck ✓, vitest ✓ (1256/1256 pass)
+- **Design Verified**: council-screen.md, high-council.md
+- **Note**: Worker timed out but output valid; orchestrator verified
+
 ## 2026-04-21 12:52 UTC — Task: council-screen-ui
 - **Status**: Worker still running (14m32s / 15m timeout)
 - **Worker**: worker-council-screen-ui (warpcore/Qwen model)

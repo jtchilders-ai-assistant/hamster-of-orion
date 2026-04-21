@@ -22,6 +22,7 @@ import {
   STATE_WAR_THRESHOLD,
 } from '../../game/systems/diplomacy';
 import { hasTreaty } from '../../game/systems/treaties';
+import { EspionagePanel, SpyMissionEvent } from '../components/EspionagePanel';
 
 // Treaty type labels (user-facing)
 const TREATY_LABELS: Record<string, string> = {
@@ -46,9 +47,20 @@ export class DiplomacyScreen {
   private readonly container: HTMLElement;
   private selectedEmpireId: EmpireId | null = null;
   private warConfirmTarget: EmpireId | null = null;
+  private espionagePanel: EspionagePanel | null = null;
+  private lastState: GameState | null = null;
 
   constructor(container: HTMLElement) {
     this.container = container;
+    this.espionagePanel = new EspionagePanel(this.container);
+
+    // Listen for spy-mission-submit events from EspionagePanel
+    this.container.addEventListener('spy-mission-submit', ((e: Event) => {
+      const detail = (e as SpyMissionEvent).detail;
+      if (!detail) return;
+      this.handleSpyMission(detail.targetEmpireId, detail.missionType, detail.allocatedPct);
+    }) as EventListener);
+
     this.buildLayout();
   }
 
@@ -86,6 +98,7 @@ export class DiplomacyScreen {
   // ═══════════════════════════════════════════════════════════════════════
 
   render(state: GameState): void {
+    this.lastState = state;
     const player = Object.values(state.empires.byId).find(e => e.isPlayer);
     if (!player) return;
 
@@ -176,6 +189,8 @@ export class DiplomacyScreen {
 
     const isAtWar = relValue <= STATE_WAR_THRESHOLD;
     const canDeclareWar = !isAtWar;
+    // Espionage is available against any non-player empire
+    const canEspionage = !empire.isPlayer;
 
     // Active treaty badges (criterion #3)
     const treatyList = treaties.length > 0
@@ -222,6 +237,20 @@ export class DiplomacyScreen {
         <div class="intel-row"><span>Fleets:</span><span>${empire.fleets.length}</span></div>
 
       </div>
+
+      ${canEspionage ? `
+        <div class="detail-section espionage-section">
+          <h3>ESPIONAGE</h3>
+          <div class="espionage-controls">
+            <p>${state.empires.playerId === empire.id
+              ? 'View another empire to manage espionage against them.'
+              : `Manage espionage operations against ${empire.name}.`}</p>
+            <button class="btn btn-sm" id="espionage-tab-btn" data-empire-id="${empire.id}">
+              OPEN ESPIONAGE PANEL
+            </button>
+          </div>
+        </div>
+      ` : ''}
 
       <div class="detail-section incoming-section">
         <h3>Incoming Proposals</h3>
@@ -292,6 +321,24 @@ export class DiplomacyScreen {
 
     // Wire up war confirmation
     this.wireWarConfirm();
+
+    // Wire up espionage tab button
+    const espBtn = detailEl.querySelector<HTMLElement>('#espionage-tab-btn');
+    if (espBtn) {
+      let espionageOpen = false;
+      espBtn.addEventListener('click', () => {
+        const targetId = espBtn.dataset['empireId'];
+        if (!targetId || !this.espionagePanel || !this.lastState) return;
+        espionageOpen = !espionageOpen;
+        this.espionagePanel.setVisible(espionageOpen);
+        if (espionageOpen) {
+          this.espionagePanel.render(this.lastState, targetId as EmpireId);
+          espBtn.textContent = 'CLOSE ESPIONAGE PANEL';
+        } else {
+          espBtn.textContent = 'OPEN ESPIONAGE PANEL';
+        }
+      });
+    }
   }
 
   // ── Propose treaty dropdown (criterion #4) ──────────────────────────────
@@ -534,6 +581,31 @@ export class DiplomacyScreen {
     if (diff === 0) return 'Comparable';
     if (diff > -3) return 'Slightly Behind';
     return 'Far Behind';
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // Espionage
+  // ═══════════════════════════════════════════════════════════════════════
+
+  private handleSpyMission(targetEmpireId: string, missionType: string, _allocatedPct: number): void {
+    const state = this.lastState;
+    if (!state) return;
+
+    const playerId = state.empires.playerId;
+
+    // Dispatch a diplomacy-action event to perform the espionage mission
+    this.container.dispatchEvent(new CustomEvent('diplomacy-action', {
+      bubbles: true,
+      detail: {
+        action: 'ESPIONAGE_MISSION',
+        senderId: playerId,
+        targetId: targetEmpireId,
+        payload: { missionType },
+      },
+    }));
+
+    // Close the espionage panel
+    this.espionagePanel?.setVisible(false);
   }
 
   // ═══════════════════════════════════════════════════════════════════════
