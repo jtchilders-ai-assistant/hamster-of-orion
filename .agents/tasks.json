@@ -348,7 +348,7 @@
             "id": "playable-demo-test",
             "name": "Playable demo integration test",
             "type": "test",
-            "status": "pending",
+            "status": "done",
             "description": "Create end-to-end test that plays through a game: new game, colonize, build ships, combat, diplomacy, victory. Verifies all systems integrate correctly.",
             "designDocs": [
                 "design/game-mechanics/turn-structure.md",

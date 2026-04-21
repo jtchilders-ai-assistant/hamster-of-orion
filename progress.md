@@ -382,3 +382,14 @@
 - **Status**: Worker still running (state=WORKING)
 - **Note**: Worker running ~20 min since initial spawn. No state transition yet.
 - **Completed**: 15/16 tasks. Remaining: constants-to-code (in progress), playable-demo-test
+
+## 2026-04-21 21:51 — Task: constants-to-code
+- **Status**: Worker still running (state=WORKING, last check 21:26)
+- **Notes**: No progress since last cycle. Will check next cycle.
+## 2026-04-21 16:56 — Task: constants-to-code
+- **Status**: Worker still running
+- **Note**: No state change since last check (21:26 UTC)
+
+## 2026-04-21 22:01 — Task: constants-to-code
+- **State**: WORKING
+- **Worker**: Still running (spawned ~35m ago, state unchanged)
