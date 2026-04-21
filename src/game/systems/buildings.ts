@@ -92,7 +92,7 @@ export function getBuildingById(id: string): BuildingData | undefined {
 //   planetaryShield: number        — shield absorption value
 //
 // We interpret:
-//   planet.buildQueue[0] (where type === 'building' | 'defense')
+//   planet.buildQueue[0] (where type === 'defense')
 //     as the active building being constructed.
 //   planet.buildings as IDs of completed per-planet buildings.
 //
@@ -218,9 +218,9 @@ export function processBuildingConstruction(
 ): GameState {
   if (!planet.isColonized || planet.ownerId === null) return state;
 
-  // Find the active building queue item (type 'defense' or 'building')
+  // Find the active building queue item (defense type — missile bases and shields)
   const activeItem = planet.buildQueue.find(
-    (item) => item.type === 'defense' || item.type === 'building',
+    (item) => item.type === 'defense',
   );
 
   if (!activeItem) return state;
@@ -299,7 +299,7 @@ export function accumulateBuildingProgress(
   if (!planet || !planet.isColonized || planet.ownerId === null) return state;
 
   const activeIndex = planet.buildQueue.findIndex(
-    (item) => item.type === 'defense' || item.type === 'building',
+    (item) => item.type === 'defense',
   );
 
   if (activeIndex === -1) return state;

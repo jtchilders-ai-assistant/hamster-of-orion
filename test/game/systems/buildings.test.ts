@@ -8,7 +8,10 @@
  *   3. Maintenance costs calculated correctly
  *   4. Available buildings filtered by tech level
  *   5. Building effects applied (missile bases, planetary shields)
- *   6. queueBuilding / cancelBuilding actions
+ *
+ * Note: MOO1 doesn't have discrete "buildings" like later 4X games.
+ * Infrastructure (missile bases, planetary shields) is built via the DEF
+ * slider allocation. There are no separate building queues.
  */
 
 import { describe, it, expect } from 'vitest';
@@ -20,11 +23,6 @@ import {
   getAvailableBuildings,
   processAllBuildingConstruction,
 } from '../../../src/game/systems/buildings';
-import {
-  queueBuilding,
-  cancelBuilding,
-  buildingReducer,
-} from '../../../src/game/actions/buildings';
 import type {
   GameState,
   Planet,
@@ -545,7 +543,7 @@ describe('Building effects applied', () => {
     const planet = makePlanet({
       buildQueue: [
         {
-          type: 'building' as const,
+          type: 'defense' as const,
           targetId: 'star_gate',
           targetName: 'Intergalactic Star Gate',
           costTotal: 3000,
@@ -568,100 +566,6 @@ describe('Building effects applied', () => {
     // Pure pass-through in current implementation — same structure
     expect(nextState.planets.byId['p1'].missileBases).toBe(3);
     expect(nextState.planets.byId['p1'].planetaryShield).toBe(5);
-  });
-});
-
-// ─────────────────────────────────────────────────────────────────────────────
-// 6. queueBuilding / cancelBuilding actions
-// ─────────────────────────────────────────────────────────────────────────────
-
-describe('queueBuilding action', () => {
-  it('adds a missile base to the build queue', () => {
-    const planet = makePlanet({ buildQueue: [] });
-    const state = makeMinimalState([planet], [makeEmpire()]);
-
-    const action = queueBuilding('p1', 'missile_base');
-    const nextState = buildingReducer(state, action);
-
-    const queue = nextState.planets.byId['p1'].buildQueue;
-    expect(queue).toHaveLength(1);
-    expect(queue[0].targetId).toBe('missile_base');
-    expect(queue[0].costTotal).toBe(150);
-    expect(queue[0].costRemaining).toBe(150);
-  });
-
-  it('replaces an existing building queue item (single active slot)', () => {
-    const planet = makePlanet({
-      buildQueue: [
-        {
-          type: 'defense',
-          targetId: 'missile_base',
-          targetName: 'Missile Base',
-          costTotal: 150,
-          costRemaining: 80,
-          turnsRemaining: 1,
-        },
-      ],
-    });
-    const state = makeMinimalState([planet], [makeEmpire('empire1', ['planetary_5_tech'])]);
-
-    const action = queueBuilding('p1', 'planetary_shield_5');
-    const nextState = buildingReducer(state, action);
-
-    const queue = nextState.planets.byId['p1'].buildQueue;
-    expect(queue).toHaveLength(1);
-    expect(queue[0].targetId).toBe('planetary_shield_5');
-    expect(queue[0].costTotal).toBe(500);
-  });
-
-  it('is a no-op for an unknown building ID', () => {
-    const planet = makePlanet();
-    const state = makeMinimalState([planet], [makeEmpire()]);
-
-    const action = queueBuilding('p1', 'nonexistent_building' as import('../../../src/game/state').BuildingId);
-    const nextState = buildingReducer(state, action);
-    expect(nextState).toBe(state);
-  });
-
-  it('is a no-op for an unknown planet ID', () => {
-    const planet = makePlanet();
-    const state = makeMinimalState([planet], [makeEmpire()]);
-
-    const action = queueBuilding('no-such-planet', 'missile_base');
-    const nextState = buildingReducer(state, action);
-    expect(nextState).toBe(state);
-  });
-});
-
-describe('cancelBuilding action', () => {
-  it('removes the active building from the queue', () => {
-    const planet = makePlanet({
-      buildQueue: [
-        {
-          type: 'defense',
-          targetId: 'missile_base',
-          targetName: 'Missile Base',
-          costTotal: 150,
-          costRemaining: 70,
-          turnsRemaining: 1,
-        },
-      ],
-    });
-    const state = makeMinimalState([planet], [makeEmpire()]);
-
-    const action = cancelBuilding('p1');
-    const nextState = buildingReducer(state, action);
-
-    expect(nextState.planets.byId['p1'].buildQueue).toHaveLength(0);
-  });
-
-  it('is a no-op when build queue is empty', () => {
-    const planet = makePlanet({ buildQueue: [] });
-    const state = makeMinimalState([planet], [makeEmpire()]);
-
-    const action = cancelBuilding('p1');
-    const nextState = buildingReducer(state, action);
-    expect(nextState).toBe(state);
   });
 });
 

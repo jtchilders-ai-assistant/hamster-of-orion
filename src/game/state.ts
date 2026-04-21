@@ -203,7 +203,8 @@ export interface PlanetProduction {
 }
 
 export interface BuildQueueItem {
-  type: 'ship' | 'building' | 'defense' | 'industry';
+  /** MOO1 build queue: ships, defensive structures (missile bases/shields), and factory construction. */
+  type: 'ship' | 'defense' | 'industry';
   targetId: string;
   targetName: string;
   costTotal: number;
@@ -236,6 +237,7 @@ export interface Planet {
 
   production: PlanetProduction;
   buildQueue: BuildQueueItem[];
+  /** IDs of completed per-planet buildings (e.g. star gates). Missile bases and shields are tracked directly on the planet. */
   buildings: BuildingId[];
 
   missileBases: number;
@@ -419,7 +421,7 @@ export interface TechPrerequisite {
 }
 
 export interface TechUnlock {
-  type: 'weapon' | 'armor' | 'shield' | 'engine' | 'building' | 'ship_system' | 'planet_bonus' | 'general_bonus';
+  type: 'weapon' | 'armor' | 'shield' | 'engine' | 'ship_system' | 'planet_bonus' | 'general_bonus';
   id: string;
   name: string;
 }
