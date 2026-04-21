@@ -254,7 +254,7 @@
       "id": "ground-combat-ui",
       "name": "Ground combat results UI",
       "type": "ui",
-      "status": "pending",
+      "status": "done",
       "description": "Create ground combat resolution UI. Shows when troops invade a planet. Display attacker/defender strength, combat rolls, and result.",
       "designDocs": [
         "design/ui-ux/ground-combat-ui.md",

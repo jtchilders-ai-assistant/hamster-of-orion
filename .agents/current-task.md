@@ -1,23 +1,23 @@
-# Current Task: Espionage UI
+# Current Task: Ground combat results UI
 
-**ID**: espionage-ui
+**ID**: ground-combat-ui
 **Type**: ui
-**Output**: src/ui/components/EspionagePanel.ts
+**Output**: src/ui/screens/GroundCombatScreen.ts
 
 ## Description
-Create espionage interface. Show spy allocation per empire, mission selection, and results. Integrate with diplomacy screen.
+Create ground combat resolution UI. Shows when troops invade a planet. Display attacker/defender strength, combat rolls, and result.
 
 ## Design Documents (MUST READ)
-- design/ui-ux/spy-network-ui.md — spy allocation UI, mission selection interface
-- design/diplomacy/espionage.md — espionage mechanics, mission types, success formulas
+- design/ui-ux/ground-combat-ui.md — ground combat UI wireframe
+- design/ships/ground-combat.md — ground combat mechanics, formulas, attack tables
 
 ## Acceptance Criteria
-1. Shows spy count per target empire
-2. Slider to allocate spies
-3. Mission type selector (sabotage, steal tech, etc)
-4. Shows success probability
-5. Results display when mission completes
-6. Shows counter-espionage events
+1. Shows attacker troops and bonuses
+2. Shows defender population and bonuses
+3. Combat rounds display with casualties
+4. Final result: planet captured or invasion failed
+5. Population changes shown
+6. Return to galaxy map after
 
 ## Dependencies
-- None (no blocking dependencies)
+- None

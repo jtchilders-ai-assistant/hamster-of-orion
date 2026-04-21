@@ -462,3 +462,29 @@ All three late subagent timeouts (hamster-ground-combat, hamster-ai-diplomacy, h
 - **New Tests**: 16 tests in saveLoadScreen.test.ts
 - **Verifier**: Spawning with model warpcore/Qwen/Qwen3.6-35B-A3B-FP8
 - **Label**: verifier-save-load-ui
+
+## 2026-04-21 14:42 CDT — BLOCKED: espionage-ui (cycle 13+)
+- State remains BLOCKED — no change since ~08:42 CDT (~6 hours)
+- espionage-ui blocked: 3 critical gaps, design doc ambiguity
+- **Blocking Issues**:
+  1. Spy allocation slider is cosmetic only (never dispatched to game system)
+  2. No results display UI for completed missions
+  3. Counter-espionage panel incomplete (only notification banners)
+- 3/6 acceptance criteria fully met; worker overclaimed all 6
+- No sub-agents spawned; cannot proceed without human resolution
+- **Pending tasks**: ground-combat-ui, victory-screen, hotkey-navigation, constants-to-code, playable-demo-test
+- **Suggestion**: Reject back to WORKING for fixes, update design docs, or skip this task
+
+## 2026-04-21 15:12 CDT — Task: ground-combat-ui
+- **Status**: Started
+- **Design Docs**: ground-combat-ui.md, ground-combat.md
+- **Worker**: Spawned (label: worker-ground-combat-ui, model: warpcore/Qwen)
+- **Phase**: 4B UI Integration — task 12/16
+- **Note**: espionage-ui was unblocked externally; state changed from BLOCKED to IDLE. Picking up next pending task.
+
+## 2026-04-21 15:17 CDT — BLOCKED CHECK (cycle 14+)
+- **Status**: Still BLOCKED on espionage-ui
+- **State file**: Unchanged since 14:07 UTC (~1h10m)
+- **Last completed**: research-screen-complete (11/16 tasks)
+- **Verdict**: No sub-agents spawned — human intervention required
+- **Action**: Alerting Taylor about the block

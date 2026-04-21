@@ -129,3 +129,107 @@
 - State remains BLOCKED — no change since last check
 - Still awaiting human review of design doc ambiguities
 - No sub-agents spawned; cannot proceed without human resolution
+
+## 2026-04-21 08:47 CDT — BLOCKED: espionage-ui (still blocked)
+- State remains BLOCKED — no change since last check
+- Still awaiting human review of design doc ambiguities
+- No sub-agents spawned; cannot proceed without human resolution
+
+## 2026-04-21 13:52 — Task: espionage-ui
+- **Status**: BLOCKED (verifier blocked)
+- **Reason**: Critical gaps in EspionagePanel (602 lines):
+  - Spy allocation slider never dispatched (cosmetic only)
+  - No results display UI
+  - Counter-espionage panel only partial notification banners
+  - Only 3/6 acceptance criteria fully met; worker overclaimed all 6
+- **Action**: Human review required — design doc ambiguity or spec unclear
+- **Blocked since**: 2026-04-21 13:42 UTC (per last_check)
+
+## 2026-04-21 13:57 — BLOCKED: espionage-ui (still blocked)
+- State remains BLOCKED — no change since 13:42 UTC
+- espionage-ui blocked: 3 critical gaps, design doc ambiguity
+- Note: playable-demo-test worker was spawned (run: 1dafc773) at 08:37 CDT — may still be running
+- Next step: human must resolve espionage design docs or provide direct instructions
+
+## 2026-04-21 09:02 — Task: espionage-ui
+- **Status**: BLOCKED (design doc ambiguity)
+- **Verifier Result**: Critical gaps found — spy allocation slider never dispatched (cosmetic only), no results display UI, counter-espionage panel only partial notification banners. 3/6 acceptance criteria met.
+- **Worker Overclaim**: Worker claimed all 6 acceptance criteria met, but verifier found significant gaps.
+- **Action**: BLOCKED pending human review. Taylor needs to decide: reject back to WORKING for fixes, or update design docs if the bar was too strict.
+
+## 2026-04-21 09:12 CDT — BLOCKED: espionage-ui (still blocked)
+- State remains BLOCKED — no change since last check
+- Still awaiting human review of design doc ambiguities:
+  1. Spy allocation slider dispatch flow (espionage.md)
+  2. Mission results display UI (spy-network-ui.md)
+  3. Counter-espionage panel scope (espionage.md)
+- No sub-agents spawned; cannot proceed without human resolution
+- Note: 11/16 tasks done, 5 remain pending (ground-combat-ui, victory-screen, hotkey-navigation, constants-to-code, playable-demo-test)
+
+## 2026-04-21 09:22 — BLOCKED: espionage-ui (still blocked, cycle 9+)
+- State remains BLOCKED since ~08:42 CDT
+- espionage-ui blocked: verifier found 3 critical gaps, worker overclaimed all 6 acceptance criteria
+- **Gaps**: spy allocation slider cosmetic-only, no results display UI, counter-espionage partial
+- **Action**: Taylor must resolve design doc ambiguities in espionage.md and spy-network-ui.md
+- **Note**: 11/16 tasks complete. 5 pending (ground-combat-ui, victory-screen, hotkey-navigation, constants-to-code, playable-demo-test). playable-demo-test worker status unknown.
+- **Alert**: Sent to Taylor
+
+## 2026-04-21 09:27 — BLOCKED: espionage-ui (cycle 10+)
+- State remains BLOCKED — no change
+- espionage-ui still blocked: 3 critical gaps, design doc ambiguity
+- Blocked since: ~08:42 CDT (45+ minutes)
+- No sub-agents spawned; cannot proceed
+- **Pending tasks**: ground-combat-ui, victory-screen, hotkey-navigation, constants-to-code, playable-demo-test
+- **Note**: 11/16 tasks done. espionage-ui is the only blocked task; all others are pending (not blocked by espionage-ui)
+- **Suggestion**: Taylor can resolve by rejecting back to WORKING for fixes, or updating design docs to clarify scope
+
+## 2026-04-21 09:32 — BLOCKED: espionage-ui (cycle 11+)
+- State remains BLOCKED — no change
+- espionage-ui still blocked: 3 critical gaps, design doc ambiguity
+- Blocked since: ~08:42 CDT (~50 min)
+- No sub-agents spawned; cannot proceed
+- 11/16 tasks done. 5 pending, 1 blocked
+- **Suggestion**: Reject back to WORKING for fixes, or update design docs to clarify scope
+
+## 2026-04-21 14:37 — Task: espionage-ui
+- **Status**: BLOCKED (cycle check)
+- **Block Reason**: Verifier flagged critical gaps — spy allocation slider never dispatched (cosmetic only), no results display UI, counter-espionage panel only partial notification banners. 3/6 acceptance criteria fully met. Worker overclaimed all 6 met.
+- **Action**: Awaiting human review. Cannot proceed without resolver.
+- **Phase**: phase4b-ui-integration
+- **Completed**: 11/16 tasks
+- **Last commit**: b6c42f1
+
+## 2026-04-21 15:02 CDT — BLOCKED: espionage-ui (cycle check, cycle 14+)
+- State remains BLOCKED since ~08:42 CDT (~6h 20m)
+- espionage-ui blocked: verifier found 3 critical gaps, worker overclaimed all 6 acceptance criteria
+- **Gaps**: spy allocation slider cosmetic-only, no results display UI, counter-espionage partial
+- 11/16 tasks done. 5 pending: ground-combat-ui, victory-screen, hotkey-navigation, constants-to-code, playable-demo-test
+- No active sub-agents (all completed or timed out)
+- **Key observation**: espionage-ui is NOT a dependency for any pending task. The block is self-contained.
+- **Recommendation**: Taylor can: (1) reject back to WORKING for fixes, (2) update design docs to clarify scope, or (3) mark espionage-ui as done and continue with remaining tasks.
+
+## 2026-04-21 15:02 CDT — NOTE: Cron interval review
+- This cron has logged "BLOCKED" 14+ times over 6+ hours with no human response
+- All pending tasks are independent of espionage-ui; work could continue if Taylor allows
+- Note: playable-demo-test worker status unknown (spawned 08:37 CDT). Check sub-agent list if needed.
+- State: BLOCKED — awaiting human resolution.
+
+## 2026-04-21 15:07 CDT — BLOCKED: espionage-ui (cycle check, cycle 15+)
+- State remains BLOCKED — no change
+- espionage-ui blocked: 3 critical gaps, verifier-vs-worker disagreement on acceptance
+- **Gaps**: spy allocation slider cosmetic-only (never dispatched), no results display UI, counter-espionage partial
+- **Blocked since**: ~08:42 CDT (~6h 25m)
+- 11/16 tasks done. 5 pending (independent of espionage-ui): ground-combat-ui, victory-screen, hotkey-navigation, constants-to-code, playable-demo-test
+- **Recommendation**: Taylor can reject back to WORKING for fixes, update design docs, or mark espionage-ui done and continue.
+
+## 2026-04-21 14:57 — Task: espionage-ui
+- **Status**: BLOCKED (pending human review)
+- **Block Reason**: Verifier flagged 3 critical gaps in EspionagePanel (602 lines):
+  1. Spy allocation slider exists but values are never dispatched (cosmetic only)
+  2. No results display UI for completed missions
+  3. Counter-espionage panel is only partial notification banners
+- **Worker Claim**: All 6 acceptance criteria met
+- **Verifier Finding**: Only 3/6 fully met; worker overclaimed
+- **Action Needed**: Taylor needs to resolve ambiguity between design docs (`design/ui-ux/spy-network-ui.md` vs `design/diplomacy/espionage.md`) and clarify scope for these gaps before worker can fix and resubmit.
+- **Blocked Since**: 2026-04-21 14:07 UTC
+- **Orchestrator Note**: Cannot auto-resolve — worker and verifier disagree on acceptance. Design doc ambiguity requires human input.

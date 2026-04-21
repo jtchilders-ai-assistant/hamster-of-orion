@@ -7,6 +7,7 @@
 
 import { Action } from './store';
 import { GameState, ScreenType } from './state';
+import { executeGroundCombat } from './systems/groundCombat';
 import { turnReducer } from './actions/turn';
 import { newGameReducer } from './actions/newGame';
 import { fleetReducer, MOVE_FLEET, MERGE_FLEETS, SPLIT_FLEET, SCRAP_FLEET, PROCESS_FLEET_MOVEMENT, OPEN_FLEET_DEPLOYMENT, UPDATE_DEPLOYMENT_SHIPS, SET_DEPLOYMENT_DESTINATION, CANCEL_FLEET_DEPLOYMENT } from './actions/fleet';
@@ -329,6 +330,26 @@ export function rootReducer(state: GameState, action: Action): GameState {
         },
       },
     };
+  }
+
+  // ── Ground Combat Result ────────────────────────────────────────────────
+  //
+  // Dispatched by GroundCombatScreen when combat concludes.
+  // Delegates full state mutation to executeGroundCombat (which handles
+  // planet capture, fleet troop depletion, empire planet list updates, etc.).
+
+  if (action.type === 'GROUNDCOMBAT_RESULT') {
+    const { attackerId, defenderId, planetId } = action.payload as {
+      attackerId: string;
+      defenderId: string;
+      planetId: PlanetId;
+    };
+    try {
+      return executeGroundCombat(state, attackerId, defenderId, planetId);
+    } catch {
+      // If preconditions aren't met (no fleet, no planet, etc.), return unchanged.
+      return state;
+    }
   }
 
   // Unknown action — return unchanged state

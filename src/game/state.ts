@@ -34,6 +34,7 @@ export type ScreenType =
   | 'reports'
   | 'council'
   | 'combat'
+  | 'ground_combat'
   | 'turn_summary'
   | 'save_load';
 

@@ -21,6 +21,7 @@ import { CouncilScreen } from './screens/CouncilScreen';
 import { CommandBar } from './components/CommandBar';
 import { TurnSummaryScreen } from './screens/TurnSummaryScreen';
 import { SaveLoadScreen } from './screens/SaveLoadScreen';
+import { GroundCombatScreen } from './screens/GroundCombatScreen';
 
 // ── F-key → Screen mapping (matches MOO1 command bar layout) ─────────────────
 
@@ -118,11 +119,12 @@ export class App {
     const diplomacyEl  = this.makeScreenContainer(root, 'diplomacy-screen');
     const designEl     = this.makeScreenContainer(root, 'design-screen');
     const newGameEl    = this.makeScreenContainer(root, 'new-game-screen');
-    const combatEl       = this.makeScreenContainer(root, 'combat-screen');
-    const councilEl      = this.makeScreenContainer(root, 'council-screen');
-    const saveLoadEl     = this.makeScreenContainer(root, 'save-load-screen');
-    const turnSummaryEl  = this.makeScreenContainer(root, 'turn-summary-screen');
-    const turnSummary    = new TurnSummaryScreen(turnSummaryEl, store);
+    const combatEl          = this.makeScreenContainer(root, 'combat-screen');
+    const groundCombatEl   = this.makeScreenContainer(root, 'ground-combat-screen');
+    const councilEl        = this.makeScreenContainer(root, 'council-screen');
+    const saveLoadEl       = this.makeScreenContainer(root, 'save-load-screen');
+    const turnSummaryEl    = this.makeScreenContainer(root, 'turn-summary-screen');
+    const turnSummary      = new TurnSummaryScreen(turnSummaryEl, store);
 
     return new Map<ScreenType, Screen>([
       ['new_game',         new NewGameScreen(newGameEl, store)],
@@ -134,6 +136,7 @@ export class App {
       ['diplomacy',        new DiplomacyScreen(diplomacyEl)],
       ['ship_design',      new DesignScreen(designEl, store)],
       ['combat',           new CombatScreen(combatEl, store)],
+      ['ground_combat',    new GroundCombatScreen(groundCombatEl, store)],
       ['council',          new CouncilScreen(councilEl)],
       ['save_load',        new SaveLoadScreen(saveLoadEl, store)],
       ['turn_summary',     turnSummary],
