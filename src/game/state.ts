@@ -728,6 +728,16 @@ export interface UIState {
   selectedFleet: FleetId | null;
   selectedShip: ShipId | null;
 
+  /** Fleet deployment mode: which ships to deploy and where. */
+  fleetDeploymentMode: {
+    /** Fleet currently being deployed (at rest, not in transit). */
+    fleetId: FleetId;
+    /** Map of ship design IDs → number of ships to deploy. */
+    ships: Record<string, number>;
+    /** Destination system (set when player clicks a star on the map). */
+    destinationId: SystemId | null;
+  } | null;
+
   camera: {
     x: number;
     y: number;

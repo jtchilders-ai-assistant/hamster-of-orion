@@ -32,6 +32,7 @@ const defaultUI: UIState = {
   selectedPlanet: null,
   selectedFleet: null,
   selectedShip: null,
+  fleetDeploymentMode: null,
   camera: {
     x: 0,
     y: 0,

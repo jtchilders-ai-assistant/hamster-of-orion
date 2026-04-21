@@ -255,3 +255,125 @@ export function drawFleetIndicator(
   ctx.fill();
   ctx.restore();
 }
+
+/**
+ * Calculate Euclidean distance between two galaxy coordinates (in parsecs).
+ */
+export function calculateDistance(a: { x: number; y: number }, b: { x: number; y: number }): number {
+  return Math.hypot(b.x - a.x, b.y - a.y);
+}
+
+/**
+ * Draw a fleet movement range circle (deployment mode).
+ *
+ * @param ctx       - 2D rendering context
+ * @param x         - Canvas X (fleet star position)
+ * @param y         - Canvas Y (fleet star position)
+ * @param radius    - Circle radius in pixels
+ * @param color     - Circle stroke color (default: green)
+ * @param lineWidth - Stroke width (default: 1.5)
+ */
+export function drawFleetRangeCircle(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  radius: number,
+  color = '#00cc66',
+  lineWidth = 1.5,
+): void {
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lineWidth;
+  ctx.globalAlpha = 0.5;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath();
+  ctx.arc(x, y, radius, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+}
+
+/**
+ * Draw a route path line between two star systems.
+ *
+ * @param ctx     - 2D rendering context
+ * @param fromX   - Canvas X (origin)
+ * @param fromY   - Canvas Y (origin)
+ * @param toX     - Canvas X (destination)
+ * @param toY     - Canvas Y (destination)
+ * @param color   - Line color: green = in-range, red = out-of-range
+ * @param dashed  - Whether to draw as dashed line
+ */
+export function drawPathLine(
+  ctx: CanvasRenderingContext2D,
+  fromX: number,
+  fromY: number,
+  toX: number,
+  toY: number,
+  color = '#00cc66',
+  dashed = false,
+): void {
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.5;
+  ctx.globalAlpha = 0.7;
+  if (dashed) {
+    ctx.setLineDash([6, 4]);
+  }
+  ctx.beginPath();
+  ctx.moveTo(fromX, fromY);
+  ctx.lineTo(toX, toY);
+  ctx.stroke();
+  ctx.restore();
+}
+
+/**
+ * Draw a fleet-in-transit indicator along a path.
+ *
+ * Shows a small triangle moving along the route line at the appropriate
+ * position based on progress (0 = at origin, 1 = at destination).
+ *
+ * @param ctx       - 2D rendering context
+ * @param fromX     - Canvas X (origin star)
+ * @param fromY     - Canvas Y (origin star)
+ * @param toX       - Canvas X (destination star)
+ * @param toY       - Canvas Y (destination star)
+ * @param progress  - 0-1 progress along the route
+ * @param color     - Fleet color
+ * @param size      - Triangle size in pixels (default: 6)
+ */
+export function drawFleetInTransit(
+  ctx: CanvasRenderingContext2D,
+  fromX: number,
+  fromY: number,
+  toX: number,
+  toY: number,
+  progress: number,
+  color: string,
+  size = 6,
+): void {
+  const t = Math.max(0, Math.min(1, progress));
+  const x = fromX + (toX - fromX) * t;
+  const y = fromY + (toY - fromY) * t;
+
+  // Direction vector (normalized)
+  const dx = toX - fromX;
+  const dy = toY - fromY;
+  const len = Math.hypot(dx, dy) || 1;
+  const nx = dx / len;
+  const ny = dy / len;
+
+  ctx.save();
+  ctx.fillStyle = color;
+  ctx.globalAlpha = 0.9;
+
+  // Triangle pointing in direction of travel
+  ctx.beginPath();
+  ctx.moveTo(x + nx * size, y + ny * size);
+  const perpX = -ny;
+  const perpY = nx;
+  ctx.lineTo(x + nx * (-size * 0.5) + perpX * size * 0.5, y + ny * (-size * 0.5) + perpY * size * 0.5);
+  ctx.lineTo(x + nx * (-size * 0.5) - perpX * size * 0.5, y + ny * (-size * 0.5) - perpY * size * 0.5);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}

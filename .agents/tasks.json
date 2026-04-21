@@ -8,7 +8,7 @@
       "id": "fleet-movement-ui",
       "name": "Fleet movement UI on galaxy map",
       "type": "ui",
-      "status": "pending",
+      "status": "done",
       "description": "Add fleet movement controls to galaxy map. Click fleet to select, click destination star to issue move order. Show movement range, ETA, and path. Fleets in transit should render between stars.",
       "designDocs": [
         "design/ui-ux/wireframes/galaxy-map.md",

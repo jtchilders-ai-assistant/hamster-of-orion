@@ -28,6 +28,12 @@ export const SPLIT_FLEET = 'SPLIT_FLEET';
 export const SCRAP_FLEET = 'SCRAP_FLEET';
 export const PROCESS_FLEET_MOVEMENT = 'PROCESS_FLEET_MOVEMENT';
 
+// Fleet deployment UI actions
+export const OPEN_FLEET_DEPLOYMENT = 'OPEN_FLEET_DEPLOYMENT';
+export const UPDATE_DEPLOYMENT_SHIPS = 'UPDATE_DEPLOYMENT_SHIPS';
+export const SET_DEPLOYMENT_DESTINATION = 'SET_DEPLOYMENT_DESTINATION';
+export const CANCEL_FLEET_DEPLOYMENT = 'CANCEL_FLEET_DEPLOYMENT';
+
 // ── Action payloads ────────────────────────────────────────────────────────────
 
 interface MoveFleetPayload {
@@ -47,6 +53,23 @@ interface SplitFleetPayload {
 
 interface ScrapFleetPayload {
   fleetId: FleetId;
+}
+
+interface OpenFleetDeploymentPayload {
+  fleetId: FleetId;
+  /** Ship design ID → number of ships to deploy (defaults to all). */
+  ships?: Record<string, number>;
+}
+
+interface UpdateDeploymentShipsPayload {
+  fleetId: FleetId;
+  /** Ship design ID → number of ships to deploy. */
+  ships: Record<string, number>;
+}
+
+interface SetDeploymentDestinationPayload {
+  fleetId: FleetId;
+  destinationId: SystemId;
 }
 
 // ── Action creators ────────────────────────────────────────────────────────────
@@ -73,6 +96,36 @@ export const scrapFleet = (fleetId: FleetId): Action => ({
 
 export const processFleetMovement = (): Action => ({
   type: PROCESS_FLEET_MOVEMENT,
+});
+
+// Fleet deployment action creators
+
+export const openFleetDeployment = (
+  fleetId: FleetId,
+  ships?: Record<string, number>,
+): Action => ({
+  type: OPEN_FLEET_DEPLOYMENT,
+  payload: { fleetId, ships },
+});
+
+export const updateDeploymentShips = (
+  fleetId: FleetId,
+  ships: Record<string, number>,
+): Action => ({
+  type: UPDATE_DEPLOYMENT_SHIPS,
+  payload: { fleetId, ships },
+});
+
+export const setDeploymentDestination = (
+  fleetId: FleetId,
+  destinationId: SystemId,
+): Action => ({
+  type: SET_DEPLOYMENT_DESTINATION,
+  payload: { fleetId, destinationId },
+});
+
+export const cancelFleetDeployment = (): Action => ({
+  type: CANCEL_FLEET_DEPLOYMENT,
 });
 
 // ── Reducer ────────────────────────────────────────────────────────────────────
@@ -109,6 +162,80 @@ export function fleetReducer(state: GameState, action: Action): GameState {
 
     case PROCESS_FLEET_MOVEMENT: {
       return doProcessFleetMovement(state);
+    }
+
+    case OPEN_FLEET_DEPLOYMENT: {
+      const { fleetId, ships } = action.payload as OpenFleetDeploymentPayload;
+      const fleet = state.fleets.byId[fleetId];
+      if (!fleet || !state.ui) return state;
+      const shipCount: Record<string, number> = ships || {};
+      // Default: deploy all ships
+      for (const shipId of fleet.shipIds) {
+        const ship = state.ships.byId[shipId];
+        if (ship) {
+          const designId = ship.designId;
+          if (!(designId in shipCount)) {
+            shipCount[designId] = fleet.shipIds.filter(
+              (sid) => state.ships.byId[sid]?.designId === designId,
+            ).length;
+          }
+        }
+      }
+      return {
+        ...state,
+        ui: {
+          ...state.ui,
+          selectedFleet: fleetId,
+          fleetDeploymentMode: {
+            fleetId,
+            ships: shipCount,
+            destinationId: null,
+          },
+        },
+      };
+    }
+
+    case UPDATE_DEPLOYMENT_SHIPS: {
+      const { fleetId, ships } = action.payload as UpdateDeploymentShipsPayload;
+      const deployment = state.ui?.fleetDeploymentMode;
+      if (!deployment || deployment.fleetId !== fleetId) return state;
+      return {
+        ...state,
+        ui: {
+          ...state.ui!,
+          fleetDeploymentMode: {
+            ...deployment,
+            ships,
+          },
+        },
+      };
+    }
+
+    case SET_DEPLOYMENT_DESTINATION: {
+      const { fleetId, destinationId } = action.payload as SetDeploymentDestinationPayload;
+      const deployment = state.ui?.fleetDeploymentMode;
+      if (!deployment || deployment.fleetId !== fleetId) return state;
+      return {
+        ...state,
+        ui: {
+          ...state.ui!,
+          fleetDeploymentMode: {
+            ...deployment,
+            destinationId,
+          },
+        },
+      };
+    }
+
+    case CANCEL_FLEET_DEPLOYMENT: {
+      if (!state.ui?.fleetDeploymentMode) return state;
+      return {
+        ...state,
+        ui: {
+          ...state.ui,
+          fleetDeploymentMode: null,
+        },
+      };
     }
 
     default:

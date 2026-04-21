@@ -9,6 +9,12 @@ import { Action } from './store';
 import { GameState, ScreenType } from './state';
 import { turnReducer } from './actions/turn';
 import { newGameReducer } from './actions/newGame';
+import { fleetReducer, MOVE_FLEET, MERGE_FLEETS, SPLIT_FLEET, SCRAP_FLEET, PROCESS_FLEET_MOVEMENT, OPEN_FLEET_DEPLOYMENT, UPDATE_DEPLOYMENT_SHIPS, SET_DEPLOYMENT_DESTINATION, CANCEL_FLEET_DEPLOYMENT } from './actions/fleet';
+
+const FLEET_ACTIONS = new Set([
+  MOVE_FLEET, MERGE_FLEETS, SPLIT_FLEET, SCRAP_FLEET, PROCESS_FLEET_MOVEMENT,
+  OPEN_FLEET_DEPLOYMENT, UPDATE_DEPLOYMENT_SHIPS, SET_DEPLOYMENT_DESTINATION, CANCEL_FLEET_DEPLOYMENT,
+]);
 
 const VALID_SCREENS: ReadonlySet<string> = new Set<ScreenType>([
   'menu', 'new_game', 'galaxy', 'planet', 'planet_list', 'fleet', 'research',
@@ -47,6 +53,7 @@ export function rootReducer(state: GameState, action: Action): GameState {
         // Clear sub-selections when switching systems
         selectedPlanet: null,
         selectedFleet: null,
+        fleetDeploymentMode: null,
       },
     };
   }
@@ -66,16 +73,39 @@ export function rootReducer(state: GameState, action: Action): GameState {
     };
   }
 
-  // Fleet selection
+  // Fleet selection — also opens deployment mode for player fleets at rest
   if (action.type === 'SELECT_FLEET') {
     const { fleetId } = action.payload as { fleetId: string | null };
-    return {
-      ...state,
-      ui: {
-        ...state.ui,
-        selectedFleet: fleetId,
-      },
-    };
+    if (!fleetId) {
+      return { ...state, ui: { ...state.ui, selectedFleet: null, fleetDeploymentMode: null } };
+    }
+    const fleet = state.fleets.byId[fleetId];
+    const isPlayerFleet = fleet?.ownerId === state.empires.playerId;
+    const isAtRest = fleet && !fleet.destination;
+    // Open deployment mode for player-owned fleets that aren't moving or in combat
+    if (fleet && isPlayerFleet && isAtRest && !fleet.isInCombat) {
+      const shipCount: Record<string, number> = {};
+      for (const shipId of fleet.shipIds) {
+        const ship = state.ships.byId[shipId];
+        if (ship) {
+          const designId = ship.designId;
+          if (!(designId in shipCount)) {
+            shipCount[designId] = fleet.shipIds.filter(
+              (sid) => state.ships.byId[sid]?.designId === designId,
+            ).length;
+          }
+        }
+      }
+      return {
+        ...state,
+        ui: {
+          ...state.ui,
+          selectedFleet: fleetId,
+          fleetDeploymentMode: { fleetId, ships: shipCount, destinationId: null },
+        },
+      };
+    }
+    return { ...state, ui: { ...state.ui, selectedFleet: fleetId } };
   }
 
   // Production slider update
@@ -189,6 +219,11 @@ export function rootReducer(state: GameState, action: Action): GameState {
           }
         : state.empires,
     };
+  }
+
+  // Fleet actions
+  if (FLEET_ACTIONS.has(action.type)) {
+    return fleetReducer(state, action);
   }
 
   // Unknown action — return unchanged state
