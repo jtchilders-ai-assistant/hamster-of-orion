@@ -1,571 +1,367 @@
 {
   "project": "hamster-of-orion-implementation",
-  "phase": "phase4a-core-interactivity",
-  "created": "2026-04-19",
-  "description": "Phase 4A: Core interactivity - planet management, ships, fleets, combat",
+  "phase": "phase4b-ui-integration",
+  "created": "2026-04-20",
+  "description": "Phase 4B: UI integration, polish, and playable demo preparation",
   "tasks": [
     {
-      "id": "planet-screen",
-      "name": "Planet management screen",
+      "id": "fleet-movement-ui",
+      "name": "Fleet movement UI on galaxy map",
       "type": "ui",
-      "status": "done",
-      "description": "Full planet screen with production sliders (SHIP/DEF/IND/ECO/TECH). Reference design/ui-ux/wireframes/planet-management.md and design/economy/slider-mathematics.md. Sliders must sum to 100%, show current allocation, and dispatch actions to update state.",
-      "output": "src/ui/screens/PlanetScreen.ts",
-      "acceptance": [
-        "5 sliders render with current values",
-        "Dragging slider updates allocation",
-        "Sliders auto-rebalance to sum 100%",
-        "Shows production output preview",
-        "Accessible from galaxy map planet click"
+      "status": "pending",
+      "description": "Add fleet movement controls to galaxy map. Click fleet to select, click destination star to issue move order. Show movement range, ETA, and path. Fleets in transit should render between stars.",
+      "designDocs": [
+        "design/ui-ux/wireframes/galaxy-map.md",
+        "design/ui-ux/wireframes/fleet-management.md",
+        "design/ships/movement.md"
       ],
-      "completed_at": "2026-04-20T02:22:00Z"
-    },
-    {
-      "id": "ship-components-data",
-      "name": "Ship components JSON data",
-      "type": "data",
-      "status": "done",
-      "completed_at": "2026-04-20T02:28:00Z",
-      "description": "Create comprehensive ship components JSON from design docs. Include weapons (design/technology/weapons.md), armor/shields (force-fields.md), engines (propulsion.md), computers, and specials. Each component needs: id, name, techLevel, size, cost, and type-specific stats.",
-      "output": "src/data/components.json",
+      "output": "src/ui/screens/GalaxyScreen.ts (fleet controls)",
       "acceptance": [
-        "All weapon types from weapons.md included",
-        "All armor types with HP multipliers",
-        "All shield classes (I-XV)",
-        "All engine types with warp/combat speed",
-        "All special systems",
-        "Valid JSON, types match state.ts"
-      ]
-    },
-    {
-      "id": "ship-designer-logic",
-      "name": "Ship designer game logic",
-      "type": "code",
-      "status": "done",
-      "completed_at": "2026-04-20T02:32:00Z",
-      "dependencies": [
-        "ship-components-data"
+        "Click fleet icon to select it",
+        "Selected fleet shows movement range circle",
+        "Click destination star to issue move order",
+        "Path line shows route to destination",
+        "ETA displayed in turns",
+        "Fleets in transit render along path",
+        "Cancel movement button works"
       ],
-      "description": "Implement ship design validation and cost calculation in src/game/. Reference design/ships/ship-design.md. Validate hull space, calculate costs, check tech requirements.",
-      "output": "src/game/systems/shipDesign.ts",
-      "acceptance": [
-        "validateDesign() checks hull space limits",
-        "calculateDesignCost() returns BC cost",
-        "checkTechRequirements() validates all components unlocked",
-        "No DOM imports",
-        "Unit tests pass"
-      ]
+      "dependencies": []
     },
     {
-      "id": "ship-designer-ui",
-      "name": "Ship designer UI screen",
+      "id": "combat-resolution-ui",
+      "name": "Combat resolution UI screen",
       "type": "ui",
-      "status": "done",
-      "completed_at": "2026-04-20T02:44:00Z",
-      "dependencies": [
-        "ship-designer-logic"
+      "status": "pending",
+      "description": "Complete the CombatScreen to show tactical combat. Display hex grid with ships, allow unit selection, movement, and firing. Show damage numbers, explosions, and combat log.",
+      "designDocs": [
+        "design/ui-ux/wireframes/tactical-combat.md",
+        "design/ships/combat-algorithm.md",
+        "design/ships/combat-mechanics.md"
       ],
-      "description": "Full ship designer screen per design/ui-ux/wireframes/ship-design.md. Hull selection, component slots, stats preview, save design.",
-      "output": "src/ui/screens/DesignScreen.ts (replace stub)",
-      "acceptance": [
-        "Hull size selector (Small/Medium/Large/Huge)",
-        "Component slots for weapons, armor, shields, engine, specials",
-        "Shows remaining space and total cost",
-        "Save design button creates ShipDesign in state",
-        "Load existing designs"
-      ]
-    },
-    {
-      "id": "ship-construction",
-      "name": "Ship construction system",
-      "type": "code",
-      "status": "done",
-      "completed_at": "2026-04-20T02:37:00Z",
-      "dependencies": [
-        "ship-designer-logic"
-      ],
-      "description": "Add ship construction to production system. When SHIP slider > 0, accumulate BC toward current ship design. When complete, spawn ship at planet. Reference design/economy/ship-costs.md.",
-      "output": "src/game/systems/shipConstruction.ts, src/game/actions/ship.ts",
-      "acceptance": [
-        "SHIP slider allocates production to shipyard",
-        "Progress accumulates across turns",
-        "Ship spawns when cost met",
-        "Ship added to planet's local fleet",
-        "Unit tests pass"
-      ]
-    },
-    {
-      "id": "fleet-state",
-      "name": "Fleet state and actions",
-      "type": "code",
-      "status": "done",
-      "completed_at": "2026-04-20T02:44:00Z",
-      "dependencies": [
-        "ship-construction"
-      ],
-      "description": "Expand fleet state management. Fleets contain ships, have location, destination, ETA. Actions for move, merge, split, scrap.",
-      "output": "src/game/systems/fleet.ts (expand), src/game/actions/fleet.ts (expand)",
-      "acceptance": [
-        "Fleet has ships[], location, destination, eta",
-        "moveFleet() sets destination and calculates ETA",
-        "Turn processing moves fleets toward destination",
-        "mergeFleets() combines two fleets",
-        "splitFleet() divides ships",
-        "Unit tests pass"
-      ]
-    },
-    {
-      "id": "fleet-ui",
-      "name": "Fleet management UI",
-      "type": "ui",
-      "status": "done",
-      "completed_at": "2026-04-20T02:50:00Z",
-      "dependencies": [
-        "fleet-state"
-      ],
-      "description": "Fleet screen showing all fleets, their composition, destinations. Allow selecting fleet and setting destination on galaxy map.",
-      "output": "src/ui/screens/FleetsScreen.ts (replace stub)",
-      "acceptance": [
-        "Lists all player fleets with location",
-        "Shows ship counts per fleet",
-        "Shows destination and ETA if moving",
-        "Can select fleet on galaxy map",
-        "Right-click destination sends fleet"
-      ]
-    },
-    {
-      "id": "colonization",
-      "name": "Colony ship and colonization",
-      "type": "code",
-      "status": "done",
-      "completed_at": "2026-04-20T02:49:00Z",
-      "dependencies": [
-        "fleet-state"
-      ],
-      "description": "Colony ship special: when fleet with colony ship reaches uncolonized habitable planet, option to colonize. Colony ship consumed, planet becomes colony.",
-      "output": "src/game/systems/colonization.ts",
-      "acceptance": [
-        "Colony Ship is special ship type",
-        "Arriving at uncolonized planet triggers colonize option",
-        "Colonizing consumes colony ship",
-        "New colony has starting population and factories",
-        "Planet added to empire",
-        "Unit tests pass"
-      ]
-    },
-    {
-      "id": "tech-tree-data",
-      "name": "Full technology tree JSON",
-      "type": "data",
-      "status": "done",
-      "completed_at": "2026-04-20T02:40:00Z",
-      "description": "Complete all 6 tech fields from design docs: weapons.md, propulsion.md, construction.md, computers.md, force-fields.md, planetology.md. Each tech needs: id, name, field, tier, cost, unlocks[], description.",
-      "output": "src/data/tech-tree.json",
-      "acceptance": [
-        "All 6 fields represented",
-        "Tiers 1-16 with correct costs",
-        "Unlocks reference component IDs",
-        "150+ technologies total",
-        "Valid JSON"
-      ]
-    },
-    {
-      "id": "research-ui",
-      "name": "Research screen UI",
-      "type": "ui",
-      "status": "done",
-      "completed_at": "2026-04-20T02:47:00Z",
-      "dependencies": [
-        "tech-tree-data"
-      ],
-      "description": "Research screen per design/ui-ux/wireframes/research-tree.md. Shows 6 fields, current research per field, RP allocation sliders, tech choices.",
-      "output": "src/ui/screens/ResearchScreen.ts (replace stub)",
-      "acceptance": [
-        "6 tech fields displayed",
-        "Current tech and progress per field",
-        "RP allocation sliders (sum to 100%)",
-        "When tech completes, show choices (2-3 techs)",
-        "Tech details on hover/click"
-      ]
-    },
-    {
-      "id": "combat-engine",
-      "name": "Tactical combat engine",
-      "type": "code",
-      "status": "done",
-      "completed_at": "2026-04-20T02:37:00Z",
-      "dependencies": [
-        "ship-components-data"
-      ],
-      "description": "Combat resolution engine per design/ships/combat-algorithm.md. Hex grid, initiative, movement, firing, damage resolution. Start with auto-resolve; manual control later.",
-      "output": "src/game/systems/combat.ts",
-      "acceptance": [
-        "initiateCombat() creates combat state",
-        "processRound() handles one combat round",
-        "Damage formula matches MOO1 (50 + (atk-def)*10)%",
-        "Shields absorb before HP",
-        "Combat ends when one side eliminated or retreats",
-        "Returns victor and losses",
-        "Unit tests pass"
-      ]
-    },
-    {
-      "id": "combat-ui",
-      "name": "Tactical combat UI",
-      "type": "ui",
-      "status": "done",
-      "completed_at": "2026-04-20T02:47:00Z",
-      "dependencies": [
-        "combat-engine"
-      ],
-      "description": "Combat screen with hex grid, ship positions, firing. Auto-resolve button + manual controls.",
       "output": "src/ui/screens/CombatScreen.ts",
       "acceptance": [
-        "Hex grid renders",
-        "Ships displayed at positions",
-        "Auto-resolve button runs combat to completion",
-        "Shows combat log/results",
-        "Return to galaxy map after combat"
-      ]
+        "Hex grid renders with ships positioned",
+        "Click ship to select, show movement range",
+        "Click hex to move selected ship",
+        "Click enemy ship to fire",
+        "Damage numbers display on hit",
+        "Ships explode when destroyed",
+        "Combat log shows all actions",
+        "Auto-resolve button skips to result",
+        "Retreat button available"
+      ],
+      "dependencies": []
     },
     {
-      "id": "ai-basic",
-      "name": "Basic AI opponent",
-      "type": "code",
-      "status": "done",
-      "dependencies": [
-        "fleet-state",
-        "colonization"
-      ],
-      "description": "Basic AI that manages production, builds ships, expands to nearby planets. Reference design/species/ai-archetypes.md for personality types.",
-      "output": "src/game/ai/AIEmpire.ts, src/game/ai/strategies.ts",
-      "acceptance": [
-        "AI sets production sliders",
-        "AI builds colony ships early game",
-        "AI colonizes nearby planets",
-        "AI builds military ships",
-        "AI sends fleets to attack if at war",
-        "No DOM imports",
-        "Unit tests pass"
-      ],
-      "completed_at": "2026-04-20T03:30:00Z"
-    },
-    {
-      "id": "turn-integration",
-      "name": "Turn processing integration",
-      "type": "code",
-      "status": "done",
-      "dependencies": [
-        "combat-engine",
-        "ai-basic",
-        "colonization"
-      ],
-      "description": "Wire all systems into turn processing. Fleet movement, combat triggers, AI turns, colonization checks.",
-      "output": "src/game/systems/turn.ts (expanded)",
-      "acceptance": [
-        "processTurn() moves all fleets",
-        "Arriving fleets trigger combat or colonize",
-        "AI empires take their turns",
-        "All production/growth/research runs",
-        "Events queue for notification"
-      ],
-      "completed_at": "2026-04-20T03:30:00Z"
-    },
-    {
-      "id": "buildings-data",
-      "name": "Buildings JSON data",
-      "type": "data",
-      "status": "done",
-      "completed_at": "2026-04-20T02:44:00Z",
-      "description": "Create buildings JSON from design/planets/buildings.md. Include factories, planetary shields, missile bases, terraforming, soil enrichment, etc. Each building needs: id, name, category, techRequired, cost, maintenance, effects.",
-      "output": "src/data/buildings.json",
-      "acceptance": [
-        "All building types from design docs",
-        "Correct tech requirements",
-        "Cost and maintenance values",
-        "Effects match design specs",
-        "Valid JSON"
-      ]
-    },
-    {
-      "id": "buildings-system",
-      "name": "Buildings construction system",
-      "type": "code",
-      "status": "done",
-      "dependencies": [
-        "buildings-data"
-      ],
-      "description": "Implement building construction via DEF slider. Queue management, completion, effects application.",
-      "output": "src/game/systems/buildings.ts, src/game/actions/buildings.ts",
-      "acceptance": [
-        "DEF slider allocates to building queue",
-        "Buildings complete when cost met",
-        "Building effects apply (shields, missile bases)",
-        "Maintenance costs deducted",
-        "Unit tests pass"
-      ],
-      "completed_at": "2026-04-20T03:30:00Z"
-    },
-    {
-      "id": "starting-fleets",
-      "name": "Starting fleets per race",
-      "type": "data",
-      "status": "done",
-      "completed_at": "2026-04-20T02:45:00Z",
-      "dependencies": [
-        "ship-components-data"
-      ],
-      "description": "Define starting ship designs and fleets for each race. Reference design/species/race-stats-complete.md for starting techs.",
-      "output": "src/data/starting-fleets.json",
-      "acceptance": [
-        "Each race has starting ship designs",
-        "Starting fleet composition defined",
-        "Ships use only starting techs",
-        "Colony ship included for expansion"
-      ]
-    },
-    {
-      "id": "diplomacy-relations",
-      "name": "Diplomacy relations system",
-      "type": "code",
-      "status": "done",
-      "dependencies": [
-        "ai-basic"
-      ],
-      "description": "Implement diplomatic relations between empires. Reference design/diplomacy/relations-system.md. Track relations value, modifiers, diplomatic state.",
-      "output": "src/game/systems/diplomacy.ts",
-      "acceptance": [
-        "Relations tracked per empire pair",
-        "Modifiers affect relations (attacks, treaties, trade)",
-        "Diplomatic states: war/hostile/neutral/friendly/allied",
-        "Relations decay/improve over time",
-        "Unit tests pass"
-      ],
-      "completed_at": "2026-04-20T03:30:00Z"
-    },
-    {
-      "id": "treaties",
-      "name": "Treaty system",
-      "type": "code",
-      "status": "done",
-      "dependencies": [
-        "diplomacy-relations"
-      ],
-      "description": "Implement treaties: peace, non-aggression, trade, research, alliance. Reference design/diplomacy/treaties.md.",
-      "output": "src/game/systems/treaties.ts (519 lines)",
-      "acceptance": [
-        "6 treaty types implemented",
-        "Treaty proposal and acceptance",
-        "Treaty effects applied (trade income, etc)",
-        "Treaty breaking penalties",
-        "Unit tests pass"
-      ],
-      "completed_at": "2026-04-20T03:41:00Z"
-    },
-    {
-      "id": "diplomacy-ui",
-      "name": "Diplomacy screen UI",
+      "id": "diplomacy-ui-complete",
+      "name": "Complete diplomacy UI",
       "type": "ui",
-      "status": "done",
-      "dependencies": [
-        "treaties"
+      "status": "pending",
+      "description": "Finish DiplomacyScreen with all treaty actions, relation display, and AI response handling. Allow proposing/accepting treaties, declaring war, and viewing relation history.",
+      "designDocs": [
+        "design/ui-ux/wireframes/diplomacy-screen.md",
+        "design/diplomacy/relationship-formulas.md",
+        "design/diplomacy/treaties.md"
       ],
-      "description": "Diplomacy screen per design/ui-ux/wireframes/diplomacy-screen.md. Show relations, propose treaties, request audience.",
-      "output": "src/ui/screens/DiplomacyScreen.ts (replace stub)",
+      "output": "src/ui/screens/DiplomacyScreen.ts",
       "acceptance": [
-        "Lists all known empires",
-        "Shows relation status per empire",
-        "Treaty proposal interface",
-        "Active treaties displayed",
-        "Declare war option"
+        "Empire list shows all known empires",
+        "Relation bar (-100 to +100) with color coding",
+        "Treaty status icons (NAP, Trade, Alliance, War)",
+        "Propose treaty dropdown with all treaty types",
+        "Accept/reject incoming proposals",
+        "Declare war button with confirmation",
+        "Relation history/events log"
       ],
-      "completed_at": "2026-04-20T01:09:00Z"
+      "dependencies": []
     },
     {
-      "id": "high-council",
-      "name": "Galactic High Council",
-      "type": "code",
-      "status": "done",
-      "dependencies": [
-        "diplomacy-relations"
-      ],
-      "description": "Implement High Council elections per design/diplomacy/high-council.md. Vote share based on population, diplomatic victory condition.",
-      "output": "src/game/systems/council.ts (380 lines)",
-      "acceptance": [
-        "Council convenes every 25 turns",
-        "Vote share = population percentage",
-        "2/3 majority = diplomatic victory",
-        "AI voting based on relations",
-        "Abstain option for player",
-        "Unit tests pass"
-      ],
-      "completed_at": "2026-04-20T03:41:00Z"
-    },
-    {
-      "id": "council-ui",
-      "name": "High Council UI",
+      "id": "colonization-ui",
+      "name": "Colonization flow UI",
       "type": "ui",
-      "status": "done",
-      "dependencies": [
-        "high-council"
+      "status": "pending",
+      "description": "Add colonization UI flow. Colony ships in orbit at uncolonized habitable planets show 'Colonize' button. Clicking triggers colonization and opens planet management.",
+      "designDocs": [
+        "design/planets/colonization.md",
+        "design/ui-ux/wireframes/galaxy-map.md"
       ],
-      "description": "Council election screen per design/ui-ux/wireframes/high-council.md. Show candidates, vote tallies, cast vote.",
+      "output": "src/ui/screens/GalaxyScreen.ts (colonization)",
+      "acceptance": [
+        "Colony ship at uncolonized planet shows Colonize button",
+        "Colonize button triggers colonization action",
+        "New colony appears on map with empire color",
+        "Planet management screen opens after colonization",
+        "Colony ship is consumed",
+        "Cannot colonize hostile planets without tech"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "turn-summary-screen",
+      "name": "Turn summary/events screen",
+      "type": "ui",
+      "status": "pending",
+      "description": "Create turn summary screen that shows between turns. Display research completed, ships built, combats resolved, diplomatic events, random events.",
+      "designDocs": [
+        "design/ui-ux/wireframes/turn-summary.md",
+        "design/game-mechanics/turn-structure.md"
+      ],
+      "output": "src/ui/screens/TurnSummaryScreen.ts",
+      "acceptance": [
+        "Shows after Next Turn is clicked",
+        "Lists research completed this turn",
+        "Lists ships built this turn",
+        "Lists combat results with links",
+        "Lists diplomatic events",
+        "Lists random events",
+        "Continue button returns to galaxy map"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "save-load-ui",
+      "name": "Save/Load game UI",
+      "type": "ui",
+      "status": "pending",
+      "description": "Create save/load game screens accessible from menu. Show save slots with game info (turn, year, empires). Allow saving, loading, and deleting saves.",
+      "designDocs": [
+        "design/ui-ux/wireframes/save-load.md"
+      ],
+      "output": "src/ui/screens/SaveLoadScreen.ts",
+      "acceptance": [
+        "Shows list of save slots",
+        "Each slot shows turn, year, player empire",
+        "Save button saves current game to slot",
+        "Load button loads selected save",
+        "Delete button removes save with confirmation",
+        "Autosave slot shown separately",
+        "Works with LocalStorage persistence"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "research-screen-complete",
+      "name": "Complete research screen",
+      "type": "ui",
+      "status": "pending",
+      "description": "Finish ResearchScreen with tech selection, progress display, and field allocation. Show available techs per field, costs, and effects.",
+      "designDocs": [
+        "design/ui-ux/wireframes/research-screen.md",
+        "design/technology/research-formulas.md",
+        "design/technology/categories.md"
+      ],
+      "output": "src/ui/screens/ResearchScreen.ts",
+      "acceptance": [
+        "Shows 6 research fields",
+        "Each field shows current research target",
+        "Click field to see available techs",
+        "Tech list shows cost, turns to complete",
+        "Select tech to set as current research",
+        "Progress bar for current research",
+        "Completed techs list/history"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "colonies-list-screen",
+      "name": "Colonies list screen (F2)",
+      "type": "ui",
+      "status": "pending",
+      "description": "Create ColoniesScreen showing all player colonies in a sortable list. Display population, factories, current build, and production stats.",
+      "designDocs": [
+        "design/ui-ux/wireframes/colony-list.md"
+      ],
+      "output": "src/ui/screens/ColoniesScreen.ts",
+      "acceptance": [
+        "Lists all player colonies",
+        "Sortable by name, population, factories",
+        "Shows current build queue item per colony",
+        "Shows production stats (BC/turn)",
+        "Click colony name to open planet screen",
+        "Shows environment type icons",
+        "Accessible via F2 or command bar"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fleets-list-screen",
+      "name": "Fleets list screen (F3)",
+      "type": "ui",
+      "status": "pending",
+      "description": "Create FleetsScreen showing all player fleets. Display location, destination, ship counts, and fleet commands.",
+      "designDocs": [
+        "design/ui-ux/wireframes/fleet-list.md",
+        "design/ui-ux/wireframes/fleet-management.md"
+      ],
+      "output": "src/ui/screens/FleetsScreen.ts",
+      "acceptance": [
+        "Lists all player fleets",
+        "Shows fleet location (system name or 'In Transit')",
+        "Shows destination if moving",
+        "Shows ship counts by design",
+        "Click fleet to select on galaxy map",
+        "Merge/split fleet buttons",
+        "Accessible via F3 or command bar"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "council-screen-ui",
+      "name": "High Council screen UI",
+      "type": "ui",
+      "status": "pending",
+      "description": "Create CouncilScreen showing Galactic High Council. Display vote shares, current leader, and voting UI when council convenes.",
+      "designDocs": [
+        "design/ui-ux/wireframes/council-screen.md",
+        "design/diplomacy/high-council.md"
+      ],
       "output": "src/ui/screens/CouncilScreen.ts",
       "acceptance": [
-        "Shows two candidates",
-        "Vote share percentages",
-        "Cast vote / abstain buttons",
-        "Results display",
-        "Victory screen if won"
+        "Shows all empires with vote share %",
+        "Vote share based on population",
+        "Current council leader highlighted",
+        "When council convenes: voting UI",
+        "Vote for self or another empire",
+        "Shows vote results and winner",
+        "Diplomatic victory triggers if 2/3 votes"
       ],
-      "completed_at": "2026-04-20T01:09:00Z"
+      "dependencies": []
     },
     {
-      "id": "espionage",
-      "name": "Espionage system",
-      "type": "code",
-      "status": "done",
-      "dependencies": [
-        "diplomacy-relations"
+      "id": "espionage-ui",
+      "name": "Espionage UI",
+      "type": "ui",
+      "status": "pending",
+      "description": "Create espionage interface. Show spy allocation per empire, mission selection, and results. Integrate with diplomacy screen.",
+      "designDocs": [
+        "design/ui-ux/spy-network-ui.md",
+        "design/diplomacy/espionage.md"
       ],
-      "description": "Implement spy missions per design/diplomacy/espionage.md. Steal tech, sabotage, incite rebellion.",
-      "output": "src/game/systems/espionage.ts",
+      "output": "src/ui/components/EspionagePanel.ts",
       "acceptance": [
-        "Spy allocation via spending",
-        "6 mission types",
-        "Success/failure based on spy levels",
-        "Counterespionage defense",
-        "Caught spies affect relations",
-        "Unit tests pass"
+        "Shows spy count per target empire",
+        "Slider to allocate spies",
+        "Mission type selector (sabotage, steal tech, etc)",
+        "Shows success probability",
+        "Results display when mission completes",
+        "Shows counter-espionage events"
       ],
-      "completed_at": "2026-04-20T04:21:00Z"
+      "dependencies": []
     },
     {
-      "id": "ground-combat",
-      "name": "Ground combat system",
-      "type": "code",
-      "status": "done",
-      "dependencies": [
-        "fleet-state"
+      "id": "ground-combat-ui",
+      "name": "Ground combat results UI",
+      "type": "ui",
+      "status": "pending",
+      "description": "Create ground combat resolution UI. Shows when troops invade a planet. Display attacker/defender strength, combat rolls, and result.",
+      "designDocs": [
+        "design/ui-ux/ground-combat-ui.md",
+        "design/ships/ground-combat.md"
       ],
-      "description": "Implement planetary invasion per design/ships/ground-combat.md. Troop transports, ground combat resolution, planet capture.",
-      "output": "src/game/systems/groundCombat.ts",
+      "output": "src/ui/screens/GroundCombatScreen.ts",
       "acceptance": [
-        "Transports carry troops",
-        "Bombardment phase (optional)",
-        "Ground combat rolls",
-        "Racial ground combat bonuses",
-        "Planet capture on victory",
-        "Unit tests pass"
+        "Shows attacker troops and bonuses",
+        "Shows defender population and bonuses",
+        "Combat rounds display with casualties",
+        "Final result: planet captured or invasion failed",
+        "Population changes shown",
+        "Return to galaxy map after"
       ],
-      "completed_at": "2026-04-20T04:21:00Z"
+      "dependencies": []
     },
     {
-      "id": "random-events",
-      "name": "Random events system",
-      "type": "code",
-      "status": "done",
-      "dependencies": [
-        "turn-integration"
+      "id": "victory-screen",
+      "name": "Victory/defeat screens",
+      "type": "ui",
+      "status": "pending",
+      "description": "Create victory and defeat screens. Show win condition met (Conquest, Diplomatic, etc) with stats and credits.",
+      "designDocs": [
+        "design/ui-ux/wireframes/victory-screen.md",
+        "design/game-mechanics/victory-conditions.md"
       ],
-      "description": "Implement random events per design/game-mechanics/random-events.md. Space monsters, plagues, discoveries, diplomatic incidents.",
-      "output": "src/game/systems/events.ts (481 lines), src/data/events.json (19 events)",
+      "output": "src/ui/screens/VictoryScreen.ts",
       "acceptance": [
-        "Events trigger randomly each turn",
-        "15+ event types from design",
-        "Space monsters (Amoeba, Crystal, Dragon)",
-        "Planet events (plague, bounty)",
-        "Event effects applied",
-        "Unit tests pass"
+        "Victory screen shows win type",
+        "Defeat screen shows who won",
+        "Game statistics (turns, planets, battles)",
+        "Play again button starts new game",
+        "Credits/about section"
       ],
-      "completed_at": "2026-04-20T03:41:00Z"
+      "dependencies": []
     },
     {
-      "id": "victory-conditions",
-      "name": "Victory condition detection",
-      "type": "code",
-      "status": "done",
-      "dependencies": [
-        "high-council",
-        "turn-integration"
+      "id": "hotkey-navigation",
+      "name": "Keyboard hotkeys (F1-F8)",
+      "type": "ui",
+      "status": "pending",
+      "description": "Implement keyboard navigation. F1=Galaxy, F2=Colonies, F3=Fleets, F4=Design, F5=Research, F6=Diplomacy, F7=Council, F8=Save. Also arrow keys for map pan.",
+      "designDocs": [
+        "design/ui-ux/navigation-flow.md"
       ],
-      "description": "Detect victory conditions: domination (last empire), diplomatic (council vote), conquest (eliminate player). Show victory/defeat screen.",
-      "output": "src/game/systems/victory.ts",
+      "output": "src/ui/app.ts (keyboard handler)",
       "acceptance": [
-        "Domination: detect when one empire remains",
-        "Diplomatic: detect council election win",
-        "Player defeat detection",
-        "Victory triggers end screen",
-        "Unit tests pass"
+        "F1 opens galaxy map",
+        "F2 opens colonies list",
+        "F3 opens fleets list",
+        "F4 opens ship designer",
+        "F5 opens research screen",
+        "F6 opens diplomacy screen",
+        "F7 opens council screen",
+        "F8 opens save/load",
+        "Arrow keys pan galaxy map",
+        "+/- keys zoom galaxy map"
       ],
-      "completed_at": "2026-04-20T04:21:00Z"
+      "dependencies": []
     },
     {
-      "id": "fog-of-war",
-      "name": "Fog of war system",
+      "id": "constants-to-code",
+      "name": "Verify all design doc constants in code",
       "type": "code",
-      "status": "done",
-      "dependencies": [
-        "fleet-state"
+      "status": "pending",
+      "description": "Audit all formulas and constants in design docs. Ensure each one appears in src/game/constants.ts with proper documentation. Run check-design script.",
+      "designDocs": [
+        "design/economy/factory-formulas.md",
+        "design/economy/population-growth.md",
+        "design/economy/slider-mathematics.md",
+        "design/ships/combat-algorithm.md",
+        "design/diplomacy/relationship-formulas.md",
+        "design/technology/research-formulas.md"
       ],
-      "description": "Implement exploration and sensor range. Unknown systems hidden, explored systems remembered, sensor range reveals fleet movements.",
-      "output": "src/game/systems/fogOfWar.ts (225 lines)",
+      "output": "src/game/constants.ts (complete audit)",
       "acceptance": [
-        "Unexplored systems show as unknown",
-        "Visiting system reveals it permanently",
-        "Sensor range from colonies/fleets",
-        "Enemy fleets visible in sensor range",
-        "Unit tests pass"
+        "npm run check-design passes",
+        "All formulas in design docs have code equivalents",
+        "Each constant has doc source reference",
+        "No magic numbers in game systems",
+        "Tests verify formulas match docs"
       ],
-      "completed_at": "2026-04-20T03:41:00Z"
+      "dependencies": []
     },
     {
-      "id": "ai-diplomacy",
-      "name": "AI diplomatic behavior",
-      "type": "code",
-      "status": "done",
-      "dependencies": [
-        "diplomacy-relations",
-        "ai-basic"
+      "id": "playable-demo-test",
+      "name": "Playable demo integration test",
+      "type": "test",
+      "status": "pending",
+      "description": "Create end-to-end test that plays through a game: new game, colonize, build ships, combat, diplomacy, victory. Verifies all systems integrate correctly.",
+      "designDocs": [
+        "design/game-mechanics/turn-structure.md",
+        "design/game-mechanics/victory-conditions.md"
       ],
-      "description": "Expand AI to handle diplomacy. Propose treaties, respond to proposals, declare war based on personality.",
-      "output": "src/game/ai/diplomacyAI.ts",
+      "output": "test/integration/full-game.test.ts",
       "acceptance": [
-        "AI proposes treaties based on relations",
-        "AI accepts/rejects proposals",
-        "AI declares war when hostile",
-        "Personality affects diplomatic behavior",
-        "Unit tests pass"
+        "Test creates new game with 2 empires",
+        "Advances 50+ turns without errors",
+        "Player colonizes at least 3 planets",
+        "Player builds ships and fleet",
+        "Combat occurs between fleets",
+        "Diplomacy interactions happen",
+        "Game ends with victory condition"
       ],
-      "completed_at": "2026-04-20T04:21:00Z"
-    },
-    {
-      "id": "ai-research",
-      "name": "AI research priorities",
-      "type": "code",
-      "status": "done",
       "dependencies": [
-        "tech-tree-data",
-        "ai-basic"
-      ],
-      "description": "AI selects research priorities based on personality and situation. Allocates RP across fields.",
-      "output": "src/game/ai/researchAI.ts",
-      "acceptance": [
-        "AI allocates RP to 6 fields",
-        "AI picks tech choices based on strategy",
-        "Racial field bonuses influence allocation",
-        "Unit tests pass"
-      ],
-      "completed_at": "2026-04-20T04:21:00Z"
-    },
-    {
-      "id": "turn-fix-compile",
-      "name": "Fix Turn Integration \u2014 Wiring & Compilation",
-      "type": "fix",
-      "status": "done",
-      "description": "Rename Commander.tsx to .ts, fix constructor to accept Store, remove TurnSummary imports, wire main.ts.",
-      "output": "src/ui/components/Commander.ts",
-      "completed_at": "2026-04-20T03:30:00Z"
+        "fleet-movement-ui",
+        "combat-resolution-ui",
+        "colonization-ui"
+      ]
     }
   ]
 }
