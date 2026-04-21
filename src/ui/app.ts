@@ -20,6 +20,7 @@ import { CombatScreen } from './screens/CombatScreen';
 import { CouncilScreen } from './screens/CouncilScreen';
 import { CommandBar } from './components/CommandBar';
 import { TurnSummaryScreen } from './screens/TurnSummaryScreen';
+import { SaveLoadScreen } from './screens/SaveLoadScreen';
 
 // ── F-key → Screen mapping (matches MOO1 command bar layout) ─────────────────
 
@@ -30,6 +31,7 @@ const F_KEY_MAP: Readonly<Record<string, ScreenType>> = {
   F4:  'research',     // TECH
   F5:  'diplomacy',    // RACES
   F6:  'ship_design',  // DESIGN
+  F8:  'save_load',    // SAVE/LOAD
   F10: 'menu',         // GAME (save/quit)
 };
 
@@ -117,6 +119,7 @@ export class App {
     const newGameEl    = this.makeScreenContainer(root, 'new-game-screen');
     const combatEl       = this.makeScreenContainer(root, 'combat-screen');
     const councilEl      = this.makeScreenContainer(root, 'council-screen');
+    const saveLoadEl     = this.makeScreenContainer(root, 'save-load-screen');
     const turnSummaryEl  = this.makeScreenContainer(root, 'turn-summary-screen');
     const turnSummary    = new TurnSummaryScreen(turnSummaryEl, store);
 
@@ -131,6 +134,7 @@ export class App {
       ['ship_design',      new DesignScreen(designEl, store)],
       ['combat',           new CombatScreen(combatEl, store)],
       ['council',          new CouncilScreen(councilEl)],
+      ['save_load',        new SaveLoadScreen(saveLoadEl, store)],
       ['turn_summary',     turnSummary],
     ]);
   }

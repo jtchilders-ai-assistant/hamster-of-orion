@@ -34,7 +34,8 @@ export type ScreenType =
   | 'reports'
   | 'council'
   | 'combat'
-  | 'turn_summary';
+  | 'turn_summary'
+  | 'save_load';
 
 export type GalaxySize = 'small' | 'medium' | 'large' | 'huge';
 export type GalaxyShape = 'spiral' | 'elliptical' | 'irregular';

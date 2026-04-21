@@ -1,46 +1,51 @@
-# Current Task: Turn summary/events screen
+# Current Task: Save/Load game UI
 
-**ID**: turn-summary-screen
+**ID**: save-load-ui
 **Type**: ui
-**Output**: src/ui/screens/TurnSummaryScreen.ts
+**Output**: src/ui/screens/SaveLoadScreen.ts
 
 ## Description
-Create turn summary screen that shows between turns. Display research completed, ships built, combats resolved, diplomatic events, random events.
+Create save/load game screens accessible from menu. Show save slots with game info (turn, year, empires). Allow saving, loading, and deleting saves.
 
 ## Design Documents (MUST READ)
-- design/ui-ux/wireframes/turn-summary.md — **FILE NOT FOUND** (see reference materials below)
-- design/game-mechanics/turn-structure.md — Turn phases (Phase 3: Research breakthrough popup, Phase 7: Combat results, Phase 9: Random events)
-- design/game-mechanics/random-events.md — Event types and effects
+- `design/ui-ux/UI_OVERVIEW.md` — GAME menu (F10/ESC) contains Save/Load/Options/Quit
+- `design/ui-ux/state-transitions.md` — Section 10: Loading and Save States (save flow, auto-save, save dialog structure)
 
-**NOTE**: The primary wireframe `design/ui-ux/wireframes/turn-summary.md` does not exist. Use the following sources:
-1. **turn-structure.md** Phase 12: "Player can review reports" — implies turn summary
-2. **MOO reference screens**: `design/moo_screens/moo_start_of_turn_*.png`
-3. **Acceptance criteria below** define the UI requirements
+**Note**: Primary wireframe `design/ui-ux/wireframes/save-load.md` does NOT exist. Use the above docs + acceptance criteria as guide.
 
-## Reference: MOO-style Turn Events
-From the reference images:
-- `moo_start_of_turn_new_planet_reveal.png` — New planet discovery popup
-- `moo_start_of_turn_select_new_research.png` — Research completed, choose next
-- `moo_start_of_turn_new_ships.png` — Ships built this turn
+### Key Design Points from state-transitions.md:
+1. **Save Dialog Flow**: GAME_MENU → SAVE_DIALOG (shows slots) → NAME_INPUT (new) or OVERWRITE_CONFIRM (existing) → SAVING → SUCCESS/ERROR
+2. **Auto-save**: Enabled by default, slot "autosave", triggers on TURN_END, COMBAT_START, BEFORE_COUNCIL. Max 3 autosaves with rotation.
+3. **Save Slots**: Show numbered slots, each with game info preview
+4. **Error handling**: Save failed → Retry/Save As/Cancel options
+
+### From UI_OVERVIEW.md:
+- GAME button (F10/ESC) opens Game Menu with Save, Load, Options, Quit
+- Modal overlay style matching existing screens
 
 ## Acceptance Criteria
-1. Shows after Next Turn is clicked
-2. Lists research completed this turn
-3. Lists ships built this turn
-4. Lists combat results with links
-5. Lists diplomatic events
-6. Lists random events
-7. Continue button returns to galaxy map
+1. Shows list of save slots
+2. Each slot shows turn, year, player empire
+3. Save button saves current game to slot
+4. Load button loads selected save
+5. Delete button removes save with confirmation
+6. Autosave slot shown separately
+7. Works with LocalStorage persistence
 
 ## Implementation Notes
-- Should be a modal/screen that appears between turns
-- Can use a card/list layout for different event types
-- Each event type can have an icon (research flask, ship, crossed swords, handshake, star)
-- Combat results should be clickable to see battle report
-- Continue button or ESC dismisses and returns to galaxy map
-- If no events, still show "Turn X Complete - Nothing of note occurred"
-- The reducer should track turn events in state (add `turnEvents` array to GameState if needed)
-- processTurn() should populate turnEvents as it processes each phase
+- Use LocalStorage API for persistence
+- Save format: JSON with GameState + metadata (turn, timestamp, player race)
+- Key format: `hamster-orion-save-{slot}` for manual saves, `hamster-orion-autosave` for autosave
+- Maximum 10 manual save slots + 1 autosave
+- Modal overlay similar to TurnSummaryScreen pattern
+- Wire into App/CommandBar GAME menu button
+- Follow existing UI patterns (main.css styles, DOM rendering)
 
 ## Dependencies
-- None (no blocking dependencies)
+- None ✓
+
+## Files to Reference
+- `src/ui/screens/TurnSummaryScreen.ts` — modal overlay pattern
+- `src/game/state.ts` — GameState structure to serialize
+- `src/ui/app.ts` — integration point
+- `src/styles/main.css` — existing styles

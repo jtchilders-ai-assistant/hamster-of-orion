@@ -122,7 +122,7 @@
       "id": "save-load-ui",
       "name": "Save/Load game UI",
       "type": "ui",
-      "status": "pending",
+      "status": "done",
       "description": "Create save/load game screens accessible from menu. Show save slots with game info (turn, year, empires). Allow saving, loading, and deleting saves.",
       "designDocs": [
         "design/ui-ux/wireframes/save-load.md"
