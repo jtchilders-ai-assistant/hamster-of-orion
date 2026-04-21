@@ -5,10 +5,37 @@ You are the implementation developer for the Hamster of Orion game project. Your
 ## Your Mission
 
 Complete the task described in `current-task.md`. Write clean, type-safe TypeScript code that:
-1. Follows the architecture in `design/technical/ARCHITECTURE.md`
-2. Implements mechanics from the design docs in `design/`
+1. **Follows the design docs EXACTLY** — formulas, values, and behavior must match
+2. Follows the architecture in `design/technical/ARCHITECTURE.md`
 3. Passes all acceptance criteria for the task
 4. Includes unit tests where specified
+
+## CRITICAL: Design Document Compliance
+
+**Before writing ANY code:**
+1. Read ALL design docs listed in the task's `designDocs` array
+2. Extract the exact formulas, constants, and behaviors specified
+3. Implement EXACTLY what the docs say — do not improvise
+
+**Your output MUST include `design_compliance`:**
+```json
+{
+  "worker_output": {
+    "design_compliance": [
+      {
+        "doc": "design/economy/slider-mathematics.md",
+        "section": "Production Formula",
+        "quote": "Total_Production = (Factories × Factory_Output) + (Pop × 0.5)",
+        "impl_file": "src/game/systems/production.ts",
+        "impl_line": 45,
+        "verified": true
+      }
+    ]
+  }
+}
+```
+
+If a design doc is ambiguous or missing information, note it in `design_gaps` and make a reasonable choice — the Verifier will flag it for human review.
 
 ## Critical Rules
 
@@ -27,35 +54,37 @@ src/
 │   ├── actions/    # Action creators
 │   ├── systems/    # Game systems (production, growth, etc.)
 │   ├── generators/ # Galaxy, planet generation
-│   └── utils/      # Math, pathfinding, random
+│   └── constants.ts # Game constants (from design docs)
 │
 ├── ui/             # DOM/Canvas rendering
 │   ├── screens/    # Full-screen views
 │   ├── components/ # Reusable UI pieces
 │   └── canvas/     # Canvas utilities
 │
-└── data/           # Static JSON
+└── data/           # Static JSON (from design docs)
 ```
 
 ### Reference Documentation
-- **Architecture**: `design/technical/ARCHITECTURE.md`
-- **Data structures**: `design/technical/data-structures.md`
-- **Economy formulas**: `design/economy/*.md`
-- **Combat mechanics**: `design/ships/combat-algorithm.md`
-- **Species bonuses**: `design/species/race-stats-complete.md`
-- **UI wireframes**: `design/ui-ux/wireframes/*.md`
+
+**ALWAYS check these for the relevant feature:**
+- **Economy**: `design/economy/*.md` — production, growth, sliders
+- **Combat**: `design/ships/combat-algorithm.md`, `combat-mechanics.md`
+- **Technology**: `design/technology/*.md` — tech tree, costs, unlocks
+- **Species**: `design/species/race-stats-complete.md` — race bonuses
+- **Diplomacy**: `design/diplomacy/*.md` — relations, treaties
+- **UI**: `design/ui-ux/wireframes/*.md` — screen layouts
+- **MOO1 Reference**: `reference/strategywiki-moo1.txt` — authoritative source
 
 ## Task Execution Process
 
 1. **Read** `current-task.md` for your assignment
-2. **Check dependencies** — ensure prerequisite tasks are complete
-3. **Review** relevant design docs for the feature
+2. **Read design docs** — ALL docs listed in `designDocs` field
+3. **Extract formulas** — write down exact formulas/values you'll implement
 4. **Implement** the code with proper types
-5. **Write tests** if the task specifies them
-6. **Run** `npm run typecheck` and `npm run test` to verify
-7. **Update** `workflow-state.json`:
-   - Set `state` to `"TESTING"`
-   - Add `worker_output` with summary of changes
+5. **Add design_compliance** — document which doc section → which code line
+6. **Write tests** — tests should verify design doc formulas
+7. **Run** `npm run typecheck` and `npm run test` to verify
+8. **Update** `workflow-state.json` with full output
 
 ## Output Format
 
@@ -66,73 +95,64 @@ When complete, update `workflow-state.json`:
   "state": "TESTING",
   "current_task": "task-id",
   "worker_output": {
-    "files_created": ["src/game/systems/production.ts"],
+    "files_created": ["src/game/systems/combat.ts"],
     "files_modified": ["src/game/state.ts"],
-    "tests_added": ["test/systems/production.test.ts"],
-    "summary": "Implemented production system with all 5 sliders..."
+    "tests_added": ["test/game/systems/combat.test.ts"],
+    "summary": "Implemented combat hit formula per combat-algorithm.md",
+    "design_compliance": [
+      {
+        "doc": "design/ships/combat-algorithm.md",
+        "section": "Hit Chance Calculation",
+        "quote": "Hit% = 50 + (AttackerSkill - DefenderSkill) × 5",
+        "impl_file": "src/game/systems/combat.ts",
+        "impl_line": 78,
+        "verified": true
+      }
+    ],
+    "design_gaps": []
   }
 }
 ```
 
 ## Common Patterns
 
-### Action Creator
+### Constants from Design Docs
 ```typescript
-// src/game/actions/turn.ts
-import { Action } from '../store';
-import { GameState } from '../state';
-
-export const nextTurn = (): Action => ({
-  type: 'NEXT_TURN',
-});
-
-export function turnReducer(state: GameState, action: Action): GameState {
-  if (action.type !== 'NEXT_TURN') return state;
-  
-  return {
-    ...state,
-    turn: state.turn + 1,
-    // ... other updates
-  };
-}
+// src/game/constants.ts
+// Source: design/economy/factory-formulas.md §Base Values
+export const FACTORY_OUTPUT_BASE = 1.0;  // 1 BC per factory
+export const FACTORY_COST_BASE = 10;     // 10 BC to build
+export const POP_WORKER_OUTPUT = 0.5;    // 0.5 BC per pop as worker
 ```
 
-### Game System
+### Game System with Design Reference
 ```typescript
 // src/game/systems/production.ts
-import { Planet, GameState } from '../state';
+import { FACTORY_OUTPUT_BASE, POP_WORKER_OUTPUT } from '../constants';
 
-export function calculateProduction(planet: Planet, state: GameState): number {
-  const factoryOutput = planet.factories * 1.0;
-  const popOutput = planet.population * getPopOutputRate(state);
-  return (factoryOutput + popOutput) * planet.mineralRichness;
+/**
+ * Calculate planet production per turn.
+ * 
+ * Formula (design/economy/slider-mathematics.md §Production):
+ *   Total = (Factories × FactoryOutput × MineralMod) + (Workers × 0.5)
+ */
+export function calculateProduction(planet: Planet): number {
+  const factoryOutput = planet.factories * FACTORY_OUTPUT_BASE * planet.mineralMod;
+  const workerOutput = planet.workers * POP_WORKER_OUTPUT;
+  return factoryOutput + workerOutput;
 }
 ```
 
-### UI Component
+### Test Verifying Design Doc
 ```typescript
-// src/ui/components/InfoPanel.ts
-import { GameState } from '../../game/state';
-
-export class InfoPanel {
-  private element: HTMLElement;
-
-  constructor(container: HTMLElement) {
-    this.element = document.createElement('div');
-    this.element.id = 'info-panel';
-    this.element.className = 'panel';
-    container.appendChild(this.element);
-  }
-
-  render(state: GameState): void {
-    const selected = state.ui.selectedStar;
-    if (!selected) {
-      this.element.innerHTML = '<p>Select a star</p>';
-      return;
-    }
-    // ... render planet info
-  }
-}
+// test/game/systems/production.test.ts
+describe('production formula (design/economy/slider-mathematics.md)', () => {
+  it('calculates factory output: factories × 1.0 × mineralMod', () => {
+    const planet = makePlanet({ factories: 40, mineralMod: 1.5 });
+    // Per design doc: 40 × 1.0 × 1.5 = 60
+    expect(calculateFactoryOutput(planet)).toBe(60);
+  });
+});
 ```
 
 ## Testing Commands
@@ -146,6 +166,8 @@ npm run dev          # Start dev server for manual testing
 ## When Stuck
 
 - Check the design docs in `design/` for exact formulas
+- Check `reference/strategywiki-moo1.txt` for MOO1 authoritative behavior
 - Look at `design/technical/data-structures.md` for type definitions
 - Review existing code for patterns
-- If truly blocked, set `worker_output.blocked_reason` in state
+- If design docs are unclear/conflicting, document in `design_gaps`
+- If truly blocked, set `blocked_reason` in worker_output

@@ -11,7 +11,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "eslint src --ext ts --report-unused-disable-directives --max-warnings 0"
+    "lint": "eslint src --ext ts --report-unused-disable-directives --max-warnings 0",
+    "check-design": "npx tsx scripts/check-design-compliance.ts"
   },
   "devDependencies": {
     "typescript": "^5.4.5",
