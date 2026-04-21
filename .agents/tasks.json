@@ -166,7 +166,7 @@
       "id": "colonies-list-screen",
       "name": "Colonies list screen (F2)",
       "type": "ui",
-      "status": "pending",
+      "status": "done",
       "description": "Create ColoniesScreen showing all player colonies in a sortable list. Display population, factories, current build, and production stats.",
       "designDocs": [
         "design/ui-ux/wireframes/colony-list.md"

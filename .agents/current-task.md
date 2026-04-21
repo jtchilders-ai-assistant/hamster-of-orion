@@ -1,46 +1,36 @@
-# Current Task: Complete research screen
+# Current Task: Colonies list screen (F2)
 
-**ID**: research-screen-complete
+**ID**: colonies-list-screen
 **Type**: ui
-**Output**: src/ui/screens/ResearchScreen.ts
+**Output**: src/ui/screens/ColoniesScreen.ts
 
 ## Description
-
-Finish ResearchScreen with tech selection, progress display, and field allocation. Show available techs per field, costs, and effects.
+Create ColoniesScreen showing all player colonies in a sortable list. Display population, factories, current build, and production stats.
 
 ## Design Documents (MUST READ)
+- `design/ui-ux/wireframes/command_menu/command_menu_planets.md` — Full wireframe with column definitions, layout, interactions, and bottom panels (SPENDING, TOTALS, FINANCE)
 
-- `design/ui-ux/wireframes/research-tree.md` — MOO1-accurate wireframe for Technology Screen (F4). Two-half layout: left = 6 field rows with RP% sliders; right = tech tree browser by level. Tech description panel at bottom. Tech selection happens via start-of-turn popup, NOT from main screen. No bottom command bar — exit via OK or ESC.
-- `design/technology/research-formulas.md` — RP calculation, tech costs by tier (§6), progress tracking (§8), miniaturization. Empire_Total_RP formula, field allocation, and completion overflow.
-- `design/technology/categories.md` — 6 tech fields: Computers, Construction, Force Fields, Planetology, Propulsion, Weaponry. Strategy considerations per field.
+**Note:** The task listed `design/ui-ux/wireframes/colony-list.md` but the actual doc is `command_menu/command_menu_planets.md`. Use that.
 
 ## Acceptance Criteria
+1. Lists all player colonies
+2. Sortable by name, population, factories
+3. Shows current build queue item per colony
+4. Shows production stats (BC/turn)
+5. Click colony name to open planet screen
+6. Shows environment type icons
+7. Accessible via F2 or command bar
 
-1. Shows 6 research fields (Computers, Construction, Force Fields, Planetology, Propulsion, Weaponry)
-2. Each field shows current research target
-3. Click field to see available techs (right-half tech tree browser by level)
-4. Tech list shows cost, turns to complete
-5. Select tech to set as current research
-6. Progress bar for current research
-7. Completed techs list/history
+## Additional Requirements from Design Doc
+- Column layout: IMG, PLANET NAME, POP (segmented bar), FACT, SHD, BASE, WST, PROD, BUILDING
+- Population shown as segmented bar (filled = current, empty = capacity)
+- Bottom panels: SPENDING (ships/bases/spying/security), TOTALS (trade/planets/total), FINANCE (reserve/transfer)
+- Click row to select, double-click to open Planet Detail
+- Scrollable if > 12-15 colonies
+- OK button returns to Galaxy Map
 
-## Key Implementation Notes
-
-From `research-tree.md`:
-- Full-screen modal opened by F4/TECH button
-- Left half (~40%): 6 stacked field rows, each showing: field name, RP%, current tech, progress bar + ETA
-- Right half (~60%): Tech tree browser for selected field, organized by level with separators
-- Tech states: [✓] researched, [→] researching, [ ] not researched
-- Bottom: description panel (~80%) + summary box with Total RP + OK button (~20%)
-- RP % sliders adjustable at any time — all 6 must sum to 100%
-- Tech selection popup is SEPARATE (start-of-turn only, not part of main screen)
-
-From `research-formulas.md`:
-- 6 fields: weapons, propulsion, construction, computers, force_fields, planetology
-- Tech tier costs: Tier 1=50 RP, Tier 2=80, ..., Tier 20=100,000 RP (see §6)
-- ETA = remaining_cost / field_rp_per_turn
-- Progress overflow carries to next tech (§8)
+## Existing Code
+There's a stub at `src/ui/screens/ColoniesScreen.ts` (1056 bytes). Replace it with full implementation.
 
 ## Dependencies
-
-- None (no blocking dependencies)
+- None (can start immediately)

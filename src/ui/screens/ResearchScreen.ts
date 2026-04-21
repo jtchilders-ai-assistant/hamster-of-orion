@@ -20,6 +20,7 @@ import {
   EmpireFieldResearch,
   createDefaultFieldResearch,
   createEvenAllocation,
+  getTechCost as systemGetTechCost,
 } from '../../game/systems/research';
 import techTreeRaw from '../../data/tech-tree.json';
 
@@ -41,13 +42,16 @@ interface TechTreeData {
 
 const TECH_DATA = (techTreeRaw as TechTreeData).technologies;
 
+// ── Tech lookup map for O(1) access ──────────────────────────────────────────
+
+const TECH_BY_ID = new Map<string, TechEntry>(TECH_DATA.map((t) => [t.id, t]));
+
 // ── Field display metadata ────────────────────────────────────────────────────
 
 /**
  * Maps ResearchField keys to the MOO1 display label and the TechField used in
- * state.ts availableTechs. The data uses 'weapons' in tech-tree.json but
- * state.ts TechField uses 'weapons' too — only the 6th field differs
- * ('biotechnology' in state.ts vs 'planetology' in research.ts / JSON).
+ * state.ts availableTechs. The 6th field differs:
+ *   'biotechnology' in state.ts TechField ↔ 'planetology' in research.ts / JSON
  */
 interface FieldMeta {
   label: string;        // MOO1 uppercase display name
@@ -56,12 +60,12 @@ interface FieldMeta {
 }
 
 const FIELD_META: Record<ResearchField, FieldMeta> = {
-  computers:   { label: 'COMPUTERS',    stateKey: 'computers',   jsonField: 'computers'   },
-  construction:{ label: 'CONSTRUCTION', stateKey: 'construction',jsonField: 'construction' },
-  force_fields:{ label: 'FORCE FIELDS', stateKey: 'force_fields',jsonField: 'force_fields' },
-  planetology: { label: 'PLANETOLOGY',  stateKey: 'biotechnology',jsonField: 'planetology' },
-  propulsion:  { label: 'PROPULSION',   stateKey: 'propulsion',  jsonField: 'propulsion'  },
-  weapons:     { label: 'WEAPONRY',     stateKey: 'weapons',     jsonField: 'weapons'     },
+  computers:    { label: 'COMPUTERS',    stateKey: 'computers',    jsonField: 'computers'    },
+  construction: { label: 'CONSTRUCTION', stateKey: 'construction', jsonField: 'construction' },
+  force_fields: { label: 'FORCE FIELDS', stateKey: 'force_fields', jsonField: 'force_fields' },
+  planetology:  { label: 'PLANETOLOGY',  stateKey: 'biotechnology',jsonField: 'planetology'  },
+  propulsion:   { label: 'PROPULSION',   stateKey: 'propulsion',   jsonField: 'propulsion'   },
+  weapons:      { label: 'WEAPONRY',     stateKey: 'weapons',      jsonField: 'weapons'      },
 };
 
 // ── Working RP allocation state ───────────────────────────────────────────────
@@ -71,7 +75,6 @@ type WorkingAllocation = Record<ResearchField, number>;
 
 function defaultAllocation(): WorkingAllocation {
   const even = createEvenAllocation();
-  // Round to integers summing to 100
   const result = {} as WorkingAllocation;
   let remaining = 100;
   for (let i = 0; i < ALL_RESEARCH_FIELDS.length; i++) {
@@ -105,19 +108,22 @@ export class ResearchScreen {
   private readonly container: HTMLElement;
   private readonly store: Store<GameState>;
 
-  /** Currently selected field (for right panel tech tree). */
+  /** Currently selected field (drives right panel tech tree). */
   private selectedField: ResearchField = 'computers';
 
-  /** Currently hovered/clicked tech for the description panel. */
+  /** Tech clicked in the right panel — shown in the description panel. */
   private selectedTechId: string | null = null;
 
-  /** Working RP allocation (may differ from state until OK is pressed). */
+  /**
+   * Working RP allocation (integers, sum = 100).
+   * Loaded from state on show(); committed to store on every +/- click.
+   */
   private allocation: WorkingAllocation = defaultAllocation();
 
-  /** Cached field research state (derived from store on render). */
+  /** Cached per-field research state derived from store on each render. */
   private fieldResearch: EmpireFieldResearch = createDefaultFieldResearch();
 
-  // DOM references
+  // ── DOM refs ────────────────────────────────────────────────────────────────
   private fieldRows: Map<ResearchField, HTMLElement> = new Map();
   private fieldPctLabels: Map<ResearchField, HTMLElement> = new Map();
   private fieldProgressBars: Map<ResearchField, HTMLElement> = new Map();
@@ -140,7 +146,6 @@ export class ResearchScreen {
   show(): void {
     this.container.classList.add('active');
     this.container.style.display = 'flex';
-    // Sync allocation from state on show
     const state = this.store.getState();
     this.syncAllocationFromState(state);
     this.render(state);
@@ -158,7 +163,7 @@ export class ResearchScreen {
     this.renderTotalRP(state);
   }
 
-  // ── Layout construction ──────────────────────────────────────────────────────
+  // ── Layout ──────────────────────────────────────────────────────────────────
 
   private buildLayout(): void {
     this.container.innerHTML = '';
@@ -166,7 +171,7 @@ export class ResearchScreen {
       'display:none; flex-direction:column; height:100%; overflow:hidden;' +
       'background:var(--color-bg); font-family:var(--font-mono);';
 
-    // ── Header ────────────────────────────────────────────────────────────────
+    // Header
     const header = document.createElement('div');
     header.style.cssText =
       'text-align:center; padding:12px 0 8px; flex-shrink:0;' +
@@ -176,7 +181,7 @@ export class ResearchScreen {
       `text-transform:uppercase;margin:0">R E S E A R C H</h1>`;
     this.container.appendChild(header);
 
-    // ── Main body (left + right) ──────────────────────────────────────────────
+    // Main body (left + right)
     const body = document.createElement('div');
     body.style.cssText = 'flex:1; display:flex; gap:0; overflow:hidden; min-height:0;';
     this.container.appendChild(body);
@@ -184,11 +189,11 @@ export class ResearchScreen {
     body.appendChild(this.buildLeftPanel());
     body.appendChild(this.buildRightPanel());
 
-    // ── Bottom section ────────────────────────────────────────────────────────
+    // Bottom section
     this.container.appendChild(this.buildBottomSection());
   }
 
-  // ── Left panel: field rows + RP sliders ──────────────────────────────────────
+  // ── Left panel: 6 field rows ─────────────────────────────────────────────────
 
   private buildLeftPanel(): HTMLElement {
     const panel = document.createElement('div');
@@ -210,7 +215,8 @@ export class ResearchScreen {
     const row = document.createElement('div');
     row.style.cssText =
       'padding:10px 14px; border-bottom:1px solid var(--color-border);' +
-      'cursor:pointer; user-select:none; transition:background 0.1s;';
+      'cursor:pointer; user-select:none; transition:background 0.1s;' +
+      'border-left:3px solid transparent;';
 
     row.addEventListener('click', () => {
       this.selectedField = field;
@@ -218,19 +224,14 @@ export class ResearchScreen {
       const state = this.store.getState();
       this.renderTechTree(state);
     });
-
     row.addEventListener('mouseenter', () => {
-      if (field !== this.selectedField) {
-        row.style.background = 'rgba(255,255,255,0.04)';
-      }
+      if (field !== this.selectedField) row.style.background = 'rgba(255,255,255,0.04)';
     });
     row.addEventListener('mouseleave', () => {
-      if (field !== this.selectedField) {
-        row.style.background = '';
-      }
+      if (field !== this.selectedField) row.style.background = '';
     });
 
-    // ── Row top: label + RP% ─────────────────────────────────────────────────
+    // Row top: label + RP% slider controls
     const topRow = document.createElement('div');
     topRow.style.cssText =
       'display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;';
@@ -241,17 +242,13 @@ export class ResearchScreen {
       'font-size:12px; letter-spacing:1px; color:var(--color-accent); text-transform:uppercase;';
 
     const pctWrapper = document.createElement('div');
-    pctWrapper.style.cssText =
-      'display:flex; align-items:center; gap:4px;';
+    pctWrapper.style.cssText = 'display:flex; align-items:center; gap:4px;';
 
     const decBtn = document.createElement('button');
     decBtn.textContent = '−';
-    decBtn.title = 'Decrease allocation';
+    decBtn.title = 'Decrease 5%';
     this.styleAllocBtn(decBtn);
-    decBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      this.adjustAllocation(field, -5);
-    });
+    decBtn.addEventListener('click', (e) => { e.stopPropagation(); this.adjustAllocation(field, -5); });
 
     const pctLabel = document.createElement('span');
     pctLabel.style.cssText =
@@ -261,31 +258,24 @@ export class ResearchScreen {
 
     const incBtn = document.createElement('button');
     incBtn.textContent = '+';
-    incBtn.title = 'Increase allocation';
+    incBtn.title = 'Increase 5%';
     this.styleAllocBtn(incBtn);
-    incBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      this.adjustAllocation(field, +5);
-    });
+    incBtn.addEventListener('click', (e) => { e.stopPropagation(); this.adjustAllocation(field, +5); });
 
-    pctWrapper.appendChild(decBtn);
-    pctWrapper.appendChild(pctLabel);
-    pctWrapper.appendChild(incBtn);
-
-    topRow.appendChild(labelEl);
-    topRow.appendChild(pctWrapper);
+    pctWrapper.append(decBtn, pctLabel, incBtn);
+    topRow.append(labelEl, pctWrapper);
     row.appendChild(topRow);
 
-    // ── Current tech label ───────────────────────────────────────────────────
+    // Current tech label
     const currentTechLabel = document.createElement('div');
     currentTechLabel.style.cssText =
-      'font-size:12px; color:var(--color-text); margin-bottom:5px;' +
+      'font-size:12px; color:var(--color-text-dim); margin-bottom:5px;' +
       'white-space:nowrap; overflow:hidden; text-overflow:ellipsis;';
-    currentTechLabel.textContent = '—';
+    currentTechLabel.textContent = '(none)';
     this.fieldCurrentTechLabels.set(field, currentTechLabel);
     row.appendChild(currentTechLabel);
 
-    // ── Progress bar + ETA ───────────────────────────────────────────────────
+    // Progress bar + ETA
     const progressRow = document.createElement('div');
     progressRow.style.cssText = 'display:flex; align-items:center; gap:8px;';
 
@@ -303,11 +293,9 @@ export class ResearchScreen {
     const etaLabel = document.createElement('span');
     etaLabel.style.cssText =
       'font-size:11px; color:var(--color-text-dim); white-space:nowrap; min-width:60px; text-align:right;';
-    etaLabel.textContent = '';
     this.fieldProgressLabels.set(field, etaLabel);
 
-    progressRow.appendChild(barTrack);
-    progressRow.appendChild(etaLabel);
+    progressRow.append(barTrack, etaLabel);
     row.appendChild(progressRow);
 
     return row;
@@ -317,8 +305,7 @@ export class ResearchScreen {
 
   private buildRightPanel(): HTMLElement {
     const panel = document.createElement('div');
-    panel.style.cssText =
-      'flex:1; display:flex; flex-direction:column; overflow:hidden;';
+    panel.style.cssText = 'flex:1; display:flex; flex-direction:column; overflow:hidden;';
 
     this.rightTitle = document.createElement('div');
     this.rightTitle.style.cssText =
@@ -328,22 +315,21 @@ export class ResearchScreen {
     panel.appendChild(this.rightTitle);
 
     this.rightTechList = document.createElement('div');
-    this.rightTechList.style.cssText =
-      'flex:1; overflow-y:auto; padding:8px 0;';
+    this.rightTechList.style.cssText = 'flex:1; overflow-y:auto; padding:8px 0;';
     panel.appendChild(this.rightTechList);
 
     return panel;
   }
 
-  // ── Bottom section: description + summary ────────────────────────────────────
+  // ── Bottom section: description + OK ────────────────────────────────────────
 
   private buildBottomSection(): HTMLElement {
     const bottom = document.createElement('div');
     bottom.style.cssText =
-      'display:flex; gap:0; flex-shrink:0; border-top:2px solid var(--color-border);' +
+      'display:flex; flex-shrink:0; border-top:2px solid var(--color-border);' +
       'min-height:120px; max-height:160px;';
 
-    // Description panel (80% width)
+    // Description panel (~80%)
     const descPanel = document.createElement('div');
     descPanel.style.cssText =
       'flex:4; padding:12px 16px; border-right:2px solid var(--color-border); overflow:hidden;';
@@ -357,12 +343,10 @@ export class ResearchScreen {
     this.descBody = document.createElement('div');
     this.descBody.style.cssText =
       'font-size:12px; color:var(--color-text); line-height:1.5; overflow:hidden;';
-    this.descBody.textContent = '';
 
-    descPanel.appendChild(this.descName);
-    descPanel.appendChild(this.descBody);
+    descPanel.append(this.descName, this.descBody);
 
-    // Summary panel (20% width)
+    // Summary panel (~20%) — Total RP + OK button
     const summaryPanel = document.createElement('div');
     summaryPanel.style.cssText =
       'flex:1; padding:12px 14px; display:flex; flex-direction:column;' +
@@ -378,12 +362,10 @@ export class ResearchScreen {
     rpTitle.textContent = 'Total RP';
 
     this.totalRPLabel = document.createElement('div');
-    this.totalRPLabel.style.cssText =
-      'font-size:14px; color:var(--color-text); font-weight:bold;';
+    this.totalRPLabel.style.cssText = 'font-size:14px; color:var(--color-text); font-weight:bold;';
     this.totalRPLabel.textContent = '— RP/turn';
 
-    rpSection.appendChild(rpTitle);
-    rpSection.appendChild(this.totalRPLabel);
+    rpSection.append(rpTitle, this.totalRPLabel);
     summaryPanel.appendChild(rpSection);
 
     const okBtn = document.createElement('button');
@@ -393,9 +375,7 @@ export class ResearchScreen {
     okBtn.addEventListener('click', () => this.close());
     summaryPanel.appendChild(okBtn);
 
-    bottom.appendChild(descPanel);
-    bottom.appendChild(summaryPanel);
-
+    bottom.append(descPanel, summaryPanel);
     return bottom;
   }
 
@@ -408,7 +388,6 @@ export class ResearchScreen {
     for (const field of ALL_RESEARCH_FIELDS) {
       this.renderFieldRow(field, state, totalRP);
     }
-
     this.highlightFieldRow(this.selectedField);
   }
 
@@ -420,34 +399,30 @@ export class ResearchScreen {
     const etaLabel = this.fieldProgressLabels.get(field);
 
     const alloc = this.allocation[field];
+    if (pctLabel) pctLabel.textContent = `${alloc}%`;
 
-    if (pctLabel) {
-      pctLabel.textContent = `${alloc}%`;
-    }
-
-    // Current tech name
+    // Current tech name from fieldResearch (derived from state)
     const currentTechId = fieldState.currentTechId;
-    const tech = currentTechId ? TECH_DATA.find((t) => t.id === currentTechId) : null;
+    const tech = currentTechId ? TECH_BY_ID.get(currentTechId) ?? null : null;
 
     if (currentTechLabel) {
       currentTechLabel.textContent = tech?.name ?? '(none)';
-      currentTechLabel.style.color = tech
-        ? 'var(--color-text)'
-        : 'var(--color-text-dim)';
+      currentTechLabel.style.color = tech ? 'var(--color-text)' : 'var(--color-text-dim)';
     }
 
     // Progress bar + ETA
+    // Per research-formulas.md §6: cost = Tier_Cost_Table[tier] × galaxy_size_modifier
+    const galaxySize = state.galaxy.size;
+    const techCost = tech ? systemGetTechCost(tech.tier, galaxySize) : 0;
     const progressRP = fieldState.progressRP;
-    const techCost = tech ? this.getTechCost(tech.tier, state) : 0;
 
     let progressFraction = 0;
     let etaText = '';
 
     if (alloc === 0) {
+      // RP never flows to this field
       etaText = 'Never';
-      progressFraction = fieldState.progressRP > 0 && techCost > 0
-        ? Math.min(1, progressRP / techCost)
-        : 0;
+      progressFraction = techCost > 0 ? Math.min(1, progressRP / techCost) : 0;
     } else if (tech && techCost > 0) {
       progressFraction = Math.min(1, progressRP / techCost);
       const fieldRPPerTurn = totalRP * (alloc / 100);
@@ -458,13 +433,11 @@ export class ResearchScreen {
       } else {
         etaText = 'Never';
       }
-    } else if (currentTechId === null) {
+    } else {
       etaText = 'No target';
     }
 
-    if (barFill) {
-      barFill.style.width = `${Math.round(progressFraction * 100)}%`;
-    }
+    if (barFill) barFill.style.width = `${Math.round(progressFraction * 100)}%`;
     if (etaLabel) {
       etaLabel.textContent = etaText;
       etaLabel.style.color =
@@ -477,13 +450,13 @@ export class ResearchScreen {
   private highlightFieldRow(field: ResearchField): void {
     for (const [f, row] of this.fieldRows.entries()) {
       if (f === field) {
-        row.style.background = 'rgba(var(--color-accent-rgb, 100,160,220),0.15)';
+        row.style.background = 'rgba(100,160,220,0.15)';
         row.style.borderLeft = '3px solid var(--color-accent)';
         row.style.paddingLeft = '11px';
       } else {
         row.style.background = '';
         row.style.borderLeft = '3px solid transparent';
-        row.style.paddingLeft = '11px';
+        row.style.paddingLeft = '14px';
       }
     }
   }
@@ -506,10 +479,9 @@ export class ResearchScreen {
     for (const tier of sortedTiers) {
       const techs = byTier.get(tier) ?? [];
 
-      // ── Tier separator ───────────────────────────────────────────────────
+      // Tier separator
       const tierSep = document.createElement('div');
-      tierSep.style.cssText =
-        'display:flex; align-items:center; padding:4px 14px; margin:2px 0;';
+      tierSep.style.cssText = 'display:flex; align-items:center; padding:4px 14px; margin:2px 0;';
 
       const tierLabel = document.createElement('span');
       tierLabel.style.cssText =
@@ -518,30 +490,47 @@ export class ResearchScreen {
       tierLabel.textContent = `Level ${tier}`;
 
       const tierLine = document.createElement('div');
-      tierLine.style.cssText =
-        'flex:1; height:1px; background:var(--color-border);';
+      tierLine.style.cssText = 'flex:1; height:1px; background:var(--color-border);';
 
-      tierSep.appendChild(tierLabel);
-      tierSep.appendChild(tierLine);
+      tierSep.append(tierLabel, tierLine);
       this.rightTechList.appendChild(tierSep);
 
-      // ── Tech rows ────────────────────────────────────────────────────────
+      // Tech rows
       for (const tech of techs) {
         const isCompleted = completedSet.has(tech.id);
         const isCurrent = tech.id === currentTechId;
-
-        const techRow = this.buildTechRow(tech, isCompleted, isCurrent);
+        const techRow = this.buildTechRow(tech, isCompleted, isCurrent, state);
         this.rightTechList.appendChild(techRow);
       }
     }
   }
 
-  private buildTechRow(tech: TechEntry, isCompleted: boolean, isCurrent: boolean): HTMLElement {
+  /**
+   * Build one tech row in the right panel.
+   *
+   * States per wireframe/research-tree.md:
+   *   [✓] Already researched — green, no select button
+   *   [→] Currently researching — accent color, no select button
+   *   [ ] Not yet researched — dimmed, shows "Research" button on hover
+   *
+   * Clicking anywhere on the row updates the description panel.
+   * Clicking "Research" sets this tech as the current research target for the
+   * field via SET_RESEARCH_CURRENT_TECH (acceptance criterion #5).
+   */
+  private buildTechRow(
+    tech: TechEntry,
+    isCompleted: boolean,
+    isCurrent: boolean,
+    state: GameState,
+  ): HTMLElement {
+    const isSelectable = !isCompleted && !isCurrent;
+
     const row = document.createElement('div');
+    row.className = 'tech-row';
     row.style.cssText =
       'display:flex; align-items:center; justify-content:space-between;' +
-      'padding:5px 14px; cursor:pointer; transition:background 0.1s;' +
-      (isCompleted ? 'opacity:1;' : isCurrent ? 'opacity:1;' : 'opacity:0.65;');
+      `padding:5px 14px; cursor:pointer; transition:background 0.1s;` +
+      (isCompleted ? 'opacity:1;' : isCurrent ? 'opacity:1;' : 'opacity:0.7;');
 
     row.addEventListener('mouseenter', () => {
       row.style.background = 'rgba(255,255,255,0.05)';
@@ -550,27 +539,62 @@ export class ResearchScreen {
       if (tech.id !== this.selectedTechId) row.style.background = '';
       else row.style.background = 'rgba(255,255,255,0.08)';
     });
-    row.addEventListener('click', () => {
+
+    // Click row → show description
+    row.addEventListener('click', (e) => {
+      // Don't re-trigger if the "Research" button was clicked
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'BUTTON') return;
+
       this.selectedTechId = tech.id;
-      this.showTechDescription(tech);
-      // Update row highlight
+      this.showTechDescription(tech, state);
       this.rightTechList.querySelectorAll<HTMLElement>('.tech-row').forEach((el) => {
-        (el as HTMLElement).style.background = '';
+        el.style.background = '';
       });
       row.style.background = 'rgba(255,255,255,0.08)';
     });
-    row.classList.add('tech-row');
 
-    // Tech name
+    // Left side: name
     const nameEl = document.createElement('span');
     nameEl.textContent = tech.name;
     nameEl.style.cssText =
-      `font-size:12px; color:${isCompleted ? 'var(--color-text)' : isCurrent ? 'var(--color-accent)' : 'var(--color-text-dim)'};`;
+      `font-size:12px; flex:1;` +
+      (isCompleted
+        ? 'color:var(--color-text);'
+        : isCurrent
+          ? 'color:var(--color-accent);'
+          : 'color:var(--color-text-dim);');
 
-    // Status indicator
+    row.appendChild(nameEl);
+
+    // Right side: status indicator + optional "Research" button
+    const rightSide = document.createElement('div');
+    rightSide.style.cssText = 'display:flex; align-items:center; gap:8px;';
+
+    if (isSelectable) {
+      // "Research" button — sets this as current tech for the field
+      // Per design doc: tech selection from this screen updates per-field targets
+      const researchBtn = document.createElement('button');
+      researchBtn.textContent = 'Research';
+      researchBtn.style.cssText =
+        'font-family:var(--font-mono); font-size:10px; padding:2px 6px; cursor:pointer;' +
+        'background:transparent; border:1px solid var(--color-border);' +
+        'color:var(--color-text-dim); border-radius:2px; display:none;';
+
+      row.addEventListener('mouseenter', () => { researchBtn.style.display = 'inline-block'; });
+      row.addEventListener('mouseleave', () => { researchBtn.style.display = 'none'; });
+
+      researchBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.selectTechForField(this.selectedField, tech.id);
+      });
+
+      rightSide.appendChild(researchBtn);
+    }
+
     const statusEl = document.createElement('span');
     statusEl.style.cssText =
-      'font-size:12px; font-family:var(--font-mono); margin-left:12px; min-width:24px; text-align:center;';
+      'font-size:12px; font-family:var(--font-mono); min-width:28px; text-align:center;';
 
     if (isCompleted) {
       statusEl.textContent = '[✓]';
@@ -583,16 +607,73 @@ export class ResearchScreen {
       statusEl.style.color = 'var(--color-text-dim)';
     }
 
-    row.appendChild(nameEl);
-    row.appendChild(statusEl);
+    rightSide.appendChild(statusEl);
+    row.appendChild(rightSide);
+
     return row;
   }
 
-  // ── Render: tech description ──────────────────────────────────────────────────
+  /**
+   * Selects a technology as the current research target for a field.
+   * Dispatches SET_RESEARCH_CURRENT_TECH to the store (reducer persists it).
+   * Per research-formulas.md §5: field_rp = empire_total_rp × (alloc% / 100).
+   *
+   * Also updates fieldCurrentTech state which is used in renderFieldRow to
+   * display the tech name and calculate ETA.
+   */
+  private selectTechForField(field: ResearchField, techId: string): void {
+    // Persist to store — reducer stores in empire.research.fieldCurrentTech
+    this.store.dispatch({
+      type: 'SET_RESEARCH_CURRENT_TECH',
+      payload: { field, techId },
+    });
 
-  private showTechDescription(tech: TechEntry): void {
+    // Update local fieldResearch so UI reflects immediately without waiting for
+    // the next full render cycle (fieldResearch is re-derived from state on render)
+    const tech = TECH_BY_ID.get(techId);
+    if (tech) {
+      this.fieldResearch = {
+        ...this.fieldResearch,
+        [field]: {
+          ...this.fieldResearch[field],
+          currentTechId: techId,
+          currentTechTier: tech.tier,
+        },
+      };
+    }
+
+    // Re-render to reflect the new selection
+    const newState = this.store.getState();
+    this.renderFieldList(newState);
+    this.renderTechTree(newState);
+
+    // Show description for the newly selected tech
+    if (tech) this.showTechDescription(tech, newState);
+  }
+
+  // ── Render: description panel ─────────────────────────────────────────────────
+
+  /**
+   * Updates the bottom description panel with the clicked tech's details.
+   * Per wireframe: name header + short description text only (no separate
+   * labeled fields for cost/tier per design note).
+   */
+  private showTechDescription(tech: TechEntry, state: GameState): void {
     this.descName.textContent = tech.name;
-    this.descBody.textContent = tech.description || '(No description available.)';
+
+    const galaxySize = state.galaxy.size;
+    let cost: number;
+    try {
+      cost = systemGetTechCost(tech.tier, galaxySize);
+    } catch {
+      // Fallback if tier not in table
+      cost = tech.cost;
+    }
+
+    // Build description with cost info (MOO1 keeps it brief)
+    const desc = tech.description || '(No description available.)';
+    const costLine = `Research cost: ${cost.toLocaleString()} RP`;
+    this.descBody.textContent = `${desc}  [${costLine}]`;
   }
 
   // ── Render: total RP ─────────────────────────────────────────────────────────
@@ -603,41 +684,36 @@ export class ResearchScreen {
     this.totalRPLabel.textContent = `${Math.round(rp)} RP/turn`;
   }
 
-  // ── RP allocation adjustment ──────────────────────────────────────────────────
+  // ── RP allocation: +/- buttons ────────────────────────────────────────────────
 
   /**
-   * Adjusts RP allocation for the given field by `delta` percentage points.
-   * Redistributes the change from/to other fields proportionally to keep sum at 100.
+   * Adjusts RP % for the given field by `delta` (±5), redistributing proportionally
+   * across the other 5 fields so the total stays exactly 100.
+   *
+   * Per research-formulas.md §5: all field percentages must sum to 100%.
    */
   private adjustAllocation(field: ResearchField, delta: number): void {
     const current = this.allocation[field];
     const newVal = Math.max(0, Math.min(100, current + delta));
     const actualDelta = newVal - current;
-
     if (actualDelta === 0) return;
 
-    // Distribute the opposite delta across other fields (proportionally, or round-robin if equal)
     const otherFields = ALL_RESEARCH_FIELDS.filter((f) => f !== field);
-    const totalOthers = otherFields.reduce((sum, f) => sum + this.allocation[f], 0);
-
-    const newAllocation = { ...this.allocation };
-    newAllocation[field] = newVal;
+    const totalOthers = otherFields.reduce((s, f) => s + this.allocation[f], 0);
+    const newAlloc = { ...this.allocation };
+    newAlloc[field] = newVal;
 
     if (totalOthers === 0) {
-      // Spread delta evenly
+      // Spread evenly across other fields
       const share = Math.floor(-actualDelta / otherFields.length);
       let leftover = -actualDelta - share * otherFields.length;
-      for (const f of otherFields) {
-        newAllocation[f] = Math.max(0, this.allocation[f] + share);
-      }
-      // Apply leftover to last field that has room
+      for (const f of otherFields) newAlloc[f] = Math.max(0, this.allocation[f] + share);
       for (let i = otherFields.length - 1; i >= 0 && leftover !== 0; i--) {
         const f = otherFields[i];
-        if (leftover > 0) {
-          newAllocation[f] = Math.min(100, newAllocation[f] + leftover);
-        } else {
-          newAllocation[f] = Math.max(0, newAllocation[f] + leftover);
-        }
+        const adj = leftover > 0
+          ? Math.min(100, newAlloc[f] + leftover)
+          : Math.max(0, newAlloc[f] + leftover);
+        newAlloc[f] = adj;
         leftover = 0;
       }
     } else {
@@ -646,68 +722,88 @@ export class ResearchScreen {
       for (let i = 0; i < otherFields.length - 1; i++) {
         const f = otherFields[i];
         const proportion = this.allocation[f] / totalOthers;
-        const change = -actualDelta * proportion;
-        newAllocation[f] = Math.max(0, Math.round(this.allocation[f] + change));
-        redistributed += newAllocation[f] - this.allocation[f];
+        newAlloc[f] = Math.max(0, Math.round(this.allocation[f] + (-actualDelta * proportion)));
+        redistributed += newAlloc[f] - this.allocation[f];
       }
-      // Last field absorbs rounding error
-      const lastField = otherFields[otherFields.length - 1];
-      newAllocation[lastField] = Math.max(
-        0,
-        this.allocation[lastField] - actualDelta - redistributed,
-      );
+      const last = otherFields[otherFields.length - 1];
+      newAlloc[last] = Math.max(0, this.allocation[last] - actualDelta - redistributed);
     }
 
-    // Clamp and ensure sum = 100
-    const total = ALL_RESEARCH_FIELDS.reduce((s, f) => s + newAllocation[f], 0);
-    if (total !== 100) {
-      // Fix rounding by adjusting a non-changed field
-      const diff = 100 - total;
+    // Ensure sum = 100 (fix any rounding error)
+    const sum = ALL_RESEARCH_FIELDS.reduce((s, f) => s + newAlloc[f], 0);
+    if (sum !== 100) {
+      const diff = 100 - sum;
       for (const f of otherFields) {
-        const adj = newAllocation[f] + diff;
-        if (adj >= 0 && adj <= 100) {
-          newAllocation[f] = adj;
-          break;
-        }
+        const adj = newAlloc[f] + diff;
+        if (adj >= 0 && adj <= 100) { newAlloc[f] = adj; break; }
       }
     }
 
-    this.allocation = newAllocation as WorkingAllocation;
+    this.allocation = newAlloc as WorkingAllocation;
 
-    // Dispatch the new allocation to store
+    // Persist to store (reducer saves to empire.research.fieldAllocation)
     this.store.dispatch({
       type: 'SET_RESEARCH_ALLOCATION',
       payload: { allocation: { ...this.allocation } },
     });
 
-    // Re-render field list with updated percentages
     const state = this.store.getState();
     this.renderFieldList(state);
   }
 
-  // ── Close / navigation ────────────────────────────────────────────────────────
+  // ── Navigation ────────────────────────────────────────────────────────────────
 
   private close(): void {
     this.store.dispatch({ type: 'NAVIGATE', payload: { screen: 'galaxy' } });
   }
 
-  // ── State synchronization ─────────────────────────────────────────────────────
+  // ── State synchronization ──────────────────────────────────────────────────────
 
   /**
-   * Pulls RP allocation from game state if available, otherwise uses defaults.
-   * The store may hold allocation under empire.research (extended fields not yet
-   * in state.ts), so we fall back gracefully.
+   * Loads RP allocation from the store's empire research state.
+   * Falls back to the current working allocation (preserves user's last choice).
+   *
+   * Reads from empire.research.fieldAllocation (persisted by SET_RESEARCH_ALLOCATION).
    */
-  private syncAllocationFromState(_state: GameState): void {
-    // If the empire's research state has per-field allocation info (future extension),
-    // use it. Otherwise keep defaults / current working allocation.
-    // For now, keep current working allocation as-is (it persists between show/hide).
+  private syncAllocationFromState(state: GameState): void {
+    const empire = this.getPlayerEmpire(state);
+    if (!empire) return;
+
+    const saved = empire.research.fieldAllocation;
+    if (!saved) return;
+
+    // Validate: all 6 fields present and sum to 100
+    const fields: Array<keyof typeof saved> = [
+      'weapons', 'propulsion', 'construction', 'computers', 'force_fields', 'planetology',
+    ];
+    const allPresent = fields.every((f) => typeof saved[f] === 'number');
+    if (!allPresent) return;
+
+    const total = fields.reduce((s, f) => s + (saved[f] ?? 0), 0);
+    if (Math.abs(total - 100) > 1) return; // sanity check
+
+    this.allocation = {
+      weapons:      saved.weapons      ?? 17,
+      propulsion:   saved.propulsion   ?? 17,
+      construction: saved.construction ?? 17,
+      computers:    saved.computers    ?? 17,
+      force_fields: saved.force_fields ?? 16,
+      planetology:  saved.planetology  ?? 16,
+    };
   }
 
   /**
-   * Builds per-field research state from the empire's ResearchState.
-   * ResearchState.currentTech is the overall active tech; we need to map it
-   * back to a field. We do this by looking up the tech in tech-tree.json.
+   * Derives per-field research state from the flat ResearchState in the store.
+   *
+   * Strategy (in priority order):
+   * 1. If empire.research.fieldCurrentTech[field] is set → use it (persisted selection)
+   * 2. If empire.research.currentTech belongs to this field → use it (legacy single-tech)
+   * 3. If empire.research.availableTechs[field] has options → show first non-completed
+   * 4. Otherwise: no current tech for this field
+   *
+   * Progress (RP accumulated):
+   * - Uses empire.research.researchPoints only for the field that owns currentTech.
+   * - Other fields start from 0 (turn-processing populates per-field progress).
    */
   private syncFieldResearchFromState(state: GameState): void {
     const empire = this.getPlayerEmpire(state);
@@ -718,54 +814,55 @@ export class ResearchScreen {
 
     const research = empire.research;
     const completedSet = new Set(research.completedTechs);
-
-    // Build per-field FieldResearchState from the flat ResearchState
     const fieldResearch = createDefaultFieldResearch();
 
     for (const field of ALL_RESEARCH_FIELDS) {
-      const jsonField = FIELD_META[field].jsonField;
+      const meta = FIELD_META[field];
+      const jsonField = meta.jsonField;
 
-      // Completed techs in this field
+      // Completed techs for this field
       const fieldCompleted = research.completedTechs.filter((id) => {
-        const tech = TECH_DATA.find((t) => t.id === id);
-        return tech?.field === jsonField;
+        const t = TECH_BY_ID.get(id);
+        return t?.field === jsonField;
       });
-
-      const maxCompletedTier = fieldCompleted.reduce((max, id) => {
-        const tech = TECH_DATA.find((t) => t.id === id);
-        return tech ? Math.max(max, tech.tier) : max;
+      fieldResearch[field].completedTechs = fieldCompleted;
+      fieldResearch[field].currentTier = fieldCompleted.reduce((max, id) => {
+        const t = TECH_BY_ID.get(id);
+        return t ? Math.max(max, t.tier) : max;
       }, 0);
 
-      fieldResearch[field].completedTechs = fieldCompleted;
-      fieldResearch[field].currentTier = maxCompletedTier;
-
-      // Detect current research target for this field
-      const currentTechId = research.currentTech;
-      if (currentTechId) {
-        const currentTech = TECH_DATA.find((t) => t.id === currentTechId);
-        if (currentTech?.field === jsonField) {
-          fieldResearch[field].currentTechId = currentTechId;
-          fieldResearch[field].currentTechTier = currentTech.tier;
-          // Map research progress: research.researchPoints / cost
-          const cost = this.getTechCost(currentTech.tier, state);
-          fieldResearch[field].progressRP = Math.min(
-            research.researchPoints,
-            cost,
-          );
+      // 1. Persisted per-field selection (SET_RESEARCH_CURRENT_TECH)
+      const savedFieldTech = research.fieldCurrentTech?.[field as keyof typeof research.fieldCurrentTech];
+      if (savedFieldTech && !completedSet.has(savedFieldTech)) {
+        const t = TECH_BY_ID.get(savedFieldTech);
+        if (t) {
+          fieldResearch[field].currentTechId = savedFieldTech;
+          fieldResearch[field].currentTechTier = t.tier;
+          // Use stored progress; research turn processor will update it
+          fieldResearch[field].progressRP = 0;
         }
       }
 
-      // Check availableTechs for this field to find a pending tech
-      const stateKey = FIELD_META[field].stateKey;
-      const availInState = research.availableTechs[stateKey] ?? [];
-      if (!fieldResearch[field].currentTechId && availInState.length > 0) {
-        // Pick first available that's not completed
-        const next = availInState.find((id) => !completedSet.has(id));
+      // 2. Legacy: single currentTech that belongs to this field
+      if (!fieldResearch[field].currentTechId && research.currentTech) {
+        const t = TECH_BY_ID.get(research.currentTech);
+        if (t?.field === jsonField) {
+          fieldResearch[field].currentTechId = research.currentTech;
+          fieldResearch[field].currentTechTier = t.tier;
+          fieldResearch[field].progressRP = research.researchPoints;
+        }
+      }
+
+      // 3. Fall back to first available tech in this field
+      if (!fieldResearch[field].currentTechId) {
+        const stateKey = meta.stateKey;
+        const available = research.availableTechs[stateKey] ?? [];
+        const next = available.find((id) => !completedSet.has(id));
         if (next) {
-          const techEntry = TECH_DATA.find((t) => t.id === next);
-          if (techEntry) {
+          const t = TECH_BY_ID.get(next);
+          if (t) {
             fieldResearch[field].currentTechId = next;
-            fieldResearch[field].currentTechTier = techEntry.tier;
+            fieldResearch[field].currentTechTier = t.tier;
           }
         }
       }
@@ -774,23 +871,14 @@ export class ResearchScreen {
     this.fieldResearch = fieldResearch;
   }
 
-  // ── Helper: tech cost ──────────────────────────────────────────────────────────
-
-  private getTechCost(tier: number, _state: GameState): number {
-    // Use the tech-tree.json cost directly (already accounts for tier).
-    // In a full implementation, this would use getTechCost(tier, state.galaxy.size).
-    const tierTechs = TECH_DATA.filter((t) => t.tier === tier);
-    return tierTechs.length > 0 ? (tierTechs[0]?.cost ?? tier * 50) : tier * 50;
-  }
-
-  // ── Helper: player empire ──────────────────────────────────────────────────────
+  // ── Helpers ────────────────────────────────────────────────────────────────────
 
   private getPlayerEmpire(state: GameState) {
     const pid = state.empires.playerId;
     return state.empires.byId[pid] ?? null;
   }
 
-  // ── UI helpers ─────────────────────────────────────────────────────────────────
+  // ── UI style helpers ──────────────────────────────────────────────────────────
 
   private styleBtn(btn: HTMLButtonElement, variant: 'default' | 'primary' = 'default'): void {
     const base =

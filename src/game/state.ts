@@ -486,6 +486,15 @@ export interface StolenTech {
   turn: number;
 }
 
+/** Six research field keys used for per-field allocation and targeting. */
+export type ResearchFieldKey =
+  | 'weapons'
+  | 'propulsion'
+  | 'construction'
+  | 'computers'
+  | 'force_fields'
+  | 'planetology';
+
 export interface ResearchState {
   currentTech: TechId | null;
   researchPoints: number;
@@ -494,6 +503,21 @@ export interface ResearchState {
   availableTechs: Record<TechField, TechId[]>;
   miniaturization: Record<TechId, number>;
   stolenTechs: StolenTech[];
+  /**
+   * Per-field RP allocation percentages. All 6 must sum to 100.
+   * Absent → defaults to even 17/17/17/17/16/16 split.
+   */
+  fieldAllocation?: Record<ResearchFieldKey, number>;
+  /**
+   * Per-field current research target (tech ID being researched).
+   * Absent or null → no research target selected for that field.
+   */
+  fieldCurrentTech?: Partial<Record<ResearchFieldKey, TechId | null>>;
+  /**
+   * Accumulated RP per field toward the current target.
+   * Carries overflow when a tech completes.
+   */
+  fieldProgress?: Partial<Record<ResearchFieldKey, number>>;
 }
 
 // ── Diplomacy ─────────────────────────────────────────────────────────────────

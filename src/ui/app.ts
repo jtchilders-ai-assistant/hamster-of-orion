@@ -127,7 +127,7 @@ export class App {
       ['new_game',         new NewGameScreen(newGameEl, store)],
       ['galaxy',           new GalaxyScreen(galaxyEl, store)],
       ['planet',           new PlanetScreen(planetEl, store)],
-      ['planet_list',      new ColoniesScreen(coloniesEl)],
+      ['planet_list',      new ColoniesScreen(coloniesEl, store)],
       ['fleet',            new FleetsScreen(fleetsEl, store)],
       ['research',         new ResearchScreen(researchEl, store)],
       ['diplomacy',        new DiplomacyScreen(diplomacyEl)],

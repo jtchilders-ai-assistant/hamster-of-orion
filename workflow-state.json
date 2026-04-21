@@ -1,171 +1,91 @@
 {
-  "state": "IDLE",
+  "state": "TESTING",
   "phase": "phase4a-core-interactivity",
-  "current_task": "colonization-ui",
+  "current_task": "research-screen-complete",
   "last_completed": "colonization-ui",
   "started_at": "2026-04-21T01:13:00Z",
-  "verification_result": {
-    "status": "approved",
-    "verified_at": "2026-04-21T04:43:00Z",
-    "tests_passed": true,
-    "typecheck_passed": true,
-    "design_compliance_verified": true,
-    "design_checks": [
-      {
-        "doc": "design/planets/planet-types.md",
-        "section": "\u00a7Hostile Environments (Require Tech)",
-        "claim": "6 hostile env types with specific Controlled [Environment] tech",
-        "verified": true,
-        "notes": "HOSTILE_ENVIRONMENT_TYPES and HOSTILE_ENV_REQUIRED_TECH in colonization.ts match design exactly: radiated\u2192controlled_radiated, toxic\u2192controlled_toxic, inferno\u2192controlled_inferno, dead\u2192controlled_dead, tundra\u2192controlled_tundra, barren\u2192controlled_barren"
-      },
-      {
-        "doc": "design/planets/planet-types.md",
-        "section": "Colonization Requirements",
-        "claim": "Standard envs colonizable from game start; hostile require Planetology tech",
-        "verified": true,
-        "notes": "hasColonizationTech() returns true for non-hostile, checks completedTechs for hostile. canColonize() enforces this before allowing action"
-      },
-      {
-        "doc": "design/planets/planet-types.md",
-        "section": "\u00a7Uninhabitable (Gas Giants)",
-        "claim": "Gas giants cannot be colonized",
-        "verified": true,
-        "notes": "UNINHABITABLE_TYPES includes 'gas_giant'. Planet types with 0 population capacity are excluded"
-      },
-      {
-        "doc": "design/ui-ux/wireframes/galaxy-map.md",
-        "section": "State 3: Uncolonized Planet",
-        "claim": "Info panel shows planet type, size, uncolonized status, 'Requires: Colony Ship'",
-        "verified": true,
-        "notes": "InfoPanel.renderUncolonized() shows all wireframe elements. Shows COLONIZE button when colony ship fleet present, 'Requires: Colony Ship' when absent"
-      },
-      {
-        "doc": ".agents/task-colonization.md",
-        "section": "Starting Colony Stats",
-        "claim": "10 population, 0 factories, 0 pollution, content morale, 20/20/20/20/20 production",
-        "verified": true,
-        "notes": "COLONY_STARTING_POPULATION=10, COLONY_STARTING_FACTORIES=0, COLONY_STARTING_POLLUTION=0, COLONY_STARTING_MORALE='content', COLONY_STARTING_PRODUCTION={20,20,20,20,20}"
-      }
-    ],
-    "issues": [
-      {
-        "type": "dead_code",
-        "doc": "src/game/actions/colony.ts",
-        "section": "colonizePlanet action creator",
-        "notes": "colonizePlanet(planetId, empireId) is never called \u2014 all dispatches go directly via store.dispatch({type: 'COLONIZE_PLANET', payload: {planetId, fleetId}}). The action creator signature doesn't match the reducer's expected payload (fleetId vs empireId). Should either wire the action creator properly or remove it.",
-        "severity": "minor"
-      }
-    ],
-    "notes": "Colonization UI fully implemented and verified. All 6 acceptance criteria met. Game logic (systems/colonization.ts) is sound: canColonize validates fleet position, ownership, habitability, colony component, and hostile env tech. colonize() correctly consumes ship, initializes colony, and updates all registries. InfoPanel correctly shows COLONIZE button when colony ship fleet exists at system. PlanetScreen correctly manages the new colony with sliders. Note: InfoPanel doesn't pre-check hostile env tech before showing colonize button (only checks fleet + colonizable target), but the colonize action properly validates this in the reducer. All 108 tests pass, typecheck clean. Minor dead code in actions/colony.ts: colonizePlanet action creator unused."
-  },
   "worker_output": {
     "files_created": [],
-    "files_modified": [],
-    "summary": "Colonization flow UI complete. Implementation spans: GalaxyScreen (screen container), InfoPanel (Colonize button in uncolonized panel), PlanetScreen (planet management), systems/colonization.ts (pure game logic), actions/colony.ts (action creators). All 6 acceptance criteria verified: (1) colony ship fleet at system shows COLONIZE button, 'Requires: Colony Ship' when absent; (2) button triggers COLONIZE_PLANET action; (3) new planet set with empire ownerId and isColonized=true, renders with empire-colored ring on star map; (4) reducer navigates to planet screen with selectedPlanet set; (5) colony ship consumed via removeColonyShip from fleet and ships registry, fleet dissolved if empty; (6) canColonize validates hasColonizationTech for hostile envs, rejects without required Controlled [Environment] tech.",
+    "files_modified": [
+      "src/game/state.ts",
+      "src/game/reducer.ts",
+      "src/ui/screens/ResearchScreen.ts"
+    ],
+    "tests_added": [],
+    "summary": "Completed ResearchScreen with full MOO1-accurate implementation. Left panel shows 6 field rows (COMPUTERS, CONSTRUCTION, FORCE FIELDS, PLANETOLOGY, PROPULSION, WEAPONRY) each with RP% allocation +/- buttons, current tech label, progress bar and ETA. Right panel is a scrollable tech tree browser for the selected field, organized by Level N separators with [✓]/[→]/[ ] state indicators. Bottom section has a description panel (click any tech to view) and a summary box (Total RP/turn + OK button). RP sliders always sum to 100% via proportional redistribution. Tech selection: hovering a [ ] tech reveals a 'Research' button that dispatches SET_RESEARCH_CURRENT_TECH to store. Extended ResearchState with optional fieldAllocation and fieldCurrentTech for per-field persistence. Added SET_RESEARCH_ALLOCATION and SET_RESEARCH_CURRENT_TECH reducer cases. All 1178 tests pass, typecheck clean.",
     "design_compliance": [
       {
-        "doc": "design/planets/planet-types.md",
-        "section": "\u00a7Hostile Environments",
-        "quote": "Radiated\u2192Controlled Radiated, Toxic\u2192Controlled Toxic, Inferno\u2192Controlled Inferno, Dead\u2192Controlled Dead, Tundra\u2192Controlled Tundra, Barren\u2192Controlled Barren",
-        "impl_file": "src/game/systems/colonization.ts",
-        "impl_line": "HOSTILE_ENV_REQUIRED_TECH \u2014 all 6 mappings exact",
+        "doc": "design/ui-ux/wireframes/research-tree.md",
+        "section": "Screen Layout — two-half layout",
+        "quote": "Left half (~40% width) FIELD LIST + RP ALLOCATION; Right half (~60% width) TECH TREE BROWSER",
+        "impl_file": "src/ui/screens/ResearchScreen.ts",
+        "impl_line": "buildLeftPanel() — width:38%; buildRightPanel() — flex:1",
         "verified": true
       },
       {
-        "doc": "design/planets/planet-types.md",
-        "section": "Colonization Requirements",
-        "quote": "Standard environments colonizable from game start; hostile require Planetology tech",
-        "impl_file": "src/game/systems/colonization.ts",
-        "impl_line": "hasColonizationTech() \u2014 returns true for standard, checks completedTechs for hostile",
+        "doc": "design/ui-ux/wireframes/research-tree.md",
+        "section": "Left Half: Field List with RP Allocation — six stacked field rows",
+        "quote": "COMPUTERS 25% / Battle Computer II / ████████░░░░ 4 turns",
+        "impl_file": "src/ui/screens/ResearchScreen.ts",
+        "impl_line": "buildFieldRow() — field label + pct slider + currentTechLabel + progress bar + ETA",
         "verified": true
       },
       {
-        "doc": "design/ui-ux/wireframes/galaxy-map.md",
-        "section": "State 3: Uncolonized Planet",
-        "quote": "Planet name/type/size + 'UNCOLONIZED' + 'Requires: Colony Ship' or COLONIZE button",
-        "impl_file": "src/ui/components/InfoPanel.ts",
-        "impl_line": "renderUncolonized() \u2014 displays all wireframe elements, conditional COLONIZE button",
+        "doc": "design/ui-ux/wireframes/research-tree.md",
+        "section": "Tech States",
+        "quote": "[✓] Already discovered/researched; [→] Currently being researched; [ ] Not yet researched",
+        "impl_file": "src/ui/screens/ResearchScreen.ts",
+        "impl_line": "buildTechRow() — statusEl.textContent = '[✓]'/'[→]'/'[ ]'",
         "verified": true
+      },
+      {
+        "doc": "design/ui-ux/wireframes/research-tree.md",
+        "section": "Bottom Section — description panel + summary box",
+        "quote": "TECH DESCRIPTION PANEL (~80% width) ... Total RP: 127 BC/turn ... OK button",
+        "impl_file": "src/ui/screens/ResearchScreen.ts",
+        "impl_line": "buildBottomSection() — flex:4 descPanel + flex:1 summaryPanel with OK button",
+        "verified": true
+      },
+      {
+        "doc": "design/technology/research-formulas.md",
+        "section": "§5 RP Allocation",
+        "quote": "RP_To_Field = Empire_Total_RP × (Field_Slider_Percentage / 100); all field percentages must sum to 100%",
+        "impl_file": "src/ui/screens/ResearchScreen.ts",
+        "impl_line": "adjustAllocation() — proportional redistribution ensures sum = 100 exactly",
+        "verified": true
+      },
+      {
+        "doc": "design/technology/research-formulas.md",
+        "section": "§6 Base Tech Cost by Tier + §7 Galaxy Size Modifier",
+        "quote": "Actual_Tech_Cost = Base_Tech_Cost × Galaxy_Size_Modifier",
+        "impl_file": "src/ui/screens/ResearchScreen.ts",
+        "impl_line": "renderFieldRow() — uses systemGetTechCost(tech.tier, galaxySize) from systems/research.ts",
+        "verified": true
+      },
+      {
+        "doc": "design/technology/categories.md",
+        "section": "6 tech fields: Computers, Construction, Force Fields, Planetology, Propulsion, Weaponry",
+        "quote": "6 technology fields",
+        "impl_file": "src/ui/screens/ResearchScreen.ts",
+        "impl_line": "FIELD_META — all 6 fields with correct MOO1 labels (WEAPONRY not WEAPONS)",
+        "verified": true
+      }
+    ],
+    "design_gaps": [
+      {
+        "gap": "Tech Selection Popup (start-of-turn only)",
+        "doc": "design/ui-ux/wireframes/research-tree.md",
+        "section": "Tech Selection Popup (Start of Turn Only)",
+        "notes": "The wireframe specifies a separate full-screen modal for tech selection at start of turn. The ResearchScreen instead exposes a 'Research' button on [ ] tech rows (visible on hover) that dispatches SET_RESEARCH_CURRENT_TECH. This satisfies acceptance criterion #5 while deferring the separate popup to a future task.",
+        "severity": "minor"
+      },
+      {
+        "gap": "Per-field progress RP tracking in state",
+        "doc": "design/technology/research-formulas.md",
+        "section": "§8 Research Progress Tracking",
+        "notes": "ResearchState has a single researchPoints field (for legacy single-tech). Per-field progress accumulation via field turn processing is not yet implemented. ETAs in the UI are calculated from researchPoints for the primary tech, and 0 for secondary fields. Full per-field RP accumulation is a turn-processor concern (process_research_turn in systems/research.ts is ready).",
+        "severity": "moderate"
       }
     ]
-  },
-  "turn_summary_screen_verification": {
-    "status": "approved",
-    "verified_at": "2026-04-21T10:34:29Z",
-    "tests_passed": true,
-    "typecheck_passed": true,
-    "design_compliance_verified": true,
-    "total_tests": 1162,
-    "new_tests": 8,
-    "design_checks": [
-      {
-        "doc": "design/game-mechanics/turn-structure.md",
-        "section": "Phase 12: End Turn \u2014 Player can review reports",
-        "claim": "Turn summary screen shows after turn ends",
-        "verified": true,
-        "notes": "collectTurnEvents() diffs before/after states, populates turnEvents. Reducer sets currentScreen to 'turn_summary'. App shows screen when currentScreen === 'turn_summary'."
-      },
-      {
-        "doc": "design/game-mechanics/turn-structure.md",
-        "section": "Phase 3: Research \u2014 Breakthrough Event popup",
-        "claim": "Research completed events shown",
-        "verified": true,
-        "notes": "collectTurnEvents diffs state.research.completed arrays. TurnSummaryScreen groups under \u2697\ufe0f Research Completed section. EVENT_META maps 'research' type correctly."
-      },
-      {
-        "doc": "design/game-mechanics/turn-structure.md",
-        "section": "Phase 7: Combat Resolution",
-        "claim": "Combat results shown with clickable links",
-        "verified": true,
-        "notes": "collectTurnEvents diffs state.combats.allIds. BuildEventItem renders 'View Battle Report \u2192' link that navigates to 'combat' screen with OPEN_COMBAT action. Correct."
-      },
-      {
-        "doc": "design/game-mechanics/turn-structure.md",
-        "section": "Phase 9: Events \u2014 Random events",
-        "claim": "Random events listed",
-        "verified": true,
-        "notes": "collectTurnEvents diffs state.events.allIds. Screen groups under \u2b50 Random Events section. Also handles diplomatic events (Phase 5) and ship_built (Phase 2 production)."
-      },
-      {
-        "doc": "design/game-mechanics/random-events.md",
-        "section": "EVENT_TYPES JSON \u2014 event categories",
-        "claim": "Event types: space_monsters, discoveries, disasters, diplomatic, opportunities",
-        "verified": true,
-        "notes": "TurnEventType enum includes all 9 types: research, ship_built, combat, diplomatic, random_event, colonization, population, production, victory. Screen displays all via EVENT_META mapping."
-      },
-      {
-        "doc": "design/moo_screens/moo_start_of_turn_select_new_research.png",
-        "section": "MOO1 research breakthrough popup",
-        "claim": "Research popup style reference",
-        "verified": true,
-        "notes": "TurnSummaryScreen groups research events under \u2697\ufe0f Research Completed section, matching MOO1 start-of-turn research popup concept."
-      },
-      {
-        "doc": "design/moo_screens/moo_start_of_turn_new_ships.png",
-        "section": "MOO1 ships built popup",
-        "claim": "Ships built popup style reference",
-        "verified": true,
-        "notes": "Screen groups ship_built events under \ud83d\ude80 Ships Built section, matching MOO1 start-of-turn ships built reference."
-      }
-    ],
-    "issues": [
-      {
-        "type": "scope_limitation",
-        "doc": "src/game/systems/turn.ts",
-        "section": "collectTurnEvents",
-        "notes": "collectTurnEvents only collects events for the player empire (filters by playerId). If AI empires have combat results or events, they won't appear in the player's turn summary. This is consistent with MOO1's perspective (player only sees their own events).",
-        "severity": "informational"
-      }
-    ],
-    "acceptance_criteria": {
-      "1_shows_after_next_turn": "verified",
-      "2_lists_research_completed": "verified",
-      "3_lists_ships_built": "verified",
-      "4_lists_combat_results_with_links": "verified",
-      "5_lists_diplomatic_events": "verified",
-      "6_lists_random_events": "verified",
-      "7_continue_button_returns_to_galaxy_map": "verified"
-    },
-    "notes": "Independent verification confirms Worker's implementation is correct. All 7 acceptance criteria met. Design compliance verified against turn-structure.md (Phases 3, 7, 9, 12), random-events.md (EVENT_TYPES), and MOO1 reference images. Architecture compliance verified: UI in src/ui/screens/TurnSummaryScreen.ts only, game logic in systems/turn.ts only, no cross-contamination. State shape updated with turnEvents (TurnEvent[]) in GameState and SHOW_TURN_SUMMARY action. collectTurnEvents correctly diffs before/after states for combat, research, events, ships, planets, diplomacy, and victory. All 1162 tests pass including 8 new turnSummary tests. Typecheck clean. Keyboard support: ESC dismisses, Enter advances turn. Empty state shows 'Nothing of note occurred'. CSS classes all defined in main.css (lines 683-886). No any types used. Navigation fallback works correctly."
   }
 }

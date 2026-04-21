@@ -267,6 +267,70 @@ export function rootReducer(state: GameState, action: Action): GameState {
     return fleetReducer(state, action);
   }
 
+  // ── Research allocation / targeting ──────────────────────────────────────────
+  //
+  // These actions are dispatched by ResearchScreen and persist the player's
+  // per-field allocation and research targets to the empire's ResearchState.
+
+  if (action.type === 'SET_RESEARCH_ALLOCATION') {
+    // Payload: { allocation: Record<string, number> }
+    // The allocation record maps ResearchField keys to percentages (sum = 100).
+    const { allocation } = action.payload as { allocation: Record<string, number> };
+    const playerId = state.empires.playerId;
+    const empire = state.empires.byId[playerId];
+    if (!empire) return state;
+    return {
+      ...state,
+      empires: {
+        ...state.empires,
+        byId: {
+          ...state.empires.byId,
+          [playerId]: {
+            ...empire,
+            research: {
+              ...empire.research,
+              fieldAllocation: allocation as import('./state').ResearchState['fieldAllocation'],
+            },
+          },
+        },
+      },
+    };
+  }
+
+  if (action.type === 'SET_RESEARCH_CURRENT_TECH') {
+    // Payload: { field: ResearchFieldKey, techId: string | null }
+    const { field, techId } = action.payload as {
+      field: string;
+      techId: string | null;
+    };
+    const playerId = state.empires.playerId;
+    const empire = state.empires.byId[playerId];
+    if (!empire) return state;
+    const prevFieldCurrentTech = empire.research.fieldCurrentTech ?? {};
+    return {
+      ...state,
+      empires: {
+        ...state.empires,
+        byId: {
+          ...state.empires.byId,
+          [playerId]: {
+            ...empire,
+            research: {
+              ...empire.research,
+              // Also set the legacy currentTech if this field matches what was
+              // previously tracked, so existing AI/system code still works.
+              currentTech: techId ?? empire.research.currentTech,
+              fieldCurrentTech: {
+                ...prevFieldCurrentTech,
+                [field]: techId,
+              },
+            },
+          },
+        },
+      },
+    };
+  }
+
   // Unknown action — return unchanged state
   return state;
 }
