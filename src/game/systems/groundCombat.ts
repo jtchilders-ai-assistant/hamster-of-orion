@@ -385,6 +385,122 @@ export function capturePlanet(
   return nextState;
 }
 
+// ── UI Simulation: round-by-round combat data ─────────────────────────────────
+
+/** A single round of combat with dice rolls and casualties. */
+export interface GroundCombatRoundUI {
+  roundNumber: number;
+  /** d10 rolls for each attacker troop */
+  attackerRolls: number[];
+  /** d10 rolls for each defender troop */
+  defenderRolls: number[];
+  casualties: number;
+  /** Troops remaining on attacker side after this round */
+  attackerRemaining: number;
+  /** Troops remaining on defender side after this round */
+  defenderRemaining: number;
+}
+
+/** Full ground combat simulation result for UI display. */
+export interface GroundCombatResultUI {
+  attackerName: string;
+  defenderName: string;
+  planetName: string;
+  attackerBonus: number;
+  defenderBonus: number;
+  rounds: GroundCombatRoundUI[];
+  attackerWins: boolean;
+  /** Total attacker troops lost across all rounds */
+  totalAttackerLosses: number;
+  /** Total defender troops lost across all rounds */
+  totalDefenderLosses: number;
+  /** Remaining attacker troops (0 if lost) */
+  attackerRemaining: number;
+  /** Remaining defender troops (0 if lost) */
+  defenderRemaining: number;
+}
+
+/**
+ * Simulate ground combat and return round-by-round data for the UI.
+ *
+ * Combat mechanic (simplified MoO1 style):
+ *   - Each round, each troop on each side rolls 1d10.
+ *   - A roll of 7+ scores a hit (1 casualty).
+ *   - Hits are matched: attacker hits → defender casualties,
+ *     defender hits → attacker casualties.
+ *   - Combat continues until one side is eliminated.
+ *
+ * This function does NOT mutate game state — it produces pure display data.
+ */
+export function simulateGroundCombat(
+  attackerName: string,
+  defenderName: string,
+  planetName: string,
+  totalAttackers: number,
+  totalDefenders: number,
+  attackerBonus = 1,
+  defenderBonus = 1
+): GroundCombatResultUI {
+  let curAtk = Math.round(totalAttackers * attackerBonus);
+  let curDef = Math.round(totalDefenders * defenderBonus);
+
+  const rounds: GroundCombatRoundUI[] = [];
+  let totalAtkLosses = 0;
+  let totalDefLosses = 0;
+  let roundNum = 1;
+
+  while (curAtk > 0 && curDef > 0) {
+    // Attacker rolls
+    const attackerRolls: number[] = [];
+    for (let i = 0; i < curAtk; i++) {
+      attackerRolls.push(Math.ceil(Math.random() * 10));
+    }
+
+    // Defender rolls
+    const defenderRolls: number[] = [];
+    for (let i = 0; i < curDef; i++) {
+      defenderRolls.push(Math.ceil(Math.random() * 10));
+    }
+
+    // Count hits (roll >= 7)
+    const attackerHits = attackerRolls.filter((r) => r >= 7).length;
+    const defenderHits = defenderRolls.filter((r) => r >= 7).length;
+
+    // Casualties: min of hits and available troops
+    const casualties = Math.min(attackerHits, defenderHits);
+
+    totalAtkLosses += casualties;
+    totalDefLosses += casualties;
+    curAtk -= casualties;
+    curDef -= casualties;
+
+    rounds.push({
+      roundNumber: roundNum,
+      attackerRolls,
+      defenderRolls,
+      casualties,
+      attackerRemaining: curAtk,
+      defenderRemaining: curDef,
+    });
+
+    roundNum++;
+  }
+
+  return {
+    attackerName,
+    defenderName,
+    planetName,
+    attackerBonus,
+    defenderBonus,
+    rounds,
+    attackerWins: curAtk > 0,
+    totalAttackerLosses: totalAtkLosses,
+    totalDefenderLosses: totalDefLosses,
+    attackerRemaining: curAtk,
+    defenderRemaining: curDef,
+  };
+}
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 /**

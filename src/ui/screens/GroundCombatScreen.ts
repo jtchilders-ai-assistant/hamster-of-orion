@@ -1,221 +1,80 @@
 /**
- * Ground Combat Screen — non-interactive planetary invasion resolution.
+ * Ground Combat Screen
  * src/ui/screens/GroundCombatScreen.ts
  *
- * Shows attacker troops vs. defender population, animates round-by-round
- * casualty rolls, then presents a result overlay (PLANET CAPTURED or
- * INVASION REPELLED) with a continue button that returns to the galaxy map.
+ * Implements the ground combat UI per design/ui-ux/ground-combat-ui.md.
  *
- * Design reference : design/ui-ux/ground-combat-ui.md
- * Combat odds      : calculateGroundCombatOdds() from groundCombat.ts
+ * Features:
+ * - Invasion preparation: troop deployment slider
+ * - Combat resolution: animated rounds with dice rolls and casualty displays
+ * - Speed controls: Slow/Normal/Fast/Instant
+ * - Result screens: Victory (colonize/enslave), Defeat (retreat/bombardment), Pyrrhic
  *
- * This screen is non-interactive: combat runs automatically.  The player only
- * clicks Continue when the result overlay appears.
- *
- * Integration
- * ───────────
- * • Navigate here by dispatching  { type: 'NAVIGATE', payload: { screen: 'ground_combat' } }
- *   from any context that wants to trigger a ground combat.
- * • Supply combat parameters via  show(params: GroundCombatParams).
- *   (App.ts calls show() on every navigation to this screen; callers must
- *   populate the params before navigating.)
- * • When the player clicks Continue the screen dispatches:
- *     GROUNDCOMBAT_RESULT  { attackerId, defenderId, planetId }
- *   which executes the full state mutation via executeGroundCombat(), then
- *   navigates back to 'galaxy'.
- *
- * Layout (matches ground-combat-ui.md §2)
- * ────────────────────────────────────────
- *   ┌─ Header ─────────────────────────────────────────┐
- *   │ GROUND COMBAT — <Planet Name>                    │
- *   ├─ Panels ─────────────────────────────────────────┤
- *   │ [ATTACKERS]          │          [DEFENDERS]       │
- *   │  portrait, troops,   │  portrait, pop, bonuses   │
- *   │  bonuses, bar        │  bar                      │
- *   ├─ Round display ──────────────────────────────────┤
- *   │  ══ ROUND N ══  Attackers: −X  Defenders: −Y    │
- *   ├─ Combat Log ─────────────────────────────────────┤
- *   │  scrollable per-round summaries                  │
- *   └──────────────────────────────────────────────────┘
- *   [Result overlay on combat end]
+ * Design constraints:
+ * - All DOM is allowed here (this is src/ui/)
+ * - Uses simulateGroundCombat from src/game/systems/groundCombat.ts
+ * - Dispatches NAVIGATE action to return to galaxy screen
  */
 
-import { GameState } from '../../game/state';
+import { GameState, EmpireId, PlanetId } from '../../game/state';
 import { Store } from '../../game/store';
-import { calculateGroundCombatOdds } from '../../game/systems/groundCombat';
+import {
+  simulateGroundCombat,
+  GroundCombatResultUI,
+  GroundCombatRoundUI,
+} from '../../game/systems/groundCombat';
 
-// ── Public parameter type ──────────────────────────────────────────────────────
+// ── Types ─────────────────────────────────────────────────────────────────────
 
-/** Caller supplies these before navigating to 'ground_combat'. */
-export interface GroundCombatParams {
-  /** EmpireId of the invading player (used in GROUNDCOMBAT_RESULT dispatch). */
-  attackerId: string;
-  /** EmpireId of the defending player. */
-  defenderId: string;
-  /** PlanetId being invaded. */
-  planetId: string;
+type CombatSpeed = 'slow' | 'normal' | 'fast' | 'instant';
+type ScreenPhase = 'planning' | 'resolving' | 'result';
 
-  // Display info (derived from state by the caller)
+interface CombatConfig {
+  planetId: PlanetId;
   planetName: string;
-  attackerRaceName: string;
-  defenderRaceName: string;
-
-  /** Number of troops the attacker is landing. */
-  attackerTroops: number;
-  /** Attacker ground-combat strength factor (from applyGroundCombatBonus). */
-  attackerStrength: number;
-  /** Flat percentage bonus to display (e.g. tech bonus, 0–100). */
-  attackerTechBonusPct: number;
-  /** Racial ground combat bonus in percent (positive = bonus). */
-  attackerRaceBonusPct: number;
-
-  /** Effective defender troop count (10% of planet population). */
+  attackerId: EmpireId;
+  attackerName: string;
+  defenderId: EmpireId;
+  defenderName: string;
+  availableTroops: number;
   defenderTroops: number;
-  /** Defender ground-combat strength factor (from applyGroundCombatBonus × groundDefense). */
-  defenderStrength: number;
-  /** Planetary fortification bonus to display (0–100). */
-  defenderFortBonusPct: number;
-  /** Racial ground combat bonus for defender (percent). */
-  defenderRaceBonusPct: number;
-
-  /** Pre-computed bombardment bonus (0–50 typically). */
-  bombardmentBonus: number;
+  attackerBonus: number;
+  defenderBonus: number;
 }
 
-// ── Internal simulation types ──────────────────────────────────────────────────
+// ── Constants ─────────────────────────────────────────────────────────────────
 
-interface CombatRound {
-  roundNum: number;
-  attackerCasualties: number;
-  defenderCasualties: number;
-  attackerRemaining: number;
-  defenderRemaining: number;
+const SPEED_DELAYS: Record<CombatSpeed, number> = {
+  slow: 2000,
+  normal: 1000,
+  fast: 400,
+  instant: 0,
+};
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function hpBarColor(ratio: number): string {
+  if (ratio > 0.5) return '#00cc66';
+  if (ratio > 0.25) return '#ffaa00';
+  return '#ff4444';
 }
 
-type CombatOutcome = 'attacker_wins' | 'defender_wins';
-
-interface SimResult {
-  rounds: CombatRound[];
-  outcome: CombatOutcome;
-  totalAttackerCasualties: number;
-  totalDefenderCasualties: number;
-}
-
-// ── Helper: run a fast ground-combat simulation ───────────────────────────────
-
-/**
- * Simulate ground combat round-by-round.
- *
- * Each round both sides roll 1d10 per effective troop.  A roll > threshold is
- * a kill on the enemy.  The threshold is derived from the MOO1 combat-odds
- * formula so the aggregate result converges to the calculated attackerChance.
- *
- * This is a pure function so it can be called during show() before any DOM
- * is updated.
- */
-function simulateCombat(params: GroundCombatParams): SimResult {
-  const { attackerChance } = calculateGroundCombatOdds(
-    params.attackerStrength,
-    params.defenderStrength,
-    1, // defenderDefenseFactor already baked into defenderStrength
-    1, // attackerAttackFactor already baked into attackerStrength
-    params.bombardmentBonus,
-  );
-
-  // Per-troop kill probability each round
-  // attackerChance is the overall win chance; per-round we want each
-  // attacker troop to have a p_a kill chance and each defender a p_d.
-  // We use: p_a = attackerChance * 0.4, p_d = (1 - attackerChance) * 0.4
-  // (0.4 throttle keeps rounds from ending in 1–2 turns for equal forces)
-  const p_a = Math.max(0.05, Math.min(0.6, attackerChance * 0.45));
-  const p_d = Math.max(0.05, Math.min(0.6, (1 - attackerChance) * 0.45));
-
-  let atk = params.attackerTroops;
-  let def = params.defenderTroops;
-
-  const rounds: CombatRound[] = [];
-  const MAX_ROUNDS = 20;
-
-  for (let r = 1; r <= MAX_ROUNDS; r++) {
-    if (atk <= 0 || def <= 0) break;
-
-    // Each attacker troop has p_a chance to kill a defender this round
-    let defKills = 0;
-    for (let i = 0; i < atk; i++) {
-      if (Math.random() < p_a) defKills++;
-    }
-
-    // Each defender troop has p_d chance to kill an attacker
-    let atkKills = 0;
-    for (let i = 0; i < def; i++) {
-      if (Math.random() < p_d) atkKills++;
-    }
-
-    // Apply — both sides lose simultaneously
-    defKills = Math.min(defKills, def);
-    atkKills = Math.min(atkKills, atk);
-    atk = Math.max(0, atk - atkKills);
-    def = Math.max(0, def - defKills);
-
-    rounds.push({
-      roundNum: r,
-      attackerCasualties: atkKills,
-      defenderCasualties: defKills,
-      attackerRemaining: atk,
-      defenderRemaining: def,
-    });
-
-    if (atk <= 0 || def <= 0) break;
-  }
-
-  // Resolve any stalemate by using the overall odds
-  let outcome: CombatOutcome;
-  if (atk > 0 && def <= 0) {
-    outcome = 'attacker_wins';
-  } else if (def > 0 && atk <= 0) {
-    outcome = 'defender_wins';
-  } else {
-    // Still ongoing after MAX_ROUNDS — use odds to decide
-    outcome = Math.random() < attackerChance ? 'attacker_wins' : 'defender_wins';
-  }
-
-  const totalAttackerCasualties = params.attackerTroops - atk;
-  const totalDefenderCasualties = params.defenderTroops - def;
-
-  return { rounds, outcome, totalAttackerCasualties, totalDefenderCasualties };
-}
-
-// ── GroundCombatScreen ─────────────────────────────────────────────────────────
+// ── GroundCombatScreen ────────────────────────────────────────────────────────
 
 export class GroundCombatScreen {
   private readonly container: HTMLElement;
   private readonly store: Store<GameState>;
 
-  // Current combat parameters (set by show())
-  private params: GroundCombatParams | null = null;
-  private simResult: SimResult | null = null;
+  // Screen state
+  private phase: ScreenPhase = 'planning';
+  private config: CombatConfig | null = null;
+  private invadingTroops = 0;
+  private speed: CombatSpeed = 'normal';
 
-  // Animation state
-  private roundIndex = -1;
-  private animTimerId: ReturnType<typeof setTimeout> | null = null;
-
-  // DOM refs (created once in buildLayout, reused across show() calls)
-  private headerEl!: HTMLElement;
-  private atkTitleEl!: HTMLElement;
-  private atkRaceEl!: HTMLElement;
-  private atkTroopsEl!: HTMLElement;
-  private atkBonusesEl!: HTMLElement;
-  private atkBarFill!: HTMLElement;
-  private atkBarLabel!: HTMLElement;
-  private defTitleEl!: HTMLElement;
-  private defRaceEl!: HTMLElement;
-  private defTroopsEl!: HTMLElement;
-  private defBonusesEl!: HTMLElement;
-  private defBarFill!: HTMLElement;
-  private defBarLabel!: HTMLElement;
-  private roundBannerEl!: HTMLElement;
-  private logEl!: HTMLElement;
-  private resultOverlayEl!: HTMLElement;
+  // Combat result state
+  private combatResult: GroundCombatResultUI | null = null;
+  private currentRoundIndex = 0;
+  private animationTimer: number | null = null;
 
   constructor(container: HTMLElement, store: Store<GameState>) {
     this.container = container;
@@ -223,39 +82,48 @@ export class GroundCombatScreen {
     this.buildLayout();
   }
 
-  // ── Screen interface ─────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Screen interface
+  // ═══════════════════════════════════════════════════════════════════════════
 
-  /** Called by App.ts on every render tick — no-op since we drive ourselves. */
-  render(_state: GameState): void { /* self-driven */ }
+  render(_state: GameState): void {
+    // Ground combat screen manages its own state; external renders refresh display
+    this.renderContent();
+  }
 
-  /**
-   * Show the screen with the given combat parameters.
-   * App.ts calls show() after dispatching NAVIGATE; callers must set params first.
-   * If called without params (no pending combat), falls back to a demo scenario.
-   */
-  show(params?: GroundCombatParams): void {
-    this.container.style.display = '';
+  show(): void {
     this.container.classList.add('active');
-
-    this.params = params ?? this.buildDemoParams();
-    this.simResult = simulateCombat(this.params);
-
-    this.resetDisplay();
-    this.startAnimation();
+    this.container.style.display = '';
+    this.renderContent();
   }
 
   hide(): void {
     this.stopAnimation();
-    this.container.style.display = 'none';
     this.container.classList.remove('active');
+    this.container.style.display = 'none';
   }
 
-  // ── Layout (built once) ──────────────────────────────────────────────────────
+  /**
+   * Initialize ground combat with the given configuration.
+   * Call this before showing the screen.
+   */
+  initCombat(config: CombatConfig): void {
+    this.config = config;
+    this.invadingTroops = config.availableTroops;
+    this.phase = 'planning';
+    this.combatResult = null;
+    this.currentRoundIndex = 0;
+    this.stopAnimation();
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Layout
+  // ═══════════════════════════════════════════════════════════════════════════
 
   private buildLayout(): void {
     this.container.innerHTML = '';
     this.container.style.cssText = `
-      display: none;
+      display: flex;
       flex-direction: column;
       width: 100%;
       height: 100%;
@@ -263,517 +131,716 @@ export class GroundCombatScreen {
       font-family: 'Courier New', Courier, monospace;
       color: #c0d8f0;
       overflow: hidden;
-      position: relative;
-      box-sizing: border-box;
+    `;
+  }
+
+  private renderContent(): void {
+    this.container.innerHTML = '';
+
+    switch (this.phase) {
+      case 'planning':
+        this.renderPlanningPhase();
+        break;
+      case 'resolving':
+        this.renderResolvingPhase();
+        break;
+      case 'result':
+        this.renderResultPhase();
+        break;
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Planning Phase (Invasion Preparation)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  private renderPlanningPhase(): void {
+    if (!this.config) return;
+
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = `
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      padding: 32px;
     `;
 
-    // ── Header ───────────────────────────────────────────────────────────────
-    this.headerEl = this.el('div', {
-      cssText: `
-        background: #0a1a2e;
-        border-bottom: 2px solid #1a3a5c;
-        padding: 10px 20px;
-        font-size: 15px;
-        font-weight: bold;
-        color: #00aaff;
-        text-transform: uppercase;
-        letter-spacing: 3px;
-        flex-shrink: 0;
-        text-align: center;
-      `,
-      text: 'GROUND COMBAT',
+    // Title
+    const title = document.createElement('h1');
+    title.style.cssText = `
+      font-size: 24px;
+      color: #00aaff;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      margin-bottom: 8px;
+    `;
+    title.textContent = `INVASION READY: ${this.config.planetName}`;
+    wrapper.appendChild(title);
+
+    // Subtitle
+    const subtitle = document.createElement('p');
+    subtitle.style.cssText = `
+      font-size: 14px;
+      color: #607080;
+      margin-bottom: 32px;
+    `;
+    subtitle.textContent = 'Planet defenses cleared. Ready to invade?';
+    wrapper.appendChild(subtitle);
+
+    // Troop info panel
+    const infoPanel = document.createElement('div');
+    infoPanel.style.cssText = `
+      background: #0a1a2e;
+      border: 1px solid #1a3a5c;
+      padding: 24px;
+      border-radius: 4px;
+      width: 100%;
+      max-width: 500px;
+      margin-bottom: 24px;
+    `;
+
+    // Available troops
+    const availableRow = document.createElement('div');
+    availableRow.style.cssText = 'display: flex; justify-content: space-between; margin-bottom: 12px;';
+    availableRow.innerHTML = `
+      <span style="color: #00aaff;">Your Troops Available:</span>
+      <span style="color: #00cc66; font-weight: bold;">${this.config.availableTroops}</span>
+    `;
+    infoPanel.appendChild(availableRow);
+
+    // Estimated defenders
+    const defenderRow = document.createElement('div');
+    defenderRow.style.cssText = 'display: flex; justify-content: space-between; margin-bottom: 24px;';
+    defenderRow.innerHTML = `
+      <span style="color: #ff6666;">Estimated Defenders:</span>
+      <span style="color: #ff6666; font-weight: bold;">~${this.config.defenderTroops}</span>
+    `;
+    infoPanel.appendChild(defenderRow);
+
+    // Troop slider section
+    const sliderSection = document.createElement('div');
+    sliderSection.style.cssText = `
+      border: 1px solid #1a3a5c;
+      padding: 16px;
+      border-radius: 4px;
+      background: #050f1e;
+    `;
+
+    const sliderLabel = document.createElement('div');
+    sliderLabel.style.cssText = 'color: #00aaff; margin-bottom: 12px; text-transform: uppercase; font-size: 12px;';
+    sliderLabel.textContent = 'Troops to Deploy';
+    sliderSection.appendChild(sliderLabel);
+
+    // Slider row
+    const sliderRow = document.createElement('div');
+    sliderRow.style.cssText = 'display: flex; align-items: center; gap: 16px;';
+
+    const slider = document.createElement('input');
+    slider.type = 'range';
+    slider.min = '1';
+    slider.max = String(this.config.availableTroops);
+    slider.value = String(this.invadingTroops);
+    slider.style.cssText = 'flex: 1; cursor: pointer;';
+
+    const valueDisplay = document.createElement('span');
+    valueDisplay.style.cssText = 'min-width: 40px; text-align: right; font-weight: bold; color: #00cc66;';
+    valueDisplay.textContent = String(this.invadingTroops);
+
+    slider.addEventListener('input', () => {
+      this.invadingTroops = parseInt(slider.value, 10);
+      valueDisplay.textContent = String(this.invadingTroops);
+      remainingDisplay.textContent = String(this.config!.availableTroops - this.invadingTroops);
     });
-    this.container.appendChild(this.headerEl);
 
-    // ── Main content ─────────────────────────────────────────────────────────
-    const main = this.el('div', {
-      cssText: `
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        min-height: 0;
-        padding: 14px;
-        gap: 10px;
-        overflow: hidden;
-      `,
-    });
-    this.container.appendChild(main);
+    sliderRow.appendChild(slider);
+    sliderRow.appendChild(valueDisplay);
+    sliderSection.appendChild(sliderRow);
 
-    // ── Side panels ──────────────────────────────────────────────────────────
-    const panelRow = this.el('div', {
-      cssText: 'display:flex; gap:14px; flex-shrink:0;',
-    });
-    main.appendChild(panelRow);
+    // Remaining troops display
+    const remainingRow = document.createElement('div');
+    remainingRow.style.cssText = 'display: flex; justify-content: space-between; margin-top: 12px; color: #607080;';
+    const remainingDisplay = document.createElement('span');
+    remainingDisplay.textContent = String(this.config.availableTroops - this.invadingTroops);
+    remainingRow.innerHTML = '<span>Remaining in reserve:</span>';
+    remainingRow.appendChild(remainingDisplay);
+    sliderSection.appendChild(remainingRow);
 
-    const atkPanel = this.makeSidePanel('#00aaff');
-    panelRow.appendChild(atkPanel.panel);
-    this.atkTitleEl   = atkPanel.title;
-    this.atkRaceEl    = atkPanel.race;
-    this.atkTroopsEl  = atkPanel.troops;
-    this.atkBonusesEl = atkPanel.bonuses;
-    this.atkBarFill   = atkPanel.barFill;
-    this.atkBarLabel  = atkPanel.barLabel;
+    infoPanel.appendChild(sliderSection);
+    wrapper.appendChild(infoPanel);
 
-    const defPanel = this.makeSidePanel('#ff4444');
-    panelRow.appendChild(defPanel.panel);
-    this.defTitleEl   = defPanel.title;
-    this.defRaceEl    = defPanel.race;
-    this.defTroopsEl  = defPanel.troops;
-    this.defBonusesEl = defPanel.bonuses;
-    this.defBarFill   = defPanel.barFill;
-    this.defBarLabel  = defPanel.barLabel;
+    // Buttons
+    const buttonRow = document.createElement('div');
+    buttonRow.style.cssText = 'display: flex; gap: 16px;';
 
-    // ── Round banner ─────────────────────────────────────────────────────────
-    this.roundBannerEl = this.el('div', {
-      cssText: `
-        flex-shrink: 0;
-        background: #050f1e;
-        border: 1px solid #1a3a5c;
-        border-radius: 3px;
-        padding: 10px 16px;
-        text-align: center;
-        font-size: 14px;
-        color: #607080;
-        letter-spacing: 1px;
-      `,
-      text: 'Combat initializing…',
-    });
-    main.appendChild(this.roundBannerEl);
+    const launchBtn = this.makeButton('LAUNCH INVASION', '#1a3a1a', '#00cc66');
+    launchBtn.addEventListener('click', () => this.launchInvasion());
+    buttonRow.appendChild(launchBtn);
 
-    // ── Log header ───────────────────────────────────────────────────────────
-    const logHeader = this.el('div', {
-      cssText: `
-        flex-shrink: 0;
-        background: #050f1e;
-        padding: 5px 16px;
-        font-size: 11px;
-        color: #00aaff;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        border: 1px solid #1a3a5c;
-        border-bottom: none;
-        border-radius: 3px 3px 0 0;
-      `,
-      text: '■ Combat Log',
-    });
-    main.appendChild(logHeader);
+    const cancelBtn = this.makeButton('CANCEL', '#3a1a1a', '#ff6666');
+    cancelBtn.addEventListener('click', () => this.returnToGalaxy());
+    buttonRow.appendChild(cancelBtn);
 
-    // ── Log body ─────────────────────────────────────────────────────────────
-    this.logEl = this.el('div', {
-      cssText: `
-        flex: 1;
-        min-height: 0;
-        overflow-y: auto;
-        background: #0a1a2e;
-        border: 1px solid #1a3a5c;
-        border-radius: 0 0 3px 3px;
-        padding: 8px 14px;
-        font-size: 12px;
-        line-height: 1.6;
-      `,
-    });
-    main.appendChild(this.logEl);
-
-    // ── Result overlay ───────────────────────────────────────────────────────
-    this.resultOverlayEl = this.el('div', {
-      cssText: `
-        display: none;
-        position: absolute;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(0,10,26,0.93);
-        z-index: 20;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 14px;
-        padding: 40px;
-      `,
-    });
-    this.container.appendChild(this.resultOverlayEl);
+    wrapper.appendChild(buttonRow);
+    this.container.appendChild(wrapper);
   }
 
-  /** Build one side-panel (attacker or defender). Returns element refs. */
-  private makeSidePanel(accentColor: string): {
-    panel: HTMLElement;
-    title: HTMLElement;
-    race: HTMLElement;
-    troops: HTMLElement;
-    bonuses: HTMLElement;
-    barFill: HTMLElement;
-    barLabel: HTMLElement;
-  } {
-    const panel = this.el('div', {
-      cssText: `
-        flex: 1;
-        background: #0a1a2e;
-        border: 2px solid #1a3a5c;
-        border-radius: 4px;
-        padding: 14px;
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-      `,
-    });
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Resolving Phase (Combat Animation)
+  // ═══════════════════════════════════════════════════════════════════════════
 
-    const title = this.el('div', {
-      cssText: `font-size:11px; color:${accentColor}; text-transform:uppercase; letter-spacing:1px; font-weight:bold;`,
-    });
-    panel.appendChild(title);
+  private renderResolvingPhase(): void {
+    if (!this.config || !this.combatResult) return;
 
-    const race = this.el('div', {
-      cssText: 'font-size:14px; font-weight:bold; color:#fff;',
-    });
-    panel.appendChild(race);
-
-    const troops = this.el('div', {
-      cssText: 'font-size:13px; color:#c0d8f0;',
-    });
-    panel.appendChild(troops);
-
-    const bonuses = this.el('div', {
-      cssText: 'font-size:11px; color:#00cc66; line-height:1.5;',
-    });
-    panel.appendChild(bonuses);
-
-    // Bar container
-    const barWrap = this.el('div', {
-      cssText: `
-        position: relative;
-        height: 18px;
-        background: #050f1e;
-        border: 1px solid #1a3a5c;
-        border-radius: 2px;
-        overflow: hidden;
-        margin-top: 4px;
-      `,
-    });
-    panel.appendChild(barWrap);
-
-    const barFill = this.el('div', {
-      cssText: `height:100%; width:100%; background:${accentColor}; border-radius:1px; transition:width 0.25s ease;`,
-    });
-    barWrap.appendChild(barFill);
-
-    const barLabel = this.el('div', {
-      cssText: `
-        position: absolute;
-        top: 0; left: 0; right: 0;
-        text-align: center;
-        line-height: 18px;
-        font-size: 10px;
-        color: #fff;
-        text-shadow: 0 0 3px #000;
-      `,
-    });
-    barWrap.appendChild(barLabel);
-
-    return { panel, title, race, troops, bonuses, barFill, barLabel };
-  }
-
-  // ── Display reset ────────────────────────────────────────────────────────────
-
-  private resetDisplay(): void {
-    const p = this.params!;
-    const s = this.simResult!;
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = `
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      padding: 24px;
+    `;
 
     // Header
-    this.headerEl.textContent = `GROUND COMBAT — ${p.planetName}`;
+    const header = document.createElement('div');
+    header.style.cssText = `
+      background: #0a1a2e;
+      border-bottom: 2px solid #1a3a5c;
+      padding: 12px 16px;
+      text-align: center;
+      margin-bottom: 24px;
+    `;
+    header.innerHTML = `
+      <h1 style="color: #00aaff; font-size: 20px; text-transform: uppercase; letter-spacing: 2px; margin: 0;">
+        GROUND COMBAT — ${this.config.planetName}
+      </h1>
+    `;
+    wrapper.appendChild(header);
 
-    // Attacker side
-    this.atkTitleEl.textContent = '⚔ ATTACKERS (YOU)';
-    this.atkRaceEl.textContent  = p.attackerRaceName;
-    this.atkTroopsEl.innerHTML  = `Troops: <strong>${p.attackerTroops}</strong>`;
-    this.atkBonusesEl.innerHTML = this.buildBonusHtml(
-      p.attackerTechBonusPct,
-      p.attackerRaceBonusPct,
-      p.bombardmentBonus,
-      'tech',
+    // Main combat area
+    const combatArea = document.createElement('div');
+    combatArea.style.cssText = `
+      display: flex;
+      gap: 24px;
+      flex: 1;
+      min-height: 0;
+    `;
+
+    // Attacker panel
+    const attackerPanel = this.buildCombatantPanel(
+      'ATTACKERS (YOU)',
+      this.config.attackerName,
+      this.invadingTroops,
+      this.getCurrentRound()?.attackerRemaining ?? this.invadingTroops,
+      this.config.attackerBonus,
+      '#00aaff'
     );
-    this.setBar(this.atkBarFill, this.atkBarLabel, p.attackerTroops, p.attackerTroops, '#00aaff');
+    combatArea.appendChild(attackerPanel);
 
-    // Defender side
-    this.defTitleEl.textContent = '🛡 DEFENDERS';
-    this.defRaceEl.textContent  = p.defenderRaceName;
-    this.defTroopsEl.innerHTML  = `Population militia: <strong>${p.defenderTroops}</strong>`;
-    this.defBonusesEl.innerHTML = this.buildBonusHtml(
-      p.defenderFortBonusPct,
-      p.defenderRaceBonusPct,
-      0,
-      'fortification',
+    // Center info panel
+    const centerPanel = this.buildCenterPanel();
+    combatArea.appendChild(centerPanel);
+
+    // Defender panel
+    const defenderPanel = this.buildCombatantPanel(
+      'DEFENDERS (ENEMY)',
+      this.config.defenderName,
+      this.config.defenderTroops,
+      this.getCurrentRound()?.defenderRemaining ?? this.config.defenderTroops,
+      this.config.defenderBonus,
+      '#ff4444'
     );
-    this.setBar(this.defBarFill, this.defBarLabel, p.defenderTroops, p.defenderTroops, '#ff4444');
+    combatArea.appendChild(defenderPanel);
 
-    // Round banner
-    this.roundBannerEl.textContent = '══ COMBAT BEGINS ══';
-    this.roundBannerEl.style.color = '#607080';
+    wrapper.appendChild(combatArea);
 
-    // Log
-    this.logEl.innerHTML = '';
-    this.logEntry(
-      `Invading ${p.planetName}… ${p.attackerTroops} troops vs ${p.defenderTroops} defenders.`,
-      '#607080',
-    );
-    if (p.bombardmentBonus > 0) {
-      this.logEntry(`Bombardment bonus: +${p.bombardmentBonus}% (softened planetary defenses).`, '#ffaa00');
+    // Speed controls
+    const speedControls = this.buildSpeedControls();
+    wrapper.appendChild(speedControls);
+
+    this.container.appendChild(wrapper);
+  }
+
+  private buildCombatantPanel(
+    title: string,
+    empireName: string,
+    totalTroops: number,
+    currentTroops: number,
+    bonus: number,
+    accentColor: string
+  ): HTMLElement {
+    const panel = document.createElement('div');
+    panel.style.cssText = `
+      flex: 1;
+      background: #0a1a2e;
+      border: 1px solid #1a3a5c;
+      padding: 16px;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+    `;
+
+    // Title
+    const titleEl = document.createElement('div');
+    titleEl.style.cssText = `
+      color: ${accentColor};
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #1a3a5c;
+    `;
+    titleEl.textContent = title;
+    panel.appendChild(titleEl);
+
+    // Empire name
+    const nameEl = document.createElement('div');
+    nameEl.style.cssText = 'font-size: 16px; font-weight: bold; margin-bottom: 16px;';
+    nameEl.textContent = empireName;
+    panel.appendChild(nameEl);
+
+    // Troops count
+    const troopsEl = document.createElement('div');
+    troopsEl.style.cssText = 'margin-bottom: 8px;';
+    troopsEl.innerHTML = `
+      <span style="color: #607080;">Troops:</span>
+      <span style="font-weight: bold; margin-left: 8px;">${currentTroops}</span>
+    `;
+    panel.appendChild(troopsEl);
+
+    // Bonus
+    const bonusEl = document.createElement('div');
+    bonusEl.style.cssText = 'margin-bottom: 16px;';
+    bonusEl.innerHTML = `
+      <span style="color: #607080;">Bonus:</span>
+      <span style="color: #ffaa00; margin-left: 8px;">+${Math.round((bonus - 1) * 100)}%</span>
+    `;
+    panel.appendChild(bonusEl);
+
+    // Troop bar
+    const ratio = totalTroops > 0 ? currentTroops / totalTroops : 0;
+    const barContainer = document.createElement('div');
+    barContainer.style.cssText = `
+      background: #050f1e;
+      height: 20px;
+      border-radius: 2px;
+      overflow: hidden;
+      position: relative;
+    `;
+
+    const bar = document.createElement('div');
+    bar.style.cssText = `
+      height: 100%;
+      width: ${ratio * 100}%;
+      background: ${hpBarColor(ratio)};
+      transition: width 0.3s ease;
+    `;
+    barContainer.appendChild(bar);
+
+    const barLabel = document.createElement('span');
+    barLabel.style.cssText = `
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 11px;
+      color: #fff;
+    `;
+    barLabel.textContent = `${currentTroops}/${totalTroops}`;
+    barContainer.appendChild(barLabel);
+
+    panel.appendChild(barContainer);
+
+    return panel;
+  }
+
+  private buildCenterPanel(): HTMLElement {
+    const panel = document.createElement('div');
+    panel.style.cssText = `
+      flex: 1.5;
+      background: #050f1e;
+      border: 1px solid #1a3a5c;
+      padding: 16px;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    `;
+
+    const round = this.getCurrentRound();
+    const roundNum = round?.roundNumber ?? 1;
+
+    // Round header
+    const roundHeader = document.createElement('div');
+    roundHeader.style.cssText = `
+      text-align: center;
+      padding: 12px;
+      background: #0a1a2e;
+      border-radius: 4px;
+      margin-bottom: 16px;
+    `;
+    roundHeader.innerHTML = `
+      <span style="color: #00aaff; font-size: 14px; text-transform: uppercase; letter-spacing: 2px;">
+        ══════════ ROUND ${roundNum} ══════════
+      </span>
+    `;
+    panel.appendChild(roundHeader);
+
+    if (round) {
+      // Dice rolls
+      const rollsSection = document.createElement('div');
+      rollsSection.style.cssText = 'margin-bottom: 16px;';
+
+      // Attacker rolls
+      const atkRolls = document.createElement('div');
+      atkRolls.style.cssText = 'margin-bottom: 8px;';
+      atkRolls.innerHTML = `
+        <span style="color: #00aaff;">Attackers roll:</span>
+        <span style="margin-left: 8px;">${round.attackerRolls.slice(0, 12).join(', ')}${round.attackerRolls.length > 12 ? '...' : ''}</span>
+      `;
+      rollsSection.appendChild(atkRolls);
+
+      // Defender rolls
+      const defRolls = document.createElement('div');
+      defRolls.innerHTML = `
+        <span style="color: #ff4444;">Defenders roll:</span>
+        <span style="margin-left: 8px;">${round.defenderRolls.slice(0, 12).join(', ')}${round.defenderRolls.length > 12 ? '...' : ''}</span>
+      `;
+      rollsSection.appendChild(defRolls);
+
+      panel.appendChild(rollsSection);
+
+      // Divider
+      const divider = document.createElement('hr');
+      divider.style.cssText = 'border: none; border-top: 1px solid #1a3a5c; margin: 16px 0;';
+      panel.appendChild(divider);
+
+      // Casualties
+      const casualties = document.createElement('div');
+      casualties.innerHTML = `
+        <div style="color: #ffaa00; font-size: 12px; text-transform: uppercase; margin-bottom: 12px;">
+          Casualties this round:
+        </div>
+        <div style="margin-bottom: 8px;">
+          • Attackers lost: <span style="color: #ff4444;">${round.casualties}</span> troops
+          (<span style="color: #00cc66;">${round.attackerRemaining}</span> remaining)
+        </div>
+        <div>
+          • Defenders lost: <span style="color: #ff4444;">${round.casualties}</span> troops
+          (<span style="color: #00cc66;">${round.defenderRemaining}</span> remaining)
+        </div>
+      `;
+      panel.appendChild(casualties);
+    } else {
+      // No round data yet
+      const placeholder = document.createElement('div');
+      placeholder.style.cssText = 'text-align: center; color: #607080; padding: 32px;';
+      placeholder.textContent = 'Combat commencing...';
+      panel.appendChild(placeholder);
     }
 
-    // Hide result overlay
-    this.resultOverlayEl.style.display = 'none';
-    this.resultOverlayEl.innerHTML = '';
+    // Continue button
+    const continueBtn = this.makeButton('Continue ▶', '#005588', '#00aaff');
+    continueBtn.style.cssText += 'margin-top: auto; align-self: center;';
+    continueBtn.addEventListener('click', () => this.advanceRound());
+    panel.appendChild(continueBtn);
 
-    this.roundIndex = -1;
-
-    void s; // suppress unused warning; used in animation
+    return panel;
   }
 
-  private buildBonusHtml(bonus1: number, bonus2: number, bonus3: number, label1: string): string {
-    const lines: string[] = [];
-    if (bonus1 > 0) lines.push(`+${bonus1}% ${label1} bonus`);
-    if (bonus2 > 0) lines.push(`+${bonus2}% racial bonus`);
-    if (bonus2 < 0) lines.push(`${bonus2}% racial penalty`);
-    if (bonus3 > 0) lines.push(`+${bonus3}% bombardment`);
-    return lines.length > 0 ? lines.join('<br>') : 'No bonuses';
+  private buildSpeedControls(): HTMLElement {
+    const controls = document.createElement('div');
+    controls.style.cssText = `
+      background: #0a1a2e;
+      border: 1px solid #1a3a5c;
+      padding: 12px 16px;
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    `;
+
+    const label = document.createElement('span');
+    label.style.cssText = 'color: #607080; font-size: 12px; text-transform: uppercase;';
+    label.textContent = 'Combat Speed:';
+    controls.appendChild(label);
+
+    const speeds: CombatSpeed[] = ['slow', 'normal', 'fast', 'instant'];
+    const speedLabels: Record<CombatSpeed, string> = {
+      slow: 'Slow',
+      normal: 'Normal',
+      fast: 'Fast',
+      instant: 'Instant',
+    };
+
+    for (const spd of speeds) {
+      const btn = document.createElement('button');
+      btn.textContent = speedLabels[spd];
+      btn.style.cssText = `
+        background: ${this.speed === spd ? '#00aaff' : '#1a3a5c'};
+        border: 1px solid ${this.speed === spd ? '#00aaff' : '#2a4a6c'};
+        color: #fff;
+        padding: 6px 12px;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 11px;
+        text-transform: uppercase;
+      `;
+      btn.addEventListener('click', () => {
+        this.speed = spd;
+        this.renderContent();
+      });
+      controls.appendChild(btn);
+    }
+
+    return controls;
   }
 
-  // ── Animation ────────────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Result Phase
+  // ═══════════════════════════════════════════════════════════════════════════
 
-  private startAnimation(): void {
-    this.stopAnimation();
-    // Slight delay before first round so layout can paint
-    this.animTimerId = setTimeout(() => this.advanceRound(), 500);
+  private renderResultPhase(): void {
+    if (!this.config || !this.combatResult) return;
+
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = `
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      padding: 32px;
+    `;
+
+    const isVictory = this.combatResult.attackerWins;
+    const isPyrrhic = isVictory && this.combatResult.totalAttackerLosses > this.invadingTroops * 0.7;
+
+    // Title
+    const title = document.createElement('h1');
+    title.style.cssText = `
+      font-size: 28px;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      margin-bottom: 16px;
+      color: ${isVictory ? '#00cc66' : '#ff4444'};
+    `;
+    title.textContent = isVictory
+      ? (isPyrrhic ? '⚠️ COSTLY VICTORY' : '🌍 PLANET CAPTURED!')
+      : '❌ INVASION REPELLED!';
+    wrapper.appendChild(title);
+
+    // Description
+    const desc = document.createElement('p');
+    desc.style.cssText = 'color: #c0d8f0; margin-bottom: 32px; text-align: center;';
+    desc.textContent = isVictory
+      ? `${this.config.planetName} is now yours!`
+      : `Your troops were defeated at ${this.config.planetName}.`;
+    wrapper.appendChild(desc);
+
+    // Casualties panel
+    const casualtiesPanel = document.createElement('div');
+    casualtiesPanel.style.cssText = `
+      background: #0a1a2e;
+      border: 1px solid #1a3a5c;
+      padding: 24px;
+      border-radius: 4px;
+      width: 100%;
+      max-width: 400px;
+      margin-bottom: 32px;
+    `;
+
+    const survivingPop = isVictory ? Math.floor(this.config.defenderTroops * 0.1) : 0;
+    const factoriesIntact = isVictory ? Math.floor(this.config.defenderTroops * 0.3) : 0;
+
+    casualtiesPanel.innerHTML = `
+      <div style="color: #ffaa00; font-size: 12px; text-transform: uppercase; margin-bottom: 16px; border-bottom: 1px solid #1a3a5c; padding-bottom: 8px;">
+        Final Casualties
+      </div>
+      <div style="margin-bottom: 8px;">
+        • Your losses: <span style="color: #ff4444; font-weight: bold;">${this.combatResult.totalAttackerLosses}</span> troops
+      </div>
+      <div style="margin-bottom: 16px;">
+        • Enemy losses: <span style="color: #ff4444; font-weight: bold;">${this.combatResult.totalDefenderLosses}</span> troops
+        ${isVictory ? '(all defenders eliminated)' : `(${this.combatResult.defenderRemaining} remain)`}
+      </div>
+      ${isVictory ? `
+      <div style="color: #00cc66; font-size: 12px; text-transform: uppercase; margin-bottom: 16px; border-bottom: 1px solid #1a3a5c; padding-bottom: 8px;">
+        Planetary Status
+      </div>
+      <div style="margin-bottom: 8px;">
+        • Surviving Population: <span style="color: #00cc66; font-weight: bold;">${survivingPop}</span>
+      </div>
+      <div style="margin-bottom: 8px;">
+        • Factories Intact: <span style="color: #00cc66; font-weight: bold;">${factoriesIntact}</span>
+      </div>
+      <div>
+        • Missile Bases: <span style="color: #ffaa00; font-weight: bold;">Cleared</span>
+      </div>
+      ` : ''}
+    `;
+    wrapper.appendChild(casualtiesPanel);
+
+    // Buttons
+    const buttonRow = document.createElement('div');
+    buttonRow.style.cssText = 'display: flex; gap: 16px;';
+
+    if (isVictory) {
+      // Victory buttons: Colonize / Enslave
+      const colonizeBtn = this.makeButton('COLONIZE', '#1a3a1a', '#00cc66');
+      colonizeBtn.addEventListener('click', () => this.doColonize());
+      buttonRow.appendChild(colonizeBtn);
+
+      // Enslave option (could be disabled based on race traits)
+      const enslaveBtn = this.makeButton('ENSLAVE', '#3a3a1a', '#ffaa00');
+      enslaveBtn.addEventListener('click', () => this.doEnslave());
+      buttonRow.appendChild(enslaveBtn);
+    } else {
+      // Defeat buttons: Return to Bombardment / Retreat
+      const bombardBtn = this.makeButton('RETURN TO BOMBARDMENT', '#1a3a3a', '#00aaff');
+      bombardBtn.addEventListener('click', () => this.returnToBombardment());
+      buttonRow.appendChild(bombardBtn);
+
+      const retreatBtn = this.makeButton('RETREAT FLEET', '#3a1a1a', '#ff6666');
+      retreatBtn.addEventListener('click', () => this.retreatFleet());
+      buttonRow.appendChild(retreatBtn);
+    }
+
+    wrapper.appendChild(buttonRow);
+    this.container.appendChild(wrapper);
   }
 
-  private stopAnimation(): void {
-    if (this.animTimerId !== null) {
-      clearTimeout(this.animTimerId);
-      this.animTimerId = null;
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Actions
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  private launchInvasion(): void {
+    if (!this.config) return;
+
+    // Simulate combat
+    this.combatResult = simulateGroundCombat(
+      this.config.attackerName,
+      this.config.defenderName,
+      this.config.planetName,
+      this.invadingTroops,
+      this.config.defenderTroops,
+      this.config.attackerBonus,
+      this.config.defenderBonus
+    );
+
+    this.currentRoundIndex = 0;
+    this.phase = 'resolving';
+    this.renderContent();
+
+    // Start auto-advance if not instant
+    if (this.speed !== 'instant') {
+      this.startAnimation();
+    } else {
+      // Jump to result
+      this.currentRoundIndex = this.combatResult.rounds.length - 1;
+      this.phase = 'result';
+      this.renderContent();
     }
   }
 
   private advanceRound(): void {
-    this.animTimerId = null;
+    if (!this.combatResult) return;
 
-    const rounds = this.simResult!.rounds;
-    this.roundIndex++;
+    this.currentRoundIndex++;
 
-    if (this.roundIndex >= rounds.length) {
-      // All rounds consumed — show result
-      this.showResult();
-      return;
+    if (this.currentRoundIndex >= this.combatResult.rounds.length) {
+      // Combat finished
+      this.phase = 'result';
+      this.stopAnimation();
     }
 
-    const round = rounds[this.roundIndex];
-    const p = this.params!;
-
-    // Update round banner
-    this.roundBannerEl.innerHTML =
-      `<span style="color:#00aaff;">══ ROUND ${round.roundNum} ══</span>` +
-      `<span style="font-size:11px; color:#607080; margin-left:14px;">` +
-      `Attacker casualties: <span style="color:#ff6666;">-${round.attackerCasualties}</span>` +
-      ` &nbsp; Defender casualties: <span style="color:#66aaff;">-${round.defenderCasualties}</span>` +
-      `</span>`;
-
-    // Update bars
-    this.setBar(this.atkBarFill, this.atkBarLabel, round.attackerRemaining, p.attackerTroops, '#00aaff');
-    this.setBar(this.defBarFill, this.defBarLabel, round.defenderRemaining, p.defenderTroops, '#ff4444');
-
-    // Log entry
-    const atkColor = round.attackerCasualties > 0 ? '#ff6666' : '#607080';
-    const defColor = round.defenderCasualties > 0 ? '#66aaff' : '#607080';
-    this.logEntry(
-      `<span style="color:#00aaff;">R${round.roundNum}</span>` +
-      ` &nbsp;Attackers: <span style="color:${atkColor};">−${round.attackerCasualties}</span>` +
-      ` → <strong>${round.attackerRemaining}</strong> remaining` +
-      ` &nbsp;|&nbsp; Defenders: <span style="color:${defColor};">−${round.defenderCasualties}</span>` +
-      ` → <strong>${round.defenderRemaining}</strong> remaining`,
-    );
-
-    // Auto-advance after ~1.4 s
-    this.animTimerId = setTimeout(() => this.advanceRound(), 1400);
+    this.renderContent();
   }
 
-  // ── Result overlay ───────────────────────────────────────────────────────────
-
-  private showResult(): void {
-    const sim = this.simResult!;
-    const p   = this.params!;
-    const won = sim.outcome === 'attacker_wins';
-    const pyrrhic = won && sim.totalAttackerCasualties >= p.attackerTroops * 0.75;
-
-    const overlay = this.resultOverlayEl;
-    overlay.innerHTML = '';
-    overlay.style.display = 'flex';
-
-    // Title
-    let titleText: string;
-    let titleColor: string;
-    if (pyrrhic) {
-      titleText = '⚠ COSTLY VICTORY';
-      titleColor = '#ffaa00';
-    } else if (won) {
-      titleText = '🌍 PLANET CAPTURED!';
-      titleColor = '#00cc66';
-    } else {
-      titleText = 'INVASION REPELLED!';
-      titleColor = '#ff4444';
-    }
-
-    const title = this.el('div', {
-      cssText: `font-size:22px; font-weight:bold; color:${titleColor}; text-transform:uppercase; letter-spacing:3px; text-align:center;`,
-      text: titleText,
-    });
-    overlay.appendChild(title);
-
-    // Planet subtitle
-    const sub = this.el('div', {
-      cssText: 'font-size:14px; color:#c0d8f0; text-align:center;',
-      text: won
-        ? `${p.planetName} is now yours!`
-        : `Your troops were defeated at ${p.planetName}.`,
-    });
-    overlay.appendChild(sub);
-
-    // Separator
-    overlay.appendChild(this.el('div', { cssText: 'width:70%; height:1px; background:#1a3a5c;' }));
-
-    // Casualties block
-    const cas = this.el('div', { cssText: 'font-size:13px; text-align:center; line-height:2;' });
-    const atkRemaining = p.attackerTroops - sim.totalAttackerCasualties;
-    const defRemaining = p.defenderTroops - sim.totalDefenderCasualties;
-    cas.innerHTML =
-      `Your losses: <strong style="color:#ff6666;">${sim.totalAttackerCasualties} troops</strong><br>` +
-      `Enemy losses: <strong style="color:#66aaff;">${sim.totalDefenderCasualties} troops</strong>` +
-      (defRemaining > 0 ? ` <span style="color:#607080;">(${defRemaining} defenders remain)</span>` : ' <span style="color:#607080;">(all eliminated)</span>');
-    overlay.appendChild(cas);
-
-    // Population change note
-    if (won) {
-      const popNote = this.el('div', {
-        cssText: 'font-size:12px; color:#607080; text-align:center;',
-        text: `Surviving population transferred to your rule. Troops remaining: ${atkRemaining}.`,
-      });
-      overlay.appendChild(popNote);
-    }
-
-    // Pyrrhic warning
-    if (pyrrhic) {
-      const warn = this.el('div', {
-        cssText: 'font-size:12px; color:#ffaa00; text-align:center;',
-        text: '⚠ Recommendation: Reinforce before next invasion.',
-      });
-      overlay.appendChild(warn);
-    }
-
-    // Continue button
-    const btn = this.el('button', {
-      cssText: `
-        background: #1a3a5c;
-        border: 2px solid #00aaff;
-        color: #fff;
-        padding: 12px 36px;
-        cursor: pointer;
-        font-family: 'Courier New', Courier, monospace;
-        font-size: 13px;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        margin-top: 8px;
-      `,
-      text: won ? 'CONTINUE TO GALAXY' : 'RETURN TO GALAXY',
-    }) as HTMLButtonElement;
-
-    btn.addEventListener('mouseover', () => {
-      btn.style.background = '#00aaff';
-      btn.style.color = '#000a1a';
-    });
-    btn.addEventListener('mouseout', () => {
-      btn.style.background = '#1a3a5c';
-      btn.style.color = '#fff';
-    });
-    btn.addEventListener('click', () => this.onContinue());
-    overlay.appendChild(btn);
-  }
-
-  // ── Continue (dispatches result + navigate) ──────────────────────────────────
-
-  private onContinue(): void {
+  private startAnimation(): void {
     this.stopAnimation();
 
-    if (this.params) {
-      // Dispatch combat result so the reducer applies planet capture / troop loss
+    const delay = SPEED_DELAYS[this.speed];
+    if (delay <= 0) return;
+
+    this.animationTimer = window.setInterval(() => {
+      this.advanceRound();
+    }, delay);
+  }
+
+  private stopAnimation(): void {
+    if (this.animationTimer !== null) {
+      clearInterval(this.animationTimer);
+      this.animationTimer = null;
+    }
+  }
+
+  private getCurrentRound(): GroundCombatRoundUI | null {
+    if (!this.combatResult || this.currentRoundIndex >= this.combatResult.rounds.length) {
+      return null;
+    }
+    return this.combatResult.rounds[this.currentRoundIndex];
+  }
+
+  private doColonize(): void {
+    // Dispatch colonize action and navigate to planet
+    if (this.config) {
       this.store.dispatch({
-        type: 'GROUNDCOMBAT_RESULT',
-        payload: {
-          attackerId: this.params.attackerId,
-          defenderId: this.params.defenderId,
-          planetId:   this.params.planetId,
-        },
+        type: 'CAPTURE_PLANET',
+        payload: { planetId: this.config.planetId, mode: 'colonize' },
       });
     }
+    this.returnToGalaxy();
+  }
 
-    // Navigate back to galaxy map
+  private doEnslave(): void {
+    // Dispatch enslave action and navigate to planet
+    if (this.config) {
+      this.store.dispatch({
+        type: 'CAPTURE_PLANET',
+        payload: { planetId: this.config.planetId, mode: 'enslave' },
+      });
+    }
+    this.returnToGalaxy();
+  }
+
+  private returnToBombardment(): void {
+    // Return to bombardment screen (tactical combat)
+    this.store.dispatch({ type: 'NAVIGATE', payload: { screen: 'combat' } });
+  }
+
+  private retreatFleet(): void {
+    // Retreat and return to galaxy
+    this.returnToGalaxy();
+  }
+
+  private returnToGalaxy(): void {
+    this.stopAnimation();
     this.store.dispatch({ type: 'NAVIGATE', payload: { screen: 'galaxy' } });
   }
 
-  // ── Bar helper ───────────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Helpers
+  // ═══════════════════════════════════════════════════════════════════════════
 
-  private setBar(
-    fill: HTMLElement,
-    label: HTMLElement,
-    current: number,
-    max: number,
-    color: string,
-  ): void {
-    const pct = max > 0 ? Math.max(0, Math.min(100, (current / max) * 100)) : 0;
-    fill.style.width   = `${pct}%`;
-    fill.style.background = color;
-    label.textContent  = `${current}/${max}`;
-  }
-
-  // ── Log helper ───────────────────────────────────────────────────────────────
-
-  private logEntry(html: string, color?: string): void {
-    const row = document.createElement('div');
-    row.style.cssText = `
-      border-bottom: 1px solid #0d1f36;
-      padding: 2px 0;
-      color: ${color ?? '#c0d8f0'};
+  private makeButton(label: string, bg: string, border: string): HTMLButtonElement {
+    const btn = document.createElement('button');
+    btn.textContent = label;
+    btn.style.cssText = `
+      background: ${bg};
+      border: 1px solid ${border};
+      color: #fff;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: background 0.15s;
     `;
-    row.innerHTML = html;
-    this.logEl.appendChild(row);
-    this.logEl.scrollTop = this.logEl.scrollHeight;
-  }
-
-  // ── Generic element factory ──────────────────────────────────────────────────
-
-  private el(
-    tag: string,
-    opts: { cssText?: string; text?: string } = {},
-  ): HTMLElement {
-    const el = document.createElement(tag);
-    if (opts.cssText)  el.style.cssText = opts.cssText;
-    if (opts.text)     el.textContent   = opts.text;
-    return el;
-  }
-
-  // ── Demo params (used when no real combat is pending) ───────────────────────
-
-  private buildDemoParams(): GroundCombatParams {
-    return {
-      attackerId: 'player',
-      defenderId: 'ai-1',
-      planetId: 'demo-planet',
-      planetName: 'New Hamsterton',
-      attackerRaceName: 'Hamster Empire',
-      defenderRaceName: 'Guinea Pig Raiders',
-      attackerTroops: 12,
-      attackerStrength: 13.2,
-      attackerTechBonusPct: 10,
-      attackerRaceBonusPct: 0,
-      defenderTroops: 8,
-      defenderStrength: 8.8,
-      defenderFortBonusPct: 10,
-      defenderRaceBonusPct: 50,
-      bombardmentBonus: 20,
-    };
+    btn.addEventListener('mouseover', () => { btn.style.background = border; });
+    btn.addEventListener('mouseout', () => { btn.style.background = bg; });
+    return btn;
   }
 }

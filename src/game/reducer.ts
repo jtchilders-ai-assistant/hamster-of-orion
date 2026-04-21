@@ -22,6 +22,7 @@ const FLEET_ACTIONS = new Set([
 const VALID_SCREENS: ReadonlySet<string> = new Set<ScreenType>([
   'menu', 'new_game', 'galaxy', 'planet', 'planet_list', 'fleet', 'research',
   'diplomacy', 'ship_design', 'reports', 'council', 'combat', 'turn_summary',
+  'ground_combat',
 ]);
 
 export function rootReducer(state: GameState, action: Action): GameState {

@@ -818,6 +818,31 @@ export interface UIState {
     diplomacy: { open: boolean; empireId?: EmpireId };
     combat: { open: boolean; combatId?: CombatId };
     victory: { open: boolean; victoryType?: VictoryType };
+    groundCombat: {
+      phase: 'planning' | 'resolving' | 'result';
+      planetId: PlanetId | null;
+      attackerId: EmpireId | null;
+      defenderId: EmpireId | null;
+      availableTroops: number;
+      invadingTroops: number;
+      attackerBonus: number;
+      defenderBonus: number;
+      result: {
+        winner: 'attacker' | 'defender';
+        rounds: Array<{
+          round: number;
+          attackerHits: number;
+          defenderHits: number;
+          attackerCasualties: number;
+          defenderCasualties: number;
+        }>;
+        attackerTotalLosses: number;
+        defenderTotalLosses: number;
+        attackerRemaining: number;
+        defenderRemaining: number;
+      } | null;
+      speed: 'slow' | 'normal' | 'fast' | 'instant';
+    } | null;
   };
 
   notifications: Notification[];

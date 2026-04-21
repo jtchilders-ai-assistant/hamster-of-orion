@@ -233,3 +233,24 @@
 - **Action Needed**: Taylor needs to resolve ambiguity between design docs (`design/ui-ux/spy-network-ui.md` vs `design/diplomacy/espionage.md`) and clarify scope for these gaps before worker can fix and resubmit.
 - **Blocked Since**: 2026-04-21 14:07 UTC
 - **Orchestrator Note**: Cannot auto-resolve — worker and verifier disagree on acceptance. Design doc ambiguity requires human input.
+
+## 2026-04-21 14:51 CDT — Task: ground-combat-ui
+- **Status**: Testing → Verifying
+- **Tests**: 1256/1256 passed (44 test files), typecheck clean
+- **State**: TESTING → VERIFYING
+- **Verifier**: Spawned (run: 312afe7f)
+- **Design Docs**: ground-combat-ui.md, ground-combat.md
+
+## 2026-04-21 14:51 CDT — Task: victory-screen
+- **Status**: IDLE → WORKING
+- **Task**: victory-screen (Victory/defeat screens)
+- **State**: IDLE → WORKING
+- **Output**: src/ui/screens/VictoryScreen.ts
+- **Dependencies**: None (all clear)
+- **Worker**: Spawned (run: 9423f442)
+- **Progress**: 13/16 tasks complete, 3 remaining (victory-screen, hotkey-navigation, constants-to-code) + playable-demo-test
+
+## 2026-04-21 19:56 — Task: victory-screen
+- **Status**: Worker still running (state=WORKING)
+- **Phase**: 4B UI Polish & Integration
+- **Worker**: Not yet finished; state unchanged since 19:51 UTC

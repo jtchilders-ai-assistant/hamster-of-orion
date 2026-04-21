@@ -44,6 +44,7 @@ const defaultUI: UIState = {
     diplomacy: { open: false },
     combat: { open: false },
     victory: { open: false },
+    groundCombat: null,
   },
   notifications: [],
   filters: {
