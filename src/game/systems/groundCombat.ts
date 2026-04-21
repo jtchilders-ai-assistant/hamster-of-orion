@@ -394,7 +394,16 @@ export interface GroundCombatRoundUI {
   attackerRolls: number[];
   /** d10 rolls for each defender troop */
   defenderRolls: number[];
-  casualties: number;
+  /**
+   * Attacker troops lost this round (defender hits that connected).
+   * Per design/ui-ux/ground-combat-ui.md §2: each side's hits cause
+   * casualties to the OPPOSING side independently.
+   */
+  attackerCasualties: number;
+  /**
+   * Defender troops lost this round (attacker hits that connected).
+   */
+  defenderCasualties: number;
   /** Troops remaining on attacker side after this round */
   attackerRemaining: number;
   /** Troops remaining on defender side after this round */
@@ -449,36 +458,48 @@ export function simulateGroundCombat(
   let totalDefLosses = 0;
   let roundNum = 1;
 
+  // Hit threshold: roll >= 7 is a hit (design/ui-ux/ground-combat-ui.md §2 Dice Roll Mechanic).
+  // Each troop rolls 1d10; rolls >= 7 score hits against the opposing side.
+  // Attacker hits => defender casualties; defender hits => attacker casualties.
+  // The bonus multipliers (attackerBonus, defenderBonus) are factored in by
+  // adjusting the effective hit threshold for each side:
+  //   effectiveThreshold = round(7 / bonus)  — higher bonus = lower threshold = more hits.
+  const BASE_HIT_ROLL = 7;
+  const atkHitThreshold = Math.max(1, Math.round(BASE_HIT_ROLL / attackerBonus));
+  const defHitThreshold = Math.max(1, Math.round(BASE_HIT_ROLL / defenderBonus));
+
   while (curAtk > 0 && curDef > 0) {
-    // Attacker rolls
+    // Attacker rolls — each troop rolls 1d10
     const attackerRolls: number[] = [];
     for (let i = 0; i < curAtk; i++) {
       attackerRolls.push(Math.ceil(Math.random() * 10));
     }
 
-    // Defender rolls
+    // Defender rolls — each troop rolls 1d10
     const defenderRolls: number[] = [];
     for (let i = 0; i < curDef; i++) {
       defenderRolls.push(Math.ceil(Math.random() * 10));
     }
 
-    // Count hits (roll >= 7)
-    const attackerHits = attackerRolls.filter((r) => r >= 7).length;
-    const defenderHits = defenderRolls.filter((r) => r >= 7).length;
+    // Attacker hits => defender casualties; defender hits => attacker casualties
+    // Hits are capped to the surviving troop count on the target side.
+    const rawAttackerHits = attackerRolls.filter((r) => r >= atkHitThreshold).length;
+    const rawDefenderHits = defenderRolls.filter((r) => r >= defHitThreshold).length;
 
-    // Casualties: min of hits and available troops
-    const casualties = Math.min(attackerHits, defenderHits);
+    const defenderCasualties = Math.min(rawAttackerHits, curDef);
+    const attackerCasualties = Math.min(rawDefenderHits, curAtk);
 
-    totalAtkLosses += casualties;
-    totalDefLosses += casualties;
-    curAtk -= casualties;
-    curDef -= casualties;
+    totalAtkLosses += attackerCasualties;
+    totalDefLosses += defenderCasualties;
+    curAtk -= attackerCasualties;
+    curDef -= defenderCasualties;
 
     rounds.push({
       roundNumber: roundNum,
       attackerRolls,
       defenderRolls,
-      casualties,
+      attackerCasualties,
+      defenderCasualties,
       attackerRemaining: curAtk,
       defenderRemaining: curDef,
     });

@@ -20,6 +20,7 @@ import { CombatScreen } from './screens/CombatScreen';
 import { CouncilScreen } from './screens/CouncilScreen';
 import { CommandBar } from './components/CommandBar';
 import { TurnSummaryScreen } from './screens/TurnSummaryScreen';
+import { VictoryScreen } from './screens/VictoryScreen';
 import { SaveLoadScreen } from './screens/SaveLoadScreen';
 import { GroundCombatScreen } from './screens/GroundCombatScreen';
 
@@ -53,6 +54,7 @@ export class App {
   private readonly commandBar: CommandBar;
   private currentScreen: ScreenType;
   private turnSummaryActive: boolean = false;
+  private victoryActive: boolean = false;
 
   constructor(store: Store<GameState>) {
     this.store = store;
@@ -125,6 +127,8 @@ export class App {
     const saveLoadEl       = this.makeScreenContainer(root, 'save-load-screen');
     const turnSummaryEl    = this.makeScreenContainer(root, 'turn-summary-screen');
     const turnSummary      = new TurnSummaryScreen(turnSummaryEl, store);
+    const victoryEl        = this.makeScreenContainer(root, 'victory-screen');
+    const victory          = new VictoryScreen(victoryEl, store);
 
     return new Map<ScreenType, Screen>([
       ['new_game',         new NewGameScreen(newGameEl, store)],
@@ -140,6 +144,7 @@ export class App {
       ['council',          new CouncilScreen(councilEl)],
       ['save_load',        new SaveLoadScreen(saveLoadEl, store)],
       ['turn_summary',     turnSummary],
+      ['victory',          victory],
     ]);
   }
 
@@ -173,6 +178,29 @@ export class App {
   private onStateChange(state: GameState): void {
     const prevScreen = this.currentScreen;
     const prevTurnSummary = this.turnSummaryActive;
+
+    // Victory screen — shown when game is over
+    if (state.isGameOver && state.victoryResult) {
+      const victoryScreen = this.screens.get('victory') as VictoryScreen | undefined;
+      if (victoryScreen) {
+        if (!this.victoryActive) {
+          // Hide whatever was active and show victory
+          this.screens.get(prevScreen)?.hide();
+          victoryScreen.render(state);
+          victoryScreen.show();
+          this.victoryActive = true;
+        } else {
+          victoryScreen.render(state);
+        }
+      }
+      this.commandBar.render(state);
+      return;
+    } else if (this.victoryActive) {
+      // Game is no longer over — hide victory, restore the underlying screen
+      this.screens.get('victory')?.hide();
+      this.victoryActive = false;
+      this.screens.get(state.currentScreen)?.show();
+    }
 
     // Special handling for turn summary — it's an overlay, not a full replacement
     if (state.currentScreen === 'turn_summary') {

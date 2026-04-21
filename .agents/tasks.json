@@ -275,7 +275,7 @@
             "id": "victory-screen",
             "name": "Victory/defeat screens",
             "type": "ui",
-            "status": "in_progress",
+            "status": "done",
             "description": "Create victory and defeat screens. Show win condition met (Conquest, Diplomatic, etc) with stats and credits.",
             "designDocs": [
                 "design/ui-ux/wireframes/victory-screen.md",

@@ -40,6 +40,12 @@ interface CombatConfig {
   defenderTroops: number;
   attackerBonus: number;
   defenderBonus: number;
+  /** Planet population before invasion (millions). Used to show changes in result. */
+  planetPopulation?: number;
+  /** Planet factories before invasion. Some are destroyed in combat. */
+  planetFactories?: number;
+  /** Missile bases on planet (cleared by bombardment before invasion). */
+  missileBases?: number;
 }
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -516,18 +522,20 @@ export class GroundCombatScreen {
       divider.style.cssText = 'border: none; border-top: 1px solid #1a3a5c; margin: 16px 0;';
       panel.appendChild(divider);
 
-      // Casualties
+      // Casualties — attackerCasualties and defenderCasualties are tracked
+      // independently per design/ui-ux/ground-combat-ui.md §2:
+      // each side's hits cause losses to the OPPOSING side.
       const casualties = document.createElement('div');
       casualties.innerHTML = `
         <div style="color: #ffaa00; font-size: 12px; text-transform: uppercase; margin-bottom: 12px;">
           Casualties this round:
         </div>
         <div style="margin-bottom: 8px;">
-          • Attackers lost: <span style="color: #ff4444;">${round.casualties}</span> troops
+          • Attackers lost: <span style="color: #ff4444;">${round.attackerCasualties}</span> troops
           (<span style="color: #00cc66;">${round.attackerRemaining}</span> remaining)
         </div>
         <div>
-          • Defenders lost: <span style="color: #ff4444;">${round.casualties}</span> troops
+          • Defenders lost: <span style="color: #ff4444;">${round.defenderCasualties}</span> troops
           (<span style="color: #00cc66;">${round.defenderRemaining}</span> remaining)
         </div>
       `;
@@ -651,8 +659,24 @@ export class GroundCombatScreen {
       margin-bottom: 32px;
     `;
 
-    const survivingPop = isVictory ? Math.floor(this.config.defenderTroops * 0.1) : 0;
-    const factoriesIntact = isVictory ? Math.floor(this.config.defenderTroops * 0.3) : 0;
+    // Planet Status data — use actual config values when provided.
+    // Per design/ui-ux/ground-combat-ui.md §4.1: show surviving pop, factories, missile bases.
+    // Population: use provided planetPopulation or fall back to rough estimate from defender troops.
+    // Some population is lost in combat (~10% of total per round, rough estimate).
+    const basePop = this.config.planetPopulation ?? Math.round(this.config.defenderTroops * 10);
+    const popLostInCombat = isVictory
+      ? Math.floor(basePop * (this.combatResult.totalDefenderLosses / Math.max(this.config.defenderTroops, 1)) * 0.5)
+      : 0;
+    const survivingPop = Math.max(0, basePop - popLostInCombat);
+
+    const baseFactories = this.config.planetFactories ?? Math.round(this.config.defenderTroops * 15);
+    // Some factories are destroyed in combat (~5% per round of fighting).
+    const factoriesLost = isVictory
+      ? Math.floor(baseFactories * Math.min(0.3, this.combatResult.rounds.length * 0.05))
+      : 0;
+    const factoriesIntact = Math.max(0, baseFactories - factoriesLost);
+
+    const missileBases = this.config.missileBases ?? 0;
 
     casualtiesPanel.innerHTML = `
       <div style="color: #ffaa00; font-size: 12px; text-transform: uppercase; margin-bottom: 16px; border-bottom: 1px solid #1a3a5c; padding-bottom: 8px;">
@@ -666,19 +690,32 @@ export class GroundCombatScreen {
         ${isVictory ? '(all defenders eliminated)' : `(${this.combatResult.defenderRemaining} remain)`}
       </div>
       ${isVictory ? `
-      <div style="color: #00cc66; font-size: 12px; text-transform: uppercase; margin-bottom: 16px; border-bottom: 1px solid #1a3a5c; padding-bottom: 8px;">
-        Planetary Status
+      <div style="color: #00cc66; font-size: 12px; text-transform: uppercase; margin-bottom: 12px; border-bottom: 1px solid #1a3a5c; padding-bottom: 8px;">
+        Planet Status
       </div>
       <div style="margin-bottom: 8px;">
-        • Surviving Population: <span style="color: #00cc66; font-weight: bold;">${survivingPop}</span>
+        • Surviving Population: <span style="color: #00cc66; font-weight: bold;">${survivingPop}M</span>
+        <span style="color: #607080; font-size: 11px;"> (transferred to your rule)</span>
       </div>
       <div style="margin-bottom: 8px;">
         • Factories Intact: <span style="color: #00cc66; font-weight: bold;">${factoriesIntact}</span>
+        ${factoriesLost > 0 ? `<span style="color: #607080; font-size: 11px;"> (${factoriesLost} destroyed in combat)</span>` : ''}
       </div>
       <div>
-        • Missile Bases: <span style="color: #ffaa00; font-weight: bold;">Cleared</span>
+        • Missile Bases: <span style="color: #ffaa00; font-weight: bold;">${missileBases}</span>
+        ${missileBases === 0 ? '<span style="color: #607080; font-size: 11px;"> (cleared by bombardment)</span>' : ''}
       </div>
-      ` : ''}
+      ` : `
+      <div style="color: #607080; font-size: 12px; text-transform: uppercase; margin-bottom: 12px; border-bottom: 1px solid #1a3a5c; padding-bottom: 8px;">
+        Planet Status
+      </div>
+      <div style="margin-bottom: 8px;">
+        • ${this.config.planetName} remains under ${this.config.defenderName} control
+      </div>
+      <div>
+        • Defenders: <span style="color: #ff4444; font-weight: bold;">${this.combatResult.defenderRemaining}</span> remaining troops
+      </div>
+      `}
     `;
     wrapper.appendChild(casualtiesPanel);
 

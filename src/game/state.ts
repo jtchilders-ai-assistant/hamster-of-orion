@@ -36,7 +36,8 @@ export type ScreenType =
   | 'combat'
   | 'ground_combat'
   | 'turn_summary'
-  | 'save_load';
+  | 'save_load'
+  | 'victory';
 
 export type GalaxySize = 'small' | 'medium' | 'large' | 'huge';
 export type GalaxyShape = 'spiral' | 'elliptical' | 'irregular';
