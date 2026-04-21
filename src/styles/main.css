@@ -104,6 +104,137 @@ html, body {
   gap: 12px;
 }
 
+/* ── Diplomacy Screen Expanded Styles ────────────────────────────────────── */
+
+/* Empire list item relation colors */
+.race-list-item.rel-war { color: #e74c3c; }
+.race-list-item.rel-unfriendly { color: #e67e22; }
+.race-list-item.rel-neutral { color: var(--text-secondary); }
+.race-list-item.rel-friendly { color: #2ecc71; }
+.race-list-item.rel-allied { color: #3498db; }
+
+.race-list-item:hover { background: var(--btn-bg); }
+.race-list-item.selected { background: var(--btn-bg); border-left: 3px solid var(--accent-color); }
+
+.race-status {
+  font-size: 10px;
+  text-transform: uppercase;
+  opacity: 0.7;
+  margin-left: 8px;
+}
+
+/* Relation bar */
+.relation-bar-outer {
+  height: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.relation-bar-inner {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.3s ease;
+}
+
+.relation-bar-inner.rel-war { background: #c0392b; }
+.relation-bar-inner.rel-unfriendly { background: #e67e22; }
+.relation-bar-inner.rel-neutral { background: #7f8c8d; }
+.relation-bar-inner.rel-friendly { background: #27ae60; }
+.relation-bar-inner.rel-allied { background: #2980b9; }
+
+/* Treaty tags / icons */
+.treaty-list { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.treaty-tag {
+  padding: 3px 10px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.treaty-tag.treaty-non_aggression { background: rgba(52, 152, 219, 0.2); color: #3498db; border: 1px solid rgba(52, 152, 219, 0.4); }
+.treaty-tag.treaty-trade { background: rgba(46, 204, 113, 0.2); color: #2ecc71; border: 1px solid rgba(46, 204, 113, 0.4); }
+.treaty-tag.treaty-military_alliance { background: rgba(155, 89, 182, 0.2); color: #9b59b6; border: 1px solid rgba(155, 89, 182, 0.4); }
+.treaty-tag.treaty-research { background: rgba(241, 196, 15, 0.2); color: #f1c40f; border: 1px solid rgba(241, 196, 15, 0.4); }
+.treaty-tag.treaty-defensive_pact { background: rgba(230, 126, 34, 0.2); color: #e67e22; border: 1px solid rgba(230, 126, 34, 0.4); }
+.treaty-tag.treaty-peace { background: rgba(149, 165, 166, 0.2); color: #95a5a6; border: 1px solid rgba(149, 165, 166, 0.4); }
+.no-treaties { color: var(--text-muted); font-style: italic; font-size: 12px; }
+
+/* War confirmation overlay */
+.war-confirm-overlay {
+  position: fixed; inset: 0; background: rgba(0, 0, 0, 0.75);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999;
+}
+.war-confirm-dialog {
+  background: #2d2d44; border: 2px solid #c0392b; border-radius: 8px;
+  padding: 24px; max-width: 380px; width: 90%;
+}
+.war-confirm-dialog h3 { color: #e74c3c; margin: 0 0 8px 0; }
+.war-confirm-dialog p { color: var(--text-secondary); margin: 0 0 20px 0; line-height: 1.5; }
+.war-confirm-actions { display: flex; gap: 10px; justify-content: flex-end; }
+.war-confirm-actions button {
+  padding: 8px 18px; border-radius: 4px; cursor: pointer; font-size: 13px; border: 1px solid;
+}
+.war-confirm-actions .btn-cancel { background: transparent; color: var(--text-muted); border-color: #555; }
+.war-confirm-actions .btn-cancel:hover { background: rgba(255,255,255,0.05); }
+.war-confirm-actions .btn-confirm { background: #c0392b; color: #fff; border-color: #c0392b; }
+.war-confirm-actions .btn-confirm:hover { background: #a93226; }
+
+/* Propose treaty dropdown */
+.propose-form { display: flex; gap: 8px; margin-top: 8px; align-items: stretch; }
+.propose-form select {
+  flex: 1; padding: 6px 10px; background: #1a1a2e; color: var(--text-primary);
+  border: 1px solid #555; border-radius: 4px; font-size: 12px; cursor: pointer;
+}
+.propose-form button {
+  padding: 6px 14px; background: var(--accent-color); color: #fff; border: none;
+  border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 500;
+}
+.propose-form button:disabled { opacity: 0.4; cursor: not-allowed; }
+.propose-hint { font-size: 11px; color: var(--text-muted); margin-top: 6px; font-style: italic; }
+
+/* Incoming proposals */
+.incoming-proposals { max-height: 100px; overflow-y: auto; }
+.proposal-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 8px; margin-bottom: 4px; background: rgba(255,255,255,0.03);
+  border-radius: 4px; font-size: 12px;
+}
+.proposal-item .proposal-text { flex: 1; }
+.proposal-item button { padding: 2px 8px; font-size: 11px; border-radius: 3px; cursor: pointer; border: 1px solid; margin-left: 4px; }
+.proposal-item .btn-accept { background: transparent; color: #2ecc71; border-color: #2ecc71; }
+.proposal-item .btn-accept:hover { background: rgba(46,204,113,0.15); }
+.proposal-item .btn-reject { background: transparent; color: #e74c3c; border-color: #e74c3c; }
+.proposal-item .btn-reject:hover { background: rgba(231,76,60,0.15); }
+.no-proposals { color: var(--text-muted); font-style: italic; font-size: 12px; }
+
+/* Relation history / events log */
+.history-log { max-height: 140px; overflow-y: auto; }
+.history-entry { display: flex; gap: 8px; padding: 3px 0; font-size: 12px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.history-entry:last-child { border-bottom: none; }
+.history-entry .turn { color: var(--text-muted); min-width: 36px; font-size: 11px; }
+.history-entry .impact { min-width: 30px; text-align: right; font-weight: 600; font-size: 11px; }
+.history-entry .impact.positive { color: #2ecc71; }
+.history-entry .impact.negative { color: #e74c3c; }
+.history-entry .impact.neutral { color: var(--text-muted); }
+.history-entry .desc { flex: 1; color: var(--text-secondary); }
+.no-history { color: var(--text-muted); font-style: italic; font-size: 12px; }
+
+/* Actions section styling */
+.actions-section { margin-top: 4px; }
+.actions-section .action-btn {
+  padding: 6px 12px; border-radius: 4px; cursor: pointer;
+  background: var(--btn-bg); color: var(--text-primary); border: 1px solid var(--border-color);
+  font-size: 11px; transition: background 0.2s, border-color 0.2s;
+}
+.actions-section .action-btn:hover { background: #3a3a5c; border-color: var(--accent-color); }
+.actions-section .action-btn.action-war { border-color: #e74c3c; color: #e74c3c; }
+.actions-section .action-btn.action-war:hover { background: rgba(231,76,60,0.12); }
+.actions-section .action-btn.action-peace { border-color: #2ecc71; color: #2ecc71; }
+.actions-section .action-buttons { display: flex; flex-wrap: wrap; gap: 6px; }
+
 .placeholder-label {
   font-family: var(--font-mono);
   font-size: 20px;

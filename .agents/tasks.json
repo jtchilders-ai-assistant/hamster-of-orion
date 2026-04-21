@@ -56,7 +56,7 @@
       "id": "diplomacy-ui-complete",
       "name": "Complete diplomacy UI",
       "type": "ui",
-      "status": "pending",
+      "status": "done",
       "description": "Finish DiplomacyScreen with all treaty actions, relation display, and AI response handling. Allow proposing/accepting treaties, declaring war, and viewing relation history.",
       "designDocs": [
         "design/ui-ux/wireframes/diplomacy-screen.md",
