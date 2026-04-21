@@ -1,6 +1,6 @@
 {
-  "state": "IDLE",
-  "current_task": null,
+  "state": "TESTING",
+  "current_task": "colonies-list-screen",
   "phase": "phase4b-ui-integration",
   "last_completed": "colonies-list-screen",
   "last_check": "2026-04-21T11:55:00Z",
@@ -8,5 +8,69 @@
     "status": "approved",
     "notes": "ColoniesScreen.ts (630 lines) implements all criteria. Worker timed out with broken test fixture; removed test. Lists colonies, sortable columns, shows pop/factories/build queue/production, click to open planet. Tests: 1178/1178 pass."
   },
-  "notes": "Phase 4B task 8/16 complete. Next: fleets-list-screen"
+  "notes": "Phase 4B task 8/16 complete. Next: fleets-list-screen",
+  "worker_output": {
+    "files_created": [
+      "test/ui/screens/coloniesScreen.test.ts"
+    ],
+    "files_modified": [
+      "src/ui/screens/ColoniesScreen.ts",
+      "src/ui/app.ts"
+    ],
+    "tests_added": [
+      "test/ui/screens/coloniesScreen.test.ts"
+    ],
+    "summary": "Full ColoniesScreen implementation per command_menu_planets.md. Replaced stub with sortable planet list (IMG/NAME/POP-bar/FACT/SHD/BASE/WST/PROD/BUILDING columns), three bottom panels (SPENDING/TOTALS/FINANCE), click-to-select, double-click to open Planet Detail, BC transfer stepper, and OK button. Added 53 unit tests covering all 7 acceptance criteria. All 1231 tests pass, zero typecheck errors.",
+    "design_compliance": [
+      {
+        "doc": "design/ui-ux/wireframes/command_menu/command_menu_planets.md",
+        "section": "Column Definitions",
+        "quote": "IMG | PLANET NAME | POP | FACT | SHD | BASE | WST | PROD | BUILDING",
+        "impl_file": "src/ui/screens/ColoniesScreen.ts",
+        "impl_line": 193,
+        "verified": true
+      },
+      {
+        "doc": "design/ui-ux/wireframes/command_menu/command_menu_planets.md",
+        "section": "Column Definitions — POP",
+        "quote": "Population displayed as a segmented bar (filled segments = current pop, empty = capacity)",
+        "impl_file": "src/ui/screens/ColoniesScreen.ts",
+        "impl_line": 471,
+        "verified": true
+      },
+      {
+        "doc": "design/ui-ux/wireframes/command_menu/command_menu_planets.md",
+        "section": "Bottom Panels — SPENDING",
+        "quote": "SHIPS, BASES, SPYING, SECURITY maintenance costs",
+        "impl_file": "src/ui/screens/ColoniesScreen.ts",
+        "impl_line": 430,
+        "verified": true
+      },
+      {
+        "doc": "design/ui-ux/wireframes/command_menu/command_menu_planets.md",
+        "section": "Bottom Panels — TOTALS",
+        "quote": "TRADE, PLANETS, TOTAL net empire income per turn",
+        "impl_file": "src/ui/screens/ColoniesScreen.ts",
+        "impl_line": 455,
+        "verified": true
+      },
+      {
+        "doc": "design/ui-ux/wireframes/command_menu/command_menu_planets.md",
+        "section": "Bottom Panels — FINANCE",
+        "quote": "RESERVE, Amount Selector [▲][▼], TRANSFER, OK",
+        "impl_file": "src/ui/screens/ColoniesScreen.ts",
+        "impl_line": 212,
+        "verified": true
+      },
+      {
+        "doc": "design/ui-ux/wireframes/command_menu/command_menu_planets.md",
+        "section": "Interactions",
+        "quote": "Click planet row → selects; Double-click → opens Planet Detail; OK/ESC → Galaxy Map",
+        "impl_file": "src/ui/screens/ColoniesScreen.ts",
+        "impl_line": 504,
+        "verified": true
+      }
+    ],
+    "design_gaps": []
+  }
 }
