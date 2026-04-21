@@ -119,6 +119,43 @@ export class CouncilScreen {
         <h2>THE COUNCIL HAS CONVENED — TURN ${state.turn}</h2>
         <p class="council-subtitle">Cast your vote for Master of Orion. ${winThreshold}% majority required to win.</p>
 
+        <div class="all-empire-votes">
+          <h3>All Empire Vote Shares</h3>
+          <table class="empire-vote-table">
+            <thead>
+              <tr>
+                <th>Empire</th>
+                <th>Status</th>
+                <th>Vote Share</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${Object.entries(voteShares)
+                .sort((a, b) => b[1] - a[1])
+                .map(([id, share]) => {
+                  const empire = state.empires.byId[id];
+                  const name = empire?.name ?? id;
+                  const isCand = id === candA || id === candB;
+                  const pct = share.toFixed(1);
+                  return `
+                  <tr class="empire-vote-row ${isCand ? 'empire-vote-row--candidate' : ''}">
+                    <td class="empire-name">${name}</td>
+                    <td class="empire-status">
+                      ${isCand ? `<span class="badge badge--candidate">★ Candidate</span>` : '—'}
+                    </td>
+                    <td class="empire-pct">
+                      <div class="vote-bar-outer bar-sm">
+                        <div class="vote-bar-inner" style="width:${pct}%"></div>
+                      </div>
+                      ${pct}%
+                    </td>
+                  </tr>
+                `;
+                }).join('')}
+            </tbody>
+          </table>
+        </div>
+
         <div class="candidate-row">
           <div class="candidate-card ${candA === playerId ? 'candidate-self' : ''}">
             <div class="candidate-portrait">${empireA.raceId.charAt(0).toUpperCase()}</div>
@@ -191,13 +228,40 @@ export class CouncilScreen {
         `;
       }).join('');
 
-    let lastVoteSection = '';
+    // Vote results summary (if a vote just happened)
+    let voteResultSection = '';
     if (lastVote && lastVote.winner) {
+      const player = Object.values(state.empires.byId).find(e => e.isPlayer);
       const winner = state.empires.byId[lastVote.winner];
-      lastVoteSection = `
-        <div class="last-vote-result">
-          <h3>Last Election Result (Turn ${lastVote.turn})</h3>
-          <p>${winner?.name ?? lastVote.winner} won with ${(lastVote.results[lastVote.winner] ?? 0).toFixed(1)}% of the vote.</p>
+      const playerWon = lastVote.winner === (player?.id ?? '');
+      const outcomeClass = playerWon ? 'result-win' : 'result-lose';
+      const outcomeIcon = playerWon ? '🏆' : '🔴';
+      const outcomeText = playerWon
+        ? 'Diplomatic Victory!' 
+        : `${winner?.name ?? lastVote.winner} won`;
+      
+      // Build per-candidate vote breakdown
+      const resultRows = lastVote.candidates
+        .filter(c => lastVote.results[c] != null)
+        .map(c => {
+          const emp = state.empires.byId[c];
+          const pct = (lastVote.results[c] ?? 0).toFixed(1);
+          const isWinner = c === lastVote.winner;
+          return `
+            <div class="result-bar ${isWinner ? 'result-bar--winner' : ''}">
+              <span class="result-bar-name">${emp?.name ?? c}</span>
+              <span class="result-bar-pct">${pct}%</span>
+            </div>
+          `;
+        }).join('');
+
+      voteResultSection = `
+        <div class="vote-result-summary ${outcomeClass}">
+          <h3>🗳️ Election Result — Turn ${lastVote.turn}</h3>
+          <div class="result-outcome">${outcomeIcon} ${outcomeText}</div>
+          <p>${playerWon ? 'Your empire has been elected Master of Orion!' : `${winner?.name ?? lastVote.winner} has been elected Master of Orion.`}</p>
+          ${resultRows}
+          <p class="result-detail">${Math.round(VICTORY_THRESHOLD * 100)}% majority required</p>
         </div>
       `;
     }
@@ -208,7 +272,7 @@ export class CouncilScreen {
         <p>Formed on turn ${council.formationTurn}. ${council.voteHistory.length} elections held.</p>
         <p class="next-vote">Next vote: Turn ${nextVoteTurn} (${turnsUntil} turns away)</p>
 
-        ${lastVoteSection}
+        ${voteResultSection}
 
         <div class="vote-shares-section">
           <h3>Current Vote Shares</h3>

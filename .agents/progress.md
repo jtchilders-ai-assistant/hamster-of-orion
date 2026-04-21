@@ -1,3 +1,36 @@
+## 2026-04-21 12:52 UTC — Task: council-screen-ui
+- **Status**: Worker still running (14m32s / 15m timeout)
+- **Worker**: worker-council-screen-ui (warpcore/Qwen model)
+- **Action**: No intervention — checking next cycle
+
+## 2026-04-21 12:47 UTC — Task: council-screen-ui
+- **Status**: Worker still running (10m / 15m timeout)
+- **Worker**: worker-council-screen-ui (warpcore/Qwen model)
+- **Action**: No intervention — checking next cycle
+
+## 2026-04-21 12:42 UTC — Task: council-screen-ui
+- **Status**: Worker still running (5m / 15m timeout)
+- **Worker**: worker-council-screen-ui (warpcore/Qwen model)
+- **Action**: No intervention — checking next cycle
+
+## 2026-04-21 12:37 UTC — Task: council-screen-ui
+- **Status**: Started
+- **Design Docs**: council-screen.md, high-council.md
+- **Worker**: Spawning with model warpcore/Qwen/Qwen3.6-35B-A3B-FP8
+- **Phase**: 4B UI Integration — task 10/16
+
+## 2026-04-21 12:33 UTC — Task: fleets-list-screen
+- **Status**: Completed ✓ (VERIFIED & COMMITTED)
+- **Tests**: typecheck ✓, vitest ✓ (1256/1256 pass)
+- **Design Verified**: fleet-screen.md, command_menu_fleet.md (8 claims verified)
+- **Note**: AC6 merge/split buttons deferred — game logic exists but wireframes don't show UI triggers
+
+## 2026-04-21 12:32 UTC — Task: fleets-list-screen
+- **Status**: Testing → Verifying
+- **Tests**: typecheck ✓, vitest ✓ (1256/1256 pass, 2.91s)
+- **Verifier**: Spawning with model warpcore/Qwen/Qwen3.6-35B-A3B-FP8
+- **Design Docs**: fleet-screen.md, command_menu_fleet.md
+
 ## 2026-04-21 12:27 UTC — Task: fleets-list-screen
 - **Status**: Worker still running (15m / 15m timeout)
 - **Worker**: worker-fleets-list-screen (warpcore/Qwen model)
@@ -39,12 +72,19 @@
 - **Phase**: 4B UI Integration — task 8/16
 - **Note**: Task referenced colony-list.md but actual doc is command_menu_planets.md
 
+## 2026-04-21 12:54 UTC — Task: council-screen-ui
+- **Status**: Completed ✓
+- **Implementation**: CouncilScreen.ts (314 lines) enhanced
+- **Worker**: Timed out checking CSS; typecheck passes
+- **Tests**: 1256/1256 pass
+- **Commit**: pending
+
 ## 2026-04-21 12:30 UTC — Task: fleets-list-screen
 - **Status**: Completed ✓
 - **Implementation**: FleetsScreen.ts (382 lines) already functional
 - **Worker**: Timed out fixing test paths; tests pass now
 - **Tests**: 1256/1256 pass (+25 new)
-- **Commit**: pending
+- **Commit**: 158e461
 
 ## 2026-04-21 11:55 UTC — Task: colonies-list-screen
 - **Status**: Completed ✓

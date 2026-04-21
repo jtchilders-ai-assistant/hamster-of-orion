@@ -22,6 +22,7 @@ interface NavButton {
 const NAV_BUTTONS: NavButton[] = [
   { label: 'GAME',    fkey: 'F10', screen: 'menu' },
   { label: 'DESIGN',  fkey: 'F6',  screen: 'ship_design' },
+  { label: 'COUNCIL', fkey: 'F7',  screen: 'council' },
   { label: 'FLEET',   fkey: 'F3',  screen: 'fleet' },
   { label: 'MAP',     fkey: 'F1',  screen: 'galaxy' },
   { label: 'RACES',   fkey: 'F5',  screen: 'diplomacy' },

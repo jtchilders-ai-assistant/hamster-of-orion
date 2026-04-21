@@ -31,6 +31,7 @@ const F_KEY_MAP: Readonly<Record<string, ScreenType>> = {
   F4:  'research',     // TECH
   F5:  'diplomacy',    // RACES
   F6:  'ship_design',  // DESIGN
+  F7:  'council',      // HIGH COUNCIL
   F8:  'save_load',    // SAVE/LOAD
   F10: 'menu',         // GAME (save/quit)
 };

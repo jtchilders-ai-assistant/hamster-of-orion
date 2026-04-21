@@ -209,7 +209,7 @@
       "id": "council-screen-ui",
       "name": "High Council screen UI",
       "type": "ui",
-      "status": "pending",
+      "status": "done",
       "description": "Create CouncilScreen showing Galactic High Council. Display vote shares, current leader, and voting UI when council convenes.",
       "designDocs": [
         "design/ui-ux/wireframes/council-screen.md",
