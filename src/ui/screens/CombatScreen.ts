@@ -2,17 +2,22 @@
  * Tactical Combat Screen
  * src/ui/screens/CombatScreen.ts
  *
- * Implements the combat UI per design/ui-ux/tactical-combat-ui.md
+ * Implements the combat UI per design/ships/combat-algorithm.md and
+ * design/ships/combat-mechanics.md.
  *
  * Features:
  * - Hex grid canvas rendering of ship positions
- * - Initiative strip showing turn order
+ * - Ship selection with movement range visualization (per combat_speed, Section 6-7)
+ * - Click-to-move: click a highlighted hex to move selected friendly ship
+ * - Click-to-fire: click an enemy ship to fire all weapons at it
+ * - Floating damage numbers on hit; explosion effect on ship destroy
+ * - Initiative strip showing turn order (speed-sorted, per Section 4-5)
  * - Ship detail panel (selected ship) + combat log
- * - Auto-resolve button that runs combat to completion
+ * - Auto-resolve button (runs combat to completion, Section 25.6 equivalent)
+ * - Retreat button (attempt fleet retreat, per Section 28-29)
  * - Combat results screen after combat ends
- * - Return to galaxy map button
  *
- * Design constraints (from worker-prompt.md):
+ * Design constraints:
  * - All DOM is allowed here (this is src/ui/)
  * - Uses the combat engine from src/game/systems/combat.ts (pure, no DOM)
  * - Dispatches NAVIGATE action to return to galaxy screen
@@ -26,9 +31,13 @@ import {
   CombatStatus,
   CombatResult,
   FleetForCombat,
+  WeaponInstance,
   initiateCombat,
   processRound,
   autoResolveCombat,
+  attemptRetreat,
+  calcHitChanceVs,
+  applyDamage,
 } from '../../game/systems/combat';
 
 // ── Hex grid constants ─────────────────────────────────────────────────────────
@@ -40,12 +49,37 @@ const HEX_SIZE = 32; // pixels, flat-top hex radius
 // Flat-top hex geometry
 const HEX_H = Math.sqrt(3) * HEX_SIZE;
 
+// Range brackets per combat-mechanics.md
+const RANGE_POINT_BLANK = 1;
+const RANGE_CLOSE_MAX   = 4;
+const RANGE_MEDIUM_MAX  = 8;
+const RANGE_LONG_MAX    = 15;
+
+// ── Visual effect types ────────────────────────────────────────────────────────
+
+interface DamageNumber {
+  x: number;
+  y: number;
+  text: string;
+  color: string;
+  opacity: number;
+  vy: number;        // upward drift speed (px/frame)
+  framesLeft: number;
+}
+
+interface ExplosionParticle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  radius: number;
+  color: string;
+  opacity: number;
+  framesLeft: number;
+}
+
 // ── Demo fleet builders ────────────────────────────────────────────────────────
 
-/**
- * Build a demo attacker fleet for standalone testing.
- * In a real game this would be sourced from GameState fleets/ships.
- */
 function buildDemoAttackerFleet(): FleetForCombat {
   return {
     ships: [
@@ -96,7 +130,7 @@ function buildDemoDefenderFleet(): FleetForCombat {
         maxHp: 30,
         shieldClass: 1,
         weapons: [
-          { id: 'w3', name: 'Laser Cannon', category: 'beam', damageMin: 4, damageMax: 10, attacksPerRound: 1 },
+          { id: 'w3', name: 'Laser', category: 'beam', damageMin: 4, damageMax: 10, attacksPerRound: 1 },
         ],
         attackRating: 1,
         defenseRating: 3,
@@ -149,7 +183,7 @@ function hexToPixel(col: number, row: number): { x: number; y: number } {
   return { x, y };
 }
 
-/** Draw a single flat-top hexagon outline. */
+/** Draw a single flat-top hexagon. */
 function drawHex(
   ctx: CanvasRenderingContext2D,
   cx: number,
@@ -157,10 +191,11 @@ function drawHex(
   size: number,
   fillColor: string,
   strokeColor: string,
+  lineWidth = 1,
 ): void {
   ctx.beginPath();
   for (let i = 0; i < 6; i++) {
-    const angle = (Math.PI / 3) * i; // flat-top: 0° is right
+    const angle = (Math.PI / 3) * i;
     const px = cx + size * Math.cos(angle);
     const py = cy + size * Math.sin(angle);
     if (i === 0) ctx.moveTo(px, py);
@@ -170,16 +205,108 @@ function drawHex(
   ctx.fillStyle = fillColor;
   ctx.fill();
   ctx.strokeStyle = strokeColor;
-  ctx.lineWidth = 1;
+  ctx.lineWidth = lineWidth;
   ctx.stroke();
 }
 
 /** Compute canvas dimensions required for the full grid. */
 function computeCanvasSize(): { width: number; height: number } {
-  // Max pixel extent for flat-top hexes
   const width = Math.ceil(HEX_SIZE * 1.5 * GRID_COLS + HEX_SIZE * 1.5);
   const height = Math.ceil(HEX_H * (GRID_ROWS + 0.5) + HEX_H / 2);
   return { width, height };
+}
+
+/**
+ * Hex distance between two grid positions using the flat-top offset→cube coord
+ * conversion.
+ *
+ * Formula source: design/ships/combat-mechanics.md — Range Brackets.
+ */
+function hexDistance(
+  a: { col: number; row: number },
+  b: { col: number; row: number },
+): number {
+  // Convert offset (flat-top, odd-r) → cube coordinates
+  function toCube(col: number, row: number): { x: number; y: number; z: number } {
+    const x = col;
+    const z = row - (col - (col & 1)) / 2;
+    const y = -x - z;
+    return { x, y, z };
+  }
+  const ca = toCube(a.col, a.row);
+  const cb = toCube(b.col, b.row);
+  return Math.max(
+    Math.abs(ca.x - cb.x),
+    Math.abs(ca.y - cb.y),
+    Math.abs(ca.z - cb.z),
+  );
+}
+
+/**
+ * BFS to find all hexes reachable within `maxDist` steps from `origin`.
+ * Excludes hexes occupied by other ships.
+ *
+ * Per design/ships/combat-algorithm.md §6-7: Movement_Points = combat_speed.
+ * Each hex costs 1 movement point.
+ */
+function getReachableHexes(
+  origin: { col: number; row: number },
+  maxDist: number,
+  occupiedHexes: Set<string>,
+): Set<string> {
+  const reachable = new Set<string>();
+  const visited = new Set<string>();
+  const queue: Array<{ col: number; row: number; dist: number }> = [
+    { col: origin.col, row: origin.row, dist: 0 },
+  ];
+  const originKey = `${origin.col},${origin.row}`;
+  visited.add(originKey);
+
+  // Flat-top hex neighbors (6 directions, col-parity-aware)
+  function neighbors(col: number, row: number): Array<{ col: number; row: number }> {
+    const isEven = col % 2 === 0;
+    return isEven
+      ? [
+          { col: col - 1, row: row - 1 },
+          { col: col + 1, row: row - 1 },
+          { col: col - 1, row },
+          { col: col + 1, row },
+          { col: col - 1, row: row + 1 },
+          { col: col + 1, row: row + 1 },
+          { col, row: row - 1 },
+          { col, row: row + 1 },
+        ]
+      : [
+          { col: col - 1, row },
+          { col: col + 1, row },
+          { col: col - 1, row: row + 1 },
+          { col: col + 1, row: row + 1 },
+          { col: col - 1, row: row - 1 },
+          { col: col + 1, row: row - 1 },
+          { col, row: row - 1 },
+          { col, row: row + 1 },
+        ];
+  }
+
+  while (queue.length > 0) {
+    const current = queue.shift()!;
+    if (current.dist >= maxDist) continue;
+
+    for (const nb of neighbors(current.col, current.row)) {
+      if (nb.col < 0 || nb.col >= GRID_COLS) continue;
+      if (nb.row < 0 || nb.row >= GRID_ROWS) continue;
+      const key = `${nb.col},${nb.row}`;
+      if (visited.has(key)) continue;
+      visited.add(key);
+
+      if (!occupiedHexes.has(key) || key === originKey) {
+        reachable.add(key);
+        queue.push({ col: nb.col, row: nb.row, dist: current.dist + 1 });
+      }
+    }
+  }
+
+  return reachable;
 }
 
 // ── Color helpers ──────────────────────────────────────────────────────────────
@@ -192,6 +319,51 @@ function hpColor(ratio: number): string {
 
 function sideColor(side: 'attacker' | 'defender'): string {
   return side === 'attacker' ? '#00aaff' : '#ff4444';
+}
+
+/** Label for range bracket per combat-mechanics.md. */
+function rangeBracket(dist: number): string {
+  if (dist <= RANGE_POINT_BLANK) return 'Point Blank';
+  if (dist <= RANGE_CLOSE_MAX) return 'Close';
+  if (dist <= RANGE_MEDIUM_MAX) return 'Medium';
+  if (dist <= RANGE_LONG_MAX) return 'Long';
+  return 'Very Long';
+}
+
+// ── Combat action helpers ──────────────────────────────────────────────────────
+
+/**
+ * Roll a single weapon attack for the attacker vs target.
+ * Returns { hit, damage, roll, hitChance }.
+ *
+ * Implements combat-algorithm.md §8-11.
+ */
+function resolveWeaponAttack(
+  attacker: CombatShip,
+  weapon: WeaponInstance,
+  target: CombatShip,
+): { hit: boolean; damage: number; roll: number; hitChance: number } {
+  const hitChance = calcHitChanceVs(attacker, weapon, target);
+  const r = Math.floor(Math.random() * 100) + 1;
+
+  if (r > hitChance) {
+    return { hit: false, damage: 0, roll: r, hitChance };
+  }
+
+  // MOO1 damage-mapped-to-roll mechanic (combat-algorithm.md §8)
+  let damage: number;
+  if (weapon.damageMin === weapon.damageMax) {
+    damage = weapon.damageMin;
+  } else {
+    const hitThreshold = 101 - hitChance;
+    const successRange = Math.max(hitChance - 1, 1);
+    const fraction = (r - hitThreshold) / successRange;
+    damage = weapon.damageMin + Math.floor(fraction * (weapon.damageMax - weapon.damageMin));
+    damage = Math.max(weapon.damageMin, damage);
+  }
+
+  applyDamage(target, damage, weapon);
+  return { hit: true, damage, roll: r, hitChance };
 }
 
 // ── CombatScreen ──────────────────────────────────────────────────────────────
@@ -216,20 +388,38 @@ export class CombatScreen {
   private attackerFleet: FleetForCombat;
   private defenderFleet: FleetForCombat;
 
-  // Position map: shipId → { col, row } — rebuilt on init and after movement
+  // Position map: shipId → { col, row } — persisted across rounds for manual movement
   private positions: Map<string, { col: number; row: number }> = new Map();
 
-  // Selected ship for detail panel
+  // Interaction state
   private selectedShipId: string | null = null;
 
-  // Animation / auto-resolve
+  /**
+   * Interaction mode:
+   * - 'select': click selects a ship
+   * - 'move': click on a highlighted hex moves selected ship
+   * - 'fire': click on an enemy ship fires at it
+   */
+  private interactionMode: 'select' | 'move' | 'fire' = 'select';
+
+  /** Hexes the selected ship can move to (BFS result). */
+  private moveableHexes: Set<string> = new Set();
+
+  /** Enemy ships the selected ship can target (within grid). */
+  private targetableShipIds: Set<string> = new Set();
+
+  // Visual effects
+  private damageNumbers: DamageNumber[] = [];
+  private explosionParticles: ExplosionParticle[] = [];
+  private animFrameId: number | null = null;
+
+  // Auto-resolve animation
   private autoResolveAnimId: number | null = null;
 
   constructor(container: HTMLElement, store: Store<GameState>) {
     this.container = container;
     this.store = store;
 
-    // Initialize with demo fleets; real game would pass from GameState
     this.attackerFleet = buildDemoAttackerFleet();
     this.defenderFleet = buildDemoDefenderFleet();
 
@@ -240,20 +430,20 @@ export class CombatScreen {
   // ── Screen interface ──────────────────────────────────────────────────────────
 
   render(_state: GameState): void {
-    // State changes are handled internally; external renders are no-ops
-    // (combat screen manages its own state independently)
+    // Combat screen manages its own state internally; external renders are no-ops
   }
 
   show(): void {
     this.container.classList.add('active');
     this.container.style.display = '';
-    // Reset and start fresh combat on each show
     this.initCombat();
     this.renderAll();
+    this.startEffectLoop();
   }
 
   hide(): void {
     this.cancelAutoResolve();
+    this.stopEffectLoop();
     this.container.classList.remove('active');
     this.container.style.display = 'none';
   }
@@ -271,6 +461,7 @@ export class CombatScreen {
       font-family: 'Courier New', Courier, monospace;
       color: #c0d8f0;
       overflow: hidden;
+      position: relative;
     `;
 
     // ── Header bar ─────────────────────────────────────────────────────────────
@@ -354,7 +545,7 @@ export class CombatScreen {
     `;
     mainArea.appendChild(sidePanel);
 
-    // Ship detail panel (top half of side)
+    // Ship detail panel
     this.shipPanelEl = document.createElement('div');
     this.shipPanelEl.style.cssText = `
       flex: 1;
@@ -366,7 +557,7 @@ export class CombatScreen {
     this.shipPanelEl.innerHTML = '<p style="color:#607080; font-size:12px;">Select a ship to view details.</p>';
     sidePanel.appendChild(this.shipPanelEl);
 
-    // Combat log (bottom half of side)
+    // Combat log
     const logWrapper = document.createElement('div');
     logWrapper.style.cssText = `
       flex: 1;
@@ -427,32 +618,37 @@ export class CombatScreen {
       align-items: center;
       justify-content: center;
     `;
-    this.container.style.position = 'relative';
     this.container.appendChild(this.resultEl);
   }
 
   private buildControls(): void {
     this.controlsEl.innerHTML = '';
 
-    // Label
     const label = document.createElement('span');
     label.style.cssText = 'font-size:12px; color:#607080; flex:1;';
     label.textContent = 'Combat Controls';
     this.controlsEl.appendChild(label);
 
-    // Next Round button
+    // Next Round
     const nextRoundBtn = this.makeButton('NEXT ROUND', '#005588', '#00aaff');
-    nextRoundBtn.title = 'Advance one combat round';
+    nextRoundBtn.title = 'Advance one combat round (AI controls all ships)';
     nextRoundBtn.addEventListener('click', () => this.stepRound());
     this.controlsEl.appendChild(nextRoundBtn);
 
-    // Auto-Resolve button
+    // Auto-Resolve
     const autoBtn = this.makeButton('AUTO-RESOLVE', '#1a3a1a', '#00cc66');
     autoBtn.title = 'Run combat to completion automatically';
     autoBtn.addEventListener('click', () => this.doAutoResolve());
     this.controlsEl.appendChild(autoBtn);
 
-    // Return to map (only enabled when combat ended)
+    // Retreat — attempt fleet retreat per combat-algorithm.md §28-29
+    // Retreat chance = clamp((ownSpeed / maxEnemySpeed) × 50 + 25, 0, 95)
+    const retreatBtn = this.makeButton('RETREAT', '#3a2a00', '#ffaa00');
+    retreatBtn.title = 'Attempt to retreat your fleet from combat';
+    retreatBtn.addEventListener('click', () => this.doRetreat());
+    this.controlsEl.appendChild(retreatBtn);
+
+    // Return to map
     const returnBtn = this.makeButton('RETURN TO MAP', '#3a1a1a', '#ff6666');
     returnBtn.id = 'combat-return-btn';
     returnBtn.title = 'Return to galaxy map';
@@ -473,14 +669,10 @@ export class CombatScreen {
       font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 1px;
-      transition: background 0.15s, border-color 0.15s;
+      transition: background 0.15s;
     `;
-    btn.addEventListener('mouseover', () => {
-      btn.style.background = border;
-    });
-    btn.addEventListener('mouseout', () => {
-      btn.style.background = bg;
-    });
+    btn.addEventListener('mouseover', () => { btn.style.background = border; });
+    btn.addEventListener('mouseout', () => { btn.style.background = bg; });
     return btn;
   }
 
@@ -490,41 +682,178 @@ export class CombatScreen {
     this.cancelAutoResolve();
     this.result = null;
     this.selectedShipId = null;
+    this.interactionMode = 'select';
+    this.moveableHexes.clear();
+    this.targetableShipIds.clear();
+    this.damageNumbers = [];
+    this.explosionParticles = [];
     this.combatState = initiateCombat(this.attackerFleet, this.defenderFleet);
     this.rebuildPositions();
     this.hideResultOverlay();
   }
 
-  /** Assign hex positions for all ships based on current state. */
+  /**
+   * Assign initial hex positions for all ships.
+   * Attackers start on left columns, defenders on right.
+   * Positions are preserved between rounds for manual movement.
+   */
   private rebuildPositions(): void {
-    this.positions.clear();
     if (!this.combatState) return;
 
-    // Attackers start on left columns, defenders on right
-    const attackerLiving = this.combatState.attackerShips.filter((s) => s.hp > 0 && !s.retreated);
-    const defenderLiving = this.combatState.defenderShips.filter((s) => s.hp > 0 && !s.retreated);
+    // Only assign positions for ships not yet placed
+    const attackerLiving = this.combatState.attackerShips.filter((s) => !this.positions.has(s.id));
+    const defenderLiving = this.combatState.defenderShips.filter((s) => !this.positions.has(s.id));
 
-    attackerLiving.forEach((ship, i) => {
-      this.positions.set(ship.id, {
-        col: 1 + Math.floor(i / GRID_ROWS),
-        row: 1 + (i % (GRID_ROWS - 1)),
-      });
+    const allAttackers = this.combatState.attackerShips;
+    const allDefenders = this.combatState.defenderShips;
+
+    allAttackers.forEach((ship, i) => {
+      if (!this.positions.has(ship.id)) {
+        this.positions.set(ship.id, {
+          col: 1 + Math.floor(i / (GRID_ROWS - 2)),
+          row: 1 + (i % (GRID_ROWS - 2)),
+        });
+      }
     });
 
-    defenderLiving.forEach((ship, i) => {
-      this.positions.set(ship.id, {
-        col: GRID_COLS - 2 - Math.floor(i / GRID_ROWS),
-        row: 1 + (i % (GRID_ROWS - 1)),
-      });
+    allDefenders.forEach((ship, i) => {
+      if (!this.positions.has(ship.id)) {
+        this.positions.set(ship.id, {
+          col: GRID_COLS - 2 - Math.floor(i / (GRID_ROWS - 2)),
+          row: 1 + (i % (GRID_ROWS - 2)),
+        });
+      }
     });
+
+    // suppress unused variable warnings
+    void attackerLiving;
+    void defenderLiving;
+  }
+
+  // ── Effect animation loop ─────────────────────────────────────────────────────
+
+  private startEffectLoop(): void {
+    if (this.animFrameId !== null) return;
+    const loop = () => {
+      this.tickEffects();
+      if (this.damageNumbers.length > 0 || this.explosionParticles.length > 0) {
+        this.renderGrid(); // redraw grid to show effect overlays
+      }
+      this.animFrameId = requestAnimationFrame(loop);
+    };
+    this.animFrameId = requestAnimationFrame(loop);
+  }
+
+  private stopEffectLoop(): void {
+    if (this.animFrameId !== null) {
+      cancelAnimationFrame(this.animFrameId);
+      this.animFrameId = null;
+    }
+  }
+
+  private tickEffects(): void {
+    // Advance damage numbers
+    this.damageNumbers = this.damageNumbers.filter((d) => d.framesLeft > 0);
+    for (const d of this.damageNumbers) {
+      d.y += d.vy;
+      d.opacity = Math.max(0, d.opacity - 0.03);
+      d.framesLeft--;
+    }
+
+    // Advance explosion particles
+    this.explosionParticles = this.explosionParticles.filter((p) => p.framesLeft > 0);
+    for (const p of this.explosionParticles) {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.opacity = Math.max(0, p.opacity - 0.025);
+      p.radius = Math.max(0.5, p.radius - 0.15);
+      p.framesLeft--;
+    }
+  }
+
+  // ── Spawn visual effects ──────────────────────────────────────────────────────
+
+  /**
+   * Spawn a floating damage number at pixel position (x, y).
+   * @param damage - damage dealt
+   * @param shieldAbsorbed - how much was absorbed by shields (shown separately)
+   * @param isCrit - whether it was a critical hit
+   */
+  private spawnDamageNumber(x: number, y: number, damage: number, shieldAbsorbed = 0, isCrit = false): void {
+    const hullDmg = damage - shieldAbsorbed;
+    const text = isCrit
+      ? `✦${damage}`
+      : shieldAbsorbed > 0 && hullDmg > 0
+      ? `${hullDmg} (${shieldAbsorbed}🛡)`
+      : `${damage}`;
+    const color = isCrit ? '#ffff00' : hullDmg > 0 ? '#ff4444' : '#4488ff';
+
+    this.damageNumbers.push({
+      x: x + (Math.random() - 0.5) * 12,
+      y: y - 12,
+      text,
+      color,
+      opacity: 1.0,
+      vy: -1.2,
+      framesLeft: 50,
+    });
+  }
+
+  private spawnMissEffect(x: number, y: number): void {
+    this.damageNumbers.push({
+      x: x + (Math.random() - 0.5) * 8,
+      y: y - 12,
+      text: 'MISS',
+      color: '#607080',
+      opacity: 0.8,
+      vy: -0.8,
+      framesLeft: 35,
+    });
+  }
+
+  /**
+   * Spawn explosion particle burst at pixel (x, y).
+   * Used when a ship is destroyed.
+   */
+  private spawnExplosion(x: number, y: number): void {
+    const colors = ['#ff8800', '#ffcc00', '#ff3300', '#ffffff', '#ffaaaa'];
+    const count = 22;
+    for (let i = 0; i < count; i++) {
+      const angle = (Math.PI * 2 * i) / count + Math.random() * 0.3;
+      const speed = 1.5 + Math.random() * 2.5;
+      this.explosionParticles.push({
+        x,
+        y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        radius: 2 + Math.random() * 3,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        opacity: 1.0,
+        framesLeft: 45 + Math.floor(Math.random() * 20),
+      });
+    }
   }
 
   // ── Step one round ────────────────────────────────────────────────────────────
 
   private stepRound(): void {
     if (!this.combatState || this.combatState.status !== 'ongoing') return;
+    this.clearInteractionMode();
     processRound(this.combatState);
-    this.rebuildPositions();
+
+    // Check for newly destroyed ships and spawn explosions
+    const allShips = [...this.combatState.attackerShips, ...this.combatState.defenderShips];
+    for (const ship of allShips) {
+      if (ship.hp <= 0) {
+        const pos = this.positions.get(ship.id);
+        if (pos) {
+          const { x, y } = hexToPixel(pos.col, pos.row);
+          this.spawnExplosion(x, y);
+          this.spawnDamageNumber(x, y, 0, 0, false);
+        }
+      }
+    }
+
     this.renderAll();
 
     if (this.combatState.status !== 'ongoing') {
@@ -532,7 +861,7 @@ export class CombatScreen {
     }
   }
 
-  // ── Auto-resolve all remaining rounds ─────────────────────────────────────────
+  // ── Auto-resolve ──────────────────────────────────────────────────────────────
 
   private doAutoResolve(): void {
     if (!this.combatState) return;
@@ -541,23 +870,88 @@ export class CombatScreen {
       return;
     }
 
-    // Run synchronously to completion (combat engine is fast)
+    this.clearInteractionMode();
     this.result = autoResolveCombat(this.attackerFleet, this.defenderFleet, 100);
-    // Sync the state's log for display
+
+    // Sync combat state from result for display
     if (this.combatState) {
       this.combatState.log = this.result.log;
       this.combatState.round = this.result.rounds;
       this.combatState.status = this.result.status;
-      // Update HP from result survivors/losses
       const allLosses = [...this.result.losses.attacker, ...this.result.losses.defender];
       const lossIds = new Set(allLosses.map((s) => s.id));
       for (const ship of [...this.combatState.attackerShips, ...this.combatState.defenderShips]) {
-        if (lossIds.has(ship.id)) ship.hp = 0;
+        if (lossIds.has(ship.id)) {
+          ship.hp = 0;
+          const pos = this.positions.get(ship.id);
+          if (pos) {
+            const { x, y } = hexToPixel(pos.col, pos.row);
+            this.spawnExplosion(x, y);
+          }
+        }
       }
-      this.rebuildPositions();
     }
+
     this.renderAll();
     this.finishCombat();
+  }
+
+  /**
+   * Attempt fleet retreat per combat-algorithm.md §28-29.
+   *
+   * Retreat chance = clamp((ownSpeed / maxEnemySpeed) × 50 + 25, 0, 95)
+   * Each attacker ship attempts retreat independently.
+   */
+  private doRetreat(): void {
+    if (!this.combatState || this.combatState.status !== 'ongoing') return;
+    this.clearInteractionMode();
+
+    const attackers = this.combatState.attackerShips.filter(
+      (s) => s.hp > 0 && !s.retreated,
+    );
+    let retreatedCount = 0;
+    let trappedCount = 0;
+
+    for (const ship of attackers) {
+      const succeeded = attemptRetreat(ship, this.combatState);
+      if (succeeded) {
+        retreatedCount++;
+        // Remove from position map — ship is gone from grid
+        this.positions.delete(ship.id);
+      } else {
+        trappedCount++;
+      }
+    }
+
+    const summary =
+      retreatedCount > 0 && trappedCount === 0
+        ? `Fleet retreated successfully (${retreatedCount} ship${retreatedCount !== 1 ? 's' : ''} escaped).`
+        : retreatedCount > 0
+        ? `Partial retreat: ${retreatedCount} escaped, ${trappedCount} trapped.`
+        : `Retreat FAILED — all ${trappedCount} ship${trappedCount !== 1 ? 's' : ''} trapped!`;
+
+    this.combatState.log.push({
+      round: this.combatState.round,
+      message: `[RETREAT] ${summary}`,
+    });
+
+    // Check if combat has ended (all attackers retreated or dead)
+    const attackersRemaining = this.combatState.attackerShips.filter(
+      (s) => s.hp > 0 && !s.retreated,
+    );
+    if (attackersRemaining.length === 0) {
+      this.combatState.status = 'defender_wins';
+      this.combatState.log.push({
+        round: this.combatState.round,
+        message: `[R${this.combatState.round}] Combat ended — all attackers retreated or destroyed.`,
+      });
+    }
+
+    this.renderAll();
+
+    if (this.combatState.status !== 'ongoing') {
+      this.finishCombat();
+    }
   }
 
   private cancelAutoResolve(): void {
@@ -573,7 +967,6 @@ export class CombatScreen {
     if (!this.combatState) return;
 
     if (!this.result) {
-      // Build result from current state
       const state = this.combatState;
       const attackerLosses = state.attackerShips.filter((s) => s.hp <= 0);
       const defenderLosses = state.defenderShips.filter((s) => s.hp <= 0);
@@ -600,37 +993,318 @@ export class CombatScreen {
 
   private returnToGalaxy(): void {
     this.cancelAutoResolve();
+    this.stopEffectLoop();
     this.store.dispatch({ type: 'NAVIGATE', payload: { screen: 'galaxy' } });
   }
 
-  // ── Canvas click: select ship ─────────────────────────────────────────────────
+  // ── Interaction mode management ───────────────────────────────────────────────
+
+  private clearInteractionMode(): void {
+    this.interactionMode = 'select';
+    this.moveableHexes.clear();
+    this.targetableShipIds.clear();
+  }
+
+  /**
+   * After selecting a friendly ship, compute:
+   * - moveableHexes: hexes reachable within ship.speed (BFS)
+   * - targetableShipIds: visible enemy ships on the grid
+   *
+   * The player can then:
+   *   1. Click a highlighted hex → move
+   *   2. Click an enemy ship → fire
+   *
+   * Per combat-algorithm.md §6-7:
+   *   Movement_Points = combat_speed
+   *   Each hex costs 1 MP.
+   */
+  private activateShipInteraction(ship: CombatShip): void {
+    if (!this.combatState) return;
+    if (ship.hp <= 0 || ship.retreated) {
+      this.clearInteractionMode();
+      return;
+    }
+
+    // Build occupied set (exclude the selected ship itself)
+    const occupied = new Set<string>();
+    for (const [id, pos] of this.positions) {
+      if (id !== ship.id) {
+        occupied.add(`${pos.col},${pos.row}`);
+      }
+    }
+
+    const origin = this.positions.get(ship.id);
+    if (!origin) { this.clearInteractionMode(); return; }
+
+    // Reachable hexes by BFS within combat_speed steps
+    this.moveableHexes = getReachableHexes(origin, ship.speed, occupied);
+
+    // Targetable enemies: all living enemies on the grid
+    const enemies = ship.side === 'attacker'
+      ? this.combatState.defenderShips
+      : this.combatState.attackerShips;
+
+    this.targetableShipIds.clear();
+    for (const enemy of enemies) {
+      if (enemy.hp > 0 && !enemy.retreated && this.positions.has(enemy.id)) {
+        this.targetableShipIds.add(enemy.id);
+      }
+    }
+
+    this.interactionMode = 'move';
+    this.renderGrid();
+  }
+
+  // ── Canvas click handler ──────────────────────────────────────────────────────
 
   private onCanvasClick(e: MouseEvent): void {
-    if (!this.combatState) return;
+    if (!this.combatState || this.combatState.status !== 'ongoing') return;
 
     const rect = this.canvasEl.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
     const clickY = e.clientY - rect.top;
 
-    // Find ship closest to click point
-    let bestDist = HEX_SIZE * 1.2;
-    let found: string | null = null;
+    // Find the closest hex col/row to the click
+    const { clickedCol, clickedRow } = this.pixelToHex(clickX, clickY);
 
-    const allShips = [...this.combatState.attackerShips, ...this.combatState.defenderShips];
-    for (const ship of allShips) {
-      const pos = this.positions.get(ship.id);
-      if (!pos) continue;
-      const { x, y } = hexToPixel(pos.col, pos.row);
-      const dist = Math.hypot(clickX - x, clickY - y);
-      if (dist < bestDist) {
-        bestDist = dist;
-        found = ship.id;
+    // Check if clicking on a ship
+    const clickedShipId = this.findShipAtHex(clickedCol, clickedRow);
+
+    if (this.interactionMode === 'select' || this.interactionMode === 'move' || this.interactionMode === 'fire') {
+      // Priority 1: click on an enemy ship → fire if a friendly is selected
+      if (clickedShipId !== null) {
+        const clickedShip = this.findShipById(clickedShipId);
+        const selectedShip = this.selectedShipId ? this.findShipById(this.selectedShipId) : null;
+
+        if (
+          selectedShip &&
+          clickedShip &&
+          clickedShip.side !== selectedShip.side &&
+          this.targetableShipIds.has(clickedShipId) &&
+          selectedShip.hp > 0
+        ) {
+          // Fire at the clicked enemy
+          this.executeFire(selectedShip, clickedShip);
+          return;
+        }
+
+        // Otherwise: select the clicked ship
+        this.selectedShipId = clickedShipId;
+        const ship = this.findShipById(clickedShipId);
+        if (ship && ship.side === 'attacker') {
+          // Activate movement/fire mode for friendly ships
+          this.activateShipInteraction(ship);
+        } else {
+          this.clearInteractionMode();
+        }
+
+        this.renderShipPanel();
+        this.renderInitiativeStrip();
+        this.renderGrid();
+        return;
+      }
+
+      // Priority 2: click on a moveable hex → move selected ship
+      const hexKey = `${clickedCol},${clickedRow}`;
+      if (
+        this.interactionMode === 'move' &&
+        this.moveableHexes.has(hexKey) &&
+        this.selectedShipId !== null
+      ) {
+        this.executeMoveToHex(this.selectedShipId, clickedCol, clickedRow);
+        return;
+      }
+
+      // Priority 3: deselect (click empty, non-moveable hex)
+      if (clickedShipId === null) {
+        this.selectedShipId = null;
+        this.clearInteractionMode();
+        this.renderShipPanel();
+        this.renderInitiativeStrip();
+        this.renderGrid();
+      }
+    }
+  }
+
+  /**
+   * Approximate nearest hex column/row from a pixel position.
+   * Uses the inverse of hexToPixel to find the closest grid cell.
+   */
+  private pixelToHex(px: number, py: number): { clickedCol: number; clickedRow: number } {
+    let bestDist = Infinity;
+    let bestCol = 0;
+    let bestRow = 0;
+
+    for (let col = 0; col < GRID_COLS; col++) {
+      for (let row = 0; row < GRID_ROWS; row++) {
+        const { x, y } = hexToPixel(col, row);
+        const dist = Math.hypot(px - x, py - y);
+        if (dist < bestDist) {
+          bestDist = dist;
+          bestCol = col;
+          bestRow = row;
+        }
       }
     }
 
-    this.selectedShipId = found;
-    this.renderShipPanel();
-    this.renderGrid(); // redraw to show selection highlight
+    return { clickedCol: bestCol, clickedRow: bestRow };
+  }
+
+  /** Returns the ship ID at the given hex position, or null if empty. */
+  private findShipAtHex(col: number, row: number): string | null {
+    for (const [id, pos] of this.positions) {
+      if (pos.col === col && pos.row === row) return id;
+    }
+    return null;
+  }
+
+  private findShipById(id: string): CombatShip | undefined {
+    if (!this.combatState) return undefined;
+    return [...this.combatState.attackerShips, ...this.combatState.defenderShips]
+      .find((s) => s.id === id);
+  }
+
+  // ── Execute move ──────────────────────────────────────────────────────────────
+
+  /**
+   * Move the selected ship to (col, row).
+   * Per combat-algorithm.md §6-7: each hex costs 1 MP = 1 movement point.
+   * After moving, the hex is occupied and movement mode clears.
+   */
+  private executeMoveToHex(shipId: string, col: number, row: number): void {
+    if (!this.combatState) return;
+    const ship = this.findShipById(shipId);
+    if (!ship || ship.hp <= 0 || ship.retreated) return;
+
+    const oldPos = this.positions.get(shipId);
+    if (!oldPos) return;
+
+    const dist = hexDistance(oldPos, { col, row });
+
+    this.positions.set(shipId, { col, row });
+
+    this.combatState.log.push({
+      round: this.combatState.round,
+      message: `[M] ${ship.designId} moves ${dist} hex${dist !== 1 ? 'es' : ''} to (${col},${row})`,
+    });
+
+    // Recompute movement range from new position
+    this.activateShipInteraction(ship);
+
+    this.renderAll();
+  }
+
+  // ── Execute fire ──────────────────────────────────────────────────────────────
+
+  /**
+   * Fire all weapons from attacker at target, one attack per weapon per
+   * attacksPerRound, per combat-algorithm.md §8-11.
+   *
+   * Hit chance formula (§9-10):
+   *   Hit% = 50 + (attackRating - defenseRating) × 5 + experience bonus
+   *   Range modifiers applied after (§10).
+   * Damage (§8 MOO1 mapped): min + floor(fraction × (max-min)).
+   * Shields (§11): absorb min(shieldClass, damage); remainder hits hull.
+   */
+  private executeFire(attacker: CombatShip, target: CombatShip): void {
+    if (!this.combatState) return;
+    if (attacker.hp <= 0 || target.hp <= 0) return;
+
+    const attackerPos = this.positions.get(attacker.id);
+    const targetPos = this.positions.get(target.id);
+
+    const distHexes = attackerPos && targetPos
+      ? hexDistance(attackerPos, targetPos)
+      : 5; // fallback if positions unknown
+
+    const bracket = rangeBracket(distHexes);
+    const targetPixel = targetPos ? hexToPixel(targetPos.col, targetPos.row) : { x: 0, y: 0 };
+
+    let totalHullDamage = 0;
+    let anyHit = false;
+    let targetDestroyed = false;
+
+    for (const weapon of attacker.weapons) {
+      const count = Math.max(1, weapon.attacksPerRound);
+
+      for (let atk = 0; atk < count; atk++) {
+        if (target.hp <= 0) { targetDestroyed = true; break; }
+
+        const hpBefore = target.hp;
+        const { hit, damage, roll, hitChance } = resolveWeaponAttack(attacker, weapon, target);
+        const hpAfter = target.hp;
+        const hullDamage = Math.max(0, hpBefore - hpAfter);
+        const shieldAbsorbed = hit ? Math.max(0, damage - hullDamage) : 0;
+
+        if (hit) {
+          anyHit = true;
+          totalHullDamage += hullDamage;
+          this.spawnDamageNumber(targetPixel.x, targetPixel.y, damage, shieldAbsorbed);
+
+          this.combatState.log.push({
+            round: this.combatState.round,
+            message:
+              `[R${this.combatState.round}] ${attacker.designId} fires ${weapon.name}` +
+              ` at ${target.designId} (${bracket})` +
+              ` — HIT (${roll}≤${hitChance}%), ${damage} dmg` +
+              (shieldAbsorbed > 0 ? ` (${shieldAbsorbed} absorbed by shields)` : '') +
+              ` → ${target.hp}/${target.maxHp} HP`,
+          });
+
+          if (target.hp <= 0) {
+            targetDestroyed = true;
+            this.spawnExplosion(targetPixel.x, targetPixel.y);
+            this.combatState.log.push({
+              round: this.combatState.round,
+              message: `[R${this.combatState.round}] ${target.designId} DESTROYED!`,
+            });
+
+            // Check if combat ended
+            const allAttackers = this.combatState.attackerShips;
+            const allDefenders = this.combatState.defenderShips;
+            const attackersAlive = allAttackers.some((s) => s.hp > 0 && !s.retreated);
+            const defendersAlive = allDefenders.some((s) => s.hp > 0 && !s.retreated);
+
+            if (!attackersAlive && !defendersAlive) {
+              this.combatState.status = 'draw';
+            } else if (!defendersAlive) {
+              this.combatState.status = 'attacker_wins';
+            } else if (!attackersAlive) {
+              this.combatState.status = 'defender_wins';
+            }
+            break;
+          }
+        } else {
+          this.spawnMissEffect(targetPixel.x, targetPixel.y);
+          this.combatState.log.push({
+            round: this.combatState.round,
+            message:
+              `[R${this.combatState.round}] ${attacker.designId} fires ${weapon.name}` +
+              ` at ${target.designId} (${bracket})` +
+              ` — MISS (roll ${roll} > ${hitChance}%)`,
+          });
+        }
+      }
+
+      if (targetDestroyed) break;
+    }
+
+    void anyHit;
+    void totalHullDamage;
+
+    // Refresh move range after firing
+    const selectedShip = this.selectedShipId ? this.findShipById(this.selectedShipId) : null;
+    if (selectedShip && selectedShip.hp > 0) {
+      this.activateShipInteraction(selectedShip);
+    } else {
+      this.clearInteractionMode();
+    }
+
+    this.renderAll();
+
+    if (this.combatState.status !== 'ongoing') {
+      setTimeout(() => this.finishCombat(), 600);
+    }
   }
 
   // ── Render all ────────────────────────────────────────────────────────────────
@@ -647,13 +1321,17 @@ export class CombatScreen {
 
   private renderHeader(): void {
     if (!this.combatState) return;
+    const modeHint = this.interactionMode === 'move' && this.selectedShipId
+      ? '  [Click hex: MOVE | Click enemy: FIRE | Click unit: SELECT]'
+      : '';
+
     const statusText: Record<CombatStatus, string> = {
-      ongoing: `ROUND ${this.combatState.round} — ONGOING`,
+      ongoing:       `ROUND ${this.combatState.round} — ONGOING`,
       attacker_wins: `ROUND ${this.combatState.round} — ATTACKERS VICTORIOUS`,
       defender_wins: `ROUND ${this.combatState.round} — DEFENDERS VICTORIOUS`,
-      draw: `ROUND ${this.combatState.round} — DRAW`,
+      draw:          `ROUND ${this.combatState.round} — DRAW`,
     };
-    this.headerEl.textContent = `TACTICAL COMBAT  ·  ${statusText[this.combatState.status]}`;
+    this.headerEl.textContent = `TACTICAL COMBAT  ·  ${statusText[this.combatState.status]}${modeHint}`;
   }
 
   // ── Initiative strip ──────────────────────────────────────────────────────────
@@ -662,10 +1340,11 @@ export class CombatScreen {
     if (!this.combatState) return;
     this.initiativeEl.innerHTML = '';
 
+    // Sort by speed descending — initiative order per §4-5
     const allShips = [
       ...this.combatState.attackerShips,
       ...this.combatState.defenderShips,
-    ].filter((s) => !s.retreated).sort((a, b) => b.speed - a.speed);
+    ].sort((a, b) => b.speed - a.speed);
 
     const label = document.createElement('span');
     label.style.cssText = 'font-size:10px; color:#607080; white-space:nowrap; margin-right:4px;';
@@ -676,8 +1355,9 @@ export class CombatScreen {
       const card = document.createElement('div');
       const isSelected = ship.id === this.selectedShipId;
       const isDead = ship.hp <= 0;
+      const isRetreated = ship.retreated;
       const color = sideColor(ship.side);
-      const hpRatio = ship.hp / ship.maxHp;
+      const hpRatio = ship.maxHp > 0 ? ship.hp / ship.maxHp : 0;
 
       card.style.cssText = `
         display: flex;
@@ -688,7 +1368,7 @@ export class CombatScreen {
         background: ${isSelected ? '#1a2a3a' : '#050f1e'};
         min-width: 80px;
         cursor: pointer;
-        opacity: ${isDead ? '0.35' : '1'};
+        opacity: ${isDead || isRetreated ? '0.35' : '1'};
         text-decoration: ${isDead ? 'line-through' : 'none'};
         flex-shrink: 0;
         transition: background 0.1s;
@@ -696,7 +1376,10 @@ export class CombatScreen {
 
       card.innerHTML = `
         <span style="font-size:10px; color:${color}; font-weight:bold; white-space:nowrap;">${ship.designId}</span>
-        <span style="font-size:9px; color:#607080; white-space:nowrap;">${ship.side === 'attacker' ? 'ALLY' : 'ENEMY'} · Spd ${ship.speed}</span>
+        <span style="font-size:9px; color:#607080; white-space:nowrap;">
+          ${ship.side === 'attacker' ? 'ALLY' : 'ENEMY'} · Spd ${ship.speed}
+          ${isRetreated ? ' · FLED' : ''}
+        </span>
         <div style="width:60px; height:5px; background:#1a1a1a; border-radius:2px; margin-top:3px; overflow:hidden;">
           <div style="width:${Math.round(hpRatio * 100)}%; height:100%; background:${hpColor(hpRatio)};"></div>
         </div>
@@ -705,6 +1388,11 @@ export class CombatScreen {
 
       card.addEventListener('click', () => {
         this.selectedShipId = ship.id;
+        if (ship.side === 'attacker' && ship.hp > 0 && !ship.retreated) {
+          this.activateShipInteraction(ship);
+        } else {
+          this.clearInteractionMode();
+        }
         this.renderShipPanel();
         this.renderInitiativeStrip();
         this.renderGrid();
@@ -722,15 +1410,53 @@ export class CombatScreen {
     const { width, height } = computeCanvasSize();
     ctx.clearRect(0, 0, width, height);
 
-    // ── Draw all hexes ──────────────────────────────────────────────────────────
+    // ── 1. Draw base hexes ──────────────────────────────────────────────────────
     for (let col = 0; col < GRID_COLS; col++) {
       for (let row = 0; row < GRID_ROWS; row++) {
         const { x, y } = hexToPixel(col, row);
-        drawHex(ctx, x, y, HEX_SIZE - 1, '#00080f', '#0f2a40');
+        const key = `${col},${row}`;
+
+        let fill = '#00080f';
+        let stroke = '#0f2a40';
+        let lineW = 1;
+
+        if (this.moveableHexes.has(key)) {
+          // Movement range highlight (blue-green tint)
+          fill = '#0a2a1a';
+          stroke = '#00aa55';
+          lineW = 1.5;
+        }
+
+        // Draw the hex
+        drawHex(ctx, x, y, HEX_SIZE - 1, fill, stroke, lineW);
+
+        // Add pulsing dot for moveable hexes
+        if (this.moveableHexes.has(key) && !this.findShipAtHex(col, row)) {
+          ctx.fillStyle = '#00aa5555';
+          ctx.beginPath();
+          ctx.arc(x, y, 5, 0, Math.PI * 2);
+          ctx.fill();
+        }
       }
     }
 
-    // ── Draw ships ──────────────────────────────────────────────────────────────
+    // ── 2. Draw range bracket labels (relative to selected ship) ──────────────
+    const selectedPos = this.selectedShipId ? this.positions.get(this.selectedShipId) : null;
+    if (selectedPos && this.interactionMode === 'move') {
+      // Lightly label the range zones
+      for (const [, pos] of this.positions) {
+        if (pos === selectedPos) continue;
+        const dist = hexDistance(selectedPos, pos);
+        const { x, y } = hexToPixel(pos.col, pos.row);
+        ctx.fillStyle = '#223344';
+        ctx.font = `8px monospace`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText(`${dist}h`, x, y + HEX_SIZE * 0.95);
+      }
+    }
+
+    // ── 3. Draw ships ───────────────────────────────────────────────────────────
     const allShips = [...this.combatState.attackerShips, ...this.combatState.defenderShips];
 
     for (const ship of allShips) {
@@ -740,13 +1466,9 @@ export class CombatScreen {
       const { x, y } = hexToPixel(pos.col, pos.row);
       const isDead = ship.hp <= 0;
       const isSelected = ship.id === this.selectedShipId;
+      const isTargetable = this.targetableShipIds.has(ship.id);
       const color = sideColor(ship.side);
-      const hpRatio = ship.hp / ship.maxHp;
-
-      // Hex highlight for selected
-      if (isSelected && !isDead) {
-        drawHex(ctx, x, y, HEX_SIZE - 1, '#1a2a3a', '#ffffff');
-      }
+      const hpRatio = ship.maxHp > 0 ? ship.hp / ship.maxHp : 0;
 
       if (isDead) {
         // Debris marker
@@ -761,46 +1483,98 @@ export class CombatScreen {
         continue;
       }
 
-      // Ship token hexagon (filled)
-      drawHex(ctx, x, y, HEX_SIZE - 2, color + '22', color);
+      if (ship.retreated) {
+        // Retreated — dim ghost
+        ctx.globalAlpha = 0.2;
+        drawHex(ctx, x, y, HEX_SIZE - 1, '#1a1a2a', '#334455');
+        ctx.globalAlpha = 1;
+        continue;
+      }
 
-      // Ship letter label
+      // Selection highlight
+      if (isSelected) {
+        drawHex(ctx, x, y, HEX_SIZE, '#1a3a5a', '#ffffff', 2);
+      }
+
+      // Targetable enemy highlight (pulsing red border)
+      if (isTargetable) {
+        ctx.globalAlpha = 0.6;
+        drawHex(ctx, x, y, HEX_SIZE - 1, '#3a0a0a', '#ff4444', 2);
+        ctx.globalAlpha = 1;
+      }
+
+      // Ship token
+      drawHex(ctx, x, y, HEX_SIZE - 3, color + '22', color, 1);
+
+      // Side initial + design abbreviation
       ctx.fillStyle = '#ffffff';
-      ctx.font = `bold ${Math.round(HEX_SIZE * 0.6)}px monospace`;
+      ctx.font = `bold ${Math.round(HEX_SIZE * 0.55)}px monospace`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      const sideInitial = ship.side === 'attacker' ? 'A' : 'E';
-      ctx.fillText(sideInitial, x, y - 4);
+      ctx.fillText(ship.side === 'attacker' ? 'A' : 'E', x, y - 5);
 
       ctx.fillStyle = color;
-      ctx.font = `${Math.round(HEX_SIZE * 0.35)}px monospace`;
-      ctx.fillText(ship.designId.slice(0, 3).toUpperCase(), x, y + 10);
+      ctx.font = `${Math.round(HEX_SIZE * 0.3)}px monospace`;
+      ctx.fillText(ship.designId.slice(0, 3).toUpperCase(), x, y + 9);
 
-      // HP bar below hex
+      // HP bar
       const barW = HEX_SIZE * 1.4;
       const barH = 4;
       const barX = x - barW / 2;
-      const barY = y + HEX_SIZE * 0.85;
-
+      const barY = y + HEX_SIZE * 0.82;
       ctx.fillStyle = '#111';
       ctx.fillRect(barX, barY, barW, barH);
       ctx.fillStyle = hpColor(hpRatio);
       ctx.fillRect(barX, barY, barW * hpRatio, barH);
 
-      // Speed/MP label
+      // Speed label
       ctx.fillStyle = '#607080';
-      ctx.font = `${Math.round(HEX_SIZE * 0.3)}px monospace`;
+      ctx.font = `${Math.round(HEX_SIZE * 0.28)}px monospace`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'top';
-      ctx.fillText(`Spd ${ship.speed}`, x, barY + barH + 2);
+      ctx.fillText(`Spd ${ship.speed}`, x, barY + barH + 1);
+
+      // Shield indicator
+      if (ship.shieldClass > 0) {
+        ctx.fillStyle = '#4488ff88';
+        ctx.font = `${Math.round(HEX_SIZE * 0.28)}px monospace`;
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'top';
+        ctx.fillText(`🛡${ship.shieldClass}`, x + HEX_SIZE * 0.85, y - HEX_SIZE * 0.9);
+      }
     }
+
+    // ── 4. Draw explosion particles ─────────────────────────────────────────────
+    for (const p of this.explosionParticles) {
+      ctx.globalAlpha = p.opacity;
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    // ── 5. Draw floating damage numbers ─────────────────────────────────────────
+    for (const d of this.damageNumbers) {
+      ctx.globalAlpha = d.opacity;
+      ctx.fillStyle = d.color;
+      ctx.font = `bold 13px 'Courier New', monospace`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      // Shadow for readability
+      ctx.shadowColor = '#000000';
+      ctx.shadowBlur = 3;
+      ctx.fillText(d.text, d.x, d.y);
+      ctx.shadowBlur = 0;
+    }
+    ctx.globalAlpha = 1;
   }
 
   // ── Ship detail panel ─────────────────────────────────────────────────────────
 
   private renderShipPanel(): void {
     if (!this.combatState || !this.selectedShipId) {
-      this.shipPanelEl.innerHTML = '<p style="color:#607080; font-size:12px;">Select a ship on the grid or initiative strip.</p>';
+      this.shipPanelEl.innerHTML = '<p style="color:#607080; font-size:12px;">Select a ship on the grid or initiative strip.<br><br><em style="font-size:10px;">Friendly ships: click to select, then click a green hex to move or an enemy to fire.</em></p>';
       return;
     }
 
@@ -812,10 +1586,18 @@ export class CombatScreen {
       return;
     }
 
-    const hpRatio = ship.hp / ship.maxHp;
+    const hpRatio = ship.maxHp > 0 ? ship.hp / ship.maxHp : 0;
     const color = sideColor(ship.side);
     const side = ship.side === 'attacker' ? 'ALLY' : 'ENEMY';
     const isDead = ship.hp <= 0;
+
+    // Range bracket if position is known
+    const selectedPos = this.positions.get(ship.id);
+    const shipPos = this.selectedShipId && this.positions.get(this.selectedShipId);
+    const rangeStr = selectedPos && shipPos && ship.id !== this.selectedShipId
+      ? rangeBracket(hexDistance(selectedPos, shipPos))
+      : '';
+    void rangeStr;
 
     const weaponRows = ship.weapons
       .map(
@@ -831,6 +1613,14 @@ export class CombatScreen {
       )
       .join('');
 
+    const interactionHint =
+      !isDead && ship.side === 'attacker' && this.interactionMode === 'move'
+        ? `<div style="font-size:10px; color:#00aa55; margin-top:6px; padding:4px; border:1px solid #00aa55; background:#001a0a;">
+            ⬡ Green hexes = move range (${ship.speed} hex${ship.speed !== 1 ? 'es' : ''})<br>
+            🎯 Red-bordered ships = fire targets
+           </div>`
+        : '';
+
     this.shipPanelEl.innerHTML = `
       <div style="border-bottom:1px solid #1a3a5c; padding-bottom:8px; margin-bottom:8px;">
         <div style="font-size:13px; color:${color}; font-weight:bold;">${ship.designId}</div>
@@ -838,6 +1628,7 @@ export class CombatScreen {
       </div>
 
       ${isDead ? '<div style="color:#ff3333; font-weight:bold; margin-bottom:8px;">⚠ DESTROYED</div>' : ''}
+      ${ship.retreated ? '<div style="color:#ffaa00; font-weight:bold; margin-bottom:8px;">↩ RETREATED</div>' : ''}
 
       <div style="margin-bottom:6px;">
         <div style="font-size:11px; color:#607080; margin-bottom:2px;">HULL POINTS</div>
@@ -849,15 +1640,19 @@ export class CombatScreen {
 
       <div style="margin-bottom:6px;">
         <div style="font-size:11px; color:#607080; margin-bottom:2px;">SHIELDS</div>
-        <div style="font-size:11px; color:#c0d8f0;">Class ${ship.shieldClass} (absorbs ${ship.shieldClass} dmg/hit)</div>
-      </div>
-
-      <div style="margin-bottom:6px;">
-        <div style="font-size:11px; color:#607080;">ATK RATING: <span style="color:#c0d8f0;">${ship.attackRating}</span>
-          &nbsp; DEF RATING: <span style="color:#c0d8f0;">${ship.defenseRating}</span>
-          &nbsp; SPEED: <span style="color:#c0d8f0;">${ship.speed}</span>
+        <div style="font-size:11px; color:#4488ff;">
+          Class ${ship.shieldClass}
+          ${ship.shieldClass > 0 ? `(absorbs ${ship.shieldClass} dmg/hit)` : '(none)'}
         </div>
       </div>
+
+      <div style="margin-bottom:6px; font-size:11px; color:#607080;">
+        ATK: <span style="color:#c0d8f0;">${ship.attackRating}</span>
+        &nbsp; DEF: <span style="color:#c0d8f0;">${ship.defenseRating}</span>
+        &nbsp; SPD: <span style="color:#c0d8f0;">${ship.speed}</span>
+      </div>
+
+      ${interactionHint}
 
       <div style="margin-top:8px;">
         <div style="font-size:11px; color:#607080; margin-bottom:4px; text-transform:uppercase;">Weapons</div>
@@ -874,16 +1669,27 @@ export class CombatScreen {
       return;
     }
 
+    // Show newest entries first (reversed)
     const entries = this.combatState.log.slice().reverse();
 
     this.logEl.innerHTML = entries
       .map((entry) => {
-        const isHit = entry.message.includes('HIT');
-        const isMiss = entry.message.includes('MISS');
-        const isEnd = entry.message.includes('Combat ended');
-        const isRetreat = entry.message.includes('retreat');
-        const color = isEnd ? '#00aaff' : isHit ? '#00cc66' : isMiss ? '#607080' : isRetreat ? '#ffaa00' : '#c0d8f0';
-        return `<div style="color:${color}; margin-bottom:2px; padding:1px 0; border-bottom:1px solid #0a1a2e;">${entry.message}</div>`;
+        const m = entry.message;
+        const isHit      = m.includes('HIT');
+        const isMiss     = m.includes('MISS');
+        const isDestroy  = m.includes('DESTROYED');
+        const isEnd      = m.includes('Combat ended') || m.includes('VICTORIOUS') || m.includes('DRAW');
+        const isRetreat  = m.includes('retreat') || m.includes('RETREAT');
+        const isMove     = m.startsWith('[M]');
+        const color =
+          isDestroy  ? '#ff8800' :
+          isEnd      ? '#00aaff' :
+          isHit      ? '#00cc66' :
+          isMiss     ? '#607080' :
+          isRetreat  ? '#ffaa00' :
+          isMove     ? '#00aaaa' :
+                       '#c0d8f0';
+        return `<div style="color:${color}; margin-bottom:2px; padding:1px 0; border-bottom:1px solid #0a1a2e;">${m}</div>`;
       })
       .join('');
   }
@@ -898,23 +1704,23 @@ export class CombatScreen {
     const statusLabel: Record<CombatStatus, string> = {
       attacker_wins: 'BATTLE WON!',
       defender_wins: 'BATTLE LOST!',
-      draw: 'DRAW — MUTUAL DESTRUCTION',
-      ongoing: 'COMBAT ONGOING',
+      draw:          'DRAW — MUTUAL DESTRUCTION',
+      ongoing:       'COMBAT ONGOING',
     };
     const statusColor: Record<CombatStatus, string> = {
       attacker_wins: '#00cc66',
       defender_wins: '#ff3333',
-      draw: '#ffaa00',
-      ongoing: '#00aaff',
+      draw:          '#ffaa00',
+      ongoing:       '#00aaff',
     };
 
     const attackerLossLines = r.losses.attacker.length > 0
       ? r.losses.attacker.map((s) => `<li>${s.designId} (${s.id})</li>`).join('')
-      : '<li>None!</li>';
+      : '<li style="color:#607080;">None</li>';
 
     const defenderLossLines = r.losses.defender.length > 0
       ? r.losses.defender.map((s) => `<li>${s.designId} (${s.id})</li>`).join('')
-      : '<li>None!</li>';
+      : '<li style="color:#607080;">None</li>';
 
     this.resultEl.style.display = 'flex';
     this.resultEl.innerHTML = `
@@ -941,14 +1747,14 @@ export class CombatScreen {
             <ul style="list-style:none; padding:0; margin:0; font-size:12px;">
               ${attackerLossLines}
             </ul>
-            <div style="font-size:11px; color:#607080; margin-top:6px;">Total: ${r.losses.attacker.length} ship${r.losses.attacker.length !== 1 ? 's' : ''}</div>
+            <div style="font-size:11px; color:#607080; margin-top:6px;">Total: ${r.losses.attacker.length}</div>
           </div>
           <div style="flex:1; background:#050f1e; padding:12px; border:1px solid #1a3a5c;">
             <div style="font-size:11px; color:#ff4444; margin-bottom:8px; text-transform:uppercase;">Enemy Losses</div>
             <ul style="list-style:none; padding:0; margin:0; font-size:12px;">
               ${defenderLossLines}
             </ul>
-            <div style="font-size:11px; color:#607080; margin-top:6px;">Total: ${r.losses.defender.length} ship${r.losses.defender.length !== 1 ? 's' : ''}</div>
+            <div style="font-size:11px; color:#607080; margin-top:6px;">Total: ${r.losses.defender.length}</div>
           </div>
         </div>
 
@@ -967,22 +1773,22 @@ export class CombatScreen {
             background:#3a1a00; border:1px solid #ffaa00; color:#fff;
             padding:10px 24px; cursor:pointer; font-family:inherit;
             font-size:12px; text-transform:uppercase; letter-spacing:1px;
-          ">RETURN TO GALAXY MAP</button>
+          ">RETURN TO MAP</button>
         </div>
       </div>
     `;
 
-    const replayBtn = this.resultEl.querySelector<HTMLButtonElement>('#result-replay-btn');
-    const returnBtn = this.resultEl.querySelector<HTMLButtonElement>('#result-return-btn');
+    this.resultEl.querySelector<HTMLButtonElement>('#result-replay-btn')
+      ?.addEventListener('click', () => {
+        this.positions.clear(); // reset positions for fresh layout
+        this.initCombat();
+        this.renderAll();
+      });
 
-    replayBtn?.addEventListener('click', () => {
-      this.initCombat();
-      this.renderAll();
-    });
-
-    returnBtn?.addEventListener('click', () => {
-      this.returnToGalaxy();
-    });
+    this.resultEl.querySelector<HTMLButtonElement>('#result-return-btn')
+      ?.addEventListener('click', () => {
+        this.returnToGalaxy();
+      });
   }
 
   private hideResultOverlay(): void {

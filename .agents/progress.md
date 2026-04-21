@@ -1,3 +1,16 @@
+## 2026-04-21 05:02 UTC — Task: combat-resolution-ui
+- **Status**: Worker v2 still running (8m20s / 15m timeout)
+- **Worker**: worker-combat-resolution-ui-v2 (warpcore/Qwen model)
+- **Action**: No action — waiting for worker to complete
+- **Notes**: Worker v1 analyzed but didn't write code; v2 spawned with specific enhancement list
+
+## 2026-04-21 04:37 UTC — Task: combat-resolution-ui
+- **Status**: Started
+- **Design Docs**: combat-algorithm.md, combat-mechanics.md (wireframe file missing)
+- **Worker**: Spawning with model warpcore/Qwen/Qwen3.6-35B-A3B-FP8
+- **Phase**: 4B UI Integration — task 2/16
+- **Note**: Previous task (fleet-movement-ui) completed successfully
+
 ## 2026-04-21 04:22 UTC — Task: fleet-movement-ui
 - **Status**: Verifying (in progress)
 - **Verifier**: Running (~16s), label: verifier-fleet-movement-ui
@@ -8,12 +21,31 @@
 - **Status**: Worker v2 running (~1 minute)
 - **Action**: No action needed — waiting for worker to complete
 
+## 2026-04-21 05:18 UTC — Task: combat-resolution-ui
+- **Status**: Completed ✓
+- **Verifier**: Approved — all 9 acceptance criteria met
+- **Design Verified**: tactical-combat-ui.md, combat-algorithm.md, combat-mechanics.md
+- **Tests**: 1048/1048 pass
+- **Commit**: pending
+
+## 2026-04-21 05:09 UTC — Task: combat-resolution-ui
+- **Status**: Verifying
+- **Tests**: Passed (typecheck ✓, vitest 1048/1048 ✓)
+- **Changes**: +945 lines to CombatScreen.ts (movement range, click-to-move/fire, damage numbers, explosions, retreat)
+- **Notes**: Worker v2 timed out after writing code but before state update
+
+## 2026-04-21 04:53 UTC — Task: combat-resolution-ui
+- **Status**: Worker v1 timed out — analyzed but no code written
+- **Findings**: CombatScreen.ts (992 lines) has hex grid, initiative, combat log, auto-resolve
+- **Missing**: movement range viz, click-to-move, click-to-fire, damage numbers, explosions, retreat
+- **Action**: Spawning focused worker with specific enhancement list
+
 ## 2026-04-21 04:34 UTC — Task: fleet-movement-ui
 - **Status**: Completed ✓
 - **Verifier**: Approved — all 7 acceptance criteria met
 - **Design Verified**: galaxy-map.md (State 5, State 6), travel.md (ETA formula)
 - **Tests**: 1048/1048 pass
-- **Commit**: pending git commit/push
+- **Commit**: b537746
 
 ## 2026-04-21 04:21 UTC — Task: fleet-movement-ui
 - **Status**: Testing

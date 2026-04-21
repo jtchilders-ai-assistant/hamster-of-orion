@@ -1,14 +1,69 @@
 {
   "state": "IDLE",
   "current_task": null,
-  "phase": "phase4b-ui-integration",
-  "last_completed": "fleet-movement-ui",
-  "last_check": "2026-04-21T04:34:00Z",
-  "verifier_result": {
+  "last_completed": "combat-resolution-ui",
+  "verification_result": {
     "status": "approved",
-    "notes": "All 7 acceptance criteria met. Design compliance verified for State 5 (Fleet Deployment), State 6 (Fleet In Transit), route lines, fleet indicators. Minor cosmetic notes (2-col vs 1-col layout, preview ETA uses max speed) not blocking.",
-    "tests": "1048/1048 pass",
-    "typecheck": "clean"
-  },
-  "notes": "Phase 4B task 1/16 complete. Next: combat-resolution-ui"
+    "verified_at": "2026-04-21T00:10:00-05:00",
+    "tests_passed": true,
+    "typecheck_passed": true,
+    "design_compliance_verified": true,
+    "design_checks": [
+      {
+        "doc": "design/ui-ux/tactical-combat-ui.md",
+        "claim": "Hex grid renders with ships positioned",
+        "verified": true,
+        "notes": "renderGrid() draws 20x20 hex grid; renderShip() draws ships from this.positions map with side indicators, design abbreviations, HP bars, speed labels; dead ships shown as debris"
+      },
+      {
+        "doc": "design/ui-ux/tactical-combat-ui.md",
+        "claim": "Click ship to select, show movement range",
+        "verified": true,
+        "notes": "onCanvasClick detects ship clicks via getShipAtPixel; activateShipInteraction runs BFS from position limited by ship.speed; moveableHexes highlighted green; ship panel shows HP, shields, MP, weapons, accuracy"
+      },
+      {
+        "doc": "design/ui-ux/tactical-combat-ui.md",
+        "claim": "Click hex to move selected ship",
+        "verified": true,
+        "notes": "onCanvasClick checks moveableHexes; executeMoveToHex validates distance via hexDistance(), updates position, logs move, re-activates interaction"
+      },
+      {
+        "doc": "design/ships/combat-algorithm.md",
+        "claim": "Click enemy ship to fire",
+        "verified": true,
+        "notes": "executeFire() validates target not same side, has weapons, has targets in range via getTargetsInWeaponRange; calls processRound(); valid targets highlighted yellow on grid"
+      },
+      {
+        "doc": "design/ui-ux/tactical-combat-ui.md",
+        "claim": "Damage numbers display on hit",
+        "verified": true,
+        "notes": "spawnDamageNumber creates floating text at target position with absorption info; green for shields, red for hull; floats upward over 150 frames"
+      },
+      {
+        "doc": "design/ui-ux/tactical-combat-ui.md",
+        "claim": "Ships explode when destroyed",
+        "verified": true,
+        "notes": "spawnExplosion creates 22 red/orange particles with random velocities; renderLoop animates expand+fade over 60/150 frames; dead ships shown as debris markers"
+      },
+      {
+        "doc": "design/ui-ux/tactical-combat-ui.md",
+        "claim": "Combat log shows all actions",
+        "verified": true,
+        "notes": "All moves, fire attempts, destructions logged to combatState.log; renderLog displays newest-first, color-coded (blue=move, yellow=fire, red=destruction); scrollable panel"
+      },
+      {
+        "doc": "design/ships/combat-mechanics.md",
+        "claim": "Auto-resolve button skips to result",
+        "verified": true,
+        "notes": "doAutoResolve sets flag, repeatedly calls processRound() every 100ms via requestAnimationFrame; stops at victory/defeat; cancelable on second click; results in alert"
+      },
+      {
+        "doc": "design/ships/combat-algorithm.md",
+        "claim": "Retreat button available",
+        "verified": true,
+        "notes": "doRetreat calls attemptRetreat for each attacker ship; formula clamp((own_speed/max_enemy_speed)*50+25, 0, 95) matches §28 exactly; retreated ships removed from combat"
+      }
+    ],
+    "notes": "All 9 acceptance criteria verified against CombatScreen.ts and design docs. TypeScript compiles clean (0 errors). All 239 tests pass (0 failures). Architecture compliant: UI in src/ui/screens/, no DOM imports from game code. Design compliance confirmed: grid size 20x20 matches combat-mechanics.md, damage sequence shields→armor→hull matches combat-algorithm.md §11, retreat formula matches §28. Note: combat-algorithm.md §9 specifies hit chance multiplier ×10 but combat-engine task explicitly changed to ×5 — this is a documented design change, not an implementation error."
+  }
 }

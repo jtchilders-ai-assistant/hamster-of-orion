@@ -31,7 +31,7 @@
       "id": "combat-resolution-ui",
       "name": "Combat resolution UI screen",
       "type": "ui",
-      "status": "pending",
+      "status": "done",
       "description": "Complete the CombatScreen to show tactical combat. Display hex grid with ships, allow unit selection, movement, and firing. Show damage numbers, explosions, and combat log.",
       "designDocs": [
         "design/ui-ux/wireframes/tactical-combat.md",
