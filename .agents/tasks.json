@@ -79,7 +79,7 @@
       "id": "colonization-ui",
       "name": "Colonization flow UI",
       "type": "ui",
-      "status": "pending",
+      "status": "done",
       "description": "Add colonization UI flow. Colony ships in orbit at uncolonized habitable planets show 'Colonize' button. Clicking triggers colonization and opens planet management.",
       "designDocs": [
         "design/planets/colonization.md",

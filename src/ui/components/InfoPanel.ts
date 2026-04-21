@@ -88,7 +88,21 @@ export class InfoPanel {
 
     const primaryPlanet = playerPlanets[0] ?? aiPlanets[0] ?? uncolonizedPlanets[0] ?? null;
 
-    if (playerFleets.length > 0 && primaryPlanet) {
+    // Colonize button: show when a colony ship fleet is at an uncolonized planet
+    const colonyShipFleetId = this.findColonyShipFleet(state, playerFleets);
+    const showColonizeButton = colonyShipFleetId && !primaryPlanet?.isColonized;
+
+    if (showColonizeButton) {
+      // Show uncolonized panel with colonize button
+      const planet = primaryPlanet;
+      if (planet) {
+        this.element.innerHTML = this.renderUncolonized(system, planet, colonyShipFleetId);
+        this.bindColonizeButton(state, system, planet, colonyShipFleetId);
+        return;
+      }
+    }
+
+    if (playerFleets.length > 0 && primaryPlanet && !showColonizeButton) {
       // Show fleet deployment info even for non-deployed fleet clicks
       const fleetId = playerFleets[0];
       const fleet = state.fleets.byId[fleetId];
@@ -133,8 +147,9 @@ export class InfoPanel {
     `;
   }
 
-  private renderUncolonized(system: StarSystem, planet: Planet): string {
+  private renderUncolonized(system: StarSystem, planet: Planet, colonyShipFleetId?: string): string {
     const maxPop = planet.maxPopulation;
+    const hasColonyShip = !!colonyShipFleetId;
     return `
       <div class="info-header">
         <h2 class="info-system-name" data-testid="planet-name">${system.name}</h2>
@@ -149,7 +164,9 @@ export class InfoPanel {
         <div class="info-divider"></div>
         <div class="info-status">UNCOLONIZED</div>
         <div class="info-divider"></div>
-        <div class="info-row">Requires: <span>Colony Ship</span></div>
+        ${hasColonyShip
+          ? `<button class="btn btn-primary" data-action="colonize" data-planet-id="${planet.id}" data-fleet-id="${colonyShipFleetId}">COLONIZE</button>`
+          : '<div class="info-row">Requires: <span>Colony Ship</span></div>'}
         <div class="info-row">Special: <span>${planet.hasArtifacts ? 'Artifacts' : 'None'}</span></div>
       </div>
     `;
@@ -459,6 +476,68 @@ export class InfoPanel {
         this.store!.dispatch(selectPlanet(planetId) as Action);
       }
     }, { once: true });
+  }
+
+  /**
+   * Bind colonize button event handler.
+   * Triggers the colonization action when a colony ship fleet is at the planet.
+   */
+  private bindColonizeButton(state: GameState, _system: StarSystem, planet: Planet, fleetId: string): void {
+    const button = this.element.querySelector<HTMLButtonElement>('[data-action="colonize"]');
+    if (!button || !this.store) return;
+
+    button.addEventListener('click', () => {
+      // Double-check planet is still uncolonized (state may have changed)
+      const currentPlanet = state.planets.byId[planet.id];
+      if (!currentPlanet || currentPlanet.isColonized) return;
+
+      // Double-check fleet still exists and is owned by player
+      const currentFleet = state.fleets.byId[fleetId];
+      if (!currentFleet) return;
+
+      this.store?.dispatch({
+        type: 'COLONIZE_PLANET' as const,
+        payload: { planetId: planet.id, fleetId },
+      } as Action);
+    });
+  }
+
+  /**
+   * Find a colony ship fleet ID among player fleets at this system.
+   * Returns null if no colony ship fleet is present.
+   */
+  private findColonyShipFleet(state: GameState, fleetIds: string[]): string | null {
+    for (const fid of fleetIds) {
+      const fleet = state.fleets.byId[fid];
+      if (!fleet || fleet.shipIds.length === 0) continue;
+
+      const shipId = this.findColonyShipIdInFleet(state, fleet);
+      if (shipId) return fid;
+    }
+    return null;
+  }
+
+  /**
+   * Find a colony ship (Colony Pod + Colony Engine) in a fleet.
+   * Returns the shipId if found, null otherwise.
+   */
+  private findColonyShipIdInFleet(state: GameState, fleet: Fleet): string | null {
+    for (const sid of fleet.shipIds) {
+      const ship = state.ships.byId[sid];
+      if (!ship) continue;
+      const design = state.shipDesigns.byId[ship.designId];
+      if (!design) continue;
+
+      const hasColonyPod = design.components?.some(
+        (c) => c.type === 'special' && c.name === 'Colony Pod',
+      );
+      const hasColonyEngine = design.components?.some(
+        (c) => c.type === 'engine' && c.name === 'Colony Engine',
+      );
+
+      if (hasColonyPod && hasColonyEngine) return sid;
+    }
+    return null;
   }
 
   /**

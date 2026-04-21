@@ -10,6 +10,8 @@ import { GameState, ScreenType } from './state';
 import { turnReducer } from './actions/turn';
 import { newGameReducer } from './actions/newGame';
 import { fleetReducer, MOVE_FLEET, MERGE_FLEETS, SPLIT_FLEET, SCRAP_FLEET, PROCESS_FLEET_MOVEMENT, OPEN_FLEET_DEPLOYMENT, UPDATE_DEPLOYMENT_SHIPS, SET_DEPLOYMENT_DESTINATION, CANCEL_FLEET_DEPLOYMENT } from './actions/fleet';
+import { colonize } from './systems/colonization';
+import type { PlanetId, FleetId } from './state';
 
 const FLEET_ACTIONS = new Set([
   MOVE_FLEET, MERGE_FLEETS, SPLIT_FLEET, SCRAP_FLEET, PROCESS_FLEET_MOVEMENT,
@@ -219,6 +221,31 @@ export function rootReducer(state: GameState, action: Action): GameState {
           }
         : state.empires,
     };
+  }
+
+  // Colonize planet action
+  if (action.type === 'COLONIZE_PLANET') {
+    const { planetId, fleetId } = action.payload as {
+      planetId: PlanetId;
+      fleetId: FleetId;
+    };
+
+    try {
+      // colonize() validates and performs the colonization
+      const newState = colonize(fleetId, planetId, state);
+      // Navigate to planet management screen for the new colony
+      return {
+        ...newState,
+        currentScreen: 'planet' as ScreenType,
+        ui: {
+          ...newState.ui,
+          selectedPlanet: planetId,
+        },
+      };
+    } catch {
+      // Colonization failed (preconditions not met) — return unchanged
+      return state;
+    }
   }
 
   // Fleet actions

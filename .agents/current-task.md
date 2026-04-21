@@ -1,55 +1,37 @@
-# Current Task: Complete diplomacy UI (REVISION)
+# Current Task: Colonization flow UI
 
-**ID**: diplomacy-ui-complete
+**ID**: colonization-ui
 **Type**: ui
-**Output**: src/ui/screens/DiplomacyScreen.ts
+**Output**: src/ui/screens/GalaxyScreen.ts (colonization)
 
-**STATUS**: REJECTED — Returning to Worker for fixes
-
-## Rejection Details
-
-The Verifier rejected this task. **6 of 7 acceptance criteria passed.** The following issues MUST be fixed:
-
-### CRITICAL: Criterion 5 Failed — Accept/reject incoming proposals
-
-**Problem**: `renderIncomingProposals()` is a hardcoded stub returning `'No pending proposals'` unconditionally. The `DiplomaticRelations` interface (state.ts) has **no `incomingProposals` field** — there is no data source for the UI to read from. The accept/reject buttons exist in HTML but are never rendered because there's no data.
-
-**Required Fix**:
-1. Add `incomingProposals: { type: TreatyType; fromEmpireId: EmpireId }[]` to `DiplomaticRelations` in `src/game/state.ts`
-2. Update `proposeTreaty()` in `src/game/diplomacy/treaties.ts` to populate this field when an AI empire proposes to the player
-3. Update `renderIncomingProposals()` in `DiplomacyScreen.ts` to iterate `player.relations[selectedEmpireId].incomingProposals` and render Accept/Reject buttons for each proposal
-
-### MODERATE BUG: Line 333 — Template literal not interpolating
-
-**Problem**: Line 333 uses single quotes instead of backticks:
-```typescript
-// WRONG:
-disabled title="Requires +${t.minRelation} relations"
-// CORRECT:
-disabled title=\`Requires +${t.minRelation} relations\`
-```
-
-The tooltip literally shows `${t.minRelation}` instead of the number.
+## Description
+Add colonization UI flow. Colony ships in orbit at uncolonized habitable planets show 'Colonize' button. Clicking triggers colonization and opens planet management.
 
 ## Design Documents (MUST READ)
-- design/ui-ux/wireframes/diplomacy-screen.md — Sub-Flow: AI-Initiated Audience shows incoming proposals as modal overlay
-- design/diplomacy/relationship-formulas.md — Relation values, modifiers, calculations
-- design/diplomacy/treaties.md — Treaty types, proposal flow, acceptance logic
+- design/planets/colonization.md — **FILE NOT FOUND** (see note below)
+- design/ui-ux/wireframes/galaxy-map.md — Info panel State 3 (Uncolonized Planet) shows "Requires: Colony Ship"
+- design/planets/planet-types.md — Colonization requirements: standard environments need colony ship, hostile environments need Controlled [Environment] tech
+
+**NOTE**: The primary design doc `design/planets/colonization.md` does not exist. Use the following sources for colonization mechanics:
+1. **galaxy-map.md** State 3: Shows uncolonized planet panel with "Requires: Colony Ship"
+2. **planet-types.md**: Standard environments colonizable from game start; hostile require Planetology tech
+3. **Acceptance criteria below** define the UI requirements
 
 ## Acceptance Criteria
-1. ✅ Empire list shows all known empires
-2. ✅ Relation bar (-100 to +100) with color coding
-3. ✅ Treaty status icons (NAP, Trade, Alliance, War)
-4. ✅ Propose treaty dropdown with all treaty types (FIX: template literal bug on line 333)
-5. ❌ Accept/reject incoming proposals — **MUST IMPLEMENT DATA MODEL + RENDERING**
-6. ✅ Declare war button with confirmation
-7. ✅ Relation history/events log
-
-## Files to Modify
-- `src/game/state.ts` — Add `incomingProposals` to `DiplomaticRelations` interface
-- `src/game/diplomacy/treaties.ts` — Populate `incomingProposals` when AI proposes
-- `src/ui/screens/DiplomacyScreen.ts` — Fix line 333 bug; implement real `renderIncomingProposals()`
-- `test/ui/screens/DiplomacyScreen.test.ts` — Add tests for incoming proposals rendering
+1. Colony ship at uncolonized planet shows Colonize button
+2. Colonize button triggers colonization action
+3. New colony appears on map with empire color
+4. Planet management screen opens after colonization
+5. Colony ship is consumed
+6. Cannot colonize hostile planets without tech
 
 ## Dependencies
-- None
+- None (no blocking dependencies)
+
+## Implementation Notes
+- The Colonize button should appear in the info panel when:
+  - A colony ship belonging to the player is orbiting a star
+  - The star has an uncolonized habitable planet
+  - The player has the required tech for hostile environments (if applicable)
+- On click: consume the colony ship, create a new colony, update the map rendering, and navigate to planet management screen
+- Check planet environment type and player's Planetology tech for hostile planet colonization
