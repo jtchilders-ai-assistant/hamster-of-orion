@@ -13,10 +13,10 @@
     "design_checks": [
       {
         "doc": "design/planets/planet-types.md",
-        "section": "§Hostile Environments (Require Tech)",
+        "section": "\u00a7Hostile Environments (Require Tech)",
         "claim": "6 hostile env types with specific Controlled [Environment] tech",
         "verified": true,
-        "notes": "HOSTILE_ENVIRONMENT_TYPES and HOSTILE_ENV_REQUIRED_TECH in colonization.ts match design exactly: radiated→controlled_radiated, toxic→controlled_toxic, inferno→controlled_inferno, dead→controlled_dead, tundra→controlled_tundra, barren→controlled_barren"
+        "notes": "HOSTILE_ENVIRONMENT_TYPES and HOSTILE_ENV_REQUIRED_TECH in colonization.ts match design exactly: radiated\u2192controlled_radiated, toxic\u2192controlled_toxic, inferno\u2192controlled_inferno, dead\u2192controlled_dead, tundra\u2192controlled_tundra, barren\u2192controlled_barren"
       },
       {
         "doc": "design/planets/planet-types.md",
@@ -27,7 +27,7 @@
       },
       {
         "doc": "design/planets/planet-types.md",
-        "section": "§Uninhabitable (Gas Giants)",
+        "section": "\u00a7Uninhabitable (Gas Giants)",
         "claim": "Gas giants cannot be colonized",
         "verified": true,
         "notes": "UNINHABITABLE_TYPES includes 'gas_giant'. Planet types with 0 population capacity are excluded"
@@ -52,7 +52,7 @@
         "type": "dead_code",
         "doc": "src/game/actions/colony.ts",
         "section": "colonizePlanet action creator",
-        "notes": "colonizePlanet(planetId, empireId) is never called — all dispatches go directly via store.dispatch({type: 'COLONIZE_PLANET', payload: {planetId, fleetId}}). The action creator signature doesn't match the reducer's expected payload (fleetId vs empireId). Should either wire the action creator properly or remove it.",
+        "notes": "colonizePlanet(planetId, empireId) is never called \u2014 all dispatches go directly via store.dispatch({type: 'COLONIZE_PLANET', payload: {planetId, fleetId}}). The action creator signature doesn't match the reducer's expected payload (fleetId vs empireId). Should either wire the action creator properly or remove it.",
         "severity": "minor"
       }
     ],
@@ -65,10 +65,10 @@
     "design_compliance": [
       {
         "doc": "design/planets/planet-types.md",
-        "section": "§Hostile Environments",
-        "quote": "Radiated→Controlled Radiated, Toxic→Controlled Toxic, Inferno→Controlled Inferno, Dead→Controlled Dead, Tundra→Controlled Tundra, Barren→Controlled Barren",
+        "section": "\u00a7Hostile Environments",
+        "quote": "Radiated\u2192Controlled Radiated, Toxic\u2192Controlled Toxic, Inferno\u2192Controlled Inferno, Dead\u2192Controlled Dead, Tundra\u2192Controlled Tundra, Barren\u2192Controlled Barren",
         "impl_file": "src/game/systems/colonization.ts",
-        "impl_line": "HOSTILE_ENV_REQUIRED_TECH — all 6 mappings exact",
+        "impl_line": "HOSTILE_ENV_REQUIRED_TECH \u2014 all 6 mappings exact",
         "verified": true
       },
       {
@@ -76,7 +76,7 @@
         "section": "Colonization Requirements",
         "quote": "Standard environments colonizable from game start; hostile require Planetology tech",
         "impl_file": "src/game/systems/colonization.ts",
-        "impl_line": "hasColonizationTech() — returns true for standard, checks completedTechs for hostile",
+        "impl_line": "hasColonizationTech() \u2014 returns true for standard, checks completedTechs for hostile",
         "verified": true
       },
       {
@@ -84,14 +84,14 @@
         "section": "State 3: Uncolonized Planet",
         "quote": "Planet name/type/size + 'UNCOLONIZED' + 'Requires: Colony Ship' or COLONIZE button",
         "impl_file": "src/ui/components/InfoPanel.ts",
-        "impl_line": "renderUncolonized() — displays all wireframe elements, conditional COLONIZE button",
+        "impl_line": "renderUncolonized() \u2014 displays all wireframe elements, conditional COLONIZE button",
         "verified": true
       }
     ]
   },
   "turn_summary_screen_verification": {
     "status": "approved",
-    "verified_at": "2026-04-21T05:18:00Z",
+    "verified_at": "2026-04-21T10:34:29Z",
     "tests_passed": true,
     "typecheck_passed": true,
     "design_compliance_verified": true,
@@ -100,52 +100,52 @@
     "design_checks": [
       {
         "doc": "design/game-mechanics/turn-structure.md",
-        "section": "Phase 12: End Turn — Player can review reports",
+        "section": "Phase 12: End Turn \u2014 Player can review reports",
         "claim": "Turn summary screen shows after turn ends",
         "verified": true,
-        "notes": "TurnSummaryScreen.ts renders from state.turnEvents, displayed via state.ui.turnSummaryVisible toggle in onStateChange"
+        "notes": "collectTurnEvents() diffs before/after states, populates turnEvents. Reducer sets currentScreen to 'turn_summary'. App shows screen when currentScreen === 'turn_summary'."
       },
       {
         "doc": "design/game-mechanics/turn-structure.md",
-        "section": "Phase 3: Research — Breakthrough Event popup",
-        "claim": "Research completed events shown as popup",
+        "section": "Phase 3: Research \u2014 Breakthrough Event popup",
+        "claim": "Research completed events shown",
         "verified": true,
-        "notes": "collectTurnEvents detects completed techs between before/after states, adds TurnEvent type 'research'. Screen groups under ⚗️ Research Completed section"
+        "notes": "collectTurnEvents diffs state.research.completed arrays. TurnSummaryScreen groups under \u2697\ufe0f Research Completed section. EVENT_META maps 'research' type correctly."
       },
       {
         "doc": "design/game-mechanics/turn-structure.md",
-        "section": "Phase 7: Combat Resolution — Combat results",
-        "claim": "Combat results shown with links",
+        "section": "Phase 7: Combat Resolution",
+        "claim": "Combat results shown with clickable links",
         "verified": true,
-        "notes": "collectTurnEvents detects new comBat entries (after.combats.byId has more than before). Screen groups under ⚔️ Combat Results section with clickable 'View Battle Report →' link that navigates to combat screen"
+        "notes": "collectTurnEvents diffs state.combats.allIds. BuildEventItem renders 'View Battle Report \u2192' link that navigates to 'combat' screen with OPEN_COMBAT action. Correct."
       },
       {
         "doc": "design/game-mechanics/turn-structure.md",
-        "section": "Phase 9: Events — Random events",
+        "section": "Phase 9: Events \u2014 Random events",
         "claim": "Random events listed",
         "verified": true,
-        "notes": "collectTurnEvents detects new entries in events registry. Screen groups under ⭐ Random Events section. Also handles diplomatic (Phase 5) and ship_built (Phase 2 production) events"
+        "notes": "collectTurnEvents diffs state.events.allIds. Screen groups under \u2b50 Random Events section. Also handles diplomatic events (Phase 5) and ship_built (Phase 2 production)."
       },
       {
         "doc": "design/game-mechanics/random-events.md",
-        "section": "EVENT_TYPES JSON — event categories",
+        "section": "EVENT_TYPES JSON \u2014 event categories",
         "claim": "Event types: space_monsters, discoveries, disasters, diplomatic, opportunities",
         "verified": true,
-        "notes": "TurnEventType enum includes all types: research, ship_built, combat, diplomatic, random_event, colonization, population, production, victory. Screen displays all via EVENT_META mapping"
+        "notes": "TurnEventType enum includes all 9 types: research, ship_built, combat, diplomatic, random_event, colonization, population, production, victory. Screen displays all via EVENT_META mapping."
       },
       {
         "doc": "design/moo_screens/moo_start_of_turn_select_new_research.png",
         "section": "MOO1 research breakthrough popup",
         "claim": "Research popup style reference",
         "verified": true,
-        "notes": "TurnSummaryScreen groups research events under ⚗️ Research Completed section, matching MOO1 start-of-turn research popup concept"
+        "notes": "TurnSummaryScreen groups research events under \u2697\ufe0f Research Completed section, matching MOO1 start-of-turn research popup concept."
       },
       {
         "doc": "design/moo_screens/moo_start_of_turn_new_ships.png",
         "section": "MOO1 ships built popup",
         "claim": "Ships built popup style reference",
         "verified": true,
-        "notes": "Screen groups ship_built events under 🚀 Ships Built section, matching MOO1 start-of-turn ships built reference"
+        "notes": "Screen groups ship_built events under \ud83d\ude80 Ships Built section, matching MOO1 start-of-turn ships built reference."
       }
     ],
     "issues": [
@@ -153,7 +153,7 @@
         "type": "scope_limitation",
         "doc": "src/game/systems/turn.ts",
         "section": "collectTurnEvents",
-        "notes": "collectTurnEvents only collects events for the player empire (filters by playerId). If AI empires have combat results or events, they won't appear in the player's turn summary. This is consistent with MOO1's perspective (player only sees their own events), but AI event tracking exists in systems/ai/ai-events.ts. Future enhancement: player can view AI events from known empires.",
+        "notes": "collectTurnEvents only collects events for the player empire (filters by playerId). If AI empires have combat results or events, they won't appear in the player's turn summary. This is consistent with MOO1's perspective (player only sees their own events).",
         "severity": "informational"
       }
     ],
@@ -166,6 +166,6 @@
       "6_lists_random_events": "verified",
       "7_continue_button_returns_to_galaxy_map": "verified"
     },
-    "notes": "Turn summary screen fully implemented and verified. All 7 acceptance criteria met. Design compliance verified against turn-structure.md (Phases 3, 7, 9, 12), random-events.md (EVENT_TYPES), and MOO1 reference images. Architecture compliance verified: UI in src/ui/screens/ only, game logic in systems/turn.ts only, no cross-contamination. State shape updated with turnEvents (TurnEvent[]) in GameState and turnSummaryVisible in UiState. collectTurnEvents correctly diffs before/after states for combat, research, events, ships, and planets. All 1162 tests pass including 8 new turnSummary tests. Typecheck clean. Keyboard support: ESC dismisses, Enter advances turn. Empty state shows 'Nothing of note occurred'. Continue button navigates to previous screen or galaxy as fallback. CSS classes all defined in main.css (lines 683-886). Minor note: collectTurnEvents only collects events for player empire, which is correct for MOO1-style perspective."
+    "notes": "Independent verification confirms Worker's implementation is correct. All 7 acceptance criteria met. Design compliance verified against turn-structure.md (Phases 3, 7, 9, 12), random-events.md (EVENT_TYPES), and MOO1 reference images. Architecture compliance verified: UI in src/ui/screens/TurnSummaryScreen.ts only, game logic in systems/turn.ts only, no cross-contamination. State shape updated with turnEvents (TurnEvent[]) in GameState and SHOW_TURN_SUMMARY action. collectTurnEvents correctly diffs before/after states for combat, research, events, ships, planets, diplomacy, and victory. All 1162 tests pass including 8 new turnSummary tests. Typecheck clean. Keyboard support: ESC dismisses, Enter advances turn. Empty state shows 'Nothing of note occurred'. CSS classes all defined in main.css (lines 683-886). No any types used. Navigation fallback works correctly."
   }
 }
