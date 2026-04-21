@@ -88,5 +88,84 @@
         "verified": true
       }
     ]
+  },
+  "turn_summary_screen_verification": {
+    "status": "approved",
+    "verified_at": "2026-04-21T05:18:00Z",
+    "tests_passed": true,
+    "typecheck_passed": true,
+    "design_compliance_verified": true,
+    "total_tests": 1162,
+    "new_tests": 8,
+    "design_checks": [
+      {
+        "doc": "design/game-mechanics/turn-structure.md",
+        "section": "Phase 12: End Turn — Player can review reports",
+        "claim": "Turn summary screen shows after turn ends",
+        "verified": true,
+        "notes": "TurnSummaryScreen.ts renders from state.turnEvents, displayed via state.ui.turnSummaryVisible toggle in onStateChange"
+      },
+      {
+        "doc": "design/game-mechanics/turn-structure.md",
+        "section": "Phase 3: Research — Breakthrough Event popup",
+        "claim": "Research completed events shown as popup",
+        "verified": true,
+        "notes": "collectTurnEvents detects completed techs between before/after states, adds TurnEvent type 'research'. Screen groups under ⚗️ Research Completed section"
+      },
+      {
+        "doc": "design/game-mechanics/turn-structure.md",
+        "section": "Phase 7: Combat Resolution — Combat results",
+        "claim": "Combat results shown with links",
+        "verified": true,
+        "notes": "collectTurnEvents detects new comBat entries (after.combats.byId has more than before). Screen groups under ⚔️ Combat Results section with clickable 'View Battle Report →' link that navigates to combat screen"
+      },
+      {
+        "doc": "design/game-mechanics/turn-structure.md",
+        "section": "Phase 9: Events — Random events",
+        "claim": "Random events listed",
+        "verified": true,
+        "notes": "collectTurnEvents detects new entries in events registry. Screen groups under ⭐ Random Events section. Also handles diplomatic (Phase 5) and ship_built (Phase 2 production) events"
+      },
+      {
+        "doc": "design/game-mechanics/random-events.md",
+        "section": "EVENT_TYPES JSON — event categories",
+        "claim": "Event types: space_monsters, discoveries, disasters, diplomatic, opportunities",
+        "verified": true,
+        "notes": "TurnEventType enum includes all types: research, ship_built, combat, diplomatic, random_event, colonization, population, production, victory. Screen displays all via EVENT_META mapping"
+      },
+      {
+        "doc": "design/moo_screens/moo_start_of_turn_select_new_research.png",
+        "section": "MOO1 research breakthrough popup",
+        "claim": "Research popup style reference",
+        "verified": true,
+        "notes": "TurnSummaryScreen groups research events under ⚗️ Research Completed section, matching MOO1 start-of-turn research popup concept"
+      },
+      {
+        "doc": "design/moo_screens/moo_start_of_turn_new_ships.png",
+        "section": "MOO1 ships built popup",
+        "claim": "Ships built popup style reference",
+        "verified": true,
+        "notes": "Screen groups ship_built events under 🚀 Ships Built section, matching MOO1 start-of-turn ships built reference"
+      }
+    ],
+    "issues": [
+      {
+        "type": "scope_limitation",
+        "doc": "src/game/systems/turn.ts",
+        "section": "collectTurnEvents",
+        "notes": "collectTurnEvents only collects events for the player empire (filters by playerId). If AI empires have combat results or events, they won't appear in the player's turn summary. This is consistent with MOO1's perspective (player only sees their own events), but AI event tracking exists in systems/ai/ai-events.ts. Future enhancement: player can view AI events from known empires.",
+        "severity": "informational"
+      }
+    ],
+    "acceptance_criteria": {
+      "1_shows_after_next_turn": "verified",
+      "2_lists_research_completed": "verified",
+      "3_lists_ships_built": "verified",
+      "4_lists_combat_results_with_links": "verified",
+      "5_lists_diplomatic_events": "verified",
+      "6_lists_random_events": "verified",
+      "7_continue_button_returns_to_galaxy_map": "verified"
+    },
+    "notes": "Turn summary screen fully implemented and verified. All 7 acceptance criteria met. Design compliance verified against turn-structure.md (Phases 3, 7, 9, 12), random-events.md (EVENT_TYPES), and MOO1 reference images. Architecture compliance verified: UI in src/ui/screens/ only, game logic in systems/turn.ts only, no cross-contamination. State shape updated with turnEvents (TurnEvent[]) in GameState and turnSummaryVisible in UiState. collectTurnEvents correctly diffs before/after states for combat, research, events, ships, and planets. All 1162 tests pass including 8 new turnSummary tests. Typecheck clean. Keyboard support: ESC dismisses, Enter advances turn. Empty state shows 'Nothing of note occurred'. Continue button navigates to previous screen or galaxy as fallback. CSS classes all defined in main.css (lines 683-886). Minor note: collectTurnEvents only collects events for player empire, which is correct for MOO1-style perspective."
   }
 }

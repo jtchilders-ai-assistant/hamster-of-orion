@@ -1,3 +1,9 @@
+## 2026-04-21 10:17 UTC — Task: turn-summary-screen
+- **Status**: Testing → Verifying
+- **Tests**: Passed (typecheck ✓, vitest ✓ — 1162 tests, 41 files)
+- **Verifier**: Spawning with model warpcore/Qwen/Qwen3.6-35B-A3B-FP8
+- **Label**: verifier-turn-summary-screen
+
 ## 2026-04-21 10:07 UTC — Task: turn-summary-screen
 - **Status**: Worker running (13m / 15m timeout)
 - **Worker**: worker-turn-summary-screen (warpcore/Qwen model)
@@ -51,7 +57,7 @@
 - **Implementation**: TurnSummaryScreen overlay after Next Turn, shows events, Continue button
 - **Worker**: Timed out; orchestrator fixed TS type narrowing issue
 - **Tests**: 1154/1154 pass (+33 new)
-- **Commit**: pending
+- **Commit**: 26cf19d
 
 ## 2026-04-21 08:52 UTC — Task: colonization-ui
 - **Status**: Completed ✓

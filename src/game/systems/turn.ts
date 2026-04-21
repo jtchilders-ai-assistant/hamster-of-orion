@@ -16,7 +16,7 @@
  * No DOM imports. No `any` types.
  */
 
-import { GameState, Planet, Empire, SystemId } from '../state';
+import { GameState, Planet, Empire, SystemId, TurnEvent } from '../state';
 import { calculateGrowth } from './growth';
 import {
   DEFAULT_PRODUCTION_CONTEXT,
@@ -361,6 +361,129 @@ function processColonization(state: GameState): GameState {
   return next;
 }
 
+// ── Phase: turn event collection ───────────────────────────────────────────────
+
+/**
+ * Compare pre-turn and post-turn state to build a list of TurnEvents.
+ *
+ * Design references:
+ *   - turn-structure.md §Phase 3 (Research breakthrough)
+ *   - turn-structure.md §Phase 7 (Combat results)
+ *   - turn-structure.md §Phase 9 (Random events)
+ *   - Acceptance criteria: list research, ships, combats, diplomacy, random events
+ */
+function collectTurnEvents(before: GameState, after: GameState): TurnEvent[] {
+  const events: TurnEvent[] = [];
+  const turn = after.turn;
+  const playerId = after.empires.playerId;
+
+  // ── Research completions ────────────────────────────────────────────────────
+  // Detect if any player empire research points crossed a tech-completion
+  // threshold. Until tech completion is tracked as a discrete event in state,
+  // we report incremental research progress for the player empire.
+  const playerBefore = before.empires.byId[playerId];
+  const playerAfter  = after.empires.byId[playerId];
+  if (playerBefore && playerAfter) {
+    const rpGained = playerAfter.research.researchPoints - playerBefore.research.researchPoints;
+    if (rpGained > 0) {
+      events.push({
+        type: 'research',
+        title: 'Research Progress',
+        description: `Your scientists generated ${rpGained} research points this turn.`,
+        empireId: playerId,
+        systemId: null,
+        planetId: null,
+        combatId: null,
+        techId: playerAfter.research.currentTech,
+        designId: null,
+        turn,
+      });
+    }
+  }
+
+  // ── Ships built ─────────────────────────────────────────────────────────────
+  // Detect new ship IDs for player-owned ships.
+  const beforeShipIds = new Set(before.ships.allIds);
+  for (const shipId of after.ships.allIds) {
+    if (beforeShipIds.has(shipId)) continue;
+    const ship = after.ships.byId[shipId];
+    if (!ship || ship.ownerId !== playerId) continue;
+    const design = after.shipDesigns.byId[ship.designId];
+    const designName = design ? design.name : ship.designId;
+    const fleet = after.fleets.byId[ship.fleetId];
+    const systemId = fleet ? fleet.systemId : null;
+    const system = systemId ? after.galaxy.systems.byId[systemId] : undefined;
+    const systemName = system ? system.name : (systemId ?? 'Unknown System');
+    events.push({
+      type: 'ship_built',
+      title: `${designName} Completed`,
+      description: `A new ${designName} has been constructed at ${systemName}.`,
+      empireId: playerId,
+      systemId,
+      planetId: null,
+      combatId: null,
+      techId: null,
+      designId: ship.designId,
+      turn,
+    });
+  }
+
+  // ── Combat detection ────────────────────────────────────────────────────────
+  // Detect fleets newly marked as in-combat that involve the player.
+  const beforeInCombat = new Set(
+    before.fleets.allIds.filter((id) => before.fleets.byId[id]?.isInCombat),
+  );
+  for (const fleetId of after.fleets.allIds) {
+    const fleet = after.fleets.byId[fleetId];
+    if (!fleet?.isInCombat) continue;
+    if (beforeInCombat.has(fleetId)) continue; // already was in combat
+    if (fleet.ownerId !== playerId) continue;
+    const system = after.galaxy.systems.byId[fleet.systemId];
+    const systemName = system ? system.name : fleet.systemId;
+    events.push({
+      type: 'combat',
+      title: 'Combat Detected',
+      description: `Enemy forces have been detected in the ${systemName} system. Your fleet is engaged.`,
+      empireId: playerId,
+      systemId: fleet.systemId,
+      planetId: null,
+      combatId: fleet.combatId,
+      techId: null,
+      designId: null,
+      turn,
+    });
+  }
+
+  // ── New colonies ────────────────────────────────────────────────────────────
+  const beforeColonies = new Set(
+    before.planets.allIds.filter((id) => {
+      const p = before.planets.byId[id];
+      return p?.isColonized && p.ownerId === playerId;
+    }),
+  );
+  for (const planetId of after.planets.allIds) {
+    const planet = after.planets.byId[planetId];
+    if (!planet?.isColonized || planet.ownerId !== playerId) continue;
+    if (beforeColonies.has(planetId)) continue;
+    const system = after.galaxy.systems.byId[planet.systemId];
+    const systemName = system ? system.name : planet.systemId;
+    events.push({
+      type: 'colonization',
+      title: `${planet.name} Colonized`,
+      description: `Colonists have established a new settlement on ${planet.name} in the ${systemName} system.`,
+      empireId: playerId,
+      systemId: planet.systemId,
+      planetId,
+      combatId: null,
+      techId: null,
+      designId: null,
+      turn,
+    });
+  }
+
+  return events;
+}
+
 // ── Core turn processor ────────────────────────────────────────────────────────
 
 /**
@@ -430,6 +553,11 @@ export function processTurn(state: GameState): GameState {
 
   // ── Step 10: AI turns ─────────────────────────────────────────────────────
   next = processAllAITurns(next);
+
+  // ── Step 11: collect turn events for the turn summary screen ─────────────
+  // Compare state before and after this turn to build the events list.
+  // Source: turn-structure.md §Phase 12 ("Player can review reports")
+  next = { ...next, turnEvents: collectTurnEvents(state, next) };
 
   return next;
 }

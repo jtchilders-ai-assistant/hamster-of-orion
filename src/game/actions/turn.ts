@@ -26,5 +26,18 @@ export function nextTurn(): Action {
  */
 export function turnReducer(state: GameState, action: Action): GameState {
   if (action.type !== NEXT_TURN) return state;
-  return processTurn(state);
+  const afterTurn = processTurn(state);
+
+  // After processing, navigate to the turn summary screen so the player
+  // can review what happened this turn (turn-structure.md §Phase 12).
+  // The turn summary's Continue button navigates back to the galaxy map.
+  return {
+    ...afterTurn,
+    currentScreen: 'turn_summary' as const,
+    ui: {
+      ...afterTurn.ui,
+      previousScreen: afterTurn.currentScreen,
+      currentScreen: 'turn_summary' as const,
+    },
+  };
 }
