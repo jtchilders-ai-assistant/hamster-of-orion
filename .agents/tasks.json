@@ -187,7 +187,7 @@
       "id": "fleets-list-screen",
       "name": "Fleets list screen (F3)",
       "type": "ui",
-      "status": "pending",
+      "status": "done",
       "description": "Create FleetsScreen showing all player fleets. Display location, destination, ship counts, and fleet commands.",
       "designDocs": [
         "design/ui-ux/wireframes/fleet-list.md",

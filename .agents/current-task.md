@@ -1,36 +1,57 @@
-# Current Task: Colonies list screen (F2)
+# Current Task: Fleets list screen (F3)
 
-**ID**: colonies-list-screen
+**ID**: fleets-list-screen
 **Type**: ui
-**Output**: src/ui/screens/ColoniesScreen.ts
+**Output**: src/ui/screens/FleetsScreen.ts
 
 ## Description
-Create ColoniesScreen showing all player colonies in a sortable list. Display population, factories, current build, and production stats.
+
+Create FleetsScreen showing all player fleets. Display location, destination, ship counts, and fleet commands.
 
 ## Design Documents (MUST READ)
-- `design/ui-ux/wireframes/command_menu/command_menu_planets.md` — Full wireframe with column definitions, layout, interactions, and bottom panels (SPENDING, TOTALS, FINANCE)
 
-**Note:** The task listed `design/ui-ux/wireframes/colony-list.md` but the actual doc is `command_menu/command_menu_planets.md`. Use that.
+- `design/ui-ux/wireframes/command_menu/command_menu_fleet.md` — Full wireframe: table layout (SYSTEM column + 6 ship design columns), in-transit display with arrow + ETA, ship icons with count badges, bottom Fleet Maintenance display, SPECS/SCRAP/OK buttons
+- `design/ui-ux/wireframes/fleet-screen.md` — MOO1-accurate spec: black background, "FLEET OVERVIEW" title with golden rule, row interactions (click to select on galaxy map), cell structure with ship sprites and count in bottom-right
+
+## Key Design Details
+
+### Layout
+- Full-screen modal (no bottom command bar visible)
+- "FLEET OVERVIEW" title centered, golden horizontal rule beneath
+- Table with 7 columns: SYSTEM + 6 ship design columns
+- Bottom section: Fleet Maintenance box (left), SPECS/SCRAP/OK buttons (right)
+
+### System Column
+- Orbiting: System name (e.g., "FIRMA")
+- In transit: `→ DESTINATION` with `ETA: N` on second line
+
+### Ship Design Columns
+- Header: Actual ship design name
+- Cell: Ship sprite with count in bottom-right corner
+- Empty cell: Solid black/background fill
+
+### Interactions
+- Click row → return to Galaxy Map with that fleet selected
+- SPECS → view ship design specifications
+- SCRAP → open scrapping interface
+- OK / ESC → close, return to Galaxy Map
 
 ## Acceptance Criteria
-1. Lists all player colonies
-2. Sortable by name, population, factories
-3. Shows current build queue item per colony
-4. Shows production stats (BC/turn)
-5. Click colony name to open planet screen
-6. Shows environment type icons
-7. Accessible via F2 or command bar
 
-## Additional Requirements from Design Doc
-- Column layout: IMG, PLANET NAME, POP (segmented bar), FACT, SHD, BASE, WST, PROD, BUILDING
-- Population shown as segmented bar (filled = current, empty = capacity)
-- Bottom panels: SPENDING (ships/bases/spying/security), TOTALS (trade/planets/total), FINANCE (reserve/transfer)
-- Click row to select, double-click to open Planet Detail
-- Scrollable if > 12-15 colonies
-- OK button returns to Galaxy Map
-
-## Existing Code
-There's a stub at `src/ui/screens/ColoniesScreen.ts` (1056 bytes). Replace it with full implementation.
+1. Lists all player fleets
+2. Shows fleet location (system name or 'In Transit')
+3. Shows destination if moving
+4. Shows ship counts by design
+5. Click fleet to select on galaxy map
+6. Merge/split fleet buttons
+7. Accessible via F3 or command bar
 
 ## Dependencies
-- None (can start immediately)
+
+- None (no blocking dependencies)
+
+## Notes
+
+- Max 6 ship designs (MOO1 constraint)
+- Fleet Maintenance shows total BC/turn upkeep
+- Reference: `design/moo_screens/moo_fleet_screen.png`
