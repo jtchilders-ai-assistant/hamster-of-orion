@@ -1,11 +1,11 @@
 {
   "state": "WORKING",
   "phase": "phase4b-ui-integration",
-  "current_task": "hotkey-navigation",
-  "last_check": "2026-04-21T20:51:00Z",
-  "last_completed": "victory-screen",
+  "current_task": "constants-to-code",
+  "last_check": "2026-04-21T21:26:00Z",
+  "last_completed": "hotkey-navigation",
   "task_count": 16,
-  "completed_count": 14,
-  "last_commit": "d2313f9",
-  "notes": "Phase 4B: hotkey-navigation worker running (spawned ~15m ago)"
+  "completed_count": 15,
+  "last_commit": "3167c0b",
+  "notes": "Phase 4B: constants-to-code started (audit all design doc constants in src/game/constants.ts)"
 }

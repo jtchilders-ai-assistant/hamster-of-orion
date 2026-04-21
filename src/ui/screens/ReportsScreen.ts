@@ -14,11 +14,10 @@ import { Store } from '../../game/store';
 
 export class ReportsScreen {
   private readonly container: HTMLElement;
-  private readonly store: Store<GameState>;
 
-  constructor(container: HTMLElement, store: Store<GameState>) {
+  // store is accepted for API consistency with other screens but not used yet.
+  constructor(container: HTMLElement, _store: Store<GameState>) {
     this.container = container;
-    this.store = store;
     this.container.classList.add('reports-screen');
   }
 

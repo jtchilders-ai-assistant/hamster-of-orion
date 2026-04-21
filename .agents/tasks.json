@@ -324,7 +324,7 @@
             "id": "constants-to-code",
             "name": "Verify all design doc constants in code",
             "type": "code",
-            "status": "pending",
+            "status": "done",
             "description": "Audit all formulas and constants in design docs. Ensure each one appears in src/game/constants.ts with proper documentation. Run check-design script.",
             "designDocs": [
                 "design/economy/factory-formulas.md",

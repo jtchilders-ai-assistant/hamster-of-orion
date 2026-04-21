@@ -1,34 +1,33 @@
-# Current Task: Keyboard Hotkeys (F1-F8)
+# Current Task: Verify All Design Doc Constants in Code
 
-**ID**: hotkey-navigation
-**Type**: ui
-**Output**: src/ui/app.ts (keyboard handler)
+**ID**: constants-to-code
+**Type**: code
+**Output**: src/game/constants.ts (complete audit)
 
 ## Description
-Implement keyboard navigation. F1=Galaxy, F2=Colonies, F3=Fleets, F4=Design, F5=Research, F6=Diplomacy, F7=Council, F8=Save. Also arrow keys for map pan, +/- keys for zoom.
+Audit all formulas and constants in design docs. Ensure each one appears in `src/game/constants.ts` with proper documentation. Run `npm run check-design` to verify compliance.
 
 ## Design Documents (MUST READ)
-- `design/ui-ux/navigation-flow.md` — §9 Keyboard Hotkeys specification
-- `design/ui-ux/interaction-spec.md` — §2 Galaxy Map keyboard controls
+- `design/economy/factory-formulas.md` — Factory output, population output, factory cost, pollution/cleanup, racial modifiers, mineral richness, slider allocation, RC levels, Industrial Tech, waste reduction, eco restoration
+- `design/economy/population-growth.md` — Growth rate, max population, environment modifiers, racial growth/food modifiers, cloning bonuses, morale modifiers, terraforming levels, soil enrichment, environment data
+- `design/economy/slider-mathematics.md` — Slider allocation (production, research, military, defense, civic), civic budget, food allocation, morale formula, welfare costs
+- `design/ships/combat-algorithm.md` — Combat damage, defense, attack, maneuverability, armor, hit points, ship design constants, hull/material types, maintenance costs
+- `design/diplomacy/relationship-formulas.md` — Relationship changes, alliance maintenance, war declaration, tribute, espionage detection, trade income, council votes, espionage defense
+- `design/technology/research-formulas.md` — RP calculation, research speed modifiers, tech categories, research cost scaling, field bonuses
 
 ## Acceptance Criteria
-1. F1 opens galaxy map
-2. F2 opens colonies list
-3. F3 opens fleets list
-4. F4 opens ship designer
-5. F5 opens research screen
-6. F6 opens diplomacy screen
-7. F7 opens council screen
-8. F8 opens save/load
-9. Arrow keys pan galaxy map
-10. +/- keys zoom galaxy map
+1. `npm run check-design` passes (zero errors/warnings)
+2. All formulas in design docs have code equivalents in constants.ts
+3. Each constant has a doc source reference (e.g. `// source: factory-formulas.md §2`)
+4. No magic numbers in game systems
+5. Tests verify formulas match docs
 
 ## Dependencies
 - None
 
 ## Implementation Notes
-- App already has a basic `onKeyDown` handler in `src/ui/app.ts` (lines 85-94) with F1/F2/F3 partial implementation and a `keyPress` state tracking last pressed key
-- Need to add: F4-F8 handlers, arrow key panning, +/- zoom
-- The app already uses `store.dispatch(NAVIGATE({ screen: ... }))` pattern for screen changes
-- Galaxy map screen needs to handle arrow key events for panning the viewport
-- The `ScreenName` enum has all the screen names: GALAXY, COLONIES, FLEETS, DESIGN, RESEARCH, DIPLOMACY, COUNCIL, SAVE_LOAD
+- Read `src/game/constants.ts` to see current constants
+- Compare against each design doc systematically
+- Add/update constants and source comments as needed
+- Run `npm run check-design` iteratively until clean
+- Run `npm run typecheck` to ensure no breakage

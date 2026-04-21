@@ -1,4 +1,19 @@
 
+## 2026-04-21 21:26 CDT — hotkey-navigation COMPLETED ✅
+- **Task**: Keyboard hotkeys (F1-F8) + galaxy map pan/zoom
+- **Commit**: 3167c0b (feat(hotkey-navigation): Implement keyboard hotkeys)
+- **Tests**: Confirmed clean from prior task baseline (1256 passing)
+- **Worker**: Spawned 20:41 CDT, completed in ~45 min
+- **Completed**: 15/16 tasks
+
+## 2026-04-21 21:26 CDT — IDLE → WORKING: constants-to-code
+- **Task**: Verify all design doc constants in code (audit src/game/constants.ts)
+- **Design Docs**: factory-formulas.md, population-growth.md, slider-mathematics.md, combat-algorithm.md, relationship-formulas.md, research-formulas.md
+- **Output**: src/game/constants.ts (complete audit with source comments)
+- **Dependencies**: None
+- **Worker**: Spawning (run: 697e407d)
+- **Completed**: 15/16 tasks. Remaining: constants-to-code (in progress), playable-demo-test
+
 ## 2026-04-19 22:36 UTC — production-system started
 
 - State: IDLE → WORKING
@@ -334,3 +349,36 @@
 - **Phase**: 4B UI Polish & Integration
 - **Completed**: 14/16 tasks. Remaining: hotkey-navigation (in progress), constants-to-code, playable-demo-test
 - **Note**: Checking next cycle for state transition
+
+## 2026-04-21 21:11 — Task: hotkey-navigation
+- **Status**: Worker still running
+- **Notes**: Spawned ~15m ago, no state change observed
+
+## 2026-04-21 21:16 — Task: hotkey-navigation
+- **Status**: Worker still running
+- **State**: WORKING (no change)
+- **Notes**: Worker spawned ~15m ago; not yet complete. Check next cycle.
+
+## 2026-04-21 21:21 — Task: hotkey-navigation
+- **Status**: Worker still running
+- **State**: WORKING (no change)
+- **Notes**: Worker (run: 45ba4dbc) running ~20m; no state transition to TESTING yet. Check next cycle.
+
+## 2026-04-21 21:31 — Task: constants-to-code
+- **Status**: Worker still running
+- **Note**: State remains WORKING, no change since last check
+
+## 2026-04-21 21:36 — Task: constants-to-code
+- **Status**: Worker still running
+- **Note**: Worker spawned at ~21:26 UTC, still processing. Will check next cycle.
+
+## 2026-04-21 21:41 CDT — Task: constants-to-code
+- **Status**: Worker still running (state=WORKING)
+- **Worker**: `worker-constants-to-code-v2` running ~7 min (run: 47adf1d4, model: Qwen)
+- **Note**: First worker (697e407d) completed in 1m17s but did not update state file, triggering v2 retry
+- **Completed**: 15/16 tasks. Remaining: constants-to-code (in progress), playable-demo-test
+
+## 2026-04-21 21:46 CDT — Task: constants-to-code
+- **Status**: Worker still running (state=WORKING)
+- **Note**: Worker running ~20 min since initial spawn. No state transition yet.
+- **Completed**: 15/16 tasks. Remaining: constants-to-code (in progress), playable-demo-test

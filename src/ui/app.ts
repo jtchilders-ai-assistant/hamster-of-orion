@@ -166,24 +166,91 @@ export class App {
   }
 
   private bindKeyboard(): void {
+    // Galaxy-map pan step (galaxy-coord units per keypress).
+    // Shift+Arrow pans 3× faster ("fast pan").
+    const PAN_STEP      = 20;
+    const PAN_STEP_FAST = 60;
+    // Zoom step per keypress (+/- keys).
+    const ZOOM_STEP = 0.25;
+
     document.addEventListener('keydown', (e: KeyboardEvent) => {
-      // Turn summary: ESC dismisses
-      if (e.key === 'Escape' && this.turnSummaryActive) {
-        (this.screens.get('turn_summary') as TurnSummaryScreen | undefined)?.continue();
+      // ── 1. Turn-summary overlay: ESC dismisses it, nothing else fires ────────
+      if (this.turnSummaryActive) {
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          (this.screens.get('turn_summary') as TurnSummaryScreen | undefined)?.continue();
+        }
+        // All other keys suppressed while turn summary is open.
         return;
       }
 
-      // Enter or Space = next turn
+      // ── 2. True modal screens block F-key navigation ─────────────────────
+      // Combat and ground-combat handle their own keys internally.
+      if (MODAL_SCREENS.has(this.currentScreen)) return;
+
+      // ── 3. ESC: open game menu from any non-modal screen ────────────────
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        this.navigate('menu');
+        return;
+      }
+
+      // ── 4. Enter / Space: end turn ────────────────────────────────
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
         this.store.dispatch({ type: 'NEXT_TURN' } as Action);
         return;
       }
 
-      const target = F_KEY_MAP[e.key];
-      if (target) {
+      // ── 5. F1–F8: global screen navigation ──────────────────────────
+      const fTarget = F_KEY_MAP[e.key];
+      if (fTarget !== undefined) {
         e.preventDefault();
-        this.navigate(target);
+        // F8 (council) is a no-op unless the High Council is currently in session.
+        if (fTarget === 'council' && !this.store.getState().highCouncil?.isActive) return;
+        this.navigate(fTarget);
+        return;
+      }
+
+      // ── 6. Galaxy-map-only keys ──────────────────────────────────
+      // Arrow-key panning and +/-/0 zoom only apply on the galaxy map.
+      if (this.currentScreen !== 'galaxy') return;
+
+      const step = e.shiftKey ? PAN_STEP_FAST : PAN_STEP;
+
+      switch (e.key) {
+        // ─ Arrow pan ──────────────────────────────────────────
+        case 'ArrowLeft':
+          e.preventDefault();
+          this.store.dispatch({ type: 'PAN_CAMERA', payload: { dx: -step, dy: 0 } } as Action);
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          this.store.dispatch({ type: 'PAN_CAMERA', payload: { dx: step, dy: 0 } } as Action);
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          this.store.dispatch({ type: 'PAN_CAMERA', payload: { dx: 0, dy: -step } } as Action);
+          break;
+        case 'ArrowDown':
+          e.preventDefault();
+          this.store.dispatch({ type: 'PAN_CAMERA', payload: { dx: 0, dy: step } } as Action);
+          break;
+
+        // ─ Zoom ──────────────────────────────────────────────
+        case '+':
+        case '=':  // unshifted + key on US keyboards
+          e.preventDefault();
+          this.store.dispatch({ type: 'ZOOM_CAMERA', payload: { delta: ZOOM_STEP } } as Action);
+          break;
+        case '-':
+          e.preventDefault();
+          this.store.dispatch({ type: 'ZOOM_CAMERA', payload: { delta: -ZOOM_STEP } } as Action);
+          break;
+        case '0':
+          e.preventDefault();
+          this.store.dispatch({ type: 'ZOOM_CAMERA', payload: { delta: 0 } } as Action);
+          break;
       }
     });
   }
