@@ -1,11 +1,32 @@
 {
-  "state": "WORKING",
+  "state": "IDLE",
   "phase": "phase4b-ui-integration",
   "current_task": "constants-to-code",
-  "last_check": "2026-04-21T21:26:00Z",
+  "verification_result": {
+    "task": "constants-to-code",
+    "status": "approved",
+    "checked_at": "2026-04-21T22:23:00Z",
+    "typecheck": "pass",
+    "tests": {
+      "total": 925,
+      "passed": 925,
+      "failed": 0
+    },
+    "check_design": "pass (0 violations)",
+    "design_docs_verified": [
+      "design/economy/factory-formulas.md",
+      "design/economy/population-growth.md",
+      "design/economy/slider-mathematics.md",
+      "design/ships/combat-algorithm.md",
+      "design/diplomacy/relationship-formulas.md",
+      "design/technology/research-formulas.md"
+    ],
+    "notes": "All 6 design docs fully represented in src/game/constants.ts. All formulas and constants match design specs. Minor issues: 12 of 119 constants lack explicit source comments (non-blocking), retro-fitted section has duplicate constant names (legacy artifacts). No functional issues."
+  },
+  "last_check": "2026-04-21T22:23:00Z",
   "last_completed": "hotkey-navigation",
   "task_count": 16,
-  "completed_count": 15,
+  "completed_count": 16,
   "last_commit": "3167c0b",
-  "notes": "Phase 4B: constants-to-code started (audit all design doc constants in src/game/constants.ts)"
+  "notes": "VERIFICATION COMPLETE: All 16/16 tasks done. Typecheck clean, 925 tests pass, check-design clean. All design doc constants verified in code."
 }
