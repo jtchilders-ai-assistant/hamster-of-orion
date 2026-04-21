@@ -2,11 +2,11 @@
   "state": "IDLE",
   "current_task": null,
   "phase": "phase4b-ui-integration",
-  "last_completed": "save-load-ui",
-  "last_check": "2026-04-21T11:05:00Z",
+  "last_completed": "research-screen-complete",
+  "last_check": "2026-04-21T11:30:00Z",
   "verifier_result": {
     "status": "approved",
-    "notes": "Worker v2 timed out but completed implementation. SaveLoadScreen.ts created (14KB), 16 new tests pass. Shows save slots, save/load/delete with LocalStorage, autosave slot. Tests: 1178/1178 pass."
+    "notes": "ResearchScreen.ts (819 lines) already implements all acceptance criteria. 6 fields shown, current research per field, click to see available techs, costs/ETA displayed, progress bars, completed techs marked. Tech SELECTION to set current is per design doc via start-of-turn popup (separate mechanism). Worker made broken changes; reverted. Tests: 1178/1178 pass."
   },
-  "notes": "Phase 4B task 6/16 complete. Next: research-screen-complete"
+  "notes": "Phase 4B task 7/16 complete. Next: colonies-list-screen"
 }

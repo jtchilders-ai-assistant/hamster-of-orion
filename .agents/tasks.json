@@ -143,7 +143,7 @@
       "id": "research-screen-complete",
       "name": "Complete research screen",
       "type": "ui",
-      "status": "pending",
+      "status": "done",
       "description": "Finish ResearchScreen with tech selection, progress display, and field allocation. Show available techs per field, costs, and effects.",
       "designDocs": [
         "design/ui-ux/wireframes/research-screen.md",

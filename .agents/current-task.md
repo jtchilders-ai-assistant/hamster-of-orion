@@ -1,51 +1,46 @@
-# Current Task: Save/Load game UI
+# Current Task: Complete research screen
 
-**ID**: save-load-ui
+**ID**: research-screen-complete
 **Type**: ui
-**Output**: src/ui/screens/SaveLoadScreen.ts
+**Output**: src/ui/screens/ResearchScreen.ts
 
 ## Description
-Create save/load game screens accessible from menu. Show save slots with game info (turn, year, empires). Allow saving, loading, and deleting saves.
+
+Finish ResearchScreen with tech selection, progress display, and field allocation. Show available techs per field, costs, and effects.
 
 ## Design Documents (MUST READ)
-- `design/ui-ux/UI_OVERVIEW.md` — GAME menu (F10/ESC) contains Save/Load/Options/Quit
-- `design/ui-ux/state-transitions.md` — Section 10: Loading and Save States (save flow, auto-save, save dialog structure)
 
-**Note**: Primary wireframe `design/ui-ux/wireframes/save-load.md` does NOT exist. Use the above docs + acceptance criteria as guide.
-
-### Key Design Points from state-transitions.md:
-1. **Save Dialog Flow**: GAME_MENU → SAVE_DIALOG (shows slots) → NAME_INPUT (new) or OVERWRITE_CONFIRM (existing) → SAVING → SUCCESS/ERROR
-2. **Auto-save**: Enabled by default, slot "autosave", triggers on TURN_END, COMBAT_START, BEFORE_COUNCIL. Max 3 autosaves with rotation.
-3. **Save Slots**: Show numbered slots, each with game info preview
-4. **Error handling**: Save failed → Retry/Save As/Cancel options
-
-### From UI_OVERVIEW.md:
-- GAME button (F10/ESC) opens Game Menu with Save, Load, Options, Quit
-- Modal overlay style matching existing screens
+- `design/ui-ux/wireframes/research-tree.md` — MOO1-accurate wireframe for Technology Screen (F4). Two-half layout: left = 6 field rows with RP% sliders; right = tech tree browser by level. Tech description panel at bottom. Tech selection happens via start-of-turn popup, NOT from main screen. No bottom command bar — exit via OK or ESC.
+- `design/technology/research-formulas.md` — RP calculation, tech costs by tier (§6), progress tracking (§8), miniaturization. Empire_Total_RP formula, field allocation, and completion overflow.
+- `design/technology/categories.md` — 6 tech fields: Computers, Construction, Force Fields, Planetology, Propulsion, Weaponry. Strategy considerations per field.
 
 ## Acceptance Criteria
-1. Shows list of save slots
-2. Each slot shows turn, year, player empire
-3. Save button saves current game to slot
-4. Load button loads selected save
-5. Delete button removes save with confirmation
-6. Autosave slot shown separately
-7. Works with LocalStorage persistence
 
-## Implementation Notes
-- Use LocalStorage API for persistence
-- Save format: JSON with GameState + metadata (turn, timestamp, player race)
-- Key format: `hamster-orion-save-{slot}` for manual saves, `hamster-orion-autosave` for autosave
-- Maximum 10 manual save slots + 1 autosave
-- Modal overlay similar to TurnSummaryScreen pattern
-- Wire into App/CommandBar GAME menu button
-- Follow existing UI patterns (main.css styles, DOM rendering)
+1. Shows 6 research fields (Computers, Construction, Force Fields, Planetology, Propulsion, Weaponry)
+2. Each field shows current research target
+3. Click field to see available techs (right-half tech tree browser by level)
+4. Tech list shows cost, turns to complete
+5. Select tech to set as current research
+6. Progress bar for current research
+7. Completed techs list/history
+
+## Key Implementation Notes
+
+From `research-tree.md`:
+- Full-screen modal opened by F4/TECH button
+- Left half (~40%): 6 stacked field rows, each showing: field name, RP%, current tech, progress bar + ETA
+- Right half (~60%): Tech tree browser for selected field, organized by level with separators
+- Tech states: [✓] researched, [→] researching, [ ] not researched
+- Bottom: description panel (~80%) + summary box with Total RP + OK button (~20%)
+- RP % sliders adjustable at any time — all 6 must sum to 100%
+- Tech selection popup is SEPARATE (start-of-turn only, not part of main screen)
+
+From `research-formulas.md`:
+- 6 fields: weapons, propulsion, construction, computers, force_fields, planetology
+- Tech tier costs: Tier 1=50 RP, Tier 2=80, ..., Tier 20=100,000 RP (see §6)
+- ETA = remaining_cost / field_rp_per_turn
+- Progress overflow carries to next tech (§8)
 
 ## Dependencies
-- None ✓
 
-## Files to Reference
-- `src/ui/screens/TurnSummaryScreen.ts` — modal overlay pattern
-- `src/game/state.ts` — GameState structure to serialize
-- `src/ui/app.ts` — integration point
-- `src/styles/main.css` — existing styles
+- None (no blocking dependencies)
