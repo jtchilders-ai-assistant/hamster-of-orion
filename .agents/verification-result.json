@@ -1,9 +1,15 @@
 {
-  "state": "VERIFIED",
-  "changes_summary": "Phase 4A complete. Worker session (b6c42f11) finished. All changes committed. No uncommitted changes. 30/30 tasks done across Phase 4A + 4B + council-ui.",
-  "test_count": 1038,
+  "state": "BLOCKED",
+  "task_id": "espionage-ui",
+  "changes_summary": "EspionagePanel.ts (602 lines) exists and renders UI. However, critical functional gaps found: spy allocation slider never dispatched (cosmetic only), no results display UI, counter-espionage panel only partial. 3/6 acceptance criteria fully met. Previous verifier approved without catching these gaps.",
+  "test_count": 1256,
   "typecheck_clean": true,
-  "test_files": 37,
-  "notes": "Typecheck: clean. Tests: 1038/1038 passed across 37 test files in 2.52s. Project fully complete, IDLE state. No action needed.",
-  "verifiedAt": "2026-04-20T06:56:00Z"
+  "test_files": 44,
+  "notes": "Typecheck: clean. Tests: 1256/1256 passed across 44 test files. EspionagePanel.ts renders spy counts, mission selector, probability, and basic notifications. But spyAllocation slider has no dispatch mechanism, results display is entirely missing, and counter-espionage panel is incomplete. Previous verifier approved without checking acceptance criteria thoroughly.",
+  "verifiedAt": "2026-04-21T13:24:00Z",
+  "blocking_issues": [
+    "Spy allocation slider is cosmetic only - never dispatched to game system",
+    "No results display UI for completed missions",
+    "Counter-espionage panel incomplete - only notification banners exist"
+  ]
 }

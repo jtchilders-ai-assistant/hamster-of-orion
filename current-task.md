@@ -1,25 +1,26 @@
-# Current Task: Complete research screen
+# Current Task: Playable demo integration test
 
-**ID**: research-screen-complete
-**Type**: ui
-**Output**: src/ui/screens/ResearchScreen.ts
+**ID**: playable-demo-test
+**Type**: test
+**Output**: test/integration/full-game.test.ts
 
 ## Description
-Finish ResearchScreen with tech selection, progress display, and field allocation. Show available techs per field, costs, and effects.
+Create end-to-end integration test that plays through a game: new game, colonize, build ships, combat, diplomacy, victory. Verifies all systems integrate correctly.
 
 ## Design Documents (MUST READ)
-- design/ui-ux/wireframes/research-screen.md — Screen layout, panels, interactions
-- design/technology/research-formulas.md — RP allocation math, cost formulas, progress tracking
-- design/technology/categories.md — 6 tech fields definitions
+- `design/game-mechanics/turn-structure.md` — Turn phases, order of operations, turn counter starts at Year 2623
+- `design/game-mechanics/victory-conditions.md` — Council Election (2/3 vote) and Military Conquest (eliminate all races)
 
 ## Acceptance Criteria
-1. Shows 6 research fields
-2. Each field shows current research target
-3. Click field to see available techs
-4. Tech list shows cost, turns to complete
-5. Select tech to set as current research
-6. Progress bar for current research
-7. Completed techs list/history
+1. Test creates new game with 2 empires
+2. Advances 50+ turns without errors
+3. Player colonizes at least 3 planets
+4. Player builds ships and fleet
+5. Combat occurs between fleets
+6. Diplomacy interactions happen
+7. Game ends with victory condition
 
 ## Dependencies
-- None
+- fleet-movement-ui ✓ (completed)
+- combat-resolution-ui ✓ (completed)
+- colonization-ui ✓ (completed)

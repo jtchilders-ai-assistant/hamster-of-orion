@@ -3,10 +3,6 @@
   "current_task": null,
   "phase": "phase4b-ui-integration",
   "last_completed": "espionage-ui",
-  "last_check": "2026-04-21T13:18:00Z",
-  "verifier_result": {
-    "status": "approved",
-    "notes": "EspionagePanel.ts (600+ lines) created. Worker v1 failed (gateway), v2 timed out but completed implementation. Shows spy allocation, mission selector, success probability, counter-espionage events. Tests: 1256/1256 pass."
-  },
-  "notes": "Phase 4B task 11/16 complete. Next: ground-combat-ui"
+  "last_check": "2026-04-21T13:50:00Z",
+  "notes": "Phase 4B 11/16 tasks done. Remaining: ground-combat-ui, victory-screen, hotkey-navigation, constants-to-code, playable-demo-test. Worker for playable-demo-test failed (gateway); existing game-loop.test.ts covers basics."
 }

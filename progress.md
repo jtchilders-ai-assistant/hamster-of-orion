@@ -96,3 +96,36 @@
 - **Status**: Verifying
 - **Tests**: Passed (typecheck ✓, 1256/1256 tests ✓)
 - **Verifier**: Spawned (run: 272b58c3)
+
+## 2026-04-21 08:27 CDT — IDLE → WORKING: playable-demo-test
+- **State**: IDLE → WORKING
+- **Task**: playable-demo-test (Integration test for full game flow)
+- **Design Docs**: turn-structure.md, victory-conditions.md
+- **Dependencies**: fleet-movement-ui ✓, combat-resolution-ui ✓, colonization-ui ✓
+- **Worker Spawned**: agent:main:subagent:33c37d85-e04a-483e-a051-5b391c69300b (run: 1dafc773)
+- **Baseline**: 1256 tests, typecheck clean (from research-screen-complete)
+
+## 2026-04-21 13:32 — Task: espionage-ui
+- **Status**: BLOCKED (human review required)
+- **Verifier Result**: Blocked — critical gaps found
+- **Details**: EspionagePanel (602 lines) has 3 critical issues:
+  - Spy allocation slider is cosmetic only (never dispatched to backend)
+  - No results display UI for completed missions
+  - Counter-espionage panel only partial (notification banners only)
+  - 3/6 acceptance criteria met; worker overclaimed all 6
+- **Blocked Reason**: Design doc ambiguity — espionage.md and spy-network-ui.md need clarification on results flow and counter-espionage panel scope. Cannot proceed without human resolution.
+- **Action Required**: Taylor must review and update design docs, or provide direct instructions to close gaps.
+- **Alert**: Failed to reach Taylor directly (no Discord channel configured). Status visible in workflow-state.json and progress.md.
+
+## 2026-04-21 08:37 CDT — BLOCKED: espionage-ui (still blocked)
+- State remains BLOCKED — no change since last check
+- Still awaiting human review of design doc ambiguities:
+  1. Spy allocation slider dispatch flow (espionage.md)
+  2. Mission results display UI (spy-network-ui.md)
+  3. Counter-espionage panel scope (espionage.md)
+- No sub-agents spawned; cannot proceed without human resolution
+
+## 2026-04-21 08:42 CDT — BLOCKED: espionage-ui (still blocked)
+- State remains BLOCKED — no change since last check
+- Still awaiting human review of design doc ambiguities
+- No sub-agents spawned; cannot proceed without human resolution
