@@ -3,6 +3,8 @@
  * src/game/store.ts
  */
 
+export const SHOW_TURN_SUMMARY = 'SHOW_TURN_SUMMARY';
+
 export interface Action {
   type: string;
   payload?: unknown;

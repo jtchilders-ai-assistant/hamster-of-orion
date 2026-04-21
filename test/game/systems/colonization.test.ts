@@ -374,13 +374,50 @@ describe('canColonize', () => {
     expect(canColonize(fleet, planet, state)).toBe(false);
   });
 
-  it('returns true for habitable but harsh planet types (toxic, radiated, etc.)', () => {
-    // These are difficult to colonize in lore but not blocked by the rules
-    for (const type of ['toxic', 'radiated', 'barren', 'dead', 'inferno'] as PlanetType[]) {
+  it('returns false for hostile planet types without Controlled Environment tech', () => {
+    // Source: design/planets/planet-types.md §Hostile Environments
+    // "Requires Controlled Environment technology from the Planetology tree to colonize."
+    for (const type of ['toxic', 'radiated', 'barren', 'dead', 'inferno', 'tundra'] as PlanetType[]) {
       const state = buildState({ withColonyShip: true, planetType: type });
       const fleet = state.fleets.byId['f1'];
       const planet = state.planets.byId['p1'];
-      expect(canColonize(fleet, planet, state)).toBe(true);
+      expect(canColonize(fleet, planet, state)).toBe(false);
+    }
+  });
+
+  it('returns true for hostile planet types when Controlled Environment tech is researched', () => {
+    // Tech IDs follow the pattern: controlled_<environment>
+    const techMap: Partial<Record<PlanetType, string>> = {
+      toxic:    'controlled_toxic',
+      radiated: 'controlled_radiated',
+      barren:   'controlled_barren',
+      dead:     'controlled_dead',
+      inferno:  'controlled_inferno',
+      tundra:   'controlled_tundra',
+    };
+    for (const [type, tech] of Object.entries(techMap) as [PlanetType, string][]) {
+      const state = buildState({ withColonyShip: true, planetType: type });
+      // Grant the required tech to the player empire
+      const empire = state.empires.byId['player'];
+      const stateWithTech = {
+        ...state,
+        empires: {
+          ...state.empires,
+          byId: {
+            ...state.empires.byId,
+            player: {
+              ...empire,
+              research: {
+                ...empire.research,
+                completedTechs: [tech],
+              },
+            },
+          },
+        },
+      };
+      const fleet = stateWithTech.fleets.byId['f1'];
+      const planet = stateWithTech.planets.byId['p1'];
+      expect(canColonize(fleet, planet, stateWithTech)).toBe(true);
     }
   });
 });

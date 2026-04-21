@@ -1,94 +1,91 @@
 {
-  "state": "TESTING",
+  "state": "IDLE",
   "phase": "phase4a-core-interactivity",
-  "current_task": "diplomacy-ui-complete",
-  "last_completed": "diplomacy-ui-complete",
+  "current_task": "colonization-ui",
+  "last_completed": "colonization-ui",
   "started_at": "2026-04-21T01:13:00Z",
-  "worker_output": {
-    "files_created": [
-      "test/ui/screens/DiplomacyScreen.test.ts"
-    ],
-    "files_modified": [
-      "src/ui/screens/DiplomacyScreen.ts",
-      "src/styles/main.css"
-    ],
-    "tests_added": [
-      "test/ui/screens/DiplomacyScreen.test.ts"
-    ],
-    "summary": "Completed DiplomacyScreen UI with all 7 acceptance criteria. Added: (1) empire list sorted by relation value with relation-colored list items and status labels; (2) relation bar -100..+100 with gradient color classes per diplomatic state; (3) treaty status icons with emoji and color-coded badge pills for all TreatyTypes; (4) propose treaty dropdown with all 5 proposable types (trade, NAP, research, defensive pact, alliance) with disabled options when relation is too low and 'cannot propose while at war' hint; (5) incoming proposals section (renders section, hooks for accept/reject dispatch ready when backend populates pending proposals); (6) declare war button with overlay confirmation modal requiring explicit confirm before dispatching event; (7) relation history log reading DiplomaticRelations.events, showing turn/impact/description with positive/negative color coding, capped at 20 entries. Added 73 tests in node environment covering all 7 criteria via pure diplomacy system logic. Full test suite: 1121 tests, all passing.",
-    "design_compliance": [
+  "verification_result": {
+    "status": "approved",
+    "verified_at": "2026-04-21T04:43:00Z",
+    "tests_passed": true,
+    "typecheck_passed": true,
+    "design_compliance_verified": true,
+    "design_checks": [
       {
-        "doc": "design/diplomacy/relationship-formulas.md",
-        "section": "§1 Relationship Scale",
-        "quote": "-100 to -50: War (Hostile) | -49 to -1: Unfriendly | 0 to +49: Neutral | +50 to +79: Friendly | +80 to +100: Allied",
-        "impl_file": "src/ui/screens/DiplomacyScreen.ts",
-        "impl_line": "statusLabel() + relationClass() — maps getDiplomaticState() result to CSS class and label",
-        "verified": true
+        "doc": "design/planets/planet-types.md",
+        "section": "§Hostile Environments (Require Tech)",
+        "claim": "6 hostile env types with specific Controlled [Environment] tech",
+        "verified": true,
+        "notes": "HOSTILE_ENVIRONMENT_TYPES and HOSTILE_ENV_REQUIRED_TECH in colonization.ts match design exactly: radiated→controlled_radiated, toxic→controlled_toxic, inferno→controlled_inferno, dead→controlled_dead, tundra→controlled_tundra, barren→controlled_barren"
       },
       {
-        "doc": "design/diplomacy/relationship-formulas.md",
-        "section": "§5.4 Racial Treaty Acceptance Thresholds (base minimum)",
-        "quote": "Trade Agreement: +10 | Non-Aggression Pact: +20 | Research Pact: +40 | Defensive Pact: +50 | Military Alliance: +65",
-        "impl_file": "src/ui/screens/DiplomacyScreen.ts",
-        "impl_line": "PROPOSABLE_TREATY_TYPES constant — minRelation values match §5.4",
-        "verified": true
+        "doc": "design/planets/planet-types.md",
+        "section": "Colonization Requirements",
+        "claim": "Standard envs colonizable from game start; hostile require Planetology tech",
+        "verified": true,
+        "notes": "hasColonizationTech() returns true for non-hostile, checks completedTechs for hostile. canColonize() enforces this before allowing action"
       },
       {
-        "doc": "design/diplomacy/relationship-formulas.md",
-        "section": "§10 Constants Summary",
-        "quote": "RELATION_MIN: -100 | RELATION_MAX: +100 | DECAY_RATE: 0.02",
-        "impl_file": "test/ui/screens/DiplomacyScreen.test.ts",
-        "impl_line": "Design compliance describe block — verifies all constants match",
-        "verified": true
+        "doc": "design/planets/planet-types.md",
+        "section": "§Uninhabitable (Gas Giants)",
+        "claim": "Gas giants cannot be colonized",
+        "verified": true,
+        "notes": "UNINHABITABLE_TYPES includes 'gas_giant'. Planet types with 0 population capacity are excluded"
       },
       {
-        "doc": "design/diplomacy/treaties.md",
-        "section": "Treaty Types",
-        "quote": "Non-Aggression Pact, Trade Agreement, Research Agreement, Military Alliance, Defensive Pact",
-        "impl_file": "src/ui/screens/DiplomacyScreen.ts",
-        "impl_line": "TREATY_LABELS and PROPOSABLE_TREATY_TYPES — all treaty types defined with labels and icons",
-        "verified": true
+        "doc": "design/ui-ux/wireframes/galaxy-map.md",
+        "section": "State 3: Uncolonized Planet",
+        "claim": "Info panel shows planet type, size, uncolonized status, 'Requires: Colony Ship'",
+        "verified": true,
+        "notes": "InfoPanel.renderUncolonized() shows all wireframe elements. Shows COLONIZE button when colony ship fleet present, 'Requires: Colony Ship' when absent"
       },
       {
-        "doc": "design/ui-ux/wireframes/diplomacy-screen.md",
-        "section": "Layout Overview — races list + race detail panel",
-        "quote": "RACES LIST (left panel) | RACE DETAIL PANEL (right): Diplomatic Status, Treaties, Military Power, Tech Level",
-        "impl_file": "src/ui/screens/DiplomacyScreen.ts",
-        "impl_line": "buildLayout() + renderRaceList() + renderDetail()",
-        "verified": true
-      },
-      {
-        "doc": "design/ui-ux/wireframes/diplomacy-screen.md",
-        "section": "Sub-Flow: Diplomatic Audience — options",
-        "quote": "[ PROPOSE TREATY ] [ DECLARE WAR ] [ CLOSE AUDIENCE ]",
-        "impl_file": "src/ui/screens/DiplomacyScreen.ts",
-        "impl_line": "renderDetail() actions-section — propose-treaty dropdown + declare-war with confirmation + propose-peace during war",
-        "verified": true
-      },
-      {
-        "doc": "design/ui-ux/wireframes/diplomacy-screen.md",
-        "section": "Sub-Flow: Treaty Negotiation — treaty types",
-        "quote": "[ ] Non-Aggression Pact | [ ] Trade Treaty | [ ] Research Agreement | [ ] Military Alliance",
-        "impl_file": "src/ui/screens/DiplomacyScreen.ts",
-        "impl_line": "renderProposeForm() — select dropdown with all treaty types and disabled state for insufficient relation",
-        "verified": true
+        "doc": ".agents/task-colonization.md",
+        "section": "Starting Colony Stats",
+        "claim": "10 population, 0 factories, 0 pollution, content morale, 20/20/20/20/20 production",
+        "verified": true,
+        "notes": "COLONY_STARTING_POPULATION=10, COLONY_STARTING_FACTORIES=0, COLONY_STARTING_POLLUTION=0, COLONY_STARTING_MORALE='content', COLONY_STARTING_PRODUCTION={20,20,20,20,20}"
       }
     ],
-    "design_gaps": [
+    "issues": [
       {
-        "doc": "design/ui-ux/wireframes/diplomacy-screen.md",
-        "gap": "Wireframe marked STUB — 'exact column widths for race list vs detail panel' and 'treaty badge icons' noted as TODO.",
-        "choice": "Implemented based on available design: 240px left panel, flex detail panel, emoji icons for treaty badges, CSS color-coded status pills. Full visual polishing can follow once wireframe is completed."
+        "type": "dead_code",
+        "doc": "src/game/actions/colony.ts",
+        "section": "colonizePlanet action creator",
+        "notes": "colonizePlanet(planetId, empireId) is never called — all dispatches go directly via store.dispatch({type: 'COLONIZE_PLANET', payload: {planetId, fleetId}}). The action creator signature doesn't match the reducer's expected payload (fleetId vs empireId). Should either wire the action creator properly or remove it.",
+        "severity": "minor"
+      }
+    ],
+    "notes": "Colonization UI fully implemented and verified. All 6 acceptance criteria met. Game logic (systems/colonization.ts) is sound: canColonize validates fleet position, ownership, habitability, colony component, and hostile env tech. colonize() correctly consumes ship, initializes colony, and updates all registries. InfoPanel correctly shows COLONIZE button when colony ship fleet exists at system. PlanetScreen correctly manages the new colony with sliders. Note: InfoPanel doesn't pre-check hostile env tech before showing colonize button (only checks fleet + colonizable target), but the colonize action properly validates this in the reducer. All 108 tests pass, typecheck clean. Minor dead code in actions/colony.ts: colonizePlanet action creator unused."
+  },
+  "worker_output": {
+    "files_created": [],
+    "files_modified": [],
+    "summary": "Colonization flow UI complete. Implementation spans: GalaxyScreen (screen container), InfoPanel (Colonize button in uncolonized panel), PlanetScreen (planet management), systems/colonization.ts (pure game logic), actions/colony.ts (action creators). All 6 acceptance criteria verified: (1) colony ship fleet at system shows COLONIZE button, 'Requires: Colony Ship' when absent; (2) button triggers COLONIZE_PLANET action; (3) new planet set with empire ownerId and isColonized=true, renders with empire-colored ring on star map; (4) reducer navigates to planet screen with selectedPlanet set; (5) colony ship consumed via removeColonyShip from fleet and ships registry, fleet dissolved if empty; (6) canColonize validates hasColonizationTech for hostile envs, rejects without required Controlled [Environment] tech.",
+    "design_compliance": [
+      {
+        "doc": "design/planets/planet-types.md",
+        "section": "§Hostile Environments",
+        "quote": "Radiated→Controlled Radiated, Toxic→Controlled Toxic, Inferno→Controlled Inferno, Dead→Controlled Dead, Tundra→Controlled Tundra, Barren→Controlled Barren",
+        "impl_file": "src/game/systems/colonization.ts",
+        "impl_line": "HOSTILE_ENV_REQUIRED_TECH — all 6 mappings exact",
+        "verified": true
       },
       {
-        "doc": "design/ui-ux/wireframes/diplomacy-screen.md",
-        "gap": "AI-Initiated Audience popup (§Sub-Flow: AI-Initiated Audience) — modal overlay for incoming treaty proposals from AI races during turn resolution. The incoming proposals section is rendered in DiplomacyScreen but the AI backend does not yet populate DiplomaticRelations with pending inbound proposals in a queryable form.",
-        "choice": "Section rendered with accept/reject button wiring ready; returns 'No pending proposals' until backend populates the data. Events dispatched as diplomacy-action with proposal-accept/proposal-reject action types."
+        "doc": "design/planets/planet-types.md",
+        "section": "Colonization Requirements",
+        "quote": "Standard environments colonizable from game start; hostile require Planetology tech",
+        "impl_file": "src/game/systems/colonization.ts",
+        "impl_line": "hasColonizationTech() — returns true for standard, checks completedTechs for hostile",
+        "verified": true
       },
       {
-        "doc": "design/diplomacy/relationship-formulas.md",
-        "gap": "§1: War threshold boundary. Design doc says '-100 to -50 = War (Hostile)' but getDiplomaticState() in diplomacy.ts uses strict < -50 (so -50 is 'unfriendly'). Small off-by-one.",
-        "choice": "Matched the actual code implementation (< -50 = war). Test updated accordingly. The discrepancy should be reviewed by design team."
+        "doc": "design/ui-ux/wireframes/galaxy-map.md",
+        "section": "State 3: Uncolonized Planet",
+        "quote": "Planet name/type/size + 'UNCOLONIZED' + 'Requires: Colony Ship' or COLONIZE button",
+        "impl_file": "src/ui/components/InfoPanel.ts",
+        "impl_line": "renderUncolonized() — displays all wireframe elements, conditional COLONIZE button",
+        "verified": true
       }
     ]
   }

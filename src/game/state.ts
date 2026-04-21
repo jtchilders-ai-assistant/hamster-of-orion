@@ -33,7 +33,8 @@ export type ScreenType =
   | 'ship_design'
   | 'reports'
   | 'council'
-  | 'combat';
+  | 'combat'
+  | 'turn_summary';
 
 export type GalaxySize = 'small' | 'medium' | 'large' | 'huge';
 export type GalaxyShape = 'spiral' | 'elliptical' | 'irregular';
@@ -86,6 +87,44 @@ export type TreatyType = 'peace' | 'non_aggression' | 'trade' | 'research' | 'mi
 export type CombatPhase = 'initiative' | 'movement' | 'firing' | 'special' | 'resolution';
 export type HexType = 'empty' | 'asteroid' | 'nebula' | 'planet';
 export type CombatStatus = 'cloaked' | 'stunned' | 'disabled' | 'repaired';
+
+// ── Turn Summary Events ───────────────────────────────────────────────────────
+
+export type TurnEventType =
+  | 'research'
+  | 'ship_built'
+  | 'combat'
+  | 'diplomatic'
+  | 'random_event'
+  | 'colonization'
+  | 'population'
+  | 'production'
+  | 'victory';
+
+export interface TurnEvent {
+  /** Machine-readable event type. */
+  type: TurnEventType;
+  /** Human-readable title. */
+  title: string;
+  /** Detailed description of what happened. */
+  description: string;
+  /** Optional empire involved (null = player). */
+  empireId: EmpireId | null;
+  /** Optional system the event occurred in. */
+  systemId: SystemId | null;
+  /** Optional planet the event occurred on. */
+  planetId: PlanetId | null;
+  /** Optional combat reference for combat-type events. */
+  combatId: CombatId | null;
+  /** Optional technology reference for research events. */
+  techId: TechId | null;
+  /** Optional ship design reference for ship-built events. */
+  designId: ShipDesignId | null;
+  /** Turn number when this event occurred. */
+  turn: number;
+}
+
+// ── UI State ──────────────────────────────────────────────────────────────────
 
 export type PersonalityType = 'aggressive' | 'scientific' | 'diplomatic' | 'expansionist' | 'builder' | 'balanced' | 'erratic';
 export type AITrait = 'honorable' | 'backstabber' | 'logical' | 'xenophobic' | 'tech_trader' | 'war_monger' | 'peaceful';
@@ -826,6 +865,9 @@ export interface GameState {
   highCouncil: HighCouncil | null;
 
   spyMissions: SpyMission[];
+
+  /** Events that occurred during the current turn, shown on the turn summary screen. */
+  turnEvents: TurnEvent[];
 
   ui: UIState;
 }

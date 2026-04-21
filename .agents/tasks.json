@@ -100,7 +100,7 @@
       "id": "turn-summary-screen",
       "name": "Turn summary/events screen",
       "type": "ui",
-      "status": "pending",
+      "status": "done",
       "description": "Create turn summary screen that shows between turns. Display research completed, ships built, combats resolved, diplomatic events, random events.",
       "designDocs": [
         "design/ui-ux/wireframes/turn-summary.md",

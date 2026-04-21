@@ -217,3 +217,8 @@ export const COLONY_STARTING_POP = 2;
  * Source: design/ships/ship-costs.md §Colony Ships
  */
 export const COLONY_SHIP_COST = 500;
+
+// ── UI Actions ────────────────────────────────────────────────────────────────
+
+/** Action shown to display the turn summary / events screen after a turn ends. */
+export const SHOW_TURN_SUMMARY = 'SHOW_TURN_SUMMARY';

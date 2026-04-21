@@ -90,16 +90,14 @@ export class InfoPanel {
 
     // Colonize button: show when a colony ship fleet is at an uncolonized planet
     const colonyShipFleetId = this.findColonyShipFleet(state, playerFleets);
-    const showColonizeButton = colonyShipFleetId && !primaryPlanet?.isColonized;
+    const colonizableTarget = uncolonizedPlanets[0] ?? null;
+    const showColonizeButton = !!(colonyShipFleetId && colonizableTarget);
 
-    if (showColonizeButton) {
-      // Show uncolonized panel with colonize button
-      const planet = primaryPlanet;
-      if (planet) {
-        this.element.innerHTML = this.renderUncolonized(system, planet, colonyShipFleetId);
-        this.bindColonizeButton(state, system, planet, colonyShipFleetId);
-        return;
-      }
+    if (showColonizeButton && colonizableTarget) {
+      // Show uncolonized panel with colonize button (takes priority over fleet-at-system view)
+      this.element.innerHTML = this.renderUncolonized(system, colonizableTarget, colonyShipFleetId);
+      this.bindColonizeButton(state, system, colonizableTarget, colonyShipFleetId);
+      return;
     }
 
     if (playerFleets.length > 0 && primaryPlanet && !showColonizeButton) {

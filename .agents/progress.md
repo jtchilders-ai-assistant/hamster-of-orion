@@ -1,3 +1,14 @@
+## 2026-04-21 10:07 UTC — Task: turn-summary-screen
+- **Status**: Worker running (13m / 15m timeout)
+- **Worker**: worker-turn-summary-screen (warpcore/Qwen model)
+- **Action**: No intervention — waiting for worker to complete
+- **Started**: 09:52 UTC
+
+## 2026-04-21 09:43 UTC — Task: colonization-ui
+- **Status**: Testing → Verifying
+- **Tests**: Passed (typecheck ✓, vitest ✓ — 1154 tests, 40 files)
+- **Verifier**: Spawning with model warpcore/Qwen/Qwen3.6-35B-A3B-FP8
+
 ## 2026-04-21 08:32 UTC — Task: colonization-ui
 - **Status**: Started
 - **Design Docs**: colonization.md (NOT FOUND), galaxy-map.md, planet-types.md
@@ -35,12 +46,19 @@
 - **Status**: Worker v2 running (~1 minute)
 - **Action**: No action needed — waiting for worker to complete
 
+## 2026-04-21 10:12 UTC — Task: turn-summary-screen
+- **Status**: Completed ✓
+- **Implementation**: TurnSummaryScreen overlay after Next Turn, shows events, Continue button
+- **Worker**: Timed out; orchestrator fixed TS type narrowing issue
+- **Tests**: 1154/1154 pass (+33 new)
+- **Commit**: pending
+
 ## 2026-04-21 08:52 UTC — Task: colonization-ui
 - **Status**: Completed ✓
 - **Implementation**: InfoPanel shows Colonize button, COLONIZE_PLANET action in reducer, calls colonize()
 - **Worker**: Timed out; orchestrator fixed TS errors
 - **Tests**: 1121/1121 pass
-- **Commit**: pending
+- **Commit**: 79615dc
 
 ## 2026-04-21 07:48 UTC — Task: diplomacy-ui-complete
 - **Status**: Completed ✓
@@ -258,3 +276,20 @@ All three late subagent timeouts (hamster-ground-combat, hamster-ai-diplomacy, h
 - **Critical Issue**: Criterion 5 (accept/reject incoming proposals) — `renderIncomingProposals()` is a stub with no data model. `DiplomaticRelations` interface lacks `incomingProposals` field.
 - **Moderate Bug**: Line 333 uses single quotes instead of backticks for template literal interpolation
 - **Action**: Spawning Worker to fix missing data model and template literal bug
+
+## 2026-04-21 09:52 UTC — Task: colonization-ui
+- **Status**: Completed ✓
+- **Verifier**: Approved — all 6 acceptance criteria met
+- **Design Verified**: galaxy-map.md (State 3), planet-types.md (hostile environments)
+- **Tests**: 1154/1154 pass, typecheck clean
+- **Files**: InfoPanel.ts, colonization.ts, reducer.ts, colonization.test.ts, colonizationUI.test.ts
+- **Commit**: 79615dc
+- **Minor Issue**: Dead code in actions/colony.ts (colonizePlanet unused)
+- **Note**: Verifier wrote to wrong workflow-state.json location; orchestrator synced state
+
+## 2026-04-21 09:52 UTC — Task: turn-summary-screen
+- **Status**: Started
+- **Design Docs**: turn-summary.md (NOT FOUND), turn-structure.md, random-events.md
+- **Worker**: Spawning with model warpcore/Qwen/Qwen3.6-35B-A3B-FP8
+- **Phase**: 4B UI Integration — task 5/16
+- **Note**: Primary wireframe missing; using turn-structure.md and MOO reference images

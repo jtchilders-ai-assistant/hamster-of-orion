@@ -19,6 +19,7 @@ import { PlanetScreen } from './screens/PlanetScreen';
 import { CombatScreen } from './screens/CombatScreen';
 import { CouncilScreen } from './screens/CouncilScreen';
 import { CommandBar } from './components/CommandBar';
+import { TurnSummaryScreen } from './screens/TurnSummaryScreen';
 
 // ── F-key → Screen mapping (matches MOO1 command bar layout) ─────────────────
 
@@ -47,6 +48,7 @@ export class App {
   private readonly screens: Map<ScreenType, Screen>;
   private readonly commandBar: CommandBar;
   private currentScreen: ScreenType;
+  private turnSummaryActive: boolean = false;
 
   constructor(store: Store<GameState>) {
     this.store = store;
@@ -113,25 +115,34 @@ export class App {
     const diplomacyEl  = this.makeScreenContainer(root, 'diplomacy-screen');
     const designEl     = this.makeScreenContainer(root, 'design-screen');
     const newGameEl    = this.makeScreenContainer(root, 'new-game-screen');
-    const combatEl     = this.makeScreenContainer(root, 'combat-screen');
-    const councilEl    = this.makeScreenContainer(root, 'council-screen');
+    const combatEl       = this.makeScreenContainer(root, 'combat-screen');
+    const councilEl      = this.makeScreenContainer(root, 'council-screen');
+    const turnSummaryEl  = this.makeScreenContainer(root, 'turn-summary-screen');
+    const turnSummary    = new TurnSummaryScreen(turnSummaryEl, store);
 
     return new Map<ScreenType, Screen>([
-      ['new_game',    new NewGameScreen(newGameEl, store)],
-      ['galaxy',      new GalaxyScreen(galaxyEl, store)],
-      ['planet',      new PlanetScreen(planetEl, store)],
-      ['planet_list', new ColoniesScreen(coloniesEl)],
-      ['fleet',       new FleetsScreen(fleetsEl, store)],
-      ['research',    new ResearchScreen(researchEl, store)],
-      ['diplomacy',   new DiplomacyScreen(diplomacyEl)],
-      ['ship_design', new DesignScreen(designEl, store)],
-      ['combat',      new CombatScreen(combatEl, store)],
-      ['council',     new CouncilScreen(councilEl)],
+      ['new_game',         new NewGameScreen(newGameEl, store)],
+      ['galaxy',           new GalaxyScreen(galaxyEl, store)],
+      ['planet',           new PlanetScreen(planetEl, store)],
+      ['planet_list',      new ColoniesScreen(coloniesEl)],
+      ['fleet',            new FleetsScreen(fleetsEl, store)],
+      ['research',         new ResearchScreen(researchEl, store)],
+      ['diplomacy',        new DiplomacyScreen(diplomacyEl)],
+      ['ship_design',      new DesignScreen(designEl, store)],
+      ['combat',           new CombatScreen(combatEl, store)],
+      ['council',          new CouncilScreen(councilEl)],
+      ['turn_summary',     turnSummary],
     ]);
   }
 
   private bindKeyboard(): void {
     document.addEventListener('keydown', (e: KeyboardEvent) => {
+      // Turn summary: ESC dismisses
+      if (e.key === 'Escape' && this.turnSummaryActive) {
+        (this.screens.get('turn_summary') as TurnSummaryScreen | undefined)?.continue();
+        return;
+      }
+
       // Enter or Space = next turn
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
@@ -152,7 +163,34 @@ export class App {
   }
 
   private onStateChange(state: GameState): void {
-    // Handle screen transitions
+    const prevScreen = this.currentScreen;
+    const prevTurnSummary = this.turnSummaryActive;
+
+    // Special handling for turn summary — it's an overlay, not a full replacement
+    if (state.currentScreen === 'turn_summary') {
+      // Hide the underlying screen (galaxy, planets, etc.)
+      this.screens.get(prevScreen)?.hide();
+      this.currentScreen = 'turn_summary';
+      this.turnSummaryActive = true;
+      this.screens.get('turn_summary')?.render(state);
+      this.screens.get('turn_summary')?.show();
+      // Always render command bar
+      this.commandBar.render(state);
+      return;
+    }
+
+    // Dismiss turn summary overlay — show underlying screen
+    if (prevTurnSummary) {
+      this.screens.get('turn_summary')?.hide();
+      this.turnSummaryActive = false;
+      this.currentScreen = state.currentScreen;
+      this.screens.get(state.currentScreen)?.render(state);
+      this.screens.get(state.currentScreen)?.show();
+      this.commandBar.render(state);
+      return;
+    }
+
+    // Normal screen transition
     if (state.currentScreen !== this.currentScreen) {
       this.screens.get(this.currentScreen)?.hide();
       this.currentScreen = state.currentScreen;

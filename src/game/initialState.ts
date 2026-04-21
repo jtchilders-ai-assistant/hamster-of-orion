@@ -116,5 +116,7 @@ export const initialState: GameState = {
 
   spyMissions: [],
 
+  turnEvents: [],
+
   ui: defaultUI,
 };

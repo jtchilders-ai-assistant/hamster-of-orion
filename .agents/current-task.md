@@ -1,37 +1,46 @@
-# Current Task: Colonization flow UI
+# Current Task: Turn summary/events screen
 
-**ID**: colonization-ui
+**ID**: turn-summary-screen
 **Type**: ui
-**Output**: src/ui/screens/GalaxyScreen.ts (colonization)
+**Output**: src/ui/screens/TurnSummaryScreen.ts
 
 ## Description
-Add colonization UI flow. Colony ships in orbit at uncolonized habitable planets show 'Colonize' button. Clicking triggers colonization and opens planet management.
+Create turn summary screen that shows between turns. Display research completed, ships built, combats resolved, diplomatic events, random events.
 
 ## Design Documents (MUST READ)
-- design/planets/colonization.md — **FILE NOT FOUND** (see note below)
-- design/ui-ux/wireframes/galaxy-map.md — Info panel State 3 (Uncolonized Planet) shows "Requires: Colony Ship"
-- design/planets/planet-types.md — Colonization requirements: standard environments need colony ship, hostile environments need Controlled [Environment] tech
+- design/ui-ux/wireframes/turn-summary.md — **FILE NOT FOUND** (see reference materials below)
+- design/game-mechanics/turn-structure.md — Turn phases (Phase 3: Research breakthrough popup, Phase 7: Combat results, Phase 9: Random events)
+- design/game-mechanics/random-events.md — Event types and effects
 
-**NOTE**: The primary design doc `design/planets/colonization.md` does not exist. Use the following sources for colonization mechanics:
-1. **galaxy-map.md** State 3: Shows uncolonized planet panel with "Requires: Colony Ship"
-2. **planet-types.md**: Standard environments colonizable from game start; hostile require Planetology tech
+**NOTE**: The primary wireframe `design/ui-ux/wireframes/turn-summary.md` does not exist. Use the following sources:
+1. **turn-structure.md** Phase 12: "Player can review reports" — implies turn summary
+2. **MOO reference screens**: `design/moo_screens/moo_start_of_turn_*.png`
 3. **Acceptance criteria below** define the UI requirements
 
+## Reference: MOO-style Turn Events
+From the reference images:
+- `moo_start_of_turn_new_planet_reveal.png` — New planet discovery popup
+- `moo_start_of_turn_select_new_research.png` — Research completed, choose next
+- `moo_start_of_turn_new_ships.png` — Ships built this turn
+
 ## Acceptance Criteria
-1. Colony ship at uncolonized planet shows Colonize button
-2. Colonize button triggers colonization action
-3. New colony appears on map with empire color
-4. Planet management screen opens after colonization
-5. Colony ship is consumed
-6. Cannot colonize hostile planets without tech
+1. Shows after Next Turn is clicked
+2. Lists research completed this turn
+3. Lists ships built this turn
+4. Lists combat results with links
+5. Lists diplomatic events
+6. Lists random events
+7. Continue button returns to galaxy map
+
+## Implementation Notes
+- Should be a modal/screen that appears between turns
+- Can use a card/list layout for different event types
+- Each event type can have an icon (research flask, ship, crossed swords, handshake, star)
+- Combat results should be clickable to see battle report
+- Continue button or ESC dismisses and returns to galaxy map
+- If no events, still show "Turn X Complete - Nothing of note occurred"
+- The reducer should track turn events in state (add `turnEvents` array to GameState if needed)
+- processTurn() should populate turnEvents as it processes each phase
 
 ## Dependencies
 - None (no blocking dependencies)
-
-## Implementation Notes
-- The Colonize button should appear in the info panel when:
-  - A colony ship belonging to the player is orbiting a star
-  - The star has an uncolonized habitable planet
-  - The player has the required tech for hostile environments (if applicable)
-- On click: consume the colony ship, create a new colony, update the map rendering, and navigate to planet management screen
-- Check planet environment type and player's Planetology tech for hostile planet colonization

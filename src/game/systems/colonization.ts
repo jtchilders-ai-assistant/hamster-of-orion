@@ -35,12 +35,57 @@ for (const comp of (componentData as { components: ComponentData[] }).components
 // ── Habitable planet types ────────────────────────────────────────────────────
 
 /**
- * Planet types that cannot be colonised. Gas giants and truly dead worlds
- * have zero population capacity and cannot support a colony.
+ * Planet types that cannot be colonised. Gas giants have zero population capacity.
  */
 const UNINHABITABLE_TYPES = new Set<PlanetType>([
   'gas_giant',
 ]);
+
+/**
+ * Hostile environments that require Controlled [Environment] tech from Planetology.
+ *
+ * Source: design/planets/planet-types.md §Hostile Environments
+ * "Requires Controlled Environment technology from the Planetology tree to colonize."
+ */
+export const HOSTILE_ENVIRONMENT_TYPES = new Set<PlanetType>([
+  'radiated',
+  'toxic',
+  'inferno',
+  'dead',
+  'tundra',
+  'barren',
+]);
+
+/**
+ * Tech IDs that unlock Controlled Environment colonization.
+ * Each hostile type maps to its specific controlled tech.
+ *
+ * Source: design/planets/planet-types.md §Hostile Environments table
+ */
+export const HOSTILE_ENV_REQUIRED_TECH: Partial<Record<PlanetType, string>> = {
+  radiated: 'controlled_radiated',
+  toxic:    'controlled_toxic',
+  inferno:  'controlled_inferno',
+  dead:     'controlled_dead',
+  tundra:   'controlled_tundra',
+  barren:   'controlled_barren',
+};
+
+/**
+ * Returns true if the player empire has researched the tech required to
+ * colonize the given hostile planet type.
+ *
+ * Standard environments always return true (no tech required).
+ */
+export function hasColonizationTech(
+  planetType: PlanetType,
+  completedTechs: string[],
+): boolean {
+  if (!HOSTILE_ENVIRONMENT_TYPES.has(planetType)) return true; // standard env
+  const requiredTech = HOSTILE_ENV_REQUIRED_TECH[planetType];
+  if (!requiredTech) return true; // safety fallback
+  return completedTechs.includes(requiredTech);
+}
 
 // ── Colony component detection ────────────────────────────────────────────────
 
@@ -98,11 +143,17 @@ export function canColonize(
   // Condition 2 — planet must be unowned
   if (planet.ownerId !== null) return false;
 
-  // Condition 3 — planet must be habitable
+  // Condition 3 — planet must be habitable (gas giants are not)
   if (UNINHABITABLE_TYPES.has(planet.type)) return false;
 
   // Condition 4 — fleet must contain a colony ship
   if (findColonyShipInFleet(fleet, state) === null) return false;
+
+  // Condition 5 — hostile environments require Controlled [Environment] tech
+  // Source: design/planets/planet-types.md §Colonization Requirements
+  const empire = state.empires.byId[fleet.ownerId];
+  const completedTechs = empire?.research.completedTechs ?? [];
+  if (!hasColonizationTech(planet.type, completedTechs)) return false;
 
   return true;
 }

@@ -20,7 +20,7 @@ const FLEET_ACTIONS = new Set([
 
 const VALID_SCREENS: ReadonlySet<string> = new Set<ScreenType>([
   'menu', 'new_game', 'galaxy', 'planet', 'planet_list', 'fleet', 'research',
-  'diplomacy', 'ship_design', 'reports', 'council', 'combat',
+  'diplomacy', 'ship_design', 'reports', 'council', 'combat', 'turn_summary',
 ]);
 
 export function rootReducer(state: GameState, action: Action): GameState {
@@ -224,6 +224,19 @@ export function rootReducer(state: GameState, action: Action): GameState {
   }
 
   // Colonize planet action
+  // Show turn summary screen
+  if (action.type === 'SHOW_TURN_SUMMARY') {
+    return {
+      ...state,
+      currentScreen: 'turn_summary' as ScreenType,
+      ui: {
+        ...state.ui,
+        previousScreen: state.currentScreen,
+        currentScreen: 'turn_summary' as ScreenType,
+      },
+    };
+  }
+
   if (action.type === 'COLONIZE_PLANET') {
     const { planetId, fleetId } = action.payload as {
       planetId: PlanetId;
@@ -239,6 +252,7 @@ export function rootReducer(state: GameState, action: Action): GameState {
         currentScreen: 'planet' as ScreenType,
         ui: {
           ...newState.ui,
+          currentScreen: 'planet' as ScreenType,
           selectedPlanet: planetId,
         },
       };

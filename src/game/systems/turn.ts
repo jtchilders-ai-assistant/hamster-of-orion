@@ -388,6 +388,8 @@ export function processTurn(state: GameState): GameState {
     turn: newTurn,
     year: newYear,
     lastPlayed: Math.max(Date.now(), state.lastPlayed + 1),
+    // Clear turn events — they'll be repopulated as the turn progresses
+    turnEvents: [],
   };
 
   // ── Step 2: empire income (credits += creditPerTurn) ──────────────────────
