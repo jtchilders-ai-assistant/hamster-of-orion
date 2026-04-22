@@ -3,6 +3,7 @@
  * src/main.ts
  */
 
+import './styles/main.css';
 import { Store } from './game/store';
 import { GameState } from './game/state';
 import { rootReducer } from './game/reducer';
