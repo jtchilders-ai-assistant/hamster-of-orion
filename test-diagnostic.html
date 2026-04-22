@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hamster of Orion — Diagnostic Test</title>
+  <style>
+    /* Standalone layout for diagnostic */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Courier New', monospace;
+      background: #111;
+      color: #0f0;
+    }
+    .diagnostic {
+      max-width: 900px;
+      margin: 20px auto;
+      padding: 20px;
+    }
+    h1 { color: #0af; margin-bottom: 10px; }
+    h2 { color: #fa0; margin: 20px 0 10px; font-size: 16px; }
+    .pass { color: #0f0; }
+    .fail { color: #f33; }
+    .warn { color: #fa0; }
+    pre {
+      background: #000;
+      padding: 10px;
+      margin: 5px 0;
+      border: 1px solid #333;
+      font-size: 12px;
+      white-space: pre-wrap;
+      max-height: 300px;
+      overflow: auto;
+    }
+    .test-section {
+      border: 1px solid #333;
+      margin: 10px 0;
+      padding: 15px;
+    }
+    button {
+      background: #0a2a4e;
+      color: #0af;
+      border: 1px solid #0af;
+      padding: 8px 16px;
+      cursor: pointer;
+      margin: 4px;
+      font-family: monospace;
+    }
+    button:hover { background: #1a3a5e; }
+  </style>
+
+  <!-- Import the ACTUAL game CSS directly (no Vite) -->
+  <link rel="stylesheet" href="src/styles/main.css" />
+
+  <script>
+    const results = [];
+    function test(name, passed, detail) {
+      results.push({ name, pass: passed, detail });
+      const cls = passed ? 'pass' : (detail ? 'warn' : 'fail');
+      document.getElementById('results').innerHTML +=
+        `<div class="test-section ${cls}"><strong>${passed ? '✅' : '❌'} ${name}</strong>` +
+        (detail ? `<br><small>${detail}</small>` : '') +
+        `</div>`;
+    }
+    function log(msg) {
+      document.getElementById('log').innerHTML += msg + '<br>';
+    }
+  </script>
+</head>
+<body>
+  <div class="diagnostic">
+    <h1>⚛️ Hamster of Orion — Diagnostic Test</h1>
+    <p>Testing CSS loading, JS execution, and screen rendering independently of Vite.</p>
+
+    <h2>📋 Test Results</h2>
+    <div id="results">
+
+    <h2>📜 Live Log</h2>
+    <pre id="log"></pre>
+
+    <h2>🎮 Test Game Screen</h2>
+    <p>Below is a minimal recreation of the game's screen system using the ACTUAL game CSS.</p>
+    <p>If this area renders a colored screen with text, the CSS is loading correctly.</p>
+
+    <div id="game-screen" class="screen" style="display:none; width:100%; min-height:200px; flex-direction:column; align-items:center; justify-content:center; background: var(--color-bg); color: var(--color-text);">
+      <h2 style="color: var(--color-accent); font-size: 24px;">🐹 HAMSTER OF ORION</h2>
+      <p style="margin-top: 10px;">CSS variables are working! The game screen is visible.</p>
+    </div>
+
+    <h2>🔧 Manual Tests</h2>
+    <div>
+      <button onclick="document.getElementById('game-screen').style.display='flex'">Show Test Screen</button>
+      <button onclick="location.reload()">Full Reload</button>
+      <button onclick="window.open('http://localhost:5173/')">Open Vite Dev Server (port 5173)</button>
+    </div>
+  </div>
+
+  <script>
+    // === TEST 1: CSS Loading ===
+    test('CSS file loads', document.styleSheets.length > 1, 'Found ' + document.styleSheets.length + ' stylesheet(s)');
+
+    // Check if main.css is loaded (last stylesheet)
+    const mainSheet = document.styleSheets[document.styleSheets.length - 1];
+    if (mainSheet) {
+      try {
+        const rules = mainSheet.cssRules || mainSheet.rules;
+        test('CSS has rules', rules.length > 0, 'Found ' + rules.length + ' CSS rules');
+
+        // Check :root variables
+        let rootStyle = null;
+        for (let i = 0; i < rules.length; i++) {
+          if (rules[i].selectorText === ':root') {
+            rootStyle = rules[i];
+            break;
+          }
+        }
+        test('CSS :root defined', rootStyle !== null,
+          rootStyle ? 'Found ' + rootStyle.style.length + ' variables' : ':root rule NOT FOUND in CSS');
+
+        // Check key selectors
+        const hasScreen = [...rules].some(r => r.selectorText === '.screen');
+        const hasScreenActive = [...rules].some(r => r.selectorText === '.screen.active');
+        test('CSS .screen rule', hasScreen, 'Screen display:none rule ' + (hasScreen ? 'found' : 'MISSING'));
+        test('CSS .screen.active rule', hasScreenActive, 'Screen active rule ' + (hasScreenActive ? 'found' : 'MISSING'));
+        test('CSS --color-bg defined', rootStyle ? rootStyle.style.getPropertyValue('--color-bg') !== '' : false,
+          'Value: ' + (rootStyle ? rootStyle.style.getPropertyValue('--color-bg') : 'N/A'));
+        test('CSS --color-text defined', rootStyle ? rootStyle.style.getPropertyValue('--color-text') !== '' : false,
+          'Value: ' + (rootStyle ? rootStyle.style.getPropertyValue('--color-text') : 'N/A'));
+
+      } catch(e) {
+        test('CSS parse error', false, e.message);
+      }
+    } else {
+      test('No extra stylesheets found', false, 'Only default stylesheets');
+    }
+
+    // === TEST 2: CSS Variables computed on html/body ===
+    const htmlStyle = getComputedStyle(document.documentElement);
+    const bodyStyle = getComputedStyle(document.body);
+    test('HTML computed --color-bg', htmlStyle.getPropertyValue('--color-bg').trim() !== '',
+      htmlStyle.getPropertyValue('--color-bg').trim());
+    test('BODY computed --color-bg', bodyStyle.getPropertyValue('--color-bg').trim() !== '',
+      bodyStyle.getPropertyValue('--color-bg').trim());
+
+    // === TEST 3: Screen elements ===
+    const screenEl = document.getElementById('game-screen');
+    test('Screen element exists', screenEl !== null, 'Found');
+    test('Screen hidden by default', screenEl.style.display === 'none' ||
+      getComputedStyle(screenEl).display === 'none',
+      getComputedStyle(screenEl).display);
+
+    // === TEST 4: Show the test screen ===
+    setTimeout(() => {
+      screenEl.style.display = 'flex';
+      log('✅ Test screen now visible — if you see colored text above, CSS is working!');
+      log('   Display: ' + getComputedStyle(screenEl).display);
+      log('   Background: ' + getComputedStyle(screenEl).backgroundColor);
+      log('   Color: ' + getComputedStyle(screenEl).color);
+      log('');
+      log('📝 SUMMARY:');
+
+      // Count passes/fails
+      const passes = results.filter(r => r.pass).length;
+      const fails = results.filter(r => !r.pass).length;
+      log('   Passed: ' + passes + '/' + results.length);
+      if (fails > 0) {
+        log('   FAILED: ' + results.filter(r => !r.pass).map(r => r.name).join(', '));
+      }
+    }, 100);
+  </script>
+</body>
+</html>

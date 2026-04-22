@@ -425,6 +425,8 @@ export class CombatScreen {
 
     this.buildLayout();
     this.initCombat();
+    // Start hidden — show() will make it visible when combat begins
+    this.container.style.display = 'none';
   }
 
   // ── Screen interface ──────────────────────────────────────────────────────────

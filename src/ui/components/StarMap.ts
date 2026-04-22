@@ -54,8 +54,16 @@ export class StarMap {
     this.store = store;
 
     const ctx = canvas.getContext('2d');
-    if (!ctx) throw new Error('Could not get 2D context from star map canvas');
-    this.ctx = ctx;
+    if (!ctx) {
+      // Some browsers return null when canvas is not yet in the DOM or has 0×0 size.
+      // Create a tiny offscreen canvas as a safe fallback so construction doesn't throw.
+      const offscreen = document.createElement('canvas');
+      offscreen.width = 1;
+      offscreen.height = 1;
+      this.ctx = offscreen.getContext('2d')!;
+    } else {
+      this.ctx = ctx;
+    }
 
     this.bindEvents();
     this.resize();
