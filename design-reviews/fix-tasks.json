@@ -1,0 +1,1799 @@
+{
+  "project": "hamster-of-orion-fixes",
+  "phase": "phase5-design-compliance-fixes",
+  "created": "2026-05-04",
+  "description": "Fix 305 design-vs-code consistency issues found in full codebase audit",
+  "total_issues": 85,
+  "tasks": [
+    {
+      "id": "fix-1",
+      "name": "Fix 16 issues in src/game/systems/combat.ts for ships",
+      "severity": "high",
+      "type": "mismatch",
+      "design_docs": [
+        "design/ships/combat-algorithm.md",
+        "design/ships/weapons-complete.md",
+        "design/ships/combat-mechanics.md"
+      ],
+      "source_files": [
+        "src/game/systems/combat.ts"
+      ],
+      "issue_count": 16,
+      "description": "[high] design/ships/combat-algorithm.md: Hit_Chance = 50 + (Effective_Attacker_Level - Effective_Defender_Level) × 10\n[high] design/ships/weapons-complete.md: Hellfire Torpedo: MOO1 fires 4 separate 25-damage attacks per hit (100 damage total). Each attack resolved independently through shields.\n[high] design/ships/combat-algorithm.md: Boarding mechanics: Sections 36-43 detail transporter boarding with success formula, casualties, and ship capture\n[medium] design/ships/combat-algorithm.md: Missile fuel: 'remaining_fuel: 2 # MOO1: ship-launched missiles self-destruct after 2 turns'\n[medium] design/ships/combat-algorithm.md: Critical Hit System: 5% base chance, +5% if Elite, +10% if Death Ray. Double damage + 50% system damage chance.\n[medium] design/ships/combat-algorithm.md: Crew loss penalties: <= 25% skeleton_crew (-20% accuracy, half speed, 50% weapon failure), <= 50% undermanned (-10% accuracy, speed -1)\n[medium] design/ships/combat-algorithm.md: Base crew by hull: Small=20, Medium=60, Large=200, Huge=500\n[medium] design/ships/combat-algorithm.md: Initiative formula: Ship_Initiative = Base_Initiative(10) + Engine_Maneuver × 2 + Battle_Scanner(+3) + Racial + Experience + roll(1,6)\n[medium] design/ships/combat-algorithm.md: Cloaking: +5 defense when cloaked, applies to effective defender level in hit chance formula\n[medium] design/ships/combat-mechanics.md: Budgies: +3 Defense Level, +3 Initiative, +20% Evasion\n[medium] design/ships/weapons-complete.md: Anti-Missile Rockets: destroys 40% of incoming missiles (−1% per missile tech level)\n[low] design/ships/combat-algorithm.md: MOO1 damage-mapped-to-roll: 'A roll exactly at the hit threshold = minimum damage. A roll of 100 = maximum damage.'\n[low] N/A: getDifficultyLevel combat modifiers (getCombatAttackModifier, getCombatDefenseModifier) - difficulty scaling is implemented but not detailed in combat design docs (not in design)\n[low] N/A: Black Hole Generator implementation with d4 roll for 25-100% destruction - referenced in special-systems.md but implementation details (penaltyPerShield, cooldown) aren't in the ships design docs (not in design)\n[low] N/A: High Energy Focus one-time +1 attack rating bonus - mentioned in components but combat behavior not detailed in algorithm doc (not in design)\n[low] N/A: activateDisplacementDevice() as an active ability (removes ship for 1 round) vs the passive 33% hit avoidance - design only mentions passive avoidance (not in design)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-2",
+      "name": "Fix 14 issues in src/game/systems/combat.ts for technology",
+      "severity": "high",
+      "type": "mismatch",
+      "design_docs": [
+        "design/technology/weapons.md",
+        "design/technology/force-fields.md",
+        "design/technology/propulsion.md",
+        "design/technology/computers.md"
+      ],
+      "source_files": [
+        "src/game/systems/combat.ts"
+      ],
+      "issue_count": 14,
+      "description": "[high] design/technology/weapons.md: Ion Stream Projector: 'Deals 20% of target's current HP as damage'\n[medium] design/technology/force-fields.md: Zyro Shield: '75% chance to destroy incoming missiles − 1% per missile tech level'\n[medium] design/technology/force-fields.md: Lightning Shield: '100% chance to destroy incoming missiles − 1% per missile tech level'\n[medium] design/technology/propulsion.md: Energy Pulsar: '5 damage to all adjacent ships + 1 damage per 2 firing ships'\n[medium] design/technology/propulsion.md: Ionic Pulsar: '10 damage to all adjacent ships + 1 damage per 2 firing ships'\n[medium] design/technology/force-fields.md: Stasis Field: 'Ship cannot move, fire, or retreat' (prevents retreat explicitly)\n[medium] design/technology/force-fields.md: Repulsor Beam: 'Push enemy ships 2 hexes away'\n[medium] design/technology/force-fields.md: Cloaking Device: '+5 Defense, invisible until firing'\n[medium] design/technology/weapons.md: Anti-Missile Rockets: 'Point defense — destroys 40% of incoming missiles (−1% per missile tech level)'\n[low] design/technology/computers.md: Hit_Chance = 50% + (Attack_Rating × 5%) - (Target_Defense × 3%)\n[low] N/A: researchMultiplier planet property that can be set to any value (design specifies only 1.0, 1.25, 4.0 for standard/artifacts/Orion) (not in design)\n[low] N/A: Experience accuracy bonus (-5%/0%/+5%/+10% for rookie/regular/veteran/elite) - not found in technology design docs (may be in ships/combat-algorithm.md) (not in design)\n[low] N/A: Range modifiers for hit chance (Point Blank +10%, Close +0%, Medium -5%, Long -10%, Very Long -20%) - may be documented elsewhere (not in design)\n[low] N/A: Size modifier for hit chance: (target_size_class - 1) × 5% - may be documented in combat-algorithm.md (not in design)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-3",
+      "name": "Fix 8 issues in src/game/systems/production.ts for economy",
+      "severity": "high",
+      "type": "mismatch",
+      "design_docs": [
+        "design/economy/factory-formulas.md",
+        "design/economy/ship-costs.md",
+        "design/economy/slider-mathematics.md"
+      ],
+      "source_files": [
+        "src/game/systems/production.ts"
+      ],
+      "issue_count": 8,
+      "description": "[high] design/economy/factory-formulas.md: Effective_Factory_Output = Operating_Factories × Base_Factory_Output × Racial_Production_Modifier\n[high] design/economy/factory-formulas.md: Difficulty Modifiers: These modifiers apply to the final net production after cleanup costs.\n[medium] design/economy/ship-costs.md: Ship_Maintenance = Ship_Cost × 0.02 (2% per turn), with racial modifiers, tech modifiers (Fleet Logistics), and minimum 1 BC\n[medium] design/economy/ship-costs.md: Handle bankruptcy: scuttle ships randomly at 10% emergency scrap rate until treasury positive\n[low] design/economy/factory-formulas.md: Mice (Meklars) Special Ability: Mice receive +2 to their effective Robotic Controls level\n[low] design/economy/slider-mathematics.md: At least one slider must remain unlocked (otherwise re-balancing is impossible)\n[low] N/A: factoryEfficiencyMultiplier in ProductionContext - design shows Mice bonus as a separate stacking modifier but code has generic multiplier field (not in design)\n[low] N/A: researchMultiplier on Planet (Orion=4.0, Artifacts=2.0) - applied to TECH RP but not documented in slider-mathematics.md or factory-formulas.md (not in design)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-4",
+      "name": "Fix 3 issues in src/game/systems/production.ts for planets",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/planets/population.md"
+      ],
+      "source_files": [
+        "src/game/systems/production.ts"
+      ],
+      "issue_count": 3,
+      "description": "[low] design/planets/population.md: Operating Factories: Population operates factories at a ratio determined by Robotic Controls technology: Base: 2 factories per population. With tech upgrades: Up to 7 factories per population\n[low] N/A: Planetology TL scaling for population labor output: basePopOutput() scales from 0.5 to 2.0 BC based on planetologyTL 0-50. Design says 0.5 BC fixed. (not in design)\n[low] N/A: Factory efficiency multiplier (factoryEfficiencyMultiplier) for races like Mice. Referenced in code but not in planets design docs. (not in design)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-5",
+      "name": "Fix issues in src/game/generators/galaxy.ts (galaxy)",
+      "severity": "high",
+      "type": "mismatch",
+      "design_docs": [
+        "design/galaxy/generation-algorithm.md",
+        "design/galaxy/exploration.md",
+        "design/galaxy/star-systems.md"
+      ],
+      "source_files": [
+        "src/game/generators/galaxy.ts"
+      ],
+      "issue_count": 9,
+      "description": "[high] design/galaxy/generation-algorithm.md: §6.1: 'best_star.planet = { environment: \"gaia\", size: {type: \"huge\", base_pop: 100}, resources: \"ultra_rich\"...}'\n[high] design/galaxy/generation-algorithm.md: §4.5: 'gaia: {\"growth_mult\": 2.0, \"pop_mult\": 1.0}' — Gaia planets should have 2× growth rate\n[high] design/galaxy/exploration.md: §Artifacts Worlds: 'Ongoing RP Multiplier (persistent): all RP generated there is multiplied by 1.25 (+25%)'\n[high] design/galaxy/generation-algorithm.md: §8.4 Table: 'MinHomeworldDistance = GalaxyDiagonal × 0.25' yields Small=160, Medium=224, Large=272, Huge=320\n[low] design/galaxy/generation-algorithm.md: §2.5: Star names include 'Thuban' listed twice in the pool\n[low] design/galaxy/generation-algorithm.md: §2.3: 'STARTING_RANGE = 45' and '3 parsecs × 15 (display scale)'\n[low] design/galaxy/star-systems.md: §Planet Environments Table: Shows 'Gaia' at top with 'Huge' base pop cap, but notes say 'Gaia environments are only created through Soil Enrichment II technology transformation'\n[low] src/game/generators/galaxy.ts: starClassForType() maps star colors to spectral classes (G, K, M, O, A, NS) — this astronomical classification detail isn't in design docs. (not in design)\n[low] src/game/generators/galaxy.ts: calculatePlanetQuality() is exported for tests but the quality scoring algorithm, while matching design §8.5, is implementation detail not explicitly required to be public. (not in design)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-6",
+      "name": "Fix issues in src/game/systems/diplomacy.ts (diplomacy)",
+      "severity": "high",
+      "type": "mismatch",
+      "design_docs": [
+        "design/diplomacy/relationship-formulas.md"
+      ],
+      "source_files": [
+        "src/game/systems/diplomacy.ts"
+      ],
+      "issue_count": 7,
+      "description": "[high] design/diplomacy/relationship-formulas.md: Section 5.2: Hamster Universal Diplomat ability grants a separate 2× multiplier on positive diplomatic action effects... Combined effective multiplier for positive actions = 1.30 × 2.0 = 2.60\n[high] design/diplomacy/relationship-formulas.md: Section 5.3: Racial Attitude Matrix starting modifiers - Guinea Pigs→Hamsters: -30, Chameleons→Everyone: -10, Everyone→Chameleons: -10 (separate incoming distrust), Hamsters→Everyone: +10\n[medium] design/diplomacy/relationship-formulas.md: Section 4: War Weariness - BaseDuration = floor(TurnsAtWar / 10), CasualtyFactor = floor(ShipsLost × ShipWeight + PopulationLost × 0.01), EconomicStrain = floor((WarMaintenanceCost / TotalIncome) × 20). Racial multipliers: Guinea Pigs 0.5×, Ferrets 0\n[medium] design/diplomacy/relationship-formulas.md: Section 6: Decay Rate Modifiers - Active trade agreement: 0.5× (slower decay), Military alliance: 0.25× (much slower decay), Recent war: 2.0× (faster decay), Treaty breaker reputation: 1.5× (faster decay), Shared enemy: 0.5× (slower decay), Border fr\n[medium] design/diplomacy/relationship-formulas.md: Section 6.3: Border Friction = ContestedSystems × 5, applied as negative modifier each turn (maximum -25). Contested System Definition: Both races have colonies within 3 parsecs, etc.\n[medium] design/diplomacy/relationship-formulas.md: Section 7: Population Dominance Coalition - DOMINANCE_WARNING_THRESHOLD=0.33, DOMINANCE_COALITION_THRESHOLD=0.40, DOMINANCE_PENALTY_PER_TURN=2, DOMINANCE_PENALTY_MAX=-30. When empire controls 40%+ of galactic population, -2 relations per turn from al\n[medium] design/diplomacy/relationship-formulas.md: Section 8: Reputation System - Four tracks: Honor (-100 to +100), Peace (-100 to +100), Fairness (-100 to +100), Mercy (-100 to +100). ReputationModifier = (Honor + Peace + Fairness + Mercy) / 400, producing EffectiveReputation = 1.0 + (ReputationMod",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-7",
+      "name": "Fix issues in src/game/systems/treaties.ts (diplomacy)",
+      "severity": "high",
+      "type": "mismatch",
+      "design_docs": [
+        "design/diplomacy/relationship-formulas.md"
+      ],
+      "source_files": [
+        "src/game/systems/treaties.ts"
+      ],
+      "issue_count": 7,
+      "description": "[high] design/diplomacy/relationship-formulas.md: Section 2.2: 'Establish trade agreement' base change = +20, 'Sign non-aggression pact' = +10, 'Sign defensive pact' = +30, 'Form military alliance' = +50\n[medium] design/diplomacy/relationship-formulas.md: Section 3.1: Treaty Maintenance Bonuses - Trade Agreement +0.20/turn, Research Pact +0.15/turn, Non-Aggression Pact +0.10/turn, Defensive Pact +0.20/turn, Military Alliance +0.30/turn, with Maximum Treaty Maintenance Cap of +10 total per turn\n[medium] design/diplomacy/relationship-formulas.md: Section 3.3: Treaty Duration Bonus formula: TreatyDurationBonus = floor(TurnsActive / 25) × 5, Maximum Duration Bonus: +20\n[low] src/game/systems/treaties.ts: TREATY_MAINTENANCE_BONUSES - maintenance cost reduction per treaty type (trade: 5%, military_alliance: 15%, defensive_pact: 10%). Not specified in design documents. (not in design)\n[low] src/game/systems/treaties.ts: calculateTreatyMaintenanceBonus() function with 50% maximum cap. Not specified in relationship-formulas.md or treaties.md. (not in design)\n[low] src/game/systems/treaties.ts: BREAK_DEFENSIVE_PACT_EARLY_PENALTY = -50 as separate penalty from normal break penalty. Design mentions fixed 30-turn duration but not specific early-break penalty. (not in design)\n[low] src/game/systems/treaties.ts: TRADE_BASE_OFFSET = 5 added to base trade income calculation. Design formula is (Production_A + Production_B) / 20 without a base offset. (not in design)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-8",
+      "name": "Fix issues in src/data/races.json (species)",
+      "severity": "high",
+      "type": "mismatch",
+      "design_docs": [
+        "design/species/ants.md",
+        "design/species/hermit-crabs.md",
+        "design/species/race-stats-complete.md"
+      ],
+      "source_files": [
+        "src/data/races.json"
+      ],
+      "issue_count": 7,
+      "description": "[high] design/species/ants.md: **Homeworld (Lore)**: Formicae — an arid world... **Gameplay:** The in-game starting planet is always Terran (equal starting conditions for all species)\n[high] design/species/hermit-crabs.md: **Homeworld (Lore)**: Crystalia — a harsh radiation-blasted world... **Gameplay:** The in-game starting planet is always Terran (equal starting conditions for all species)\n[medium] design/species/race-stats-complete.md: Chameleons: research: +20% Computers only (Darloks are good at Computers, not expert)\n[low] design/species/race-stats-complete.md: Ferrets special ability 'Deadly Accuracy': All weapons gain +4 Attack Levels (equivalent to 4 tiers of targeting computers)\n[low] design/species/race-stats-complete.md: Budgies special ability 'Superior Pilots': All ships gain +3 combat initiative, +3 defense level, and +20% evasion\n[low] design/species/race-stats-complete.md: Hermit Crabs ability 'Armored Shell': Natural +50% defense bonus in ground combat\n[low] src/data/races.json: leaderNames.titles array exists for all races but usage in getRandomLeaderName() is inconsistent (only used when titles array exists, but logic for including titles is unclear) (not in design)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-9",
+      "name": "Fix 5 issues in src/ui/components/CommandBar.ts for ui-core",
+      "severity": "high",
+      "type": "mismatch",
+      "design_docs": [
+        "design/ui-ux/navigation-flow.md"
+      ],
+      "source_files": [
+        "src/ui/components/CommandBar.ts"
+      ],
+      "issue_count": 5,
+      "description": "[high] design/ui-ux/navigation-flow.md: F10 intentionally omitted — ESC is the sole Game Menu trigger.\n[high] design/ui-ux/navigation-flow.md: The MAP button opens a **separate full-screen MAP view** — a completely different rendering mode from the normal Galaxy View. Within the MAP screen, three mode buttons on the right panel filter what data is displayed.\n[medium] design/ui-ux/navigation-flow.md: F7 = Reports (statistics/graphs)\n[low] N/A: Speed control buttons (SPEED: ▶ ▶▶ ▶▶▶) with slow/normal/fast animation speeds. Not mentioned in any of the design documents reviewed. May be a QoL addition but not in spec. (not in design)\n[low] N/A: Toast notification system (showToast method) for user feedback. Not specified in reviewed design docs but reasonable UX addition. (not in design)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-10",
+      "name": "Fix 2 issues in src/ui/components/CommandBar.ts for ui-widgets",
+      "severity": "high",
+      "type": "mismatch",
+      "design_docs": [
+        "design/ui-ux/screen-inventory.md"
+      ],
+      "source_files": [
+        "src/ui/components/CommandBar.ts"
+      ],
+      "issue_count": 2,
+      "description": "[high] design/ui-ux/screen-inventory.md: ### 2.8 ~~Reports Screen~~ (REMOVED)\n\n> **REMOVED (2026-04-12):** F7 Reports was not in MOO1 and was never properly defined.\n> The command bar follows MOO1: GAME/DESIGN/FLEET/MAP/RACES/PLANETS/TECH.\n> F7 = Tech Screen.\n[low] N/A: REPORTS button (F7) - explicitly removed from design per screen-inventory.md (not in design)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-11",
+      "name": "Fix issues in src/game/systems/victoryConditions.ts (game-mechanics)",
+      "severity": "high",
+      "type": "mismatch",
+      "design_docs": [
+        "design/game-mechanics/victory-conditions.md"
+      ],
+      "source_files": [
+        "src/game/systems/victoryConditions.ts"
+      ],
+      "issue_count": 4,
+      "description": "[high] design/game-mechanics/victory-conditions.md: Hamster of Orion (following MOO1) has **two victory conditions**: 1. Council Election Victory, 2. Military Conquest. There is NO research/transcendence victory in MOO1.\n[high] design/game-mechanics/victory-conditions.md: The High Council forms when **50% or more** of habitable planets in the galaxy are colonized\n[medium] design/game-mechanics/victory-conditions.md: Council meets every **25 turns** to hold an election\n[low] src/game/systems/victoryConditions.ts: Conquest victory type: An empire wins by controlling 3+ star systems (CONQUEST_SYSTEM_THRESHOLD = 3). This is not part of the MOO1-faithful design which only has diplomatic and military victories. (not in design)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-12",
+      "name": "Fix issues in src/game/types/shipComponents.ts (ships, technology)",
+      "severity": "high",
+      "type": "mismatch",
+      "design_docs": [
+        "design/ships/combat-algorithm.md",
+        "design/ships/components-complete.md",
+        "design/ships/weapons-complete.md",
+        "design/technology/weapons.md"
+      ],
+      "source_files": [
+        "src/game/types/shipComponents.ts"
+      ],
+      "issue_count": 4,
+      "description": "[high] design/ships/combat-algorithm.md: Base_HP by Hull Size (MOO1): Small: 3, Medium: 18, Large: 100, Huge: 600\n[low] design/ships/components-complete.md: Cloaking Device tech_level: 30, Improved Cloaking: 40, Perfect Cloaking: 50\n[low] design/ships/weapons-complete.md: Neutron Pellet Gun tech_level: 7\n[low] design/technology/weapons.md: Scatter Packs: 'MIRV missiles that split into multiple warheads' (e.g., Scatter Pack V = 5 MIRVs × 6 dmg each)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-13",
+      "name": "Fix issues in src/game/systems/research.ts (technology)",
+      "severity": "high",
+      "type": "mismatch",
+      "design_docs": [
+        "design/technology/research-formulas.md"
+      ],
+      "source_files": [
+        "src/game/systems/research.ts"
+      ],
+      "issue_count": 3,
+      "description": "[high] design/technology/research-formulas.md: §4 Artifacts World: 'ongoing +25% RP from that planet' via multiplier 1.25\n[low] design/technology/research-formulas.md: §6 Force Fields tier costs use accelerated schedule (e.g., FF Tier 14 = 50,000 RP = Global Tier 18)\n[low] src/game/systems/research.ts: miniaturization_minimum_scale constant (code references it from JSON) - design only mentions 50% max reduction, not explicit minimum scale factor (not in design)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-14",
+      "name": "Fix issues in src/game/systems/growth.ts (economy)",
+      "severity": "high",
+      "type": "mismatch",
+      "design_docs": [
+        "design/economy/population-growth.md"
+      ],
+      "source_files": [
+        "src/game/systems/growth.ts"
+      ],
+      "issue_count": 1,
+      "description": "[high] design/economy/population-growth.md: Population growth system with logistic model, fractional tracking, cloning bonuses",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-15",
+      "name": "Fix issues in src/game/systems/shipDesign.ts (ships)",
+      "severity": "high",
+      "type": "mismatch",
+      "design_docs": [
+        "design/ships/ship-classes.md"
+      ],
+      "source_files": [
+        "src/game/systems/shipDesign.ts"
+      ],
+      "issue_count": 1,
+      "description": "[high] design/ships/ship-classes.md: Hull sizes: Small=25, Medium=70, Large=280, Huge=1400 base space",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-16",
+      "name": "Fix issues in design/species/race-stats-complete.md (species)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/species/race-stats-complete.md"
+      ],
+      "source_files": [
+        "design/species/race-stats-complete.md"
+      ],
+      "issue_count": 11,
+      "description": "[medium] design/species/race-stats-complete.md: No implementation found for BASE_PRODUCTION_PER_POP constant usage - constant defined (1.0) but no function uses it\n[medium] design/species/race-stats-complete.md: No implementation found for BASE_RESEARCH_PER_SCIENTIST constant usage - constant defined (1.0) but no function uses it\n[medium] design/species/race-stats-complete.md: No food bonus application function (applyFoodBonus) despite food bonus being defined for all races\n[medium] design/species/race-stats-complete.md: No implementation of Hamsters 'Universal Diplomat' ability effect (all races start at Neutral vs Unfriendly)\n[medium] design/species/race-stats-complete.md: No implementation of Hamsters 'Trade Hub' ability (+25% trade credits)\n[medium] design/species/race-stats-complete.md: No implementation of Hamsters 'Council Favorite' ability (+1 vote)\n[medium] design/species/race-stats-complete.md: No implementation of Hermit Crabs 'Cannot Terraform' restriction (restrictedTechs defined but no enforcement code)\n[medium] design/species/race-stats-complete.md: No implementation of Hermit Crabs 'No Food Requirement' ability in resource allocation\n[medium] design/species/race-stats-complete.md: No implementation of Mice 'No Refit Costs' ability (noRefitCosts flag defined but no ship refit code)\n[medium] design/species/race-stats-complete.md: No implementation of Ants 'Perfect Efficiency' morale immunity (immune_to_unrest defined but no morale system code)\n[medium] design/species/race-stats-complete.md: No implementation of volatilityFlag for Mice AI behavior randomness",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-17",
+      "name": "Fix 4 issues in src/game/systems/population.ts for economy",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/economy/population-growth.md"
+      ],
+      "source_files": [
+        "src/game/systems/population.ts"
+      ],
+      "issue_count": 4,
+      "description": "[medium] design/economy/population-growth.md: Conquered Population: Post-invasion reduction of 50% (Ferrets: 40%)\n[medium] design/economy/population-growth.md: Overcrowding: When current_population > max_population, growth halts and starvation reduces pop over time\n[low] design/economy/population-growth.md: Rabbits Special: Can redirect overflow population to transports automatically\n[low] N/A: NEBULA_CAPACITY_BONUS = 15 - bonus population capacity for planets in nebula systems, not mentioned in population-growth.md (not in design)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-18",
+      "name": "Fix 6 issues in src/game/systems/population.ts for planets",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/planets/generation-tables.md"
+      ],
+      "source_files": [
+        "src/game/systems/population.ts"
+      ],
+      "issue_count": 6,
+      "description": "[medium] design/planets/generation-tables.md: Environment growth modifiers: radiated=0.10×, toxic=0.20×, inferno=0.20×, dead=0.30×, barren=0.40×, tundra=0.50×\n[medium] design/planets/generation-tables.md: Environment capacity modifiers: radiated=0.20×, toxic=0.30×, inferno=0.30×, dead=0.40×, barren=0.50×, tundra=0.60×\n[low] N/A: NEBULA_CAPACITY_BONUS = 15: Nebula systems grant +15 population capacity. Not found in planets design docs (may be in galaxy generation docs). (not in design)\n[low] N/A: Soil enrichment levels (0/1/2) with +25/+50 population bonus. Not found in planets design docs. (not in design)\n[low] N/A: Morale modifier formula: 0.5 + (morale / 200). Design mentions morale affects conquered planets but doesn't specify this formula. (not in design)\n[low] N/A: Food/farming system: processFoodAndStarvation(), farmers, ENV_FERTILITY. Design docs for planets mention no separate food system ('❌ Farms/Hydroponic facilities (no separate food system)'). (not in design)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-19",
+      "name": "Fix issues in design/ships/combat-algorithm.md (ships)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/ships/combat-algorithm.md"
+      ],
+      "source_files": [
+        "design/ships/combat-algorithm.md"
+      ],
+      "issue_count": 10,
+      "description": "[medium] design/ships/combat-algorithm.md: Boarding mechanics (Sections 36-43): Transporter-based ship capture, boarding parties, crew casualties, prize ship status\n[medium] design/ships/combat-algorithm.md: Critical hit system (Section 14): 5% base chance, double damage, system damage effects\n[medium] design/ships/combat-algorithm.md: Repair systems: Automated Repair (+15% HP/turn), Advanced Damage Control (+30% HP/turn)\n[medium] design/ships/combat-algorithm.md: Stasis Field combat special: disables target for 2 turns (Section 25)\n[medium] design/ships/combat-algorithm.md: Repulsor Beam: push ships 1 hex away\n[medium] design/ships/combat-algorithm.md: Tractor Beam: pull ships 1 hex closer\n[medium] design/ships/combat-algorithm.md: Full initiative formula with maneuver rating, battle scanner, racial bonuses, experience\n[medium] design/ships/combat-algorithm.md: Crew loss penalty thresholds (skeleton_crew at 25%, undermanned at 50%)\n[medium] design/ships/combat-algorithm.md: Hellfire Torpedo multi-hit effect (4 separate 25-damage attacks)\n[medium] design/ships/combat-algorithm.md: Planetary bombardment phase (Section 35): bomb damage distribution to population/factories/defenses",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-20",
+      "name": "Fix issues in design/ui-ux/tactical-combat-ui.md (ui-widgets)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/ui-ux/tactical-combat-ui.md"
+      ],
+      "source_files": [
+        "design/ui-ux/tactical-combat-ui.md"
+      ],
+      "issue_count": 10,
+      "description": "[medium] design/ui-ux/tactical-combat-ui.md: Missile tokens on hex grid (~M~) that advance each round and can be intercepted by point defense\n[medium] design/ui-ux/tactical-combat-ui.md: Point Defense auto-fire when missile enters range\n[medium] design/ui-ux/tactical-combat-ui.md: Movement Points tracking per ship per round (currently shows static speed, not consumable MP)\n[medium] design/ui-ux/tactical-combat-ui.md: Instant animation speed option in tactical combat (only exists in ground combat)\n[medium] design/ui-ux/tactical-combat-ui.md: Critical hit mechanic (×2 damage on natural 95-100 roll or similar)\n[medium] design/ui-ux/tactical-combat-ui.md: Asteroid hex cover (-20% to hit) and nebula sensor disruption terrain types\n[medium] design/ui-ux/tactical-combat-ui.md: Planet/Moon hex blocking movement and line of sight\n[medium] design/ui-ux/tactical-combat-ui.md: Bombardment phase trigger after combat (BOMBARDMENT_PHASE state)\n[medium] design/ui-ux/tactical-combat-ui.md: Special Systems panel (cloak, repair bots, tractor beam, teleporter)\n[medium] design/ui-ux/tactical-combat-ui.md: Multi-faction combat (3+ factions in one battle)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-21",
+      "name": "Fix issues in design/economy/ship-costs.md (economy)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/economy/ship-costs.md"
+      ],
+      "source_files": [
+        "design/economy/ship-costs.md"
+      ],
+      "issue_count": 7,
+      "description": "[medium] design/economy/ship-costs.md: Ship maintenance system: calculateFleetMaintenance(), racial maintenance modifiers, Fleet Logistics tech modifiers, minimum 1 BC per ship\n[medium] design/economy/ship-costs.md: Ship scrapping system: scrap value calculation (25% base, 35% at shipyard, 15% damaged, 10% enemy territory)\n[medium] design/economy/ship-costs.md: Ship refitting system: Refit_Cost = (New_Cost - Old_Value) × 0.50, must be at planet with shipyard\n[medium] design/economy/ship-costs.md: Bankruptcy handling: Emergency scrap at 10% value, morale -5, diplomatic reputation -10\n[medium] design/economy/ship-costs.md: Miniaturization cost reduction: (Current_Tier - Component_Tier) × 0.05, max 50% reduction\n[medium] design/economy/ship-costs.md: Defensive installation maintenance: missile_base=2 BC/turn, starbase=5 BC/turn, etc.\n[medium] design/economy/ship-costs.md: Troop transports: Light (50 BC, 5 troops), Heavy (100 BC, 10 troops), Assault (200 BC, 20 troops)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-22",
+      "name": "Fix issues in design/game-mechanics/difficulty.md (game-mechanics)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/game-mechanics/difficulty.md"
+      ],
+      "source_files": [
+        "design/game-mechanics/difficulty.md"
+      ],
+      "issue_count": 7,
+      "description": "[medium] design/game-mechanics/difficulty.md: AI Starting Tech Bonuses: Hard (2 bonus techs), Impossible (4 bonus techs, starting tier 2)\n[medium] design/game-mechanics/difficulty.md: Anti-Player Coalition mechanic: AI empires coordinate against leading player at higher difficulties\n[medium] design/game-mechanics/difficulty.md: Guardian of Orion difficulty scaling: HP ranges from 16,000 (Simple) to 48,000 (Impossible)\n[medium] design/game-mechanics/difficulty.md: Council formation threshold varies by difficulty: 60% (Simple) to 40% (Impossible)\n[medium] design/game-mechanics/difficulty.md: Ship maintenance modifiers by difficulty: Player 0.75x (Simple) to 1.25x (Impossible)\n[medium] design/game-mechanics/difficulty.md: Combat modifiers: Player attack/defense bonuses (+10% on Simple to -10% on Impossible)\n[medium] design/game-mechanics/difficulty.md: Population growth modifiers by difficulty: Player 1.25x (Simple) to 0.75x (Impossible)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-23",
+      "name": "Fix issues in src/ui/screens/CombatScreen.ts (ui-widgets)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/ui-ux/tactical-combat-ui.md"
+      ],
+      "source_files": [
+        "src/ui/screens/CombatScreen.ts"
+      ],
+      "issue_count": 7,
+      "description": "[medium] design/ui-ux/tactical-combat-ui.md: **HP bars on grid tokens**: Each ship token on the hex grid shows a small HP bar (color coded: green > 50%, yellow 25–50%, red < 25%).\n**MP display on grid tokens**: Movement Points remaining shown as `MP:n/max` below each token.\n[medium] design/ui-ux/tactical-combat-ui.md: **Combat log**: Scrollable event log; damage numbers shown inline (e.g. `-45 dmg`).\n**Combat log panel tracks all events.**\n[medium] design/ui-ux/tactical-combat-ui.md: ### Animation Speed Options\n```\n( ) Slow (2x time)\n(•) Normal\n( ) Fast (0.5x time)\n( ) Instant (no animations)\n```\n[medium] design/ui-ux/tactical-combat-ui.md: **Missiles in flight**: `[3 in flight]` shown in weapon list; missile tokens (~M~) appear on the hex grid and advance each round.\n[low] design/ui-ux/tactical-combat-ui.md: ### Targeting Overlay (On Grid)\nE₁ = Target 1 (85% hit) - RED glow\nE₂ = Target 2 (70% hit) - ORANGE glow\n[low] design/ui-ux/tactical-combat-ui.md: **CRITICAL HIT! ×2 damage**\n... CRIT indicator with floating damage\n[low] src/ui/screens/CombatScreen.ts: DEV_ENABLE_DEMO_COMBAT flag for testing combat UI with demo fleets - development convenience not in design (not in design)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-24",
+      "name": "Fix issues in src/game/systems/espionage.ts (diplomacy)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/diplomacy/espionage.md"
+      ],
+      "source_files": [
+        "src/game/systems/espionage.ts"
+      ],
+      "issue_count": 6,
+      "description": "[medium] design/diplomacy/espionage.md: Section 2.1: Chameleon SpyRollBonus = +30 (flat bonus added directly to spy rolls, MOO1 mechanic)\n[medium] design/diplomacy/espionage.md: Section 2.2: Defensive Security Bonuses - Ants: Immune (cannot spy on), Chameleons: +30, Mice: +10, Rats: +5, Rabbits: -5, Hermit Crabs: -10\n[medium] design/diplomacy/espionage.md: Section 1.3: All Spies Fail - Catastrophic Result: When detection_roll == 100 (natural 100 on d100), ALL of empire's currently-infiltrated spies lose their next action turn\n[medium] design/diplomacy/espionage.md: Section 4.1: Security Level table - Level 0: 0 BC, 10% detection; Level 1: 50 BC, 20% detection; ... Level 10: 2750 BC, 99% detection. Cost formula: RequiredSpending = (SecurityLevel × (SecurityLevel + 1) / 2) × 50 + (SecurityLevel × 50)\n[low] design/diplomacy/espionage.md: Section 6.2: Tech Theft - TechValueModifier: Tier 1-3 techs: +10, Tier 4-6: +0, Tier 7-9: -5, Tier 10-12: -10, Tier 13+: -15\n[low] src/game/systems/espionage.ts: MissionType includes 'propaganda' and 'infiltration' as separate types. Design only specifies: reconnaissance, theft, sabotage_factories, sabotage_bases, incite_rebellion, frame, assassination. (not in design)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-25",
+      "name": "Fix issues in design/technology/planetology.md (technology)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/technology/planetology.md"
+      ],
+      "source_files": [
+        "design/technology/planetology.md"
+      ],
+      "issue_count": 6,
+      "description": "[medium] design/technology/planetology.md: Biological Weapons (Death Spores, Doom Virus, Bio Terminator) - ship-mounted weapons that kill planetary population; no bio weapon combat implementation found\n[medium] design/technology/planetology.md: Bio-Defense (Bio Toxin Antidote, Universal Antidote) - casualty reduction from bio attacks\n[medium] design/technology/planetology.md: Cloning technology: Design specifies flat +2/+5 pop/turn bonus (§Cloning Technology), not BC-invested formula\n[medium] design/technology/planetology.md: Atmospheric Terraforming: Convert hostile→standard environment for 200 BC\n[medium] design/technology/planetology.md: Soil Enrichment: +25/+50 max pop per planet for one-time BC cost\n[medium] design/technology/planetology.md: Ecological Restoration upgrades: Cleanup_Modifier progression (1.00 → 0.67 → 0.40 → 0.20 → 0.10)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-26",
+      "name": "Fix 2 issues in src/ui/components/EspionagePanel.ts for diplomacy",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/diplomacy/espionage.md"
+      ],
+      "source_files": [
+        "src/ui/components/EspionagePanel.ts"
+      ],
+      "issue_count": 2,
+      "description": "[low] design/diplomacy/espionage.md: Section 6.5: Incite Rebellion requires target planet morale < 70%\n[low] N/A: Spy allocation slider (0-100% of 25 total spies). Design uses per-spy cost model rather than percentage-based allocation. (not in design)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-27",
+      "name": "Fix 4 issues in src/ui/components/EspionagePanel.ts for ui-widgets",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/ui-ux/spy-network-ui.md"
+      ],
+      "source_files": [
+        "src/ui/components/EspionagePanel.ts"
+      ],
+      "issue_count": 4,
+      "description": "[low] design/ui-ux/spy-network-ui.md: Active Spy Summary:\n  Offensive Spies: 4 (funded by SPYING budget)\n  Counter-Intel: 2 (funded by SECURITY budget)\n  (Each agent costs ~5 BC/turn to maintain)\n[low] N/A: intelligence_gathering mission type (separate from infiltration) - design only mentions Steal Technology, Sabotage Factories/Bases, Frame Empire (not in design)\n[low] N/A: frame_job mission type with BC cost - design calls it 'Frame Empire' with no cost specified (not in design)\n[low] N/A: Cumulative Hostility score display in counter-espionage section - not specified in design (not in design)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-28",
+      "name": "Fix issues in design/diplomacy/espionage.md (diplomacy)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/diplomacy/espionage.md"
+      ],
+      "source_files": [
+        "design/diplomacy/espionage.md"
+      ],
+      "issue_count": 5,
+      "description": "[medium] design/diplomacy/espionage.md: Section 8: Counter-Espionage Operations - Active Counter-Intelligence bonus, Spy Hunt Mode (200 BC), turning spies into double agents\n[medium] design/diplomacy/espionage.md: Section 10.1: Chameleon Sleeper Agents - 150 BC to plant, 50 BC/turn maintenance, +30% to next mission bonus\n[medium] design/diplomacy/espionage.md: Section 10.2: False Flag Operations - planting evidence suggesting third party conducted espionage\n[medium] design/diplomacy/espionage.md: Section 10.3: Technology Sabotage - delay enemy research by removing 15-30% of accumulated research points\n[medium] design/diplomacy/espionage.md: Section 9.2: Cumulative Espionage Hostility tracking with decay (SuccessfulMissions×5 + CaughtMissions×15, threshold 100, decay 2/turn)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-29",
+      "name": "Fix issues in design/technical/ai-implementation.md (diplomacy)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/technical/ai-implementation.md"
+      ],
+      "source_files": [
+        "design/technical/ai-implementation.md"
+      ],
+      "issue_count": 5,
+      "description": "[medium] design/technical/ai-implementation.md: Section 1.4: Economic Threat Component formula - Enemy_Production / Our_Production × 50\n[medium] design/technical/ai-implementation.md: Section 1.5: Technology Threat Component formula - Tech_Gap × 10 based on average tech levels\n[medium] design/technical/ai-implementation.md: Section 1.8: Racial Threat Perception Modifiers (Guinea Pigs 0.70, Rabbits 1.30, etc.)\n[medium] design/technical/ai-implementation.md: Section 2: Full Expansion Priority Scoring with Environment_Modifier, Resource_Modifier, Strategic_Bonus, Competition_Modifier\n[medium] design/technical/ai-implementation.md: Section 4: Fleet Deployment Decisions with Fleet Role Classification, Deployment Target Scoring, Combat Engagement Decision formula",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-30",
+      "name": "Fix issues in src/game/systems/buildings.ts (economy, planets)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/economy/slider-mathematics.md",
+        "design/planets/buildings.md"
+      ],
+      "source_files": [
+        "src/game/systems/buildings.ts"
+      ],
+      "issue_count": 5,
+      "description": "[medium] design/economy/slider-mathematics.md: DEF slider builds missile bases at base cost 100 BC (reduced by Construction tech) and planetary shields\n[low] src/game/systems/buildings.ts: Stellar Converter building that converts gas giants to terran worlds over 50 turns - not mentioned in economy design docs (may be in technology/buildings docs) (not in design)\n[low] design/planets/buildings.md: Star Gates: Cost: 3000 BC, Tech Required: Intergalactic Star Gates (Propulsion), Effect: Instant travel between gated planets\n[low] src/game/systems/buildings.ts: Stellar Converter gas giant conversion: convertGasGiantToTerran() converts gas giants to terran worlds after 50 turns. Design mentions Stellar Converter destroys planets but doesn't specify gas giant terraforming. (not in design)\n[low] src/game/systems/buildings.ts: canBuildStellarConverter() restricts Stellar Converter to gas giants only. Design doesn't specify this restriction. (not in design)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-31",
+      "name": "Fix issues in design/ui-ux/spy-network-ui.md (ui-widgets)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/ui-ux/spy-network-ui.md"
+      ],
+      "source_files": [
+        "design/ui-ux/spy-network-ui.md"
+      ],
+      "issue_count": 5,
+      "description": "[medium] design/ui-ux/spy-network-ui.md: SPYING/SECURITY budget integration from PLANETS screen\n[medium] design/ui-ux/spy-network-ui.md: Frame Empire mission type (diplomatic warfare to blame another empire)\n[medium] design/ui-ux/spy-network-ui.md: Sabotage Missile Bases mission type\n[medium] design/ui-ux/spy-network-ui.md: Spy caught response options (APOLOGIZE vs DENY) in notification popup\n[medium] design/ui-ux/spy-network-ui.md: Enemy spy caught options (EXECUTE/IMPRISON/RELEASE) in notification popup",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-32",
+      "name": "Fix issues in design/diplomacy/relationship-formulas.md (diplomacy)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/diplomacy/relationship-formulas.md"
+      ],
+      "source_files": [
+        "design/diplomacy/relationship-formulas.md"
+      ],
+      "issue_count": 4,
+      "description": "[medium] design/diplomacy/relationship-formulas.md: Section 7.2: Dominance Warning system - diplomatic message when any empire crosses 33% of galactic population threshold\n[medium] design/diplomacy/relationship-formulas.md: Section 7.4: Coalition AI Behavior Trigger - COALITION_WAR_BOOST (+20 war tendency vs dominant empire), COALITION_ALLIANCE_BOOST (+30 alliance acceptance among non-dominant races)\n[medium] design/diplomacy/relationship-formulas.md: Section 8.2: Reputation Change Events - specific events that modify Honor, Peace, Fairness, and Mercy tracks\n[medium] design/diplomacy/relationship-formulas.md: Section 3.2: Treaty Violation Penalties - 'Treaty Breaker' reputation flag with duration tracking (50 turns base, +25 per additional violation)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-33",
+      "name": "Fix issues in src/game/systems/turn.ts (game-mechanics)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/game-mechanics/turn-structure.md",
+        "design/game-mechanics/difficulty.md"
+      ],
+      "source_files": [
+        "src/game/systems/turn.ts"
+      ],
+      "issue_count": 4,
+      "description": "[medium] design/game-mechanics/turn-structure.md: Starting: Year 2623 (lore: 123 years post-Awakening). Each Turn: +1 year. Display: 'Year 2623 - Turn 1'\n[medium] design/game-mechanics/difficulty.md: Production Modifiers: Simple (Player 1.25, AI 0.75), Easy (1.10, 0.90), Average (1.00, 1.00), Hard (0.90, 1.25), Impossible (0.75, 1.50)\n[medium] design/game-mechanics/difficulty.md: Research Modifiers: AI Tech Cost varies by difficulty (Simple 1.50x, Average 1.00x, Impossible 0.50x)\n[low] design/game-mechanics/turn-structure.md: Phase 9: Events - Random Events (10% chance)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-34",
+      "name": "Fix issues in src/game/actions/newGame.ts (game-mechanics, species)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/game-mechanics/difficulty.md"
+      ],
+      "source_files": [
+        "src/game/actions/newGame.ts"
+      ],
+      "issue_count": 4,
+      "description": "[medium] design/game-mechanics/difficulty.md: Starting Conditions table: Simple (50 pop, 40 factories, 100 BC), Easy (45 pop, 35 factories, 50 BC), Average (40 pop, 30 factories, 0 BC), Hard/Impossible (40 pop, 30 factories, 0 BC)\n[medium] design/game-mechanics/difficulty.md: AI empires always start with Average-level conditions (40 pop, 30 factories, 1 scout)\n[low] src/game/actions/newGame.ts: 'custom' difficulty level allowing individual modifier adjustment - design mentions this but implementation details differ (not in design)\n[low] src/game/actions/newGame.ts: Player bonus +10 to starting relations (line in buildRelations: 'if (isPlayer) baseRelationValue += 10'). This mechanic is not documented in design specs (not in design)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-35",
+      "name": "Fix issues in design/game-mechanics/turn-structure.md (game-mechanics)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/game-mechanics/turn-structure.md"
+      ],
+      "source_files": [
+        "design/game-mechanics/turn-structure.md"
+      ],
+      "issue_count": 4,
+      "description": "[medium] design/game-mechanics/turn-structure.md: Bankruptcy mechanic: Ships scrap randomly until balanced when negative BC, with morale penalties and diplomatic reputation damage\n[medium] design/game-mechanics/turn-structure.md: Ship maintenance calculation: Ships, buildings, spies cost upkeep (currently always 0)\n[medium] design/game-mechanics/turn-structure.md: Quick Combat auto-resolve option for tactical battles\n[medium] design/game-mechanics/turn-structure.md: Fleet interception: Fast fleets can intercept slow ones during movement phase",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-36",
+      "name": "Fix issues in design/game-mechanics/random-events.md (game-mechanics)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/game-mechanics/random-events.md"
+      ],
+      "source_files": [
+        "design/game-mechanics/random-events.md"
+      ],
+      "issue_count": 4,
+      "description": "[medium] design/game-mechanics/random-events.md: Multi-turn events: Plague spreading (3-5 turns), Comet countdown (5 turns), Supernova warning (5 turns)\n[medium] design/game-mechanics/random-events.md: Event mitigation via technology: Bio Toxin Antidote cures plague, Battle Computer V reduces virus duration\n[medium] design/game-mechanics/random-events.md: Space monster roaming behavior: Cosmic Blob and Crystal Horror move toward nearest colony each turn\n[medium] design/game-mechanics/random-events.md: Ancient Derelict choice-based event with 60% tech discovery / 25% nothing / 15% trap outcomes",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-37",
+      "name": "Fix issues in design/planets/population.md (planets)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/planets/population.md"
+      ],
+      "source_files": [
+        "design/planets/population.md"
+      ],
+      "issue_count": 4,
+      "description": "[medium] design/planets/population.md: Population Transport: Transport population between colonies using transport ships\n[medium] design/planets/population.md: Invasion ground combat: Transport population to enemy planets for ground combat\n[medium] design/planets/population.md: Conquered Populations: Morale penalty and production reduction until stabilized\n[medium] design/planets/population.md: Population voting: Council votes proportional to population for diplomatic victory",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-38",
+      "name": "Fix issues in design/technology/research-formulas.md (technology)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/technology/research-formulas.md"
+      ],
+      "source_files": [
+        "design/technology/research-formulas.md"
+      ],
+      "issue_count": 4,
+      "description": "[medium] design/technology/research-formulas.md: Tech Stealing (Espionage): Steal_Success_Chance formula with Tech_Difficulty modifier\n[medium] design/technology/research-formulas.md: Tech Trading: Trade_Value formula for diplomatic tech exchange\n[medium] design/technology/research-formulas.md: Reverse Engineering: Captured ships reveal tech over time (Rats: instant, Mice: 50% faster)\n[medium] design/technology/research-formulas.md: Random tech choices: 2-3 random techs offered per tier (Rats always get 3 per Academic Network ability)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-39",
+      "name": "Fix issues in src/ui/app.ts (ui-core)",
+      "severity": "low",
+      "type": "mismatch",
+      "design_docs": [
+        "design/ui-ux/state-transitions.md",
+        "design/ui-ux/interaction-spec.md",
+        "design/ui-ux/navigation-flow.md"
+      ],
+      "source_files": [
+        "src/ui/app.ts"
+      ],
+      "issue_count": 4,
+      "description": "[low] design/ui-ux/state-transitions.md: Screen transitions should use FADE transition with 200ms duration and ease-in-out easing for standard screen navigation (F1-F7).\n[low] design/ui-ux/interaction-spec.md: Galaxy Map Shortcuts: N = Next Colony, Shift+N = Prev Colony, F = Next Fleet, Shift+F = Prev Fleet, G = Toggle Grid, R = Range Circles, T = Trade Routes, E = Highlight Enemy Fleets\n[low] design/ui-ux/navigation-flow.md: F8 = High Council (only when Council is in session; otherwise no-op)\n[low] src/ui/app.ts: Victory screen handling with victoryActive flag and isGameOver/victoryResult state checks. The victory screen flow exists but specific screen transition behavior wasn't detailed in the UI core design docs (may be in other docs). (not in design)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-40",
+      "name": "Fix issues in src/game/state.ts (galaxy)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/galaxy/exploration.md"
+      ],
+      "source_files": [
+        "src/game/state.ts"
+      ],
+      "issue_count": 3,
+      "description": "[medium] design/galaxy/exploration.md: §Scanner Range: 'Base range: 2 parsecs... Scanner range is improved by Computers field technologies (e.g., Deep Space Scanner: 4 parsecs, Subspace Scanner: 6 parsecs)'\n[low] src/game/state.ts: PlanetType includes 'gas_giant' which is not documented in any design spec for planet environments. (not in design)\n[low] src/game/state.ts: QuadTreeNode spatial index for fast star lookups — this optimization structure isn't described in design docs (but is a reasonable implementation detail). (not in design)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-41",
+      "name": "Fix issues in design/galaxy/exploration.md (galaxy)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/galaxy/exploration.md"
+      ],
+      "source_files": [
+        "design/galaxy/exploration.md"
+      ],
+      "issue_count": 3,
+      "description": "[medium] design/galaxy/exploration.md: Space Monsters (Amoeba and Crystal): Random events after Turn 100 that attack planets. MonsterType is defined in state.ts but no generation or behavior code exists.\n[medium] design/galaxy/exploration.md: Random Events system: Events like Ancient Derelict, Fertile Planet, Comet, Plague, etc. are described but no event generation code exists in galaxy generator.\n[medium] design/galaxy/exploration.md: Artifacts first-scout tech bonus: 'First scout bonus: One random technology at current tier + 1-3' is not implemented — only the research multiplier is set during generation.",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-42",
+      "name": "Fix issues in src/ui/screens/ColoniesScreen.ts (planets)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/planets/production.md",
+        "design/planets/population.md"
+      ],
+      "source_files": [
+        "src/ui/screens/ColoniesScreen.ts"
+      ],
+      "issue_count": 3,
+      "description": "[medium] design/planets/production.md: Display Text: `(Ship Name) & Turns` (e.g., 'Scout 4') for ship slider\n[medium] design/planets/population.md: Formula: Total_Production = (Operating_Factories × 1 BC) + (Population × 0.5 BC)\n[low] src/ui/screens/ColoniesScreen.ts: TRANSFER_BC action for moving credits from empire reserve to planet production. Not specified in planets production design. (not in design)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-43",
+      "name": "Fix issues in design/planets/special-planets.md (planets)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/planets/special-planets.md"
+      ],
+      "source_files": [
+        "design/planets/special-planets.md"
+      ],
+      "issue_count": 3,
+      "description": "[medium] design/planets/special-planets.md: Guardian ship combat: Must defeat Guardian before colonizing Orion - no guardian battle implementation visible\n[medium] design/planets/special-planets.md: Artifacts World one-time tech bonus: First empire to colonize receives a random technology\n[medium] design/planets/special-planets.md: Stellar Converter planet destruction: Transforms habitable planet into asteroid field",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-44",
+      "name": "Fix issues in src/game/systems/races.ts (species)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/species/race-stats-complete.md"
+      ],
+      "source_files": [
+        "src/game/systems/races.ts"
+      ],
+      "issue_count": 3,
+      "description": "[medium] design/species/race-stats-complete.md: Ship combat bonuses apply to attack rolls: EffectiveAttack = BaseAttack + (ShipCombatBonus / 10)\n[medium] design/species/race-stats-complete.md: InitialRelationship = DIPLOMACY_UNFRIENDLY_START + (DiplomacyBonus / 3)\n[low] src/game/systems/races.ts: isBloodEnemiesAll() helper function exists but blood_enemies_all mechanic is only briefly mentioned in race-stats-complete.md without full specification (not in design)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-45",
+      "name": "Fix issues in design/technology/propulsion.md (technology)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/technology/propulsion.md"
+      ],
+      "source_files": [
+        "design/technology/propulsion.md"
+      ],
+      "issue_count": 3,
+      "description": "[medium] design/technology/propulsion.md: Combat Transporters: Board enemy ships (Tech Level 45)\n[medium] design/technology/propulsion.md: Star Gates: Intergalactic Star Gates (3,000 BC infrastructure, instant colony-to-colony travel)\n[medium] design/technology/propulsion.md: Sub-Space Interdictor: Nullifies Sub-Space Teleporters in systems with owned planets",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-46",
+      "name": "Fix issues in design/technology/computers.md (technology)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/technology/computers.md"
+      ],
+      "source_files": [
+        "design/technology/computers.md"
+      ],
+      "issue_count": 3,
+      "description": "[medium] design/technology/computers.md: Oracle Interface: All weapons become armor-piercing (Tech Level 46)\n[medium] design/technology/computers.md: Technology Nullifier: Target -2 to -6 attack rating (Tech Level 49)\n[medium] design/technology/computers.md: Hyperspace Communications: Reroute fleets in transit (Tech Level 34)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-47",
+      "name": "Fix issues in design/technology/construction.md (technology)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/technology/construction.md"
+      ],
+      "source_files": [
+        "design/technology/construction.md"
+      ],
+      "issue_count": 3,
+      "description": "[medium] design/technology/construction.md: Automated Repair Unit: +15% HP per turn combat repair\n[medium] design/technology/construction.md: Advanced Damage Control: +30% HP per turn combat repair\n[medium] design/technology/construction.md: Hull Space bonuses: Improved/Advanced/Superior/Maximum Hull Space (+20%/+40%/+60%/+80%)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-48",
+      "name": "Fix issues in design/ui-ux/interaction-spec.md (ui-core)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/ui-ux/interaction-spec.md"
+      ],
+      "source_files": [
+        "design/ui-ux/interaction-spec.md"
+      ],
+      "issue_count": 3,
+      "description": "[medium] design/ui-ux/interaction-spec.md: Galaxy map letter shortcuts: N (Next Colony), Shift+N (Prev Colony), F (Next Fleet), Shift+F (Prev Fleet), G (Toggle Grid), R (Range Circles), T (Trade Routes), E (Enemy Fleets).\n[medium] design/ui-ux/interaction-spec.md: Right-click context menus on Galaxy Map (star, fleet, empty space contexts). Design specifies detailed context menu layouts but no right-click handling visible in reviewed files.\n[medium] design/ui-ux/interaction-spec.md: Middle-click map panning. Design: 'Hold middle + drag = pan view'. Code only implements keyboard arrow panning and doesn't show middle-click handling.",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-49",
+      "name": "Fix issues in src/game/constants.ts (economy)",
+      "severity": "low",
+      "type": "mismatch",
+      "design_docs": [
+        "design/economy/factory-formulas.md"
+      ],
+      "source_files": [
+        "src/game/constants.ts"
+      ],
+      "issue_count": 3,
+      "description": "[low] design/economy/factory-formulas.md: Bombed Factories: Factories_Destroyed = Bomb_Damage × Factory_Vulnerability; Factory_Vulnerability = 0.1 (10%)\n[low] src/game/constants.ts: PLANET_SIZE constant with TINY=20, SMALL=40, etc. - design docs explicitly say NOT to use hardcoded per-size constants, use generated base_population instead (not in design)\n[low] src/game/constants.ts: Extensive combat constants (hit chance, range classes, damage sequence, etc.) - these belong in combat design area, not economy (not in design)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-50",
+      "name": "Fix issues in src/game/initialState.ts (game-mechanics)",
+      "severity": "low",
+      "type": "mismatch",
+      "design_docs": [],
+      "source_files": [
+        "src/game/initialState.ts"
+      ],
+      "issue_count": 3,
+      "description": "[low] src/game/initialState.ts: Game version field (version: '0.1.0') - useful but not specified in design (not in design)\n[low] src/game/initialState.ts: Playtime tracking (playTime: 0) - useful but not specified in design (not in design)\n[low] src/game/initialState.ts: colorBlindMode and highContrast accessibility settings - beneficial additions not in original design (not in design)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-51",
+      "name": "Fix issues in design/diplomacy/council.md (diplomacy)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/diplomacy/council.md"
+      ],
+      "source_files": [
+        "design/diplomacy/council.md"
+      ],
+      "issue_count": 2,
+      "description": "[medium] design/diplomacy/council.md: Section 6.1-6.3: Pre-Vote Lobbying Phase - 5 turns before council meeting with bribery interface, vote requests\n[medium] design/diplomacy/council.md: Section 6.5-6.6: Post-Vote Options - player can reject their own victory (-30 relation with supporters) or reject opponent's victory (triggers galactic war)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-52",
+      "name": "Fix issues in design/diplomacy/trade.md (diplomacy)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/diplomacy/trade.md"
+      ],
+      "source_files": [
+        "design/diplomacy/trade.md"
+      ],
+      "issue_count": 2,
+      "description": "[medium] design/diplomacy/trade.md: Pirates & Space Monsters affecting trade routes with 20-50% income reduction\n[medium] design/diplomacy/trade.md: Trade Sanctions as Council action - all trade with target banned, -50% their income",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-53",
+      "name": "Fix issues in design/economy/population-growth.md (economy)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/economy/population-growth.md"
+      ],
+      "source_files": [
+        "design/economy/population-growth.md"
+      ],
+      "issue_count": 2,
+      "description": "[medium] design/economy/population-growth.md: Population transport system: Colony Transport 50 BC, 1 BC/turn maintenance, 1 million pop capacity\n[medium] design/economy/population-growth.md: Bio weapon max population reduction: Death Spores -10%, Doom Virus -25%, Bio Terminator -50%",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-54",
+      "name": "Fix issues in design/economy/factory-formulas.md (economy)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/economy/factory-formulas.md"
+      ],
+      "source_files": [
+        "design/economy/factory-formulas.md"
+      ],
+      "issue_count": 2,
+      "description": "[medium] design/economy/factory-formulas.md: Mice +50% factory efficiency from Automated Production ability (factoryEfficiencyMultiplier exists but needs to be set to 1.5 for Mice)\n[medium] design/economy/factory-formulas.md: Bombed factory destruction: Factory_Vulnerability = 0.1 (10% of bomb damage)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-55",
+      "name": "Fix issues in design/economy/slider-mathematics.md (economy)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/economy/slider-mathematics.md"
+      ],
+      "source_files": [
+        "design/economy/slider-mathematics.md"
+      ],
+      "issue_count": 2,
+      "description": "[medium] design/economy/slider-mathematics.md: SHIP slider queue: BC accumulation, overflow to next item in queue, overflow to Empire Reserve when queue empty\n[medium] design/economy/slider-mathematics.md: Reserve Fund: Empire-wide BC pool for manual injection into any planet's production",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-56",
+      "name": "Fix issues in src/game/utils/pathfinding.ts (galaxy)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/galaxy/travel.md"
+      ],
+      "source_files": [
+        "src/game/utils/pathfinding.ts"
+      ],
+      "issue_count": 2,
+      "description": "[medium] design/galaxy/travel.md: §Warp Speed Table: 'Retro Engines=1, Nuclear=2, Sub-Light=2, Fusion=3, Impulse=3, Ion=4, Anti-Matter=5, Interphased=6, Hyperdrives=7, Hyper-X=8, Temporal=9'\n[medium] design/galaxy/travel.md: §Nebulae: 'Ships reduced to Warp 1 speed' — movement through nebulae should be slowed",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-57",
+      "name": "Fix issues in design/galaxy/travel.md (galaxy)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/galaxy/travel.md"
+      ],
+      "source_files": [
+        "design/galaxy/travel.md"
+      ],
+      "issue_count": 2,
+      "description": "[medium] design/galaxy/travel.md: Star Gates: 'Intergalactic Star Gates (3000 BC each)' for instant travel between gated planets. No Star Gate building or routing support in pathfinding.\n[medium] design/galaxy/travel.md: Reserve Fuel Tanks (+3 parsecs) and Extended Fuel Tanks (+6 parsecs) special equipment effects on ship range. Not integrated with pathfinding maxRange.",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-58",
+      "name": "Fix issues in design/galaxy/generation-algorithm.md (galaxy)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/galaxy/generation-algorithm.md"
+      ],
+      "source_files": [
+        "design/galaxy/generation-algorithm.md"
+      ],
+      "issue_count": 2,
+      "description": "[medium] design/galaxy/generation-algorithm.md: §8.5 ValidateHomeworldNeighbors quality check: Code counts neighbors but doesn't validate average quality score or emit warnings for low_quality_neighbors.\n[medium] design/galaxy/generation-algorithm.md: Guardian ship placement at Orion: hasGuardian flag is set on the system and planet, but no actual Guardian ship/fleet entity is created during generation.",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-59",
+      "name": "Fix issues in design/game-mechanics/victory-conditions.md (game-mechanics)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/game-mechanics/victory-conditions.md"
+      ],
+      "source_files": [
+        "design/game-mechanics/victory-conditions.md"
+      ],
+      "issue_count": 2,
+      "description": "[medium] design/game-mechanics/victory-conditions.md: Council defiance mechanic: If you lose the Council vote but refuse to accept, all other races immediately declare war\n[medium] design/game-mechanics/victory-conditions.md: Guardian of Orion respawn: Respawns after 50 turns if destroyed unless Orion is colonized",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-60",
+      "name": "Fix issues in design/planets/production.md (planets)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/planets/production.md"
+      ],
+      "source_files": [
+        "design/planets/production.md"
+      ],
+      "issue_count": 2,
+      "description": "[medium] design/planets/production.md: Rush Production: Pay extra BC to complete projects instantly at 2× remaining BC cost\n[medium] design/planets/production.md: Planetary Governors: AI manages sliders for casual play",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-61",
+      "name": "Fix issues in design/ships/combat-mechanics.md (ships)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/ships/combat-mechanics.md"
+      ],
+      "source_files": [
+        "design/ships/combat-mechanics.md"
+      ],
+      "issue_count": 2,
+      "description": "[medium] design/ships/combat-mechanics.md: Shield regeneration between battles\n[medium] design/ships/combat-mechanics.md: Missile base combat participation (Section on Missile Bases)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-62",
+      "name": "Fix issues in src/game/ai/ai-personalities.ts (diplomacy)",
+      "severity": "low",
+      "type": "mismatch",
+      "design_docs": [
+        "design/diplomacy/ai-personalities.md"
+      ],
+      "source_files": [
+        "src/game/ai/ai-personalities.ts"
+      ],
+      "issue_count": 2,
+      "description": "[low] design/diplomacy/ai-personalities.md: Hamsters: baseFriendliness=20, warReluctance=30, treatyBonus=15\n[low] src/game/ai/ai-personalities.ts: AIPersonalityProfile.research field (0-100) not present in design personality definitions. Design focuses on expansion, military, diplomacy, technology preferences but not a general 'research' stat. (not in design)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-63",
+      "name": "Fix issues in src/game/systems/council.ts (diplomacy)",
+      "severity": "low",
+      "type": "mismatch",
+      "design_docs": [
+        "design/diplomacy/council.md"
+      ],
+      "source_files": [
+        "src/game/systems/council.ts"
+      ],
+      "issue_count": 2,
+      "description": "[low] design/diplomacy/council.md: Section 4.4: Bribery Factor = (Bribe_Value / Voter_Economy) × BRIBERY_WEIGHT × Racial_Bribe_Modifier. Tech_Value(tech) = Tech_Tier × 50 + (1000 if voter_does_not_have)\n[low] design/diplomacy/council.md: Section 7.6: Alliance Voting - 80% chance to vote for allied candidate, 20% independent. Chameleons: Only 50% alliance loyalty.",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-64",
+      "name": "Fix issues in src/game/systems/events.ts (game-mechanics)",
+      "severity": "low",
+      "type": "mismatch",
+      "design_docs": [
+        "design/game-mechanics/random-events.md"
+      ],
+      "source_files": [
+        "src/game/systems/events.ts"
+      ],
+      "issue_count": 2,
+      "description": "[low] design/game-mechanics/random-events.md: Space monster stats: Cosmic Blob (500 HP, regen 15/round), Crystal Horror (400 HP, 25% beam reflection), Void Wyrm (750 HP)\n[low] design/game-mechanics/random-events.md: Guardian of Orion stats: HP 3000, Attack 12, Defense 10, Shield Class XV, multiple weapons",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-65",
+      "name": "Fix issues in design/diplomacy/treaties.md (diplomacy)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/diplomacy/treaties.md"
+      ],
+      "source_files": [
+        "design/diplomacy/treaties.md"
+      ],
+      "issue_count": 1,
+      "description": "[medium] design/diplomacy/treaties.md: Research Agreement +10% research bonus to both sides (TREATY_DEFAULTS has researchBonus:10 but implementation in processTreatyEffects comments says 'handled by research system; no-op here')",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-66",
+      "name": "Fix issues in design/galaxy/star-systems.md (galaxy)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/galaxy/star-systems.md"
+      ],
+      "source_files": [
+        "design/galaxy/star-systems.md"
+      ],
+      "issue_count": 1,
+      "description": "[medium] design/galaxy/star-systems.md: Wormholes: hasWormhole and wormholeTarget fields exist in StarSystem type but no wormhole generation code exists in galaxy.ts.",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-67",
+      "name": "Fix issues in design/planets/planet-types.md (planets)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/planets/planet-types.md"
+      ],
+      "source_files": [
+        "design/planets/planet-types.md"
+      ],
+      "issue_count": 1,
+      "description": "[medium] design/planets/planet-types.md: Terraforming environment upgrade: Some advanced techs can improve environment type (e.g., barren → minimal)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-68",
+      "name": "Fix issues in design/ships/special-systems.md (ships)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/ships/special-systems.md"
+      ],
+      "source_files": [
+        "design/ships/special-systems.md"
+      ],
+      "issue_count": 1,
+      "description": "[medium] design/ships/special-systems.md: Lightning Shield: 50% damage reflection (design departure from MOO1)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-69",
+      "name": "Fix issues in design/ships/components-complete.md (ships)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/ships/components-complete.md"
+      ],
+      "source_files": [
+        "design/ships/components-complete.md"
+      ],
+      "issue_count": 1,
+      "description": "[medium] design/ships/components-complete.md: Racial component modifiers: Budgies +3 Defense, Hermit Crabs +25% Armor HP, Mice -15% Component Space, Ants -10% Component Cost",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-70",
+      "name": "Fix issues in design/technology/weapons.md (technology)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/technology/weapons.md"
+      ],
+      "source_files": [
+        "design/technology/weapons.md"
+      ],
+      "issue_count": 1,
+      "description": "[medium] design/technology/weapons.md: Ferrets racial weapon bonus: +4 Attack Levels (hit chance only, no damage bonus)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-71",
+      "name": "Fix issues in src/ui/components/InfoPanel.ts (ui-core)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/ui-ux/main-screens.md"
+      ],
+      "source_files": [
+        "src/ui/components/InfoPanel.ts"
+      ],
+      "issue_count": 1,
+      "description": "[medium] design/ui-ux/main-screens.md: Production Sliders: SHIP ■■■■□□□□□□□□□□□□ 38% Scout (2 turns), DEF ■□□□□□□□□□□□□□□□ 0% (none), IND ■■■■■■■■■□□□□□□□ 62% Factory (1 turn), ECO ■□□□□□□□□□□□□□□□ 0% Clean, TECH ■□□□□□□□□□□□□□□□ 0% (none)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-72",
+      "name": "Fix issues in src/ui/canvas/renderer.ts (ui-core)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/ui-ux/UI_OVERVIEW.md"
+      ],
+      "source_files": [
+        "src/ui/canvas/renderer.ts"
+      ],
+      "issue_count": 1,
+      "description": "[medium] design/ui-ux/UI_OVERVIEW.md: Color Palette - Deep Space Blue: #0a1628 (backgrounds), Panel Background: #1a2a3a (info panels), Highlight: #4a90d9 (selection)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-73",
+      "name": "Fix issues in design/ui-ux/navigation-flow.md (ui-core)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/ui-ux/navigation-flow.md"
+      ],
+      "source_files": [
+        "design/ui-ux/navigation-flow.md"
+      ],
+      "issue_count": 1,
+      "description": "[medium] design/ui-ux/navigation-flow.md: Separate MAP screen with Colonies/Environment/Minerals filter modes. Design describes 'The MAP button opens a **separate full-screen MAP view**' with three mode buttons, but code routes MAP to 'galaxy' screen.",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-74",
+      "name": "Fix issues in design/ui-ux/main-screens.md (ui-core)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/ui-ux/main-screens.md"
+      ],
+      "source_files": [
+        "design/ui-ux/main-screens.md"
+      ],
+      "issue_count": 1,
+      "description": "[medium] design/ui-ux/main-screens.md: 5 Production sliders (SHIP/DEF/IND/ECO/TECH) in the info panel when a colony is selected. The design wireframe shows these prominently but InfoPanel.renderYourColony() doesn't render them.",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-75",
+      "name": "Fix issues in design/ui-ux/state-transitions.md (ui-core)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/ui-ux/state-transitions.md"
+      ],
+      "source_files": [
+        "design/ui-ux/state-transitions.md"
+      ],
+      "issue_count": 1,
+      "description": "[medium] design/ui-ux/state-transitions.md: Turn end confirmation dialog. Design shows: 'Shows automatically when player presses Enter/End Turn. Summarizes all actions that will execute. Highlights warnings for undefended colonies, idle production.' Code dispatches NEXT_TURN directly without c",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-76",
+      "name": "Fix issues in design/ui-ux/ground-combat-ui.md (ui-widgets)",
+      "severity": "medium",
+      "type": "mismatch",
+      "design_docs": [
+        "design/ui-ux/ground-combat-ui.md"
+      ],
+      "source_files": [
+        "design/ui-ux/ground-combat-ui.md"
+      ],
+      "issue_count": 1,
+      "description": "[medium] design/ui-ux/ground-combat-ui.md: Transport ship capacity display (Ship Type | Troop Capacity table)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-77",
+      "name": "Fix issues in src/game/ai/strategies.ts (diplomacy)",
+      "severity": "low",
+      "type": "mismatch",
+      "design_docs": [
+        "design/technical/ai-implementation.md"
+      ],
+      "source_files": [
+        "src/game/ai/strategies.ts"
+      ],
+      "issue_count": 1,
+      "description": "[low] design/technical/ai-implementation.md: Section 1.3: Military Threat Component - Ship_Power formula includes Hull_HP × Armor_Multiplier × 0.5 + Total_Weapon_Damage × 2.0 + Shield_Class × 5 + Speed × 3",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-78",
+      "name": "Fix issues in src/game/ai/researchAI.ts (diplomacy)",
+      "severity": "low",
+      "type": "mismatch",
+      "design_docs": [
+        "design/technical/ai-implementation.md"
+      ],
+      "source_files": [
+        "src/game/ai/researchAI.ts"
+      ],
+      "issue_count": 1,
+      "description": "[low] design/technical/ai-implementation.md: Section 3.5: Racial Research Preferences table with specific multipliers (e.g., guinea_pigs.weapons=1.4, chameleons.computers=1.5, rabbits.planetology=1.5)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-79",
+      "name": "Fix issues in src/game/ai/diplomacyAI.ts (diplomacy)",
+      "severity": "low",
+      "type": "mismatch",
+      "design_docs": [],
+      "source_files": [
+        "src/game/ai/diplomacyAI.ts"
+      ],
+      "issue_count": 1,
+      "description": "[low] src/game/ai/diplomacyAI.ts: DiplomaticDecision priority scoring (1-10 scale) not specified in design documents. AI decision priority weighting is implementation detail. (not in design)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-80",
+      "name": "Fix issues in src/ui/canvas/starmap.ts (galaxy)",
+      "severity": "low",
+      "type": "mismatch",
+      "design_docs": [],
+      "source_files": [
+        "src/ui/canvas/starmap.ts"
+      ],
+      "issue_count": 1,
+      "description": "[low] src/ui/canvas/starmap.ts: drawFleetInTransit() with progress-based positioning along route — fleet animation details not specified in design docs. (not in design)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-81",
+      "name": "Fix issues in src/game/actions/fleet.ts (galaxy)",
+      "severity": "low",
+      "type": "mismatch",
+      "design_docs": [],
+      "source_files": [
+        "src/game/actions/fleet.ts"
+      ],
+      "issue_count": 1,
+      "description": "[low] src/game/actions/fleet.ts: Fleet deployment mode UI state (OPEN_FLEET_DEPLOYMENT, UPDATE_DEPLOYMENT_SHIPS, etc.) — detailed UI workflow not specified in travel.md design. (not in design)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-82",
+      "name": "Fix issues in src/game/systems/shipConstruction.ts (ships)",
+      "severity": "low",
+      "type": "mismatch",
+      "design_docs": [],
+      "source_files": [
+        "src/game/systems/shipConstruction.ts"
+      ],
+      "issue_count": 1,
+      "description": "[low] src/game/systems/shipConstruction.ts: Ship experience starting at 'green' level - design uses 'rookie' as the lowest level (not in design)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-83",
+      "name": "Fix issues in src/game/systems/groundCombat.ts (ships)",
+      "severity": "low",
+      "type": "mismatch",
+      "design_docs": [],
+      "source_files": [
+        "src/game/systems/groundCombat.ts"
+      ],
+      "issue_count": 1,
+      "description": "[low] src/game/systems/groundCombat.ts: Morale system ('unrest' after capture) - not detailed in ships design docs though may be in a separate design doc (not in design)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-84",
+      "name": "Fix issues in src/ui/persistence.ts (ui-core)",
+      "severity": "low",
+      "type": "mismatch",
+      "design_docs": [],
+      "source_files": [
+        "src/ui/persistence.ts"
+      ],
+      "issue_count": 1,
+      "description": "[low] src/ui/persistence.ts: File-based save/load with browser download/upload. Design mentions Save/Load in game menu but file export/import specifics not in reviewed docs. (not in design)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "fix-85",
+      "name": "Fix issues in src/ui/screens/GroundCombatScreen.ts (ui-widgets)",
+      "severity": "low",
+      "type": "mismatch",
+      "design_docs": [
+        "design/ui-ux/ground-combat-ui.md"
+      ],
+      "source_files": [
+        "src/ui/screens/GroundCombatScreen.ts"
+      ],
+      "issue_count": 1,
+      "description": "[low] design/ui-ux/ground-combat-ui.md: Troop bars:\nAttackers: ████████████████████████ 12/12 (full, green)\n           ████████████ 6/12 (half, yellow)",
+      "acceptance": [
+        "Code changes align with design specification",
+        "npm run typecheck passes",
+        "npm run test passes",
+        "npm run check-design passes"
+      ],
+      "dependencies": []
+    }
+  ]
+}

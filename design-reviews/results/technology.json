@@ -1,0 +1,317 @@
+{
+  "area": "technology",
+  "name": "Technology & Research",
+  "reviewer": "orion-reviewer-6",
+  "timestamp": "2026-05-03T03:39:00.000Z",
+  "summary": "The research system implementation is largely faithful to the design specifications. Core RP calculations, miniaturization formulas, and tech tier costs match the design documents. However, several gaps exist: the code lacks implementation for bio weapons, some special weapon mechanics (percent-damage weapons use different rates than design), and cloning is implemented differently than design (flat bonus vs BC-invested). The combat system implements most weapon special effects but has some formula deviations. UI correctly displays research allocation and field targeting.",
+  "matches": [
+    {
+      "design_doc": "design/technology/research-formulas.md",
+      "source_file": "src/game/systems/research.ts",
+      "description": "BASE_RP_PER_SCIENTIST = 1.0 RP/turn matches design §1"
+    },
+    {
+      "design_doc": "design/technology/research-formulas.md",
+      "source_file": "src/game/systems/research.ts",
+      "description": "Research building multipliers match design §2: Research Lab +0.5, Supercomputer +1.0, Autolab +1.5, Galactic Cybernet +2.0 (cumulative)"
+    },
+    {
+      "design_doc": "design/technology/research-formulas.md",
+      "source_file": "src/game/systems/research.ts",
+      "description": "Racial research modifiers match design §3: Rats 1.50, Mice 1.15, Rabbits 0.90, Ants 0.90, Guinea Pigs 0.80, others 1.00"
+    },
+    {
+      "design_doc": "design/technology/research-formulas.md",
+      "source_file": "src/game/systems/research.ts",
+      "description": "Planet RP formula correctly applies racial modifier to RP generation (not tech cost) per design §7 clarification"
+    },
+    {
+      "design_doc": "design/technology/research-formulas.md",
+      "source_file": "src/game/systems/research.ts",
+      "description": "Difficulty modifier only affects AI tech cost, not player RP generation, per design §7"
+    },
+    {
+      "design_doc": "design/technology/research-formulas.md",
+      "source_file": "src/game/systems/research.ts",
+      "description": "Galaxy size modifiers match design: small 0.75, medium 1.00, large 1.25, huge 1.50"
+    },
+    {
+      "design_doc": "design/technology/research-formulas.md",
+      "source_file": "src/game/systems/research.ts",
+      "description": "Miniaturization formula matches design §9: 5% reduction per tier, 50% maximum cap"
+    },
+    {
+      "design_doc": "design/technology/research-formulas.md",
+      "source_file": "src/game/systems/research.ts",
+      "description": "Research allocation correctly enforces 100% sum constraint per design §5"
+    },
+    {
+      "design_doc": "design/technology/research-formulas.md",
+      "source_file": "src/game/systems/research.ts",
+      "description": "Tech tier cost table is loaded from JSON and matches design §6 values (50 to 100,000 RP)"
+    },
+    {
+      "design_doc": "design/technology/research-formulas.md",
+      "source_file": "src/game/systems/research.ts",
+      "description": "Research overflow correctly carries to next tech per design §8"
+    },
+    {
+      "design_doc": "design/technology/force-fields.md",
+      "source_file": "src/game/systems/combat.ts",
+      "description": "Black Hole Generator mechanics implemented: 1d4 roll × 25% base destruction, 2% penalty per shield class, 3-turn cooldown"
+    },
+    {
+      "design_doc": "design/technology/force-fields.md",
+      "source_file": "src/game/systems/combat.ts",
+      "description": "Displacement Device 33% hit avoidance chance implemented correctly"
+    },
+    {
+      "design_doc": "design/technology/propulsion.md",
+      "source_file": "src/game/systems/combat.ts",
+      "description": "Warp Dissipator prevents enemy retreat as specified in design"
+    },
+    {
+      "design_doc": "design/technology/weapons.md",
+      "source_file": "src/game/types/shipComponents.ts",
+      "description": "WeaponEffect interface supports design weapon properties: damageMin/Max, attacksPerRound, missileSpeed, mirvCount, damagePerMirv, groundCombatBonus, ignoresShields, etc."
+    },
+    {
+      "design_doc": "design/technology/computers.md",
+      "source_file": "src/game/types/shipComponents.ts",
+      "description": "ComputerEffect interface supports design properties: attackRating, missileDefense, factoriesPerPop, initiativeBonus, colonyDetectRange, shipDetectRange, seeCloaked"
+    },
+    {
+      "design_doc": "design/technology/construction.md",
+      "source_file": "src/game/types/shipComponents.ts",
+      "description": "ArmorEffect interface supports hpMultiplier and groundCombatBonus per design"
+    },
+    {
+      "design_doc": "design/technology/force-fields.md",
+      "source_file": "src/game/types/shipComponents.ts",
+      "description": "ShieldEffect interface supports damageAbsorption, defenseBonus, invisibleUntilFire per design"
+    }
+  ],
+  "mismatches": [
+    {
+      "severity": "high",
+      "design_doc": "design/technology/weapons.md",
+      "design_spec": "Ion Stream Projector: 'Deals 20% of target's current HP as damage'",
+      "source_file": "src/game/systems/combat.ts",
+      "source_line": 564,
+      "actual_impl": "Uses weapon.percentDamage which could be any value; not specifically validated to be 0.20 for Ion Stream Projector",
+      "recommendation": "Ensure components.json defines Ion Stream Projector with percentDamage: 0.20 and Neutron Stream Projector with percentDamage: 0.40"
+    },
+    {
+      "severity": "high",
+      "design_doc": "design/technology/research-formulas.md",
+      "design_spec": "§4 Artifacts World: 'ongoing +25% RP from that planet' via multiplier 1.25",
+      "source_file": "src/game/systems/research.ts",
+      "source_line": 175,
+      "actual_impl": "Code uses technologiesData.special_rp_bonuses.artifacts_world_multiplier but design clarification (M2) states 1.25 while earlier text says 2.0. Verify JSON value matches intended 1.25.",
+      "recommendation": "Confirm technologies.json special_rp_bonuses.artifacts_world_multiplier is 1.25 (not 2.0). The design doc has conflicting values in different sections."
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/technology/force-fields.md",
+      "design_spec": "Zyro Shield: '75% chance to destroy incoming missiles − 1% per missile tech level'",
+      "source_file": "src/game/systems/combat.ts",
+      "source_line": 378,
+      "actual_impl": "calculateInterceptionChance sums beam weapon PD (10% per attack) and anti-missile rockets (40% - techLevel), but does not implement Zyro Shield's 75% base - 1%/TL formula",
+      "recommendation": "Add Zyro Shield interception check: ships with zyroShield property should get 75% - (missileTechLevel * 1)% destruction chance per missile"
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/technology/force-fields.md",
+      "design_spec": "Lightning Shield: '100% chance to destroy incoming missiles − 1% per missile tech level'",
+      "source_file": "src/game/systems/combat.ts",
+      "source_line": 378,
+      "actual_impl": "Lightning Shield missile interception not implemented in calculateInterceptionChance",
+      "recommendation": "Add Lightning Shield check: 100% - (missileTechLevel * 1)% destruction chance per missile"
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/technology/propulsion.md",
+      "design_spec": "Energy Pulsar: '5 damage to all adjacent ships + 1 damage per 2 firing ships'",
+      "source_file": "src/game/systems/combat.ts",
+      "source_line": 0,
+      "actual_impl": "Energy Pulsar weapon special effect not implemented in combat.ts",
+      "recommendation": "Implement Energy Pulsar AoE damage: 5 base damage to all ships in adjacent hexes, +1 per 2 ships with the weapon in the stack, affects friendly ships too"
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/technology/propulsion.md",
+      "design_spec": "Ionic Pulsar: '10 damage to all adjacent ships + 1 damage per 2 firing ships'",
+      "source_file": "src/game/systems/combat.ts",
+      "source_line": 0,
+      "actual_impl": "Ionic Pulsar weapon special effect not implemented",
+      "recommendation": "Implement Ionic Pulsar as upgraded Energy Pulsar with 10 base damage"
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/technology/force-fields.md",
+      "design_spec": "Stasis Field: 'Ship cannot move, fire, or retreat' (prevents retreat explicitly)",
+      "source_file": "src/game/systems/combat.ts",
+      "source_line": 0,
+      "actual_impl": "Stasis Field effect not implemented in combat.ts; the design clarifies stasis prevents retreat contrary to an earlier note",
+      "recommendation": "Implement Stasis Field: target ship cannot act (move/fire/retreat) for 1 combat round, immune to targeting while in stasis, cannot use on same target consecutive rounds"
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/technology/force-fields.md",
+      "design_spec": "Repulsor Beam: 'Push enemy ships 2 hexes away'",
+      "source_file": "src/game/systems/combat.ts",
+      "source_line": 0,
+      "actual_impl": "Repulsor Beam push effect not implemented",
+      "recommendation": "Implement Repulsor Beam: auto-activates when enemy enters range 2, pushes them 2 hexes back"
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/technology/force-fields.md",
+      "design_spec": "Cloaking Device: '+5 Defense, invisible until firing'",
+      "source_file": "src/game/systems/combat.ts",
+      "source_line": 287,
+      "actual_impl": "Cloaking reduces hit chance by 50% (-5 defense levels = -50%) but design says +5 defense (should be -25% at ×5 per level formula)",
+      "recommendation": "Fix cloaking hit penalty: +5 defense at ×5% per level = -25% hit chance, not -50%"
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/technology/weapons.md",
+      "design_spec": "Anti-Missile Rockets: 'Point defense — destroys 40% of incoming missiles (−1% per missile tech level)'",
+      "source_file": "src/game/systems/combat.ts",
+      "source_line": 385,
+      "actual_impl": "Code subtracts missileTechLevel directly: 'Math.max(0, 40 - missileTechLevel)' instead of '40 - missileTechLevel%'",
+      "recommendation": "Formula should be: 40 - (missileTechLevel * 1) = 40 - techLevel percentage points, which is what the code does. This is correct but verify missiles have proper techLevel values."
+    },
+    {
+      "severity": "low",
+      "design_doc": "design/technology/research-formulas.md",
+      "design_spec": "§6 Force Fields tier costs use accelerated schedule (e.g., FF Tier 14 = 50,000 RP = Global Tier 18)",
+      "source_file": "src/game/systems/research.ts",
+      "source_line": 217,
+      "actual_impl": "getTechCost uses single TIER_COST_MAP lookup; does not distinguish Force Fields accelerated cost schedule",
+      "recommendation": "Either: (a) store Force Fields techs with their effective global tier in JSON, or (b) add field parameter to getTechCost to apply FF-specific tier mapping"
+    },
+    {
+      "severity": "low",
+      "design_doc": "design/technology/weapons.md",
+      "design_spec": "Scatter Packs: 'MIRV missiles that split into multiple warheads' (e.g., Scatter Pack V = 5 MIRVs × 6 dmg each)",
+      "source_file": "src/game/types/shipComponents.ts",
+      "source_line": 26,
+      "actual_impl": "WeaponEffect has mirvCount and damagePerMirv properties defined, but combat.ts does not handle MIRV splitting logic",
+      "recommendation": "Implement MIRV handling in combat: when missile hits, spawn mirvCount warheads each dealing damagePerMirv damage"
+    },
+    {
+      "severity": "low",
+      "design_doc": "design/technology/computers.md",
+      "design_spec": "Hit_Chance = 50% + (Attack_Rating × 5%) - (Target_Defense × 3%)",
+      "source_file": "src/game/systems/combat.ts",
+      "source_line": 273,
+      "actual_impl": "calcHitChanceVs uses: 50 + differential * 5 where differential = attackRating - defenseRating. This is (AR - DR) × 5%, not AR × 5% - DR × 3%",
+      "recommendation": "Minor formula difference: design uses separate multipliers (×5% attack, ×3% defense) but code uses unified differential (×5%). Consider which is intended; current implementation slightly favors attackers."
+    }
+  ],
+  "missing_from_code": [
+    {
+      "design_doc": "design/technology/planetology.md",
+      "feature": "Biological Weapons (Death Spores, Doom Virus, Bio Terminator) - ship-mounted weapons that kill planetary population; no bio weapon combat implementation found"
+    },
+    {
+      "design_doc": "design/technology/planetology.md",
+      "feature": "Bio-Defense (Bio Toxin Antidote, Universal Antidote) - casualty reduction from bio attacks"
+    },
+    {
+      "design_doc": "design/technology/planetology.md",
+      "feature": "Cloning technology: Design specifies flat +2/+5 pop/turn bonus (§Cloning Technology), not BC-invested formula"
+    },
+    {
+      "design_doc": "design/technology/planetology.md",
+      "feature": "Atmospheric Terraforming: Convert hostile→standard environment for 200 BC"
+    },
+    {
+      "design_doc": "design/technology/planetology.md",
+      "feature": "Soil Enrichment: +25/+50 max pop per planet for one-time BC cost"
+    },
+    {
+      "design_doc": "design/technology/planetology.md",
+      "feature": "Ecological Restoration upgrades: Cleanup_Modifier progression (1.00 → 0.67 → 0.40 → 0.20 → 0.10)"
+    },
+    {
+      "design_doc": "design/technology/propulsion.md",
+      "feature": "Combat Transporters: Board enemy ships (Tech Level 45)"
+    },
+    {
+      "design_doc": "design/technology/propulsion.md",
+      "feature": "Star Gates: Intergalactic Star Gates (3,000 BC infrastructure, instant colony-to-colony travel)"
+    },
+    {
+      "design_doc": "design/technology/propulsion.md",
+      "feature": "Sub-Space Interdictor: Nullifies Sub-Space Teleporters in systems with owned planets"
+    },
+    {
+      "design_doc": "design/technology/computers.md",
+      "feature": "Oracle Interface: All weapons become armor-piercing (Tech Level 46)"
+    },
+    {
+      "design_doc": "design/technology/computers.md",
+      "feature": "Technology Nullifier: Target -2 to -6 attack rating (Tech Level 49)"
+    },
+    {
+      "design_doc": "design/technology/computers.md",
+      "feature": "Hyperspace Communications: Reroute fleets in transit (Tech Level 34)"
+    },
+    {
+      "design_doc": "design/technology/construction.md",
+      "feature": "Automated Repair Unit: +15% HP per turn combat repair"
+    },
+    {
+      "design_doc": "design/technology/construction.md",
+      "feature": "Advanced Damage Control: +30% HP per turn combat repair"
+    },
+    {
+      "design_doc": "design/technology/construction.md",
+      "feature": "Hull Space bonuses: Improved/Advanced/Superior/Maximum Hull Space (+20%/+40%/+60%/+80%)"
+    },
+    {
+      "design_doc": "design/technology/research-formulas.md",
+      "feature": "Tech Stealing (Espionage): Steal_Success_Chance formula with Tech_Difficulty modifier"
+    },
+    {
+      "design_doc": "design/technology/research-formulas.md",
+      "feature": "Tech Trading: Trade_Value formula for diplomatic tech exchange"
+    },
+    {
+      "design_doc": "design/technology/research-formulas.md",
+      "feature": "Reverse Engineering: Captured ships reveal tech over time (Rats: instant, Mice: 50% faster)"
+    },
+    {
+      "design_doc": "design/technology/research-formulas.md",
+      "feature": "Random tech choices: 2-3 random techs offered per tier (Rats always get 3 per Academic Network ability)"
+    },
+    {
+      "design_doc": "design/technology/weapons.md",
+      "feature": "Ferrets racial weapon bonus: +4 Attack Levels (hit chance only, no damage bonus)"
+    }
+  ],
+  "not_in_design": [
+    {
+      "source_file": "src/game/systems/combat.ts",
+      "feature": "researchMultiplier planet property that can be set to any value (design specifies only 1.0, 1.25, 4.0 for standard/artifacts/Orion)"
+    },
+    {
+      "source_file": "src/game/systems/combat.ts",
+      "feature": "Experience accuracy bonus (-5%/0%/+5%/+10% for rookie/regular/veteran/elite) - not found in technology design docs (may be in ships/combat-algorithm.md)"
+    },
+    {
+      "source_file": "src/game/systems/combat.ts",
+      "feature": "Range modifiers for hit chance (Point Blank +10%, Close +0%, Medium -5%, Long -10%, Very Long -20%) - may be documented elsewhere"
+    },
+    {
+      "source_file": "src/game/systems/combat.ts",
+      "feature": "Size modifier for hit chance: (target_size_class - 1) × 5% - may be documented in combat-algorithm.md"
+    },
+    {
+      "source_file": "src/game/systems/research.ts",
+      "feature": "miniaturization_minimum_scale constant (code references it from JSON) - design only mentions 50% max reduction, not explicit minimum scale factor"
+    }
+  ]
+}

@@ -18,7 +18,67 @@ export type CombatId = string;
 
 // ── Enumerations ──────────────────────────────────────────────────────────────
 
-export type DifficultyLevel = 'easy' | 'normal' | 'hard' | 'impossible' | 'custom';
+export type DifficultyLevel = 'simple' | 'easy' | 'average' | 'hard' | 'impossible' | 'custom';
+
+// ── Turn Phases ───────────────────────────────────────────────────────────────
+
+/**
+ * The 12-phase turn sequence as specified in design/game-mechanics/turn-structure.md.
+ * Phases execute in order; each produces specific outputs for the turn summary.
+ */
+export enum TurnPhase {
+  /** Phase 1: Collect income, pay maintenance, calculate net income */
+  IncomeAndMaintenance = 'income_and_maintenance',
+  /** Phase 2: Apply sliders, run factories, generate pollution */
+  Production = 'production',
+  /** Phase 3: Sum RP, apply to current tech, handle breakthroughs */
+  Research = 'research',
+  /** Phase 4: Calculate growth, apply food/pollution effects */
+  PopulationGrowth = 'population_growth',
+  /** Phase 5: AI diplomacy actions, trade routes, proposals */
+  Diplomacy = 'diplomacy',
+  /** Phase 6: Fleet movement, interceptions, scout reveals */
+  Movement = 'movement',
+  /** Phase 7: Combat initiation and resolution */
+  CombatResolution = 'combat_resolution',
+  /** Phase 8: Ground invasions, bombardment, colonization */
+  GroundCombatAndColonization = 'ground_combat_colonization',
+  /** Phase 9: Random events (10% chance) and scripted events */
+  Events = 'events',
+  /** Phase 10: Victory condition checks */
+  VictoryCheck = 'victory_check',
+  /** Phase 11: AI empire turns (slider adjustments, ship designs, fleet orders) */
+  AITurn = 'ai_turn',
+  /** Phase 12: Cleanup and turn summary preparation */
+  EndTurn = 'end_turn',
+}
+
+/**
+ * Output from a single phase, used for turn summary display.
+ */
+export interface PhaseOutput {
+  phase: TurnPhase;
+  /** Human-readable summary of what happened */
+  summary: string;
+  /** Detailed events that occurred during this phase */
+  events: TurnEvent[];
+  /** Key metrics produced by this phase */
+  metrics?: Record<string, number | string>;
+}
+
+/**
+ * Complete turn processing result with per-phase outputs.
+ */
+export interface TurnResult {
+  /** Turn number after processing */
+  turn: number;
+  /** All phase outputs in execution order */
+  phaseOutputs: PhaseOutput[];
+  /** Aggregated events across all phases */
+  allEvents: TurnEvent[];
+  /** Victory result if game ended this turn */
+  victoryResult: { winnerId: EmpireId; type: VictoryType; description: string } | null;
+}
 export type GameSpeed = 'slow' | 'normal' | 'fast';
 export type VictoryType = 'diplomatic' | 'military' | 'conquest';
 export type ScreenType =
@@ -37,7 +97,8 @@ export type ScreenType =
   | 'ground_combat'
   | 'turn_summary'
   | 'save_load'
-  | 'victory';
+  | 'victory'
+  | 'hall_of_fame';
 
 export type GalaxySize = 'small' | 'medium' | 'large' | 'huge';
 export type GalaxyShape = 'spiral' | 'elliptical' | 'irregular';
@@ -71,7 +132,8 @@ export type MissionType =
   | 'propaganda'
   | 'infiltration'
   | 'assassination'
-  | 'intelligence_gathering';
+  | 'intelligence_gathering'
+  | 'frame_job';
 
 export interface SpyMission {
   id: string;
@@ -920,6 +982,12 @@ export interface GameState {
 
   /** Events that occurred during the current turn, shown on the turn summary screen. */
   turnEvents: TurnEvent[];
+
+  /** Current phase being processed (null when not processing a turn) */
+  currentPhase: TurnPhase | null;
+
+  /** Per-phase outputs from the most recent turn, for turn summary display */
+  phaseOutputs: PhaseOutput[];
 
   ui: UIState;
 }

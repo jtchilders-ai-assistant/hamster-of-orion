@@ -46,6 +46,19 @@ export const BREAK_ALLIANCE_PENALTY = -100;
 /** Generic relation penalty for breaking any other treaty type. */
 export const BREAK_DEFAULT_PENALTY = -20;
 
+/** Severe penalty for breaking a defensive pact early (before duration expires). */
+export const BREAK_DEFENSIVE_PACT_EARLY_PENALTY = -50;
+
+/** Fixed duration in turns for defensive pacts (cannot be broken early without severe penalty). */
+export const DEFENSIVE_PACT_FIXED_DURATION = 30;
+
+/** Maintenance cost reduction per alliance tier (percentage). */
+export const TREATY_MAINTENANCE_BONUSES: Partial<Record<TreatyType, number>> = {
+  trade: 5,               // -5% maintenance with trade partner
+  military_alliance: 15,  // -15% maintenance with ally
+  defensive_pact: 10,     // -10% maintenance with defensive pact
+};
+
 // ── Default treaty terms by type ─────────────────────────────────────────────
 
 const TREATY_DEFAULTS: Record<TreatyType, Partial<TreatyTerms>> = {
@@ -54,7 +67,7 @@ const TREATY_DEFAULTS: Record<TreatyType, Partial<TreatyTerms>> = {
   trade:             { breakPenalty: 20 },
   research:          { researchBonus: 10, breakPenalty: 20 },
   military_alliance: { mustJoinWars: true, sharedIntelligence: true, breakPenalty: 100 },
-  defensive_pact:    { mustDefend: true, sharedIntelligence: true, breakPenalty: 50 },
+  defensive_pact:    { mustDefend: true, sharedIntelligence: true, breakPenalty: 50, nonAggressionDuration: DEFENSIVE_PACT_FIXED_DURATION },
 };
 
 // ── ID generator ─────────────────────────────────────────────────────────────
@@ -235,12 +248,18 @@ export function computeTradeIncome(
   return income;
 }
 
+/** Base trade income offset when a trade agreement exists. */
+export const TRADE_BASE_OFFSET = 5;
+
 /**
  * Compute the base trade income for an agreement between two empires.
- * Formula: (creditPerTurn_A + creditPerTurn_B) / 20
+ * Formula: TRADE_BASE_OFFSET + (creditPerTurn_A + creditPerTurn_B) / 20
+ * 
+ * The +5 offset represents the baseline benefit of establishing trade
+ * relations, even between small economies.
  */
 export function computeBaseTradeIncome(empireA: Empire, empireB: Empire): number {
-  return (empireA.creditPerTurn + empireB.creditPerTurn) / 20;
+  return TRADE_BASE_OFFSET + (empireA.creditPerTurn + empireB.creditPerTurn) / 20;
 }
 
 // ── Public API ────────────────────────────────────────────────────────────────
@@ -466,8 +485,17 @@ export function breakTreaty(
     treaties: rel.treaties.filter(t => !(t.type === type && t.isActive)),
   }));
 
+  // Calculate penalty - defensive pacts have severe early-break penalty
+  let penalty = BREAK_PENALTY_FOR_TYPE[type];
+  if (type === 'defensive_pact') {
+    const turnsActive = state.turn - treaty.signedTurn;
+    if (turnsActive < DEFENSIVE_PACT_FIXED_DURATION) {
+      // Early break: use severe penalty instead of normal penalty
+      penalty = BREAK_DEFENSIVE_PACT_EARLY_PENALTY;
+    }
+  }
+
   // Apply penalty to all empire pairs that include the breaker
-  const penalty = BREAK_PENALTY_FOR_TYPE[type];
   for (const othEmpireId of next.empires.allIds) {
     if (othEmpireId === breakerId) continue;
     next = nudgeRelation(next, breakerId, othEmpireId, penalty);
@@ -618,3 +646,55 @@ const BREAK_PENALTY_FOR_TYPE: Record<TreatyType, number> = {
   military_alliance: BREAK_ALLIANCE_PENALTY,
   defensive_pact:    BREAK_DEFAULT_PENALTY,
 };
+
+/**
+ * Calculate the total maintenance bonus percentage for an empire based on active treaties.
+ * Returns a percentage reduction (e.g., 20 means -20% maintenance).
+ */
+export function calculateTreatyMaintenanceBonus(
+  state: GameState,
+  empireId: EmpireId,
+): number {
+  const empire = state.empires.byId[empireId];
+  if (!empire) return 0;
+
+  let totalBonus = 0;
+
+  for (const otherId of Object.keys(empire.relations)) {
+    if (otherId === empireId) continue;
+
+    const rel = empire.relations[otherId];
+    if (!rel) continue;
+
+    for (const treaty of rel.treaties) {
+      if (!treaty.isActive) continue;
+
+      const bonus = TREATY_MAINTENANCE_BONUSES[treaty.type];
+      if (bonus) {
+        totalBonus += bonus;
+      }
+    }
+  }
+
+  // Cap at 50% maximum reduction
+  return Math.min(totalBonus, 50);
+}
+
+/**
+ * Check if breaking a defensive pact would incur the early-break penalty.
+ * Returns true if the pact hasn't reached its minimum duration yet.
+ */
+export function isDefensivePactEarlyBreak(
+  state: GameState,
+  empireAId: EmpireId,
+  empireBId: EmpireId,
+): boolean {
+  const rel = getRelation(state, empireAId, empireBId);
+  if (!rel) return false;
+
+  const pact = rel.treaties.find(t => t.type === 'defensive_pact' && t.isActive);
+  if (!pact) return false;
+
+  const turnsActive = state.turn - pact.signedTurn;
+  return turnsActive < DEFENSIVE_PACT_FIXED_DURATION;
+}

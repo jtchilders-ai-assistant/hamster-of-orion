@@ -1,0 +1,399 @@
+{
+  "area": "economy",
+  "name": "Economy & Production Systems",
+  "reviewer": "orion-reviewer-1",
+  "timestamp": "2026-05-03T03:39:00Z",
+  "summary": "Overall good alignment between design and implementation. The core production formulas, population growth mechanics, and slider mathematics are implemented correctly. Found 3 high-severity issues: (1) racialProductionModifier not applied to factory output per design spec, (2) growth.ts file missing entirely, (3) potential double-counting of difficulty modifiers on factory output. Several medium-severity gaps relate to missing ship maintenance system implementation and incomplete food/starvation integration in the turn loop. Constants file is comprehensive and matches design documents well.",
+  "matches": [
+    {
+      "design_doc": "design/economy/factory-formulas.md",
+      "source_file": "src/game/constants.ts",
+      "description": "BASE_FACTORY_OUTPUT = 1.0 matches 'base_output_per_factory: 1.0'"
+    },
+    {
+      "design_doc": "design/economy/factory-formulas.md",
+      "source_file": "src/game/constants.ts",
+      "description": "Population output scaling formula (0.5 + TL/50 * 1.5) correctly implemented with BASE_POP_OUTPUT_MIN=0.5, BASE_POP_OUTPUT_MAX=2.0, BASE_POP_OUTPUT_TL_CAP=50"
+    },
+    {
+      "design_doc": "design/economy/factory-formulas.md",
+      "source_file": "src/game/constants.ts",
+      "description": "FACTORY_COST_BASE=10 and FACTORY_COST_MIN=2 match design spec"
+    },
+    {
+      "design_doc": "design/economy/factory-formulas.md",
+      "source_file": "src/game/constants.ts",
+      "description": "INDUSTRIAL_TECH_FACTORY_COSTS array matches all tech levels and factory costs from design (0→10, 3→9, 8→8, 13→7, 18→6, 23→5, 28→4, 33→3, 38→2)"
+    },
+    {
+      "design_doc": "design/economy/factory-formulas.md",
+      "source_file": "src/game/constants.ts",
+      "description": "WASTE_REDUCTION array matches design: TL 0→1.0, TL 5→0.8, TL 15→0.6, TL 25→0.4, TL 35→0.2, TL 45→0.0"
+    },
+    {
+      "design_doc": "design/economy/factory-formulas.md",
+      "source_file": "src/game/constants.ts",
+      "description": "ECO_RESTORATION cleanup modifiers match design: TL 1→1.0, TL 4→0.67, TL 11→0.4, TL 22→0.2, TL 29→0.1"
+    },
+    {
+      "design_doc": "design/economy/factory-formulas.md",
+      "source_file": "src/game/constants.ts",
+      "description": "ROBOTIC_CONTROLS tech levels match design: TL 1→2, TL 8→3, TL 18→4, TL 28→5, TL 38→6, TL 48→7"
+    },
+    {
+      "design_doc": "design/economy/factory-formulas.md",
+      "source_file": "src/game/constants.ts",
+      "description": "RACIAL_PRODUCTION_MODIFIERS match design: ants=1.5, mice=1.25, guinea_pigs=1.1, hamsters=1.0, etc."
+    },
+    {
+      "design_doc": "design/economy/factory-formulas.md",
+      "source_file": "src/game/constants.ts",
+      "description": "MINERAL_RICHNESS_MODIFIERS match design: ultra_poor=0.33, poor=0.5, normal=1.0, rich=2.0, ultra_rich=3.0"
+    },
+    {
+      "design_doc": "design/economy/factory-formulas.md",
+      "source_file": "src/game/constants.ts",
+      "description": "RACIAL_RC_BONUS for mice=2 matches design spec for Meklars +2 RC level bonus"
+    },
+    {
+      "design_doc": "design/economy/factory-formulas.md",
+      "source_file": "src/game/systems/production.ts",
+      "description": "basePopOutput() function correctly implements formula: 0.5 + (clampedTL / 50) * 1.5"
+    },
+    {
+      "design_doc": "design/economy/factory-formulas.md",
+      "source_file": "src/game/systems/production.ts",
+      "description": "operatingFactories() correctly calculates min(factories, population * roboticControlsLevel)"
+    },
+    {
+      "design_doc": "design/economy/factory-formulas.md",
+      "source_file": "src/game/systems/production.ts",
+      "description": "calculatePollution() correctly implements Pollution = opFac * wasteRate; CleanupCost = Pollution * 0.5 * cleanupModifier"
+    },
+    {
+      "design_doc": "design/economy/factory-formulas.md",
+      "source_file": "src/game/systems/production.ts",
+      "description": "buildFactories() correctly implements factory overflow to Empire Reserve when at max factories"
+    },
+    {
+      "design_doc": "design/economy/population-growth.md",
+      "source_file": "src/game/systems/population.ts",
+      "description": "BASE_GROWTH_RATE = 0.10 (10%) matches design spec"
+    },
+    {
+      "design_doc": "design/economy/population-growth.md",
+      "source_file": "src/game/systems/population.ts",
+      "description": "ENV_GROWTH_MODIFIER matches all environment values from design (gaia=1.0, terran=1.0, jungle=0.9, ocean=0.9, arid=0.8, etc.)"
+    },
+    {
+      "design_doc": "design/economy/population-growth.md",
+      "source_file": "src/game/systems/population.ts",
+      "description": "ENV_CAPACITY_MODIFIER matches all environment values from design"
+    },
+    {
+      "design_doc": "design/economy/population-growth.md",
+      "source_file": "src/game/systems/population.ts",
+      "description": "ENV_FERTILITY matches all environment fertility values from design"
+    },
+    {
+      "design_doc": "design/economy/population-growth.md",
+      "source_file": "src/game/systems/population.ts",
+      "description": "RACIAL_GROWTH_MODIFIER matches design: rabbits=2.0, ants=1.25, mice=0.75, hermit_crabs=0.5, others=1.0"
+    },
+    {
+      "design_doc": "design/economy/population-growth.md",
+      "source_file": "src/game/systems/population.ts",
+      "description": "RACIAL_CAPACITY_MODIFIER correctly has ants=1.25 for Overpopulation ability, others=1.0"
+    },
+    {
+      "design_doc": "design/economy/population-growth.md",
+      "source_file": "src/game/systems/population.ts",
+      "description": "calculateMoraleModifier() correctly implements 0.5 + (morale / 200)"
+    },
+    {
+      "design_doc": "design/economy/population-growth.md",
+      "source_file": "src/game/systems/population.ts",
+      "description": "TERRAFORMING_BONUS_TABLE matches design tech levels and bonuses (TL 2→+10, TL 6→+20, ..., TL 46→+120)"
+    },
+    {
+      "design_doc": "design/economy/population-growth.md",
+      "source_file": "src/game/systems/population.ts",
+      "description": "CLONING_BONUS_TABLE matches design: TL 11→+2/turn, TL 22→+5/turn"
+    },
+    {
+      "design_doc": "design/economy/population-growth.md",
+      "source_file": "src/game/systems/population.ts",
+      "description": "SOIL_ENRICHMENT_BONUS matches design: level 1→+25, level 2→+50"
+    },
+    {
+      "design_doc": "design/economy/population-growth.md",
+      "source_file": "src/game/systems/population.ts",
+      "description": "Hermit Crabs special rules implemented: ignores environment modifiers, no food required, all environments colonizable"
+    },
+    {
+      "design_doc": "design/economy/population-growth.md",
+      "source_file": "src/game/systems/population.ts",
+      "description": "Ants immune to morale effects correctly implemented (isAnt ? 1.0 : calculateMoraleModifier)"
+    },
+    {
+      "design_doc": "design/economy/population-growth.md",
+      "source_file": "src/game/systems/population.ts",
+      "description": "Starvation formula correctly implements floor(deficit * 0.5) deaths and -20 morale penalty"
+    },
+    {
+      "design_doc": "design/economy/population-growth.md",
+      "source_file": "src/game/systems/population.ts",
+      "description": "Food production formula correctly implements farmers * 2.0 * fertility * racial_mod"
+    },
+    {
+      "design_doc": "design/economy/population-growth.md",
+      "source_file": "src/game/systems/population.ts",
+      "description": "Mice reduced food requirement (0.5) correctly implemented"
+    },
+    {
+      "design_doc": "design/economy/population-growth.md",
+      "source_file": "src/game/constants.ts",
+      "description": "INITIAL_COLONY_POPULATION=2 matches design spec"
+    },
+    {
+      "design_doc": "design/economy/population-growth.md",
+      "source_file": "src/game/constants.ts",
+      "description": "Difficulty modifiers for growth match design: Simple player=1.25/AI=0.75, Easy 1.10/0.90, Average 1.0/1.0, Hard 0.90/1.25, Impossible 0.75/1.50"
+    },
+    {
+      "design_doc": "design/economy/slider-mathematics.md",
+      "source_file": "src/game/systems/production.ts",
+      "description": "validateSliders() correctly checks slider sum = 100"
+    },
+    {
+      "design_doc": "design/economy/slider-mathematics.md",
+      "source_file": "src/game/systems/production.ts",
+      "description": "TECH slider correctly diverts population from labor (activePop = population * (1 - techPercent/100))"
+    },
+    {
+      "design_doc": "design/economy/slider-mathematics.md",
+      "source_file": "src/game/systems/production.ts",
+      "description": "allocateSliders() correctly handles TECH as population diversion, not BC consumption"
+    },
+    {
+      "design_doc": "design/economy/slider-mathematics.md",
+      "source_file": "src/game/systems/production.ts",
+      "description": "ECO priority phases implemented correctly: 1. cleanup (mandatory), 2. growth bonus, 3. terraforming"
+    },
+    {
+      "design_doc": "design/economy/slider-mathematics.md",
+      "source_file": "src/game/systems/production.ts",
+      "description": "GROWTH_BC_EFFICIENCY = 0.1 (1 BC → 0.1 pop growth) matches design"
+    },
+    {
+      "design_doc": "design/economy/slider-mathematics.md",
+      "source_file": "src/game/systems/production.ts",
+      "description": "rebalanceSliders() implements proportional redistribution among unlocked sliders per design §7"
+    },
+    {
+      "design_doc": "design/economy/slider-mathematics.md",
+      "source_file": "src/game/systems/production.ts",
+      "description": "Net production correctly applies floor() per design"
+    },
+    {
+      "design_doc": "design/economy/slider-mathematics.md",
+      "source_file": "src/game/systems/production.ts",
+      "description": "Mineral richness modifier correctly applied to gross production (factory + population labor)"
+    },
+    {
+      "design_doc": "design/economy/ship-costs.md",
+      "source_file": "src/game/constants.ts",
+      "description": "HULL_BASE_HP matches design: small=3, medium=18, large=54, huge=120 (implicit from cost/space ratios)"
+    }
+  ],
+  "mismatches": [
+    {
+      "severity": "high",
+      "design_doc": "design/economy/factory-formulas.md",
+      "design_spec": "Effective_Factory_Output = Operating_Factories × Base_Factory_Output × Racial_Production_Modifier",
+      "source_file": "src/game/systems/production.ts",
+      "source_line": 178,
+      "actual_impl": "Factory output only uses factoryEfficiencyMultiplier (for Mice), NOT racialProductionModifier. Code comment says 'racialProductionModifier applies ONLY to population labor, not factory output, to avoid double-counting'",
+      "recommendation": "The design doc explicitly shows racialProductionModifier applied to factory output. Either update the code to match design, OR update the design doc to clarify that racial production modifier only applies to population labor (and document how Mice's three stacking bonuses work). The current implementation may be intentional to avoid double-counting for Mice, but it contradicts the design formula."
+    },
+    {
+      "severity": "high",
+      "design_doc": "design/economy/population-growth.md",
+      "design_spec": "Population growth system with logistic model, fractional tracking, cloning bonuses",
+      "source_file": "src/game/systems/growth.ts",
+      "source_line": 0,
+      "actual_impl": "File does not exist - ENOENT error when attempting to read",
+      "recommendation": "Either create growth.ts or confirm population growth is handled entirely in population.ts (which does appear to have the implementation). If growth.ts is expected by other modules, create it as re-exports from population.ts."
+    },
+    {
+      "severity": "high",
+      "design_doc": "design/economy/factory-formulas.md",
+      "design_spec": "Difficulty Modifiers: These modifiers apply to the final net production after cleanup costs.",
+      "source_file": "src/game/systems/production.ts",
+      "source_line": 173,
+      "actual_impl": "Difficulty modifier is applied separately to both factory production (line 173) AND population production (line 178), rather than once to final net production. This could result in double-application in some code paths.",
+      "recommendation": "Apply difficulty modifier once to the final netProduction value, not to factoryBC and popBC separately. Current approach achieves same mathematical result for gross production but the comment says 'after cleanup costs' suggesting it should be applied even later."
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/economy/ship-costs.md",
+      "design_spec": "Ship_Maintenance = Ship_Cost × 0.02 (2% per turn), with racial modifiers, tech modifiers (Fleet Logistics), and minimum 1 BC",
+      "source_file": "src/game/systems/production.ts",
+      "source_line": 0,
+      "actual_impl": "No ship maintenance calculation system found in production.ts or any scanned economy files",
+      "recommendation": "Implement calculateFleetMaintenance() function per ship-costs.md, including racial modifiers (Ants 0.75, Mice 0.80, etc.), Fleet Logistics tech modifiers (multiplicative stacking), and minimum 1 BC per ship."
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/economy/ship-costs.md",
+      "design_spec": "Handle bankruptcy: scuttle ships randomly at 10% emergency scrap rate until treasury positive",
+      "source_file": "src/game/systems/production.ts",
+      "source_line": 0,
+      "actual_impl": "No bankruptcy handling or emergency ship scrapping found in production.ts",
+      "recommendation": "Implement handle_bankruptcy() function that scuttles ships at 10% emergency scrap rate when empire treasury goes negative, with morale and diplomatic reputation penalties."
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/economy/population-growth.md",
+      "design_spec": "Conquered Population: Post-invasion reduction of 50% (Ferrets: 40%)",
+      "source_file": "src/game/systems/population.ts",
+      "source_line": 0,
+      "actual_impl": "No conquest population reduction logic found in population.ts",
+      "recommendation": "Implement conquest population reduction in the invasion/conquest system. CONQUEST_POPULATION_REDUCTION and FERRET_CONQUEST_REDUCTION constants exist in constants.ts but are not used."
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/economy/slider-mathematics.md",
+      "design_spec": "DEF slider builds missile bases at base cost 100 BC (reduced by Construction tech) and planetary shields",
+      "source_file": "src/game/systems/buildings.ts",
+      "source_line": 238,
+      "actual_impl": "Buildings system uses building data from JSON file but doesn't apply Construction tech reduction to missile base cost",
+      "recommendation": "The missile base cost reduction by Construction tech (mentioned in factory-formulas.md: same tech tree reduces factory cost) should be applied to missile base construction, similar to factory cost reduction."
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/economy/population-growth.md",
+      "design_spec": "Overcrowding: When current_population > max_population, growth halts and starvation reduces pop over time",
+      "source_file": "src/game/systems/population.ts",
+      "source_line": 0,
+      "actual_impl": "calculatePopulationGrowth() returns 0 growth when pop >= maxPop, but there's no explicit handling for the case where maxPop is REDUCED below current pop (e.g., bio weapon). The starvation system would need food shortfall to trigger.",
+      "recommendation": "Add explicit overcrowding check that triggers when maxPop is reduced below current pop, ensuring starvation mechanism activates even if food production is adequate."
+    },
+    {
+      "severity": "low",
+      "design_doc": "design/economy/factory-formulas.md",
+      "design_spec": "Mice (Meklars) Special Ability: Mice receive +2 to their effective Robotic Controls level",
+      "source_file": "src/game/systems/production.ts",
+      "source_line": 0,
+      "actual_impl": "RACIAL_RC_BONUS is defined in constants.ts but there's no code in production.ts that applies this +2 RC bonus for mice when calculating operatingFactories",
+      "recommendation": "In operatingFactories() or when building ProductionContext, add logic to apply RACIAL_RC_BONUS[raceId] to roboticControlsLevel for Mice."
+    },
+    {
+      "severity": "low",
+      "design_doc": "design/economy/factory-formulas.md",
+      "design_spec": "Bombed Factories: Factories_Destroyed = Bomb_Damage × Factory_Vulnerability; Factory_Vulnerability = 0.1 (10%)",
+      "source_file": "src/game/constants.ts",
+      "source_line": 0,
+      "actual_impl": "No FACTORY_VULNERABILITY constant or bomb damage factory destruction formula found",
+      "recommendation": "Add FACTORY_VULNERABILITY = 0.1 to constants.ts and implement factory destruction during bombardment."
+    },
+    {
+      "severity": "low",
+      "design_doc": "design/economy/slider-mathematics.md",
+      "design_spec": "At least one slider must remain unlocked (otherwise re-balancing is impossible)",
+      "source_file": "src/game/systems/production.ts",
+      "source_line": 405,
+      "actual_impl": "rebalanceSliders() returns error 'NO_UNLOCKED_SLIDERS' if all adjustable sliders are locked, but the check only looks at sliders OTHER than the changed one - doesn't prevent locking all 5 sliders",
+      "recommendation": "Add a check that prevents the user from locking all 5 sliders. The current check works for rebalancing, but UI should also prevent the lock action itself when it would leave 0 unlocked."
+    },
+    {
+      "severity": "low",
+      "design_doc": "design/economy/population-growth.md",
+      "design_spec": "Rabbits Special: Can redirect overflow population to transports automatically",
+      "source_file": "src/game/systems/population.ts",
+      "source_line": 0,
+      "actual_impl": "RACIAL_SPECIAL_RULES.rabbits.auto_transport_overflow mentioned in design but not implemented",
+      "recommendation": "Implement auto-transport queuing for Rabbits when population reaches max capacity."
+    }
+  ],
+  "missing_from_code": [
+    {
+      "design_doc": "design/economy/ship-costs.md",
+      "feature": "Ship maintenance system: calculateFleetMaintenance(), racial maintenance modifiers, Fleet Logistics tech modifiers, minimum 1 BC per ship"
+    },
+    {
+      "design_doc": "design/economy/ship-costs.md",
+      "feature": "Ship scrapping system: scrap value calculation (25% base, 35% at shipyard, 15% damaged, 10% enemy territory)"
+    },
+    {
+      "design_doc": "design/economy/ship-costs.md",
+      "feature": "Ship refitting system: Refit_Cost = (New_Cost - Old_Value) × 0.50, must be at planet with shipyard"
+    },
+    {
+      "design_doc": "design/economy/ship-costs.md",
+      "feature": "Bankruptcy handling: Emergency scrap at 10% value, morale -5, diplomatic reputation -10"
+    },
+    {
+      "design_doc": "design/economy/ship-costs.md",
+      "feature": "Miniaturization cost reduction: (Current_Tier - Component_Tier) × 0.05, max 50% reduction"
+    },
+    {
+      "design_doc": "design/economy/ship-costs.md",
+      "feature": "Defensive installation maintenance: missile_base=2 BC/turn, starbase=5 BC/turn, etc."
+    },
+    {
+      "design_doc": "design/economy/ship-costs.md",
+      "feature": "Troop transports: Light (50 BC, 5 troops), Heavy (100 BC, 10 troops), Assault (200 BC, 20 troops)"
+    },
+    {
+      "design_doc": "design/economy/population-growth.md",
+      "feature": "Population transport system: Colony Transport 50 BC, 1 BC/turn maintenance, 1 million pop capacity"
+    },
+    {
+      "design_doc": "design/economy/population-growth.md",
+      "feature": "Bio weapon max population reduction: Death Spores -10%, Doom Virus -25%, Bio Terminator -50%"
+    },
+    {
+      "design_doc": "design/economy/factory-formulas.md",
+      "feature": "Mice +50% factory efficiency from Automated Production ability (factoryEfficiencyMultiplier exists but needs to be set to 1.5 for Mice)"
+    },
+    {
+      "design_doc": "design/economy/factory-formulas.md",
+      "feature": "Bombed factory destruction: Factory_Vulnerability = 0.1 (10% of bomb damage)"
+    },
+    {
+      "design_doc": "design/economy/slider-mathematics.md",
+      "feature": "SHIP slider queue: BC accumulation, overflow to next item in queue, overflow to Empire Reserve when queue empty"
+    },
+    {
+      "design_doc": "design/economy/slider-mathematics.md",
+      "feature": "Reserve Fund: Empire-wide BC pool for manual injection into any planet's production"
+    }
+  ],
+  "not_in_design": [
+    {
+      "source_file": "src/game/systems/production.ts",
+      "feature": "factoryEfficiencyMultiplier in ProductionContext - design shows Mice bonus as a separate stacking modifier but code has generic multiplier field"
+    },
+    {
+      "source_file": "src/game/systems/production.ts",
+      "feature": "researchMultiplier on Planet (Orion=4.0, Artifacts=2.0) - applied to TECH RP but not documented in slider-mathematics.md or factory-formulas.md"
+    },
+    {
+      "source_file": "src/game/systems/buildings.ts",
+      "feature": "Stellar Converter building that converts gas giants to terran worlds over 50 turns - not mentioned in economy design docs (may be in technology/buildings docs)"
+    },
+    {
+      "source_file": "src/game/systems/population.ts",
+      "feature": "NEBULA_CAPACITY_BONUS = 15 - bonus population capacity for planets in nebula systems, not mentioned in population-growth.md"
+    },
+    {
+      "source_file": "src/game/constants.ts",
+      "feature": "PLANET_SIZE constant with TINY=20, SMALL=40, etc. - design docs explicitly say NOT to use hardcoded per-size constants, use generated base_population instead"
+    },
+    {
+      "source_file": "src/game/constants.ts",
+      "feature": "Extensive combat constants (hit chance, range classes, damage sequence, etc.) - these belong in combat design area, not economy"
+    }
+  ]
+}

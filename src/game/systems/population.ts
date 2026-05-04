@@ -9,7 +9,8 @@
  * modifiers. No DOM, no side effects.
  */
 
-import { Planet, PlanetType } from '../state';
+import { Planet, PlanetType, DifficultyLevel } from '../state';
+import { getGrowthMultiplier } from './difficulty';
 
 // ── Extended planet fields (optional additions to Planet) ─────────────────────
 
@@ -28,6 +29,8 @@ export interface PopulationPlanetFields {
   farmers?: number;
   /** Per-planet generated base max-pop (from galaxy generation). */
   base_population?: number;
+  /** Whether this planet is in a nebula system (bonus capacity). Default: false. */
+  in_nebula?: boolean;
 }
 
 /**
@@ -42,7 +45,8 @@ export interface TechState {
 
 // ── Difficulty type ────────────────────────────────────────────────────────────
 
-export type Difficulty = 'simple' | 'easy' | 'average' | 'hard' | 'impossible';
+// Re-export Difficulty type from state (now DifficultyLevel)
+export type Difficulty = DifficultyLevel;
 
 // ── Environment tables ────────────────────────────────────────────────────────
 
@@ -216,6 +220,11 @@ const SOIL_ENRICHMENT_BONUS: Record<0 | 1 | 2, number> = {
   2: 50,
 };
 
+// ── Nebula capacity bonus ─────────────────────────────────────────────────────
+
+/** Nebula systems grant bonus population capacity from rich gases. */
+export const NEBULA_CAPACITY_BONUS = 15;
+
 // ── Helper: get race ID from planet/empire ────────────────────────────────────
 
 /**
@@ -226,6 +235,10 @@ export interface PopulationContext {
   raceId: string;
   /** Tech state for terraforming and cloning lookups. */
   techState: TechState;
+  /** Difficulty level for growth modifiers. */
+  difficulty?: DifficultyLevel;
+  /** Whether this is the player's empire (affects difficulty modifier direction). */
+  isPlayer?: boolean;
 }
 
 // ── calculateMaxPopulation ────────────────────────────────────────────────────
@@ -239,6 +252,8 @@ export interface MaxPopulationResult {
   terraformingBonus: number;
   /** Soil enrichment bonus applied. */
   soilBonus: number;
+  /** Nebula capacity bonus applied. */
+  nebulaBonus: number;
   /** Environment capacity modifier (1.0 for Hermit Crabs). */
   envCapacityModifier: number;
   /** Racial capacity modifier (1.25 for Ants, 1.0 others). */
@@ -273,13 +288,16 @@ export function calculateMaxPopulation(
   const soilLevel = (planet.soil_enrichment_level ?? 0) as 0 | 1 | 2;
   const soilBonus = SOIL_ENRICHMENT_BONUS[soilLevel];
 
+  // Nebula capacity bonus (from rich gases in nebula systems)
+  const nebulaBonus = planet.in_nebula ? NEBULA_CAPACITY_BONUS : 0;
+
   // Hermit Crabs ignore environment capacity
   const envCapacityModifier = isHermitCrab ? 1.0 : (ENV_CAPACITY_MODIFIER[planet.type] ?? 1.0);
 
   const racialCapacityModifier = RACIAL_CAPACITY_MODIFIER[ctx.raceId] ?? 1.0;
 
   const maxPopulation = Math.floor(
-    (basePop + terraformingBonus + soilBonus)
+    (basePop + terraformingBonus + soilBonus + nebulaBonus)
     * envCapacityModifier
     * racialCapacityModifier,
   );
@@ -289,6 +307,7 @@ export function calculateMaxPopulation(
     basePop,
     terraformingBonus,
     soilBonus,
+    nebulaBonus,
     envCapacityModifier,
     racialCapacityModifier,
   };
@@ -369,8 +388,13 @@ export function calculatePopulationGrowth(
   // Logistic growth factor
   const growthFactor = 1 - pop / maxPopulation;
 
-  // Natural growth
-  const naturalGrowth = pop * 0.10 * envGrowthMod * racialMod * moraleModifier * growthFactor;
+  // Difficulty growth modifier
+  const difficultyGrowthMod = ctx.difficulty 
+    ? getGrowthMultiplier(ctx.difficulty, ctx.isPlayer ?? true) 
+    : 1.0;
+
+  // Natural growth (with difficulty modifier)
+  const naturalGrowth = pop * 0.10 * envGrowthMod * racialMod * moraleModifier * growthFactor * difficultyGrowthMod;
 
   // Cloning bonus
   const cloningBonus = getCloningBonus(ctx.techState.cloning_tech_level);
@@ -509,7 +533,7 @@ export function processFoodAndStarvation(
  * | Hard       | 0.90   | 1.25 |
  * | Impossible | 0.75   | 1.50 |
  */
-const DIFFICULTY_GROWTH_MODIFIERS: Record<Difficulty, { player: number; ai: number }> = {
+const DIFFICULTY_GROWTH_MODIFIERS: Record<Exclude<Difficulty, 'custom'>, { player: number; ai: number }> = {
   simple:     { player: 1.25, ai: 0.75 },
   easy:       { player: 1.10, ai: 0.90 },
   average:    { player: 1.00, ai: 1.00 },
@@ -528,7 +552,9 @@ export function calculateDifficultyGrowthModifier(
   difficulty: Difficulty,
   isPlayer: boolean,
 ): number {
-  const entry = DIFFICULTY_GROWTH_MODIFIERS[difficulty];
+  // Custom difficulty defaults to Average
+  const key = difficulty === 'custom' ? 'average' : difficulty;
+  const entry = DIFFICULTY_GROWTH_MODIFIERS[key];
   return isPlayer ? entry.player : entry.ai;
 }
 

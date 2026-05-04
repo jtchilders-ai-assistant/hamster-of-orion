@@ -89,6 +89,15 @@ const MISSION_DEFS: Record<MissionType, MissionDef> = {
     deathRisk: 5,
     relationPenalty: -10,
   },
+  frame_job: {
+    type: 'frame_job',
+    label: 'Credit Theft',
+    baseSuccess: 35,
+    cost: 3,
+    riskLevel: 'High',
+    deathRisk: 40,
+    relationPenalty: -35,
+  },
 };
 
 // ── Risk level color map ─────────────────────────────────────────────────────
@@ -404,6 +413,7 @@ export class EspionagePanel {
   private renderHistoryCard(mission: SpyMission, success: boolean): string {
     const statusText = success ? 'SUCCESS' : 'FOILED';
     const statusClass = success ? 'status-success' : 'status-failed';
+    const rewardText = this.formatReward(mission);
     return `
       <div class="mission-card ${success ? 'completed' : 'foiled'}">
         <div class="mission-card-header">
@@ -411,11 +421,46 @@ export class EspionagePanel {
           <span class="mission-status ${statusClass}" data-testid="${success ? 'mission-completed' : 'mission-foiled'}">${statusText}</span>
         </div>
         <div class="mission-card-body">
-          <div>Turn completed: <strong>${mission.startTurn}</strong></div>
-          ${mission.reward ? `<div>Reward: <strong>${mission.reward.type}</strong> (${mission.reward.value})</div>` : ''}
+          <div>Turn completed: <strong>${mission.startTurn + mission.durationTurns}</strong></div>
+          ${rewardText ? `<div class="mission-reward">${rewardText}</div>` : ''}
         </div>
       </div>
     `;
+  }
+
+  /**
+   * Format the reward/effect from a completed mission for display.
+   */
+  private formatReward(mission: SpyMission): string {
+    if (!mission.reward) return '';
+
+    switch (mission.reward.type) {
+      case 'productionSabotage':
+        return `<span style="color:#ff9933">🏭 Production sabotaged: -${mission.reward.value}% for 1 turn</span>`;
+
+      case 'tech_stolen':
+        return `<span style="color:#66ccff">🔬 Technology stolen!</span>`;
+
+      case 'building_destroyed':
+        return `<span style="color:#ff5533">🏗️ Building destroyed</span>`;
+
+      case 'leader_killed':
+        return `<span style="color:#cc0000">💀 Leader assassinated! -20% production for ${mission.reward.value} turns</span>`;
+
+      case 'intel_gathered':
+        return `<span style="color:#66cc66">📡 Intel acquired for ${mission.reward.value} turn(s)</span>`;
+
+      case 'reconnaissance':
+        return `<span style="color:#66cc66">🔍 Basic intelligence gathered</span>`;
+
+      case 'sabotage_failed':
+      case 'theft_failed':
+      case 'build_sabotage_failed':
+        return `<span style="color:#888">No valid target found</span>`;
+
+      default:
+        return `<span style="color:#aaa">${mission.reward.type}: ${mission.reward.value}</span>`;
+    }
   }
 
   private renderCounterEspionage(

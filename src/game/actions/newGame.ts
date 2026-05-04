@@ -6,10 +6,16 @@
  */
 
 import { Action } from '../store';
-import { GameState, Empire, AIEmpire, EmpireId, DifficultyLevel, GalaxySize, ResearchState } from '../state';
+import { GameState, Empire, AIEmpire, EmpireId, DifficultyLevel, GalaxySize, ResearchState, AIPersonality, AITrait } from '../state';
 import { generateGalaxy } from '../generators/galaxy';
 import { initialState } from '../initialState';
 import racesData from '../../data/races.json';
+import {
+  getRace,
+  startingRelationship,
+  isBloodEnemiesAll,
+  getRandomLeaderName,
+} from '../systems/races';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -18,7 +24,7 @@ export type GalaxyAge = 'young' | 'average' | 'old';
 export interface NewGameOptions {
   galaxySize: GalaxySize;
   opponents: number;           // 1-9
-  difficulty: DifficultyLevel; // 'easy' | 'normal' | 'hard' | 'impossible'
+  difficulty: DifficultyLevel; // 'simple' | 'easy' | 'average' | 'hard' | 'impossible' | 'custom'
   galaxyAge: GalaxyAge;
   raceId: string;
   empireColor: string;
@@ -45,12 +51,16 @@ export const startGame = (options: NewGameOptions): Action => ({
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function emptyResearchState(): ResearchState {
+/**
+ * Create initial research state with race-specific starting technologies.
+ */
+function buildResearchState(raceId: string): ResearchState {
+  const race = getRace(raceId);
   return {
     currentTech: null,
     researchPoints: 0,
     researchPerTurn: 0,
-    completedTechs: [],
+    completedTechs: [...race.startingTechnologies],
     availableTechs: {
       weapons: [],
       propulsion: [],
@@ -64,22 +74,50 @@ function emptyResearchState(): ResearchState {
   };
 }
 
+/**
+ * Build diplomatic relations for an empire.
+ * Uses race-specific starting relationship calculations and handles special cases
+ * like Ferrets' blood_enemies_all status.
+ */
 function buildRelations(
   empireA: EmpireId,
-  allEmpireIds: EmpireId[],
+  raceAId: string,
+  allEmpiresWithRaces: Array<{ empireId: EmpireId; raceId: string }>,
   isPlayer: boolean,
 ): Empire['relations'] {
   const relations: Empire['relations'] = {};
-  for (const otherId of allEmpireIds) {
+  const isBloodEnemy = isBloodEnemiesAll(raceAId);
+
+  for (const { empireId: otherId, raceId: otherRaceId } of allEmpiresWithRaces) {
     if (otherId === empireA) continue;
+
+    const otherIsBloodEnemy = isBloodEnemiesAll(otherRaceId);
+
+    // Calculate base relationship using both races' diplomacy bonuses
+    let baseRelationValue = startingRelationship(raceAId, otherRaceId);
+
+    // Apply player bonus: player starts with slightly better relations
+    if (isPlayer) {
+      baseRelationValue += 10;
+    }
+
+    // Determine if we start at war (Ferrets mechanic)
+    const startsAtWar = isBloodEnemy || otherIsBloodEnemy;
+    const relationState = startsAtWar ? 'war' : 'neutral';
+
+    // Blood enemies start at very negative relations
+    if (startsAtWar) {
+      baseRelationValue = Math.min(baseRelationValue, -40);
+    }
+
     relations[otherId] = {
       empireA,
       empireB: otherId,
-      value: isPlayer ? 50 : 40,
-      state: 'neutral',
+      value: Math.round(baseRelationValue),
+      state: relationState,
       treaties: [],
       events: [],
-      warStartTurn: null,
+      warStartTurn: startsAtWar ? 1 : null,
       lastContact: isPlayer ? 1 : -1,
       modifiers: [],
       incomingProposals: [],
@@ -88,12 +126,109 @@ function buildRelations(
   return relations;
 }
 
+/**
+ * Map AI behavior archetype to personality type for AI state.
+ */
+function archetypeToPersonalityType(archetype: string): AIPersonality['type'] {
+  const mapping: Record<string, AIPersonality['type']> = {
+    diplomat: 'diplomatic',
+    industrialist: 'builder',
+    erratic_industrialist: 'erratic',
+    researcher: 'scientific',
+    aggressive_expansionist: 'expansionist',
+    xenophobic_expansionist: 'expansionist',
+    aggressive: 'aggressive',
+    honorable_militarist: 'balanced',
+    sneaky: 'erratic',
+  };
+  return mapping[archetype] ?? 'balanced';
+}
+
+/**
+ * Map AI behavior archetype to AI traits.
+ */
+function archetypeToTraits(archetype: string, raceId: string): AITrait[] {
+  const traits: AITrait[] = [];
+  const race = getRace(raceId);
+
+  switch (archetype) {
+    case 'diplomat':
+      traits.push('honorable');
+      break;
+    case 'industrialist':
+      // Ants have hive mind but it's not an AITrait - they're immune to espionage
+      if (race.immuneToEspionage) traits.push('logical');
+      break;
+    case 'erratic_industrialist':
+      traits.push('logical');
+      break;
+    case 'researcher':
+      traits.push('logical', 'tech_trader');
+      break;
+    case 'aggressive_expansionist':
+      // Rabbits - no specific traits
+      break;
+    case 'xenophobic_expansionist':
+      traits.push('xenophobic');
+      break;
+    case 'aggressive':
+      traits.push('war_monger');
+      break;
+    case 'honorable_militarist':
+      traits.push('honorable');
+      break;
+    case 'sneaky':
+      traits.push('backstabber', 'xenophobic');
+      break;
+  }
+
+  return traits;
+}
+
+/**
+ * Map AI archetype to strategic primary goal.
+ */
+function archetypeToPrimaryStrategy(archetype: string): AIEmpire['strategy']['primary'] {
+  const mapping: Record<string, AIEmpire['strategy']['primary']> = {
+    diplomat: 'diplomatic_victory',
+    industrialist: 'expansion',
+    erratic_industrialist: 'tech_advantage',
+    researcher: 'tech_advantage',
+    aggressive_expansionist: 'expansion',
+    xenophobic_expansionist: 'expansion',
+    aggressive: 'military_supremacy',
+    honorable_militarist: 'military_supremacy',
+    sneaky: 'survival', // Sneaky races focus on survival through subterfuge
+  };
+  return mapping[archetype] ?? 'expansion';
+}
+
+/**
+ * Map AI archetype to military stance.
+ */
+function archetypeToMilitaryStance(archetype: string, declaresWarFirst: boolean): AIEmpire['strategy']['militaryStance'] {
+  if (declaresWarFirst) return 'aggressive';
+  if (archetype === 'researcher' || archetype === 'diplomat') return 'defensive';
+  return 'neutral';
+}
+
+/**
+ * Map AI archetype to diplomatic goal.
+ */
+function archetypeToDiplomaticGoal(archetype: string): AIEmpire['strategy']['diplomaticGoal'] {
+  if (archetype === 'diplomat') return 'alliances';
+  if (archetype === 'xenophobic_expansionist' || archetype === 'sneaky') return 'isolation';
+  if (archetype === 'aggressive') return 'domination';
+  return 'alliances';
+}
+
 function buildPlayerEmpire(
   empireId: EmpireId,
   options: NewGameOptions,
-  allEmpireIds: EmpireId[],
+  allEmpiresWithRaces: Array<{ empireId: EmpireId; raceId: string }>,
 ): Empire {
-  const relations = buildRelations(empireId, allEmpireIds, true);
+  const relations = buildRelations(empireId, options.raceId, allEmpiresWithRaces, true);
+  const research = buildResearchState(options.raceId);
 
   return {
     id: empireId,
@@ -110,7 +245,7 @@ function buildPlayerEmpire(
     securityLevel: 0,
     exploredSystems: [],
     visibleSystems: [],
-    research: emptyResearchState(),
+    research,
     relations,
     isDefeated: false,
     defeatedTurn: null,
@@ -119,15 +254,24 @@ function buildPlayerEmpire(
 
 function buildAIEmpire(
   empireId: EmpireId,
-  raceData: RaceData,
-  allEmpireIds: EmpireId[],
+  raceId: string,
+  allEmpiresWithRaces: Array<{ empireId: EmpireId; raceId: string }>,
+  seed: number,
+  index: number,
 ): { empire: Empire; ai: AIEmpire } {
-  const relations = buildRelations(empireId, allEmpireIds, false);
+  const race = getRace(raceId);
+  const aiBehavior = race.aiBehavior;
+
+  // Use race-specific leader name
+  const leaderName = getRandomLeaderName(raceId, seed + index);
+
+  const relations = buildRelations(empireId, raceId, allEmpiresWithRaces, false);
+  const research = buildResearchState(raceId);
 
   const empire: Empire = {
     id: empireId,
-    raceId: raceData.id,
-    name: `Emperor of ${raceData.name}`,
+    raceId: raceId,
+    name: leaderName,
     isPlayer: false,
     credits: 250,
     creditPerTurn: 0,
@@ -139,30 +283,47 @@ function buildAIEmpire(
     securityLevel: 0,
     exploredSystems: [],
     visibleSystems: [],
-    research: emptyResearchState(),
+    research,
     relations,
     isDefeated: false,
     defeatedTurn: null,
   };
 
+  // Build AI personality from race's aiBehavior data
+  const personality: AIPersonality = {
+    type: archetypeToPersonalityType(aiBehavior.archetype),
+    // Convert 0.0-1.0 scale to 0-100 scale
+    aggression: Math.round(aiBehavior.aggression * 100),
+    expansionism: Math.round(aiBehavior.expansion * 100),
+    diplomacy: Math.round(aiBehavior.diplomacyPriority * 100),
+    research: Math.round(aiBehavior.researchFocus * 100),
+    traits: archetypeToTraits(aiBehavior.archetype, raceId),
+  };
+
+  // Build strategy from race behavior
+  const primaryStrategy = archetypeToPrimaryStrategy(aiBehavior.archetype);
+  const militaryStance = archetypeToMilitaryStance(aiBehavior.archetype, aiBehavior.declaresWarFirst);
+  const diplomaticGoal = archetypeToDiplomaticGoal(aiBehavior.archetype);
+
+  // Determine economic focus based on race strengths
+  let economicFocus: 'production' | 'research' | 'growth' = 'production';
+  if (aiBehavior.researchFocus > aiBehavior.productionFocus) {
+    economicFocus = 'research';
+  } else if (race.bonuses.growth > 50) {
+    economicFocus = 'growth';
+  }
+
   const ai: AIEmpire = {
     id: empireId,
-    raceId: raceData.id,
-    empireName: empire.name,
-    personality: {
-      type: 'balanced',
-      aggression: 50,
-      expansionism: 50,
-      diplomacy: 50,
-      research: 50,
-      traits: [],
-    },
+    raceId: raceId,
+    empireName: leaderName,
+    personality,
     strategy: {
-      primary: 'expansion',
-      secondary: 'tech_advantage',
-      economicFocus: 'production',
-      militaryStance: 'neutral',
-      diplomaticGoal: 'alliances',
+      primary: primaryStrategy,
+      secondary: primaryStrategy === 'expansion' ? 'tech_advantage' : 'expansion',
+      economicFocus,
+      militaryStance,
+      diplomaticGoal,
       targetEmpires: {},
       targetSystems: [],
       lastEvaluation: 0,
@@ -179,24 +340,51 @@ function buildAIEmpire(
       receivedHelp: [],
     },
     weights: {
-      shipWeight: 20,
-      defenseWeight: 15,
-      industryWeight: 25,
+      // Use race behavior to weight production allocation
+      shipWeight: Math.round(20 * (1 + aiBehavior.aggression)),
+      defenseWeight: aiBehavior.declaresWarFirst ? 10 : 20,
+      industryWeight: Math.round(25 * aiBehavior.productionFocus),
       ecologyWeight: 20,
-      researchWeight: 20,
-      weaponsPriority: 50,
-      propulsionPriority: 50,
-      constructionPriority: 50,
-      computersPriority: 50,
-      forceFieldsPriority: 50,
-      biotechPriority: 50,
-      fleetSizeThreshold: 60,
-      threatTolerance: 40,
-      retreatThreshold: 30,
+      researchWeight: Math.round(20 * (1 + aiBehavior.researchFocus)),
+      // Research priorities based on race archetype
+      weaponsPriority: aiBehavior.aggression > 0.5 ? 70 : 40,
+      propulsionPriority: aiBehavior.expansion > 0.6 ? 60 : 45,
+      constructionPriority: aiBehavior.productionFocus > 0.6 ? 65 : 50,
+      computersPriority: aiBehavior.researchFocus > 0.6 ? 60 : 50,
+      forceFieldsPriority: aiBehavior.declaresWarFirst ? 40 : 55,
+      biotechPriority: race.bonuses.growth > 50 ? 60 : 45,
+      // Military thresholds
+      fleetSizeThreshold: aiBehavior.aggression > 0.6 ? 50 : 70,
+      threatTolerance: Math.round(50 - aiBehavior.aggression * 20),
+      retreatThreshold: aiBehavior.declaresWarFirst ? 20 : 35,
     },
   };
 
   return { empire, ai };
+}
+
+/**
+ * Initialize war entries for empires at war (Ferrets blood_enemies_all).
+ * Modifies the empires' relations in place to add wars_with entries.
+ */
+function initializeWars(empires: Record<EmpireId, Empire>): void {
+  const empireList = Object.values(empires);
+
+  for (const empire of empireList) {
+    // Find all empires we're at war with based on relations
+    const warsWithIds: EmpireId[] = [];
+
+    for (const [otherId, relation] of Object.entries(empire.relations)) {
+      if (relation.state === 'war') {
+        warsWithIds.push(otherId as EmpireId);
+      }
+    }
+
+    // Update the empire with wars_with if not already present
+    if (warsWithIds.length > 0) {
+      (empire as any).wars_with = warsWithIds;
+    }
+  }
 }
 
 // ── Reducer ───────────────────────────────────────────────────────────────────
@@ -233,17 +421,32 @@ export function newGameReducer(state: GameState, action: Action): GameState {
     aiRaces.push(otherRaces[i % otherRaces.length]);
   }
 
-  // Build empires
-  const playerEmpire = buildPlayerEmpire(playerEmpireId, options, allEmpireIds);
+  // Build list of all empires with their races for relationship calculation
+  const allEmpiresWithRaces: Array<{ empireId: EmpireId; raceId: string }> = [
+    { empireId: playerEmpireId, raceId: raceId },
+    ...aiEmpireIds.map((id, i) => ({ empireId: id, raceId: aiRaces[i].id })),
+  ];
+
+  // Build empires using race-specific data
+  const playerEmpire = buildPlayerEmpire(playerEmpireId, options, allEmpiresWithRaces);
 
   const aiEmpiresById: Record<EmpireId, Empire> = {};
   const aiEmpireStates: Record<EmpireId, AIEmpire> = {};
   for (let i = 0; i < numOpponents; i++) {
     const id = aiEmpireIds[i];
-    const { empire, ai } = buildAIEmpire(id, aiRaces[i], allEmpireIds);
+    const { empire, ai } = buildAIEmpire(id, aiRaces[i].id, allEmpiresWithRaces, seed, i);
     aiEmpiresById[id] = empire;
     aiEmpireStates[id] = ai;
   }
+
+  // Combine all empires for war initialization
+  const allEmpires: Record<EmpireId, Empire> = {
+    [playerEmpireId]: { ...playerEmpire, name: emperorName },
+    ...aiEmpiresById,
+  };
+
+  // Initialize wars for Ferrets blood_enemies_all
+  initializeWars(allEmpires);
 
   // Set homeworld name for player's home system
   const playerHomeSystemId = galaxy.homeSystemIds[playerEmpireId];
@@ -296,10 +499,7 @@ export function newGameReducer(state: GameState, action: Action): GameState {
     shipDesigns: { byId: {}, allIds: [] },
 
     empires: {
-      byId: {
-        [playerEmpireId]: { ...playerEmpire, name: emperorName },
-        ...aiEmpiresById,
-      },
+      byId: allEmpires,
       allIds: allEmpireIds,
       playerId: playerEmpireId,
     },

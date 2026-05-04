@@ -58,7 +58,7 @@ function makeTestState(overrides: Partial<GameState> = {}): GameState {
     ...initialState,
     seed: 'test-seed',
     turn: 50,
-    difficulty: 'normal',
+    difficulty: 'average',
     empires: {
       byId: {
         player: {

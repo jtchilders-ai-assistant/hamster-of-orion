@@ -522,6 +522,24 @@
       "builtVia": "tech_unlock",
       "scope": "empire",
       "startingTech": true
+    },
+
+    {
+      "id": "stellar_converter",
+      "name": "Stellar Converter",
+      "category": "terraforming",
+      "techRequired": "stellar_converter_tech",
+      "cost": 5000,
+      "maintenance": 50,
+      "effects": {
+        "allowsGasGiantTerraforming": true,
+        "convertsGasGiantToTerran": true,
+        "conversionTurns": 50,
+        "maxPerPlanet": 1,
+        "note": "Advanced planetary engineering facility that can convert a gas giant into a habitable terran world. The conversion process takes 50 turns and requires massive ongoing energy expenditure. Once complete, the planet becomes a normal terran world with base population capacity of 100."
+      },
+      "builtVia": "special_project",
+      "planetTypeRestriction": ["gas_giant"]
     }
 
   ],

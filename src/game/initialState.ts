@@ -59,7 +59,7 @@ export const initialState: GameState = {
   seed: 'default',
   turn: 1,
   year: 2501,
-  difficulty: 'normal',
+  difficulty: 'average',
   isPaused: false,
   gameSpeed: 'normal',
   currentScreen: 'menu',
@@ -118,6 +118,10 @@ export const initialState: GameState = {
   spyMissions: [],
 
   turnEvents: [],
+
+  currentPhase: null,
+
+  phaseOutputs: [],
 
   ui: defaultUI,
 };

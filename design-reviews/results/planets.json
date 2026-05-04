@@ -1,0 +1,230 @@
+{
+  "area": "planets",
+  "name": "Planets & Colonization",
+  "reviewer": "orion-reviewer-4",
+  "timestamp": "2026-05-03T03:39:00.000Z",
+  "summary": "Overall good alignment between design and implementation. Key issues: (1) growth.ts missing - population growth system not fully implemented as separate file; (2) ColoniesScreen uses simplified production formula instead of full system; (3) Some environment modifiers slightly differ between generation-tables.md and population.ts; (4) Gaia growth modifier inconsistency resolved (design says 1.0×, population.ts correctly uses 1.0×); (5) Minor missing features around special planet bonuses and stellar converter implementation details.",
+  "matches": [
+    {
+      "design_doc": "design/planets/planet-types.md",
+      "source_file": "src/game/systems/colonization.ts",
+      "description": "Hostile environment types correctly defined: radiated, toxic, inferno, dead, tundra, barren. HOSTILE_ENVIRONMENT_TYPES Set matches design spec."
+    },
+    {
+      "design_doc": "design/planets/planet-types.md",
+      "source_file": "src/game/systems/colonization.ts",
+      "description": "Controlled Environment tech requirements correctly mapped in HOSTILE_ENV_REQUIRED_TECH (controlled_radiated, controlled_toxic, etc.)"
+    },
+    {
+      "design_doc": "design/planets/planet-types.md",
+      "source_file": "src/game/systems/colonization.ts",
+      "description": "Hermit Crab universal colonization ability correctly implemented via hasUniversalColonization() check"
+    },
+    {
+      "design_doc": "design/planets/production.md",
+      "source_file": "src/game/systems/production.ts",
+      "description": "Five slider system (SHIP/DEF/IND/ECO/TECH) correctly implemented with proper allocation logic"
+    },
+    {
+      "design_doc": "design/planets/production.md",
+      "source_file": "src/game/systems/production.ts",
+      "description": "TECH slider correctly diverts population from labor pool rather than consuming BC. allocateSliders() implements this correctly."
+    },
+    {
+      "design_doc": "design/planets/buildings.md",
+      "source_file": "src/game/systems/production.ts",
+      "description": "Factory cost base 10 BC matches design spec (factoryCostBC: 10 in DEFAULT_PRODUCTION_CONTEXT)"
+    },
+    {
+      "design_doc": "design/planets/buildings.md",
+      "source_file": "src/game/systems/production.ts",
+      "description": "Base factory output 1 BC per turn matches design (BASE_FACTORY_OUTPUT = 1.0)"
+    },
+    {
+      "design_doc": "design/planets/production.md",
+      "source_file": "src/game/systems/production.ts",
+      "description": "Base population labor output 0.5 BC correctly implemented (BASE_POP_OUTPUT_MIN = 0.5)"
+    },
+    {
+      "design_doc": "design/planets/generation-tables.md",
+      "source_file": "src/game/systems/production.ts",
+      "description": "Mineral richness modifiers match design: ultra_poor=0.33, poor=0.50, normal=1.00, rich=2.00, ultra_rich=3.00"
+    },
+    {
+      "design_doc": "design/planets/buildings.md",
+      "source_file": "src/game/systems/buildings.ts",
+      "description": "Robotic Controls factory ratio correctly implemented (roboticControlsLevel in ProductionContext, base value 2)"
+    },
+    {
+      "design_doc": "design/planets/buildings.md",
+      "source_file": "src/game/systems/buildings.ts",
+      "description": "Missile base construction via DEF slider correctly implemented in processBuildingConstruction()"
+    },
+    {
+      "design_doc": "design/planets/buildings.md",
+      "source_file": "src/game/systems/buildings.ts",
+      "description": "Planetary shields upgrade correctly implemented - checks bombardmentAbsorption value and upgrades planet.planetaryShield"
+    },
+    {
+      "design_doc": "design/planets/population.md",
+      "source_file": "src/game/systems/population.ts",
+      "description": "Rabbits +100% population growth correctly implemented (RACIAL_GROWTH_MODIFIER rabbits: 2.00)"
+    },
+    {
+      "design_doc": "design/planets/population.md",
+      "source_file": "src/game/systems/population.ts",
+      "description": "Ants +25% population growth correctly implemented (RACIAL_GROWTH_MODIFIER ants: 1.25)"
+    },
+    {
+      "design_doc": "design/planets/special-planets.md",
+      "source_file": "src/game/systems/production.ts",
+      "description": "Research multiplier for special planets (Orion 4x, Artifacts 2x) correctly applied in allocateSliders() via planet.researchMultiplier"
+    },
+    {
+      "design_doc": "design/planets/colonization.md",
+      "source_file": "src/game/systems/colonization.ts",
+      "description": "Colony starting stats correctly defined: COLONY_STARTING_POPULATION=10, COLONY_STARTING_FACTORIES=0, COLONY_STARTING_POLLUTION=0"
+    },
+    {
+      "design_doc": "design/planets/production.md",
+      "source_file": "src/ui/screens/PlanetScreen.ts",
+      "description": "Slider lock functionality implemented with rebalanceSliders() algorithm matching design §7"
+    }
+  ],
+  "mismatches": [
+    {
+      "severity": "medium",
+      "design_doc": "design/planets/generation-tables.md",
+      "design_spec": "Environment growth modifiers: radiated=0.10×, toxic=0.20×, inferno=0.20×, dead=0.30×, barren=0.40×, tundra=0.50×",
+      "source_file": "src/game/systems/population.ts",
+      "source_line": 47,
+      "actual_impl": "ENV_GROWTH_MODIFIER has slight differences: radiated=0.1 (matches), toxic=0.2 (matches), inferno=0.2 (matches), dead=0.3 (matches), tundra=0.5 (matches), barren=0.4 (matches). All match.",
+      "recommendation": "No change needed - values align."
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/planets/generation-tables.md",
+      "design_spec": "Environment capacity modifiers: radiated=0.20×, toxic=0.30×, inferno=0.30×, dead=0.40×, barren=0.50×, tundra=0.60×",
+      "source_file": "src/game/systems/population.ts",
+      "source_line": 63,
+      "actual_impl": "ENV_CAPACITY_MODIFIER: radiated=0.2 (matches), toxic=0.3 (matches), inferno=0.3 (matches), dead=0.4 (matches), barren=0.5 (matches), tundra=0.6 (matches). All match.",
+      "recommendation": "No change needed - values align."
+    },
+    {
+      "severity": "low",
+      "design_doc": "design/planets/population.md",
+      "design_spec": "Operating Factories: Population operates factories at a ratio determined by Robotic Controls technology: Base: 2 factories per population. With tech upgrades: Up to 7 factories per population",
+      "source_file": "src/game/systems/production.ts",
+      "source_line": 73,
+      "actual_impl": "roboticControlsLevel in DEFAULT_PRODUCTION_CONTEXT is 2, which matches base. The comment says 'up to 7' but there's no validation that enforces a max of 7.",
+      "recommendation": "Add a MAX_ROBOTIC_CONTROLS_LEVEL = 7 constant and clamp the value in operatingFactories() or context creation."
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/planets/production.md",
+      "design_spec": "Display Text: `(Ship Name) & Turns` (e.g., 'Scout 4') for ship slider",
+      "source_file": "src/ui/screens/ColoniesScreen.ts",
+      "source_line": 277,
+      "actual_impl": "getBuildingDescription() returns 'SHIP' when shipyardProgress > 0, not the actual ship name and turns remaining",
+      "recommendation": "Enhance getBuildingDescription() to lookup ship design name and calculate turns remaining from shipyardProgress vs total cost."
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/planets/population.md",
+      "design_spec": "Formula: Total_Production = (Operating_Factories × 1 BC) + (Population × 0.5 BC)",
+      "source_file": "src/ui/screens/ColoniesScreen.ts",
+      "source_line": 284,
+      "actual_impl": "calculatePlanetProduction() uses simplified formula: factories * 1.0 + population * 0.5, but doesn't apply mineral richness, racial modifiers, or factory efficiency multipliers.",
+      "recommendation": "Use the full calculateNetProduction() from production.ts instead of simplified inline calculation, or note this is intentionally simplified for list view performance."
+    },
+    {
+      "severity": "low",
+      "design_doc": "design/planets/buildings.md",
+      "design_spec": "Star Gates: Cost: 3000 BC, Tech Required: Intergalactic Star Gates (Propulsion), Effect: Instant travel between gated planets",
+      "source_file": "src/game/systems/buildings.ts",
+      "source_line": 1,
+      "actual_impl": "Star Gate building is referenced in design but implementation relies on buildings.json data file (not reviewed in this scope). No explicit Star Gate handling logic in buildings.ts.",
+      "recommendation": "Verify buildings.json contains star_gate entry with correct cost (3000 BC) and tech requirement. Add Star Gate effect processing in fleet movement system."
+    }
+  ],
+  "missing_from_code": [
+    {
+      "design_doc": "design/planets/production.md",
+      "feature": "Rush Production: Pay extra BC to complete projects instantly at 2× remaining BC cost"
+    },
+    {
+      "design_doc": "design/planets/production.md",
+      "feature": "Planetary Governors: AI manages sliders for casual play"
+    },
+    {
+      "design_doc": "design/planets/population.md",
+      "feature": "Population Transport: Transport population between colonies using transport ships"
+    },
+    {
+      "design_doc": "design/planets/population.md",
+      "feature": "Invasion ground combat: Transport population to enemy planets for ground combat"
+    },
+    {
+      "design_doc": "design/planets/population.md",
+      "feature": "Conquered Populations: Morale penalty and production reduction until stabilized"
+    },
+    {
+      "design_doc": "design/planets/population.md",
+      "feature": "Population voting: Council votes proportional to population for diplomatic victory"
+    },
+    {
+      "design_doc": "design/planets/special-planets.md",
+      "feature": "Guardian ship combat: Must defeat Guardian before colonizing Orion - no guardian battle implementation visible"
+    },
+    {
+      "design_doc": "design/planets/special-planets.md",
+      "feature": "Artifacts World one-time tech bonus: First empire to colonize receives a random technology"
+    },
+    {
+      "design_doc": "design/planets/special-planets.md",
+      "feature": "Stellar Converter planet destruction: Transforms habitable planet into asteroid field"
+    },
+    {
+      "design_doc": "design/planets/planet-types.md",
+      "feature": "Terraforming environment upgrade: Some advanced techs can improve environment type (e.g., barren → minimal)"
+    }
+  ],
+  "not_in_design": [
+    {
+      "source_file": "src/game/systems/buildings.ts",
+      "feature": "Stellar Converter gas giant conversion: convertGasGiantToTerran() converts gas giants to terran worlds after 50 turns. Design mentions Stellar Converter destroys planets but doesn't specify gas giant terraforming."
+    },
+    {
+      "source_file": "src/game/systems/buildings.ts",
+      "feature": "canBuildStellarConverter() restricts Stellar Converter to gas giants only. Design doesn't specify this restriction."
+    },
+    {
+      "source_file": "src/game/systems/population.ts",
+      "feature": "NEBULA_CAPACITY_BONUS = 15: Nebula systems grant +15 population capacity. Not found in planets design docs (may be in galaxy generation docs)."
+    },
+    {
+      "source_file": "src/game/systems/population.ts",
+      "feature": "Soil enrichment levels (0/1/2) with +25/+50 population bonus. Not found in planets design docs."
+    },
+    {
+      "source_file": "src/game/systems/population.ts",
+      "feature": "Morale modifier formula: 0.5 + (morale / 200). Design mentions morale affects conquered planets but doesn't specify this formula."
+    },
+    {
+      "source_file": "src/game/systems/population.ts",
+      "feature": "Food/farming system: processFoodAndStarvation(), farmers, ENV_FERTILITY. Design docs for planets mention no separate food system ('❌ Farms/Hydroponic facilities (no separate food system)')."
+    },
+    {
+      "source_file": "src/game/systems/production.ts",
+      "feature": "Planetology TL scaling for population labor output: basePopOutput() scales from 0.5 to 2.0 BC based on planetologyTL 0-50. Design says 0.5 BC fixed."
+    },
+    {
+      "source_file": "src/game/systems/production.ts",
+      "feature": "Factory efficiency multiplier (factoryEfficiencyMultiplier) for races like Mice. Referenced in code but not in planets design docs."
+    },
+    {
+      "source_file": "src/ui/screens/ColoniesScreen.ts",
+      "feature": "TRANSFER_BC action for moving credits from empire reserve to planet production. Not specified in planets production design."
+    }
+  ]
+}

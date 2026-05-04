@@ -17,7 +17,7 @@ import { initialState } from '../../src/game/initialState';
 import { startGame, NewGameOptions } from '../../src/game/actions/newGame';
 import { nextTurn } from '../../src/game/actions/turn';
 import { calculateBaseProduction } from '../../src/game/systems/production';
-import { calculateGrowth } from '../../src/game/systems/growth';
+import { calculatePopulationGrowth, makePopulationContext, DEFAULT_TECH_STATE } from '../../src/game/systems/population';
 import { GameState, Planet } from '../../src/game/state';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -28,7 +28,7 @@ const DEFAULT_OPTIONS: NewGameOptions = {
   opponents: 1,
   difficulty: 'normal',
   galaxyAge: 'average',
-  raceId: 'humans',
+  raceId: 'hamsters',
   empireColor: '#00aaff',
   emperorName: 'Emperor Test',
   homeworldName: 'Terra',
@@ -290,13 +290,16 @@ describe('Game Loop Integration', () => {
     });
 
     it('planet below max population has positive growth delta', () => {
-      const playerPlanets = getPlayerPlanets(store.getState());
+      const state = store.getState();
+      const playerPlanets = getPlayerPlanets(state);
       const planet = playerPlanets[0];
+      const empire = state.empires.byId[planet.ownerId!];
 
       // Growth system requires population below max
       if (planet.population < planet.maxPopulation) {
-        const growth = calculateGrowth(planet);
-        expect(growth).toBeGreaterThanOrEqual(0);
+        const ctx = makePopulationContext(empire.raceId, DEFAULT_TECH_STATE);
+        const result = calculatePopulationGrowth(planet, ctx);
+        expect(result.totalGrowth).toBeGreaterThanOrEqual(0);
       }
     });
 
@@ -334,11 +337,14 @@ describe('Game Loop Integration', () => {
     });
 
     it('population growth rate is non-negative for content morale', () => {
-      const playerPlanets = getPlayerPlanets(store.getState());
+      const state = store.getState();
+      const playerPlanets = getPlayerPlanets(state);
       for (const planet of playerPlanets) {
         if (planet.morale !== 'rebellion') {
-          const growth = calculateGrowth(planet);
-          expect(growth).toBeGreaterThanOrEqual(0);
+          const empire = state.empires.byId[planet.ownerId!];
+          const ctx = makePopulationContext(empire.raceId, DEFAULT_TECH_STATE);
+          const result = calculatePopulationGrowth(planet, ctx);
+          expect(result.totalGrowth).toBeGreaterThanOrEqual(0);
         }
       }
     });

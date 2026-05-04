@@ -159,7 +159,7 @@ function makeEmpire(
 ): Empire {
   return {
     id,
-    raceId: 'humans',
+    raceId: 'hamsters',
     name: `Empire ${id}`,
     isPlayer,
     credits: 1000,
@@ -330,7 +330,7 @@ function makeAIEmpire(id: string, personality?: Partial<AIPersonality>): AIEmpir
 
   return {
     id,
-    raceId: 'humans',
+    raceId: 'hamsters',
     empireName: `AI ${id}`,
     personality: defaultPersonality,
     strategy: defaultStrategy,

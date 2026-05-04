@@ -230,10 +230,11 @@ describe('DEF production accumulates toward building queue', () => {
     const planet = planetWithMissileBaseQueued(150); // 150 cost, none paid
     const state = makeMinimalState([planet], [makeEmpire()]);
 
-    const nextState = accumulateBuildingProgress(state, 'p1', 50);
-    const updatedPlanet = nextState.planets.byId['p1'];
+    const result = accumulateBuildingProgress(state, 'p1', 50);
+    const updatedPlanet = result.state.planets.byId['p1'];
 
     expect(updatedPlanet.buildQueue[0].costRemaining).toBe(100);
+    expect(result.overflow).toBe(0);
   });
 
   it('accumulates across multiple turns (partial payments)', () => {
@@ -242,11 +243,13 @@ describe('DEF production accumulates toward building queue', () => {
     let state = makeMinimalState([planet], [empire]);
 
     // Turn 1: pay 60
-    state = accumulateBuildingProgress(state, 'p1', 60);
+    let result = accumulateBuildingProgress(state, 'p1', 60);
+    state = result.state;
     expect(state.planets.byId['p1'].buildQueue[0].costRemaining).toBe(90);
 
     // Turn 2: pay 60 more
-    state = accumulateBuildingProgress(state, 'p1', 60);
+    result = accumulateBuildingProgress(state, 'p1', 60);
+    state = result.state;
     expect(state.planets.byId['p1'].buildQueue[0].costRemaining).toBe(30);
   });
 
@@ -255,28 +258,33 @@ describe('DEF production accumulates toward building queue', () => {
     const state = makeMinimalState([planet], [makeEmpire()]);
 
     // Pay 200 BC (way more than the 30 remaining)
-    const nextState = accumulateBuildingProgress(state, 'p1', 200);
-    const updatedPlanet = nextState.planets.byId['p1'];
+    const result = accumulateBuildingProgress(state, 'p1', 200);
+    const updatedPlanet = result.state.planets.byId['p1'];
 
     // costRemaining should be 0 and building removed (complete)
     expect(updatedPlanet.buildQueue).toHaveLength(0);
     expect(updatedPlanet.missileBases).toBe(1);
+    // Overflow: 200 paid - 30 needed = 170 BC
+    expect(result.overflow).toBe(170);
   });
 
   it('no-ops when build queue is empty', () => {
     const planet = makePlanet({ buildQueue: [] });
     const state = makeMinimalState([planet], [makeEmpire()]);
 
-    const nextState = accumulateBuildingProgress(state, 'p1', 100);
-    expect(nextState).toBe(state); // same reference — pure no-op
+    const result = accumulateBuildingProgress(state, 'p1', 100);
+    expect(result.state).toBe(state); // same reference — pure no-op
+    // All BC overflows when queue is empty
+    expect(result.overflow).toBe(100);
   });
 
   it('no-ops for uncolonized planets', () => {
     const planet = makePlanet({ isColonized: false, ownerId: null });
     const state = makeMinimalState([planet], [makeEmpire()]);
 
-    const nextState = accumulateBuildingProgress(state, 'p1', 100);
-    expect(nextState).toBe(state);
+    const result = accumulateBuildingProgress(state, 'p1', 100);
+    expect(result.state).toBe(state);
+    expect(result.overflow).toBe(0);
   });
 });
 
@@ -289,11 +297,12 @@ describe('Building completes when cost accumulated', () => {
     const planet = planetWithMissileBaseQueued(150);
     const state = makeMinimalState([planet], [makeEmpire()]);
 
-    const nextState = accumulateBuildingProgress(state, 'p1', 150);
-    const updatedPlanet = nextState.planets.byId['p1'];
+    const result = accumulateBuildingProgress(state, 'p1', 150);
+    const updatedPlanet = result.state.planets.byId['p1'];
 
     expect(updatedPlanet.missileBases).toBe(1);
     expect(updatedPlanet.buildQueue).toHaveLength(0);
+    expect(result.overflow).toBe(0);
   });
 
   it('missile base count increments (multiple bases)', () => {
@@ -342,8 +351,8 @@ describe('Building completes when cost accumulated', () => {
     const planet = planetWithMissileBaseQueued(150);
     const state = makeMinimalState([planet], [makeEmpire()]);
 
-    const nextState = accumulateBuildingProgress(state, 'p1', 150);
-    expect(nextState.planets.byId['p1'].buildQueue).toHaveLength(0);
+    const result = accumulateBuildingProgress(state, 'p1', 150);
+    expect(result.state.planets.byId['p1'].buildQueue).toHaveLength(0);
   });
 
   it('processAllBuildingConstruction completes buildings across all planets', () => {
@@ -376,10 +385,36 @@ describe('Building completes when cost accumulated', () => {
     const empire = makeEmpire();
     const state = makeMinimalState([planet1, planet2], [empire]);
 
-    const nextState = processAllBuildingConstruction(state, { p1: 150, p2: 150 });
+    const result = processAllBuildingConstruction(state, { p1: 150, p2: 150 });
 
-    expect(nextState.planets.byId['p1'].missileBases).toBe(1);
-    expect(nextState.planets.byId['p2'].missileBases).toBe(1);
+    expect(result.state.planets.byId['p1'].missileBases).toBe(1);
+    expect(result.state.planets.byId['p2'].missileBases).toBe(1);
+    expect(result.overflowByEmpire).toEqual({});
+  });
+
+  it('processAllBuildingConstruction returns overflow grouped by empire', () => {
+    const planet1 = makePlanet({
+      id: 'p1',
+      ownerId: 'empire1',
+      buildQueue: [
+        {
+          type: 'defense',
+          targetId: 'missile_base',
+          targetName: 'Missile Base',
+          costTotal: 150,
+          costRemaining: 50, // only 50 BC needed
+          turnsRemaining: 1,
+        },
+      ],
+    });
+    const empire = makeEmpire();
+    const state = makeMinimalState([planet1], [empire]);
+
+    // Pay 100 BC when only 50 needed → 50 BC overflow
+    const result = processAllBuildingConstruction(state, { p1: 100 });
+
+    expect(result.state.planets.byId['p1'].missileBases).toBe(1);
+    expect(result.overflowByEmpire).toEqual({ empire1: 50 });
   });
 });
 

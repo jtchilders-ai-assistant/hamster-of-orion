@@ -335,15 +335,24 @@ export class FleetsScreen {
   // ── Event handlers ────────────────────────────────────────────────────────
 
   private handleKeyDown(e: KeyboardEvent): void {
-    if (e.key === 'Escape' || e.key === 'Esc') {
-      e.preventDefault();
-      this.handleClose();
+    // ESC is handled globally by app.ts — no local override needed.
+    // Screen-specific shortcuts can be added here if needed.
+    // Per interaction-spec.md §2.4 Fleet Screen shortcuts:
+    // M = Move, C = Cancel Orders, S = Split Fleet, J = Join/Merge, X = Explore, P = Patrol
+    switch (e.key.toLowerCase()) {
+      case 'm':
+        // TODO: Enter destination selection mode
+        console.debug('[FleetsScreen] M pressed — move mode');
+        break;
+      case 's':
+        // TODO: Open split fleet dialog
+        console.debug('[FleetsScreen] S pressed — split fleet');
+        break;
     }
   }
 
   private handleClose(): void {
-    this.hide();
-    this.store.dispatch({ type: 'SHOW_SCREEN', payload: { screen: 'galaxy' } });
+    this.store.dispatch({ type: 'NAVIGATE', payload: { screen: 'galaxy' } });
   }
 
   private handleSpecs(): void {

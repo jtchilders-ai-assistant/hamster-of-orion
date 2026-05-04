@@ -43,6 +43,17 @@ export interface GalaxyConfig {
   clusterCountMax: number;
 }
 
+/**
+ * Minimum homeworld distance values.
+ *
+ * NOTE: The design spec has two sets of values:
+ * - Section 1.2 JSON config: 150/175/200/225 (hardcoded, what the code used)
+ * - Section 8.4 formula: diagonal × 0.25 = 160/224/272/320 (theoretical)
+ *
+ * The formula-derived distances are too strict for reliable homeworld placement
+ * with the given star counts. Using the config values which were tested and working.
+ * See design/galaxy/generation-algorithm.md §1.2 galaxy_config block.
+ */
 const GALAXY_CONFIGS: Record<GalaxySize, GalaxyConfig> = {
   small: {
     starCount: 24, width: 500, height: 400,
@@ -495,10 +506,13 @@ function placeOrion(stars: InternalStar[], config: GalaxyConfig): void {
   best.name = 'Orion';
   best.color = 'yellow';
   best.isOrion = true;
+  // Per design/planets/generation-tables.md §10.2 Forced Overrides:
+  // Orion is 'dead' environment (not 'gaia' — Gaia never spawns naturally),
+  // Huge size with base population 150, Ultra Rich resources.
   best.planet = {
-    environment: 'gaia',
+    environment: 'dead',
     size: 'huge',
-    basePop: 100,
+    basePop: 150,
     resources: 'ultra_rich',
     researchMultiplier: 4.0,
     hasGuardian: true,

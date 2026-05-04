@@ -25,7 +25,19 @@ const store = new Store<GameState>(rootReducer, startingState);
 // Expose debug API in dev mode
 initDebugHooks(store);
 
-// Start UI
-new Commander(document.getElementById('app')!, store);
+// Start UI — with full error tracking
+try {
+  const appEl = document.getElementById('app');
+  console.log('[main] #app element:', appEl ? 'found' : 'NOT FOUND');
+  if (!appEl) {
+    console.error('[main] FATAL: #app element not in DOM!');
+    document.body.innerHTML = '<h1 style="color:red;padding:20px;">FATAL: #app element not found in HTML</h1>';
+  }
+  new Commander(appEl!, store);
+  console.log('[main] Commander created successfully');
+} catch (err) {
+  console.error('[main] FATAL during Commander creation:', err);
+  document.body.innerHTML = `<h1 style="color:red;padding:20px;">FATAL: ${err}</h1>`;
+}
 
 console.log('✅ Hamster of Orion — Ready!');

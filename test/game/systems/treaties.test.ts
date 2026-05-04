@@ -523,10 +523,11 @@ describe('hasTreaty', () => {
 // ── Tests: computeBaseTradeIncome ────────────────────────────────────────────
 
 describe('computeBaseTradeIncome', () => {
-  it('computes (creditPerTurnA + creditPerTurnB) / 20', () => {
+  it('computes TRADE_BASE_OFFSET + (creditPerTurnA + creditPerTurnB) / 20', () => {
     const a = makeEmpire('a', {}, 'rats', 100);
     const b = makeEmpire('b', {}, 'rats', 60);
-    expect(computeBaseTradeIncome(a, b)).toBe((100 + 60) / 20);
+    // Formula: 5 + (100 + 60) / 20 = 5 + 8 = 13
+    expect(computeBaseTradeIncome(a, b)).toBe(5 + (100 + 60) / 20);
   });
 
   it('is symmetric', () => {

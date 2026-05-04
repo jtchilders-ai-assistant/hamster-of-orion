@@ -88,7 +88,12 @@
         "treatyReliability": 0.95,
         "declaresWarFirst": false
       },
-      "shipPrefix": "HSS"
+      "shipPrefix": "HSS",
+      "leaderNames": {
+        "male": ["Whiskers", "Nibbles", "Pip", "Chester", "Fuzzy", "Buttons"],
+        "female": ["Daisy", "Peanut", "Cinnamon", "Honey", "Marble", "Biscuit"],
+        "titles": ["Ambassador", "Diplomat-Prime", "Chief Negotiator"]
+      }
     },
     {
       "id": "ants",
@@ -182,7 +187,12 @@
         "treatyReliability": 1.0,
         "declaresWarFirst": true
       },
-      "shipPrefix": "CAS"
+      "shipPrefix": "CAS",
+      "leaderNames": {
+        "coordinators": ["Efficiency-Node-Alpha", "Production-Nexus-12", "War-Coordinator-Prime"],
+        "queens": ["Colony-Founder-92", "Genetic-Template-Omega", "Egg-Layer-3847"],
+        "titles": ["Coordinator", "Nexus-Prime", "Hive-Administrator"]
+      }
     },
     {
       "id": "mice",
@@ -291,7 +301,12 @@
         "declaresWarFirst": false,
         "volatilityFlag": true
       },
-      "shipPrefix": "MCS"
+      "shipPrefix": "MCS",
+      "leaderNames": {
+        "male": ["Circuit", "Protocol", "Algorithm", "Binary", "Vector", "Nexus"],
+        "female": ["Matrix", "Syntax", "Compiler", "Data", "Network", "Logic"],
+        "titles": ["Chief Engineer", "Architect-Prime", "System Administrator"]
+      }
     },
     {
       "id": "rats",
@@ -386,7 +401,12 @@
         "treatyReliability": 0.9,
         "declaresWarFirst": false
       },
-      "shipPrefix": "RSS"
+      "shipPrefix": "RSS",
+      "leaderNames": {
+        "male": ["Professor Theorem", "Doctor Hypothesis", "Scholar Paradigm", "Sage Equation"],
+        "female": ["Doctor Axiom", "Professor Theory", "Philosopher Quantum", "Savant Logic"],
+        "titles": ["Chief Scientist", "Research Director", "Academy Head"]
+      }
     },
     {
       "id": "rabbits",
@@ -482,7 +502,12 @@
         "treatyReliability": 0.75,
         "declaresWarFirst": false
       },
-      "shipPrefix": "RCS"
+      "shipPrefix": "RCS",
+      "leaderNames": {
+        "male": ["Warren", "Clover", "Thicket", "Meadow", "Burrow", "Hazel"],
+        "female": ["Blossom", "Garden", "Willow", "Daisy", "Heather", "Fern"],
+        "titles": ["Warren-Master", "Brood-Leader", "Population Director"]
+      }
     },
     {
       "id": "hermit_crabs",
@@ -612,7 +637,12 @@
         "treatyReliability": 0.6,
         "declaresWarFirst": false
       },
-      "shipPrefix": "HCS"
+      "shipPrefix": "HCS",
+      "leaderNames": {
+        "male": ["Quartz", "Obsidian", "Geode", "Basalt", "Granite", "Feldspar"],
+        "female": ["Crystal", "Diamond", "Pearl", "Opal", "Jade", "Amethyst"],
+        "titles": ["Elder Crystal", "Stone-Shaper", "Shell-Lord"]
+      }
     },
     {
       "id": "guinea_pigs",
@@ -701,7 +731,12 @@
         "treatyReliability": 0.5,
         "declaresWarFirst": true
       },
-      "shipPrefix": "GPS"
+      "shipPrefix": "GPS",
+      "leaderNames": {
+        "male": ["Ironhide", "Battleheart", "Grimfang", "Stonefoot", "Thundercharge"],
+        "female": ["Steelfur", "Wartooth", "Bloodwhisker", "Rockmane", "Shieldmaiden"],
+        "titles": ["Warlord", "Battle-Commander", "Champion"]
+      }
     },
     {
       "id": "ferrets",
@@ -725,6 +760,7 @@
         "espionage": 10,
         "diplomacy": -30
       },
+      "startingRelations": "blood_enemies_all",
       "researchFieldBonuses": {},
       "researchFieldPenalties": {},
       "canConductEspionage": true,
@@ -786,7 +822,12 @@
         "treatyReliability": 0.7,
         "declaresWarFirst": true
       },
-      "shipPrefix": "FHS"
+      "shipPrefix": "FHS",
+      "leaderNames": {
+        "male": ["Fang", "Talon", "Blade", "Strike", "Hunter", "Razor"],
+        "female": ["Slash", "Pierce", "Venom", "Shadow", "Claw", "Swift"],
+        "titles": ["Huntmaster", "Apex Predator", "First Strike"]
+      }
     },
     {
       "id": "budgies",
@@ -876,7 +917,12 @@
         "treatyReliability": 0.9,
         "declaresWarFirst": false
       },
-      "shipPrefix": "FAS"
+      "shipPrefix": "FAS",
+      "leaderNames": {
+        "male": ["Skydancer", "Cloudstriker", "Windcaller", "Galeforce", "Stormwing"],
+        "female": ["Breezewhisper", "Draftrider", "Updraft", "Skyweaver", "Zephyr"],
+        "titles": ["Wing-Commander", "Flight-Master", "Sky-Admiral"]
+      }
     },
     {
       "id": "chameleons",
@@ -974,7 +1020,12 @@
         "treatyReliability": 0.2,
         "declaresWarFirst": false
       },
-      "shipPrefix": "CSS"
+      "shipPrefix": "CSS",
+      "leaderNames": {
+        "male": ["Shade", "Whisper", "Phantom", "Eclipse", "Silhouette", "Mirage"],
+        "female": ["Shadow", "Umbra", "Specter", "Veil", "Haze", "Mist"],
+        "titles": ["Director", "Shadow-Master", "Intelligence Chief"]
+      }
     }
   ]
 }

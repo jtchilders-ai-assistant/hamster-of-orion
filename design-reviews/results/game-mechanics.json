@@ -1,0 +1,252 @@
+{
+  "area": "game-mechanics",
+  "name": "Core Game Mechanics",
+  "reviewer": "orion-reviewer-9",
+  "timestamp": "2026-05-03T03:39:00.000Z",
+  "summary": "Overall good alignment between design and implementation for core mechanics. Turn structure follows the 12-phase design. Victory conditions are implemented but include an extra 'conquest' type not in design. Random events system has solid infrastructure but many event effects are stubbed. Difficulty modifiers are partially implemented. Key issues: starting year mismatch (2500 vs 2623), conquest victory not in design, Council voting interval mismatch (25 turns design vs undetermined in code), several random event effects are deferred/stubbed.",
+  "matches": [
+    {
+      "design_doc": "design/game-mechanics/turn-structure.md",
+      "source_file": "src/game/systems/turn.ts",
+      "description": "12-phase turn structure correctly implemented: Income & Maintenance, Production, Research, Population Growth, Diplomacy, Movement, Combat Resolution, Ground Combat & Colonization, Events, Victory Check, AI Turn, End Turn"
+    },
+    {
+      "design_doc": "design/game-mechanics/turn-structure.md",
+      "source_file": "src/game/systems/turn.ts",
+      "description": "Turn counter increments by 1 each turn as specified (newTurn = state.turn + 1)"
+    },
+    {
+      "design_doc": "design/game-mechanics/victory-conditions.md",
+      "source_file": "src/game/systems/victoryConditions.ts",
+      "description": "Military Conquest victory implemented correctly: only one living empire remains with either colonies or colony ships"
+    },
+    {
+      "design_doc": "design/game-mechanics/victory-conditions.md",
+      "source_file": "src/game/systems/victoryConditions.ts",
+      "description": "Diplomatic victory requires 2/3 (66.67%) majority vote as specified in design"
+    },
+    {
+      "design_doc": "design/game-mechanics/random-events.md",
+      "source_file": "src/game/systems/events.ts",
+      "description": "Base event probability formula matches design: BASE_EVENT_CHANCE (0.03) + turn * TURN_PROBABILITY_INCREMENT (0.001), capped at MAX_EVENT_CHANCE (0.15)"
+    },
+    {
+      "design_doc": "design/game-mechanics/random-events.md",
+      "source_file": "src/game/systems/events.ts",
+      "description": "Category weights match design: space_monsters:15, discoveries:25, disasters:30, diplomatic:15, opportunities:15"
+    },
+    {
+      "design_doc": "design/game-mechanics/difficulty.md",
+      "source_file": "src/game/systems/events.ts",
+      "description": "Event frequency multiplier uses difficulty-based modifiers via getEventFrequencyMultiplier()"
+    },
+    {
+      "design_doc": "design/game-mechanics/difficulty.md",
+      "source_file": "src/game/actions/newGame.ts",
+      "description": "Five difficulty levels supported: simple, easy, average, hard, impossible (plus custom)"
+    },
+    {
+      "design_doc": "design/game-mechanics/turn-structure.md",
+      "source_file": "src/game/persistence.ts",
+      "description": "Save system implemented with autosave capability and versioned save envelopes for future migrations"
+    },
+    {
+      "design_doc": "design/game-mechanics/turn-structure.md",
+      "source_file": "src/game/initialState.ts",
+      "description": "Game speed options implemented: 'normal' default with settings for animation speed"
+    }
+  ],
+  "mismatches": [
+    {
+      "severity": "medium",
+      "design_doc": "design/game-mechanics/turn-structure.md",
+      "design_spec": "Starting: Year 2623 (lore: 123 years post-Awakening). Each Turn: +1 year. Display: 'Year 2623 - Turn 1'",
+      "source_file": "src/game/systems/turn.ts",
+      "source_line": 541,
+      "actual_impl": "Starting year is 2500 (newYear = 2500 + newTurn), resulting in Year 2501 on Turn 1",
+      "recommendation": "Change to newYear = 2622 + newTurn to match design starting year of 2623 on Turn 1"
+    },
+    {
+      "severity": "high",
+      "design_doc": "design/game-mechanics/victory-conditions.md",
+      "design_spec": "Hamster of Orion (following MOO1) has **two victory conditions**: 1. Council Election Victory, 2. Military Conquest. There is NO research/transcendence victory in MOO1.",
+      "source_file": "src/game/systems/victoryConditions.ts",
+      "source_line": 17,
+      "actual_impl": "Three victory types defined: 'diplomatic', 'military', 'conquest'. The 'conquest' type (controlling 3+ star systems) is not in the design document.",
+      "recommendation": "Remove 'conquest' victory type as it's not part of the MOO1-faithful design. Only diplomatic and military victories should exist."
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/game-mechanics/victory-conditions.md",
+      "design_spec": "Council meets every **25 turns** to hold an election",
+      "source_file": "src/game/systems/victoryConditions.ts",
+      "source_line": 108,
+      "actual_impl": "Uses isCouncilTurn(state.turn) but the COUNCIL_INTERVAL constant is defined in council.ts, not verified to be 25",
+      "recommendation": "Verify COUNCIL_INTERVAL in council.ts is set to 25 turns as per design spec"
+    },
+    {
+      "severity": "high",
+      "design_doc": "design/game-mechanics/victory-conditions.md",
+      "design_spec": "The High Council forms when **50% or more** of habitable planets in the galaxy are colonized",
+      "source_file": "src/game/systems/victoryConditions.ts",
+      "source_line": 108,
+      "actual_impl": "Only checks state.highCouncil?.isActive without verifying the 50% colonization threshold logic exists",
+      "recommendation": "Ensure council.ts implements the 50% colonization threshold for council formation as per design"
+    },
+    {
+      "severity": "low",
+      "design_doc": "design/game-mechanics/turn-structure.md",
+      "design_spec": "Phase 9: Events - Random Events (10% chance)",
+      "source_file": "src/game/systems/turn.ts",
+      "source_line": 468,
+      "actual_impl": "processPhaseEvents is a stub that always returns 'No random events this turn' - does not call processRandomEvents from events.ts",
+      "recommendation": "Integrate processRandomEvents(state) from events.ts into processPhaseEvents"
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/game-mechanics/difficulty.md",
+      "design_spec": "Starting Conditions table: Simple (50 pop, 40 factories, 100 BC), Easy (45 pop, 35 factories, 50 BC), Average (40 pop, 30 factories, 0 BC), Hard/Impossible (40 pop, 30 factories, 0 BC)",
+      "source_file": "src/game/actions/newGame.ts",
+      "source_line": 218,
+      "actual_impl": "All difficulties start with 250 BC (credits: 250). No difficulty-based starting conditions are applied for population, factories, or reserve BC.",
+      "recommendation": "Implement difficulty-based starting conditions from the design spec table for player homeworld"
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/game-mechanics/difficulty.md",
+      "design_spec": "AI empires always start with Average-level conditions (40 pop, 30 factories, 1 scout)",
+      "source_file": "src/game/actions/newGame.ts",
+      "source_line": 271,
+      "actual_impl": "AI empires start with 250 BC same as player, without specific population/factory starting conditions",
+      "recommendation": "Implement AI starting conditions to match design spec (40 pop, 30 factories, 1 scout)"
+    },
+    {
+      "severity": "low",
+      "design_doc": "design/game-mechanics/random-events.md",
+      "design_spec": "Space monster stats: Cosmic Blob (500 HP, regen 15/round), Crystal Horror (400 HP, 25% beam reflection), Void Wyrm (750 HP)",
+      "source_file": "src/game/systems/events.ts",
+      "source_line": 230,
+      "actual_impl": "Monster spawn events use 'spawn_monster' effect type which is deferred/stubbed - no actual monster stats or combat implementation",
+      "recommendation": "Implement monster spawning and combat with stats from design spec"
+    },
+    {
+      "severity": "low",
+      "design_doc": "design/game-mechanics/random-events.md",
+      "design_spec": "Guardian of Orion stats: HP 3000, Attack 12, Defense 10, Shield Class XV, multiple weapons",
+      "source_file": "src/game/systems/events.ts",
+      "source_line": 1,
+      "actual_impl": "Guardian of Orion is not implemented in the events system (correctly noted as 'NOT a random event' in design, but implementation location unclear)",
+      "recommendation": "Verify Guardian of Orion is implemented somewhere in the combat/fleet systems with correct stats"
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/game-mechanics/difficulty.md",
+      "design_spec": "Production Modifiers: Simple (Player 1.25, AI 0.75), Easy (1.10, 0.90), Average (1.00, 1.00), Hard (0.90, 1.25), Impossible (0.75, 1.50)",
+      "source_file": "src/game/systems/turn.ts",
+      "source_line": 98,
+      "actual_impl": "buildProductionContext returns DEFAULT_PRODUCTION_CONTEXT without any difficulty-based modifiers",
+      "recommendation": "Implement difficulty-based production modifiers in buildProductionContext"
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/game-mechanics/difficulty.md",
+      "design_spec": "Research Modifiers: AI Tech Cost varies by difficulty (Simple 1.50x, Average 1.00x, Impossible 0.50x)",
+      "source_file": "src/game/systems/turn.ts",
+      "source_line": 197,
+      "actual_impl": "processPhaseResearch does not apply difficulty-based tech cost modifiers to AI empires",
+      "recommendation": "Apply difficulty-based research cost modifiers for AI empires as per design spec"
+    }
+  ],
+  "missing_from_code": [
+    {
+      "design_doc": "design/game-mechanics/turn-structure.md",
+      "feature": "Bankruptcy mechanic: Ships scrap randomly until balanced when negative BC, with morale penalties and diplomatic reputation damage"
+    },
+    {
+      "design_doc": "design/game-mechanics/turn-structure.md",
+      "feature": "Ship maintenance calculation: Ships, buildings, spies cost upkeep (currently always 0)"
+    },
+    {
+      "design_doc": "design/game-mechanics/turn-structure.md",
+      "feature": "Quick Combat auto-resolve option for tactical battles"
+    },
+    {
+      "design_doc": "design/game-mechanics/turn-structure.md",
+      "feature": "Fleet interception: Fast fleets can intercept slow ones during movement phase"
+    },
+    {
+      "design_doc": "design/game-mechanics/victory-conditions.md",
+      "feature": "Council defiance mechanic: If you lose the Council vote but refuse to accept, all other races immediately declare war"
+    },
+    {
+      "design_doc": "design/game-mechanics/victory-conditions.md",
+      "feature": "Guardian of Orion respawn: Respawns after 50 turns if destroyed unless Orion is colonized"
+    },
+    {
+      "design_doc": "design/game-mechanics/random-events.md",
+      "feature": "Multi-turn events: Plague spreading (3-5 turns), Comet countdown (5 turns), Supernova warning (5 turns)"
+    },
+    {
+      "design_doc": "design/game-mechanics/random-events.md",
+      "feature": "Event mitigation via technology: Bio Toxin Antidote cures plague, Battle Computer V reduces virus duration"
+    },
+    {
+      "design_doc": "design/game-mechanics/random-events.md",
+      "feature": "Space monster roaming behavior: Cosmic Blob and Crystal Horror move toward nearest colony each turn"
+    },
+    {
+      "design_doc": "design/game-mechanics/random-events.md",
+      "feature": "Ancient Derelict choice-based event with 60% tech discovery / 25% nothing / 15% trap outcomes"
+    },
+    {
+      "design_doc": "design/game-mechanics/difficulty.md",
+      "feature": "AI Starting Tech Bonuses: Hard (2 bonus techs), Impossible (4 bonus techs, starting tier 2)"
+    },
+    {
+      "design_doc": "design/game-mechanics/difficulty.md",
+      "feature": "Anti-Player Coalition mechanic: AI empires coordinate against leading player at higher difficulties"
+    },
+    {
+      "design_doc": "design/game-mechanics/difficulty.md",
+      "feature": "Guardian of Orion difficulty scaling: HP ranges from 16,000 (Simple) to 48,000 (Impossible)"
+    },
+    {
+      "design_doc": "design/game-mechanics/difficulty.md",
+      "feature": "Council formation threshold varies by difficulty: 60% (Simple) to 40% (Impossible)"
+    },
+    {
+      "design_doc": "design/game-mechanics/difficulty.md",
+      "feature": "Ship maintenance modifiers by difficulty: Player 0.75x (Simple) to 1.25x (Impossible)"
+    },
+    {
+      "design_doc": "design/game-mechanics/difficulty.md",
+      "feature": "Combat modifiers: Player attack/defense bonuses (+10% on Simple to -10% on Impossible)"
+    },
+    {
+      "design_doc": "design/game-mechanics/difficulty.md",
+      "feature": "Population growth modifiers by difficulty: Player 1.25x (Simple) to 0.75x (Impossible)"
+    }
+  ],
+  "not_in_design": [
+    {
+      "source_file": "src/game/systems/victoryConditions.ts",
+      "feature": "Conquest victory type: An empire wins by controlling 3+ star systems (CONQUEST_SYSTEM_THRESHOLD = 3). This is not part of the MOO1-faithful design which only has diplomatic and military victories."
+    },
+    {
+      "source_file": "src/game/initialState.ts",
+      "feature": "Game version field (version: '0.1.0') - useful but not specified in design"
+    },
+    {
+      "source_file": "src/game/initialState.ts",
+      "feature": "Playtime tracking (playTime: 0) - useful but not specified in design"
+    },
+    {
+      "source_file": "src/game/initialState.ts",
+      "feature": "colorBlindMode and highContrast accessibility settings - beneficial additions not in original design"
+    },
+    {
+      "source_file": "src/game/actions/newGame.ts",
+      "feature": "'custom' difficulty level allowing individual modifier adjustment - design mentions this but implementation details differ"
+    }
+  ]
+}

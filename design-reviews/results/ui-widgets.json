@@ -1,0 +1,275 @@
+{
+  "area": "ui-widgets",
+  "name": "UI Widgets & Tactical Systems",
+  "reviewer": "orion-reviewer-8",
+  "timestamp": "2026-05-03T03:39:00.000Z",
+  "summary": "Good overall implementation with some mismatches between design docs and code. CommandBar includes a REPORTS button (F7) that was explicitly removed from the design spec. CombatScreen implements most tactical combat features but is missing some UI elements from the design. GroundCombatScreen closely follows the design. EspionagePanel implements spy mechanics but differs from design in allocation model. InfoPanel and sprites.ts are well-aligned with their purposes.",
+  "matches": [
+    {
+      "design_doc": "design/ui-ux/tactical-combat-ui.md",
+      "source_file": "src/ui/screens/CombatScreen.ts",
+      "description": "15x15 hex grid size matches design spec (GRID_COLS = 15, GRID_ROWS = 15)"
+    },
+    {
+      "design_doc": "design/ui-ux/tactical-combat-ui.md",
+      "source_file": "src/ui/screens/CombatScreen.ts",
+      "description": "Range brackets match design (Point Blank ≤1, Close ≤4, Medium ≤8, Long ≤15)"
+    },
+    {
+      "design_doc": "design/ui-ux/tactical-combat-ui.md",
+      "source_file": "src/ui/screens/CombatScreen.ts",
+      "description": "HP bar colors match design: green (>50%), yellow (25-50%), red (<25%)"
+    },
+    {
+      "design_doc": "design/ui-ux/tactical-combat-ui.md",
+      "source_file": "src/ui/screens/CombatScreen.ts",
+      "description": "Initiative strip implemented showing turn order sorted by speed"
+    },
+    {
+      "design_doc": "design/ui-ux/tactical-combat-ui.md",
+      "source_file": "src/ui/screens/CombatScreen.ts",
+      "description": "WAIT and DONE buttons implemented per design spec"
+    },
+    {
+      "design_doc": "design/ui-ux/tactical-combat-ui.md",
+      "source_file": "src/ui/screens/CombatScreen.ts",
+      "description": "Combat speed controls implemented (Slow/Normal/Fast) with multipliers"
+    },
+    {
+      "design_doc": "design/ui-ux/tactical-combat-ui.md",
+      "source_file": "src/ui/screens/CombatScreen.ts",
+      "description": "Auto-resolve button implemented per design"
+    },
+    {
+      "design_doc": "design/ui-ux/tactical-combat-ui.md",
+      "source_file": "src/ui/screens/CombatScreen.ts",
+      "description": "Floating damage numbers implemented with upward drift animation"
+    },
+    {
+      "design_doc": "design/ui-ux/tactical-combat-ui.md",
+      "source_file": "src/ui/screens/CombatScreen.ts",
+      "description": "Ship destruction explosion effect implemented with particle burst"
+    },
+    {
+      "design_doc": "design/ui-ux/ground-combat-ui.md",
+      "source_file": "src/ui/screens/GroundCombatScreen.ts",
+      "description": "Three-phase structure matches design: planning → resolving → result"
+    },
+    {
+      "design_doc": "design/ui-ux/ground-combat-ui.md",
+      "source_file": "src/ui/screens/GroundCombatScreen.ts",
+      "description": "Troop deployment slider implemented per design (1 to max available)"
+    },
+    {
+      "design_doc": "design/ui-ux/ground-combat-ui.md",
+      "source_file": "src/ui/screens/GroundCombatScreen.ts",
+      "description": "Speed controls match design: Slow/Normal/Fast/Instant"
+    },
+    {
+      "design_doc": "design/ui-ux/ground-combat-ui.md",
+      "source_file": "src/ui/screens/GroundCombatScreen.ts",
+      "description": "Victory options (COLONIZE/ENSLAVE) match design §4.1"
+    },
+    {
+      "design_doc": "design/ui-ux/ground-combat-ui.md",
+      "source_file": "src/ui/screens/GroundCombatScreen.ts",
+      "description": "Defeat options (RETURN TO BOMBARDMENT/RETREAT FLEET) match design §4.2"
+    },
+    {
+      "design_doc": "design/ui-ux/spy-network-ui.md",
+      "source_file": "src/ui/components/EspionagePanel.ts",
+      "description": "Mission types match design: sabotage, theft, propaganda, infiltration, assassination"
+    },
+    {
+      "design_doc": "design/ui-ux/spy-network-ui.md",
+      "source_file": "src/ui/components/EspionagePanel.ts",
+      "description": "Success rate display implemented with color-coded probability bar"
+    },
+    {
+      "design_doc": "design/ui-ux/spy-network-ui.md",
+      "source_file": "src/ui/components/EspionagePanel.ts",
+      "description": "Mission history and counter-espionage events displayed"
+    },
+    {
+      "design_doc": "design/ui-ux/information-displays.md",
+      "source_file": "src/ui/components/InfoPanel.ts",
+      "description": "Colony info display shows population, factories, bases, shields, waste per design"
+    },
+    {
+      "design_doc": "design/ui-ux/information-displays.md",
+      "source_file": "src/ui/components/InfoPanel.ts",
+      "description": "Fleet deployment panel shows ships, ETA, accept/cancel buttons"
+    }
+  ],
+  "mismatches": [
+    {
+      "severity": "high",
+      "design_doc": "design/ui-ux/screen-inventory.md",
+      "design_spec": "### 2.8 ~~Reports Screen~~ (REMOVED)\n\n> **REMOVED (2026-04-12):** F7 Reports was not in MOO1 and was never properly defined.\n> The command bar follows MOO1: GAME/DESIGN/FLEET/MAP/RACES/PLANETS/TECH.\n> F7 = Tech Screen.",
+      "source_file": "src/ui/components/CommandBar.ts",
+      "source_line": 37,
+      "actual_impl": "CommandBar includes REPORTS button with F7 hotkey: { label: 'REPORTS', fkey: 'F7', screen: 'reports', tooltip: 'Empire Reports — Statistics and graphs' }",
+      "recommendation": "Remove REPORTS from NAV_BUTTONS array. Per design spec, F7 should be TECH screen. Current impl has F7=REPORTS and F4=TECH but design says F7=TECH and no REPORTS button."
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/ui-ux/tactical-combat-ui.md",
+      "design_spec": "**HP bars on grid tokens**: Each ship token on the hex grid shows a small HP bar (color coded: green > 50%, yellow 25–50%, red < 25%).\n**MP display on grid tokens**: Movement Points remaining shown as `MP:n/max` below each token.",
+      "source_file": "src/ui/screens/CombatScreen.ts",
+      "source_line": 1089,
+      "actual_impl": "HP bars are rendered on ship tokens, but MP is displayed as 'Spd N' (combat speed) instead of remaining movement points per turn. No tracking of used movement points within a round.",
+      "recommendation": "Track movementPointsUsed per ship per round. Display as 'MP: remaining/total' below HP bar. Currently shows static speed stat instead of consumable movement points."
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/ui-ux/tactical-combat-ui.md",
+      "design_spec": "**Combat log**: Scrollable event log; damage numbers shown inline (e.g. `-45 dmg`).\n**Combat log panel tracks all events.**",
+      "source_file": "src/ui/screens/CombatScreen.ts",
+      "source_line": 1130,
+      "actual_impl": "Combat log is rendered but with reversed order (newest first). Design mockup shows chronological order (Round 3 at top, Round 2 below). Log entries also use different format than design.",
+      "recommendation": "Display log in chronological order (oldest at top, newest at bottom with auto-scroll) to match the design wireframe visual."
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/ui-ux/tactical-combat-ui.md",
+      "design_spec": "### Animation Speed Options\n```\n( ) Slow (2x time)\n(•) Normal\n( ) Fast (0.5x time)\n( ) Instant (no animations)\n```",
+      "source_file": "src/ui/screens/CombatScreen.ts",
+      "source_line": 48,
+      "actual_impl": "SPEED_MULTIPLIERS only defines slow/normal/fast but code lacks 'instant' option in the combat screen (only in GroundCombatScreen). CombatScreen has no instant mode toggle.",
+      "recommendation": "Add 'instant' to GameSpeed type and SPEED_MULTIPLIERS. Add instant speed button to combat controls that skips animations entirely."
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/ui-ux/tactical-combat-ui.md",
+      "design_spec": "**Missiles in flight**: `[3 in flight]` shown in weapon list; missile tokens (~M~) appear on the hex grid and advance each round.",
+      "source_file": "src/ui/screens/CombatScreen.ts",
+      "source_line": 1,
+      "actual_impl": "No missile tracking system implemented. WeaponInstance has category 'beam' but no missile flight tracking, in-flight token rendering, or point defense auto-fire. All weapons resolve instantly.",
+      "recommendation": "Implement missile tracking: add 'missile' category weapons, track in-flight missiles with positions, render ~M~ tokens on grid, advance per round, implement point defense interception."
+    },
+    {
+      "severity": "low",
+      "design_doc": "design/ui-ux/tactical-combat-ui.md",
+      "design_spec": "### Targeting Overlay (On Grid)\nE₁ = Target 1 (85% hit) - RED glow\nE₂ = Target 2 (70% hit) - ORANGE glow",
+      "source_file": "src/ui/screens/CombatScreen.ts",
+      "source_line": 1067,
+      "actual_impl": "Targetable enemies all get the same red border highlight. No hit chance gradient (red vs orange) based on accuracy.",
+      "recommendation": "Color-code targetable ship highlights based on hit chance: red for high chance, orange for medium, yellow for low."
+    },
+    {
+      "severity": "low",
+      "design_doc": "design/ui-ux/tactical-combat-ui.md",
+      "design_spec": "**CRITICAL HIT! ×2 damage**\n... CRIT indicator with floating damage",
+      "source_file": "src/ui/screens/CombatScreen.ts",
+      "source_line": 666,
+      "actual_impl": "spawnDamageNumber has isCrit parameter and shows ✦ prefix, but no critical hit mechanic is implemented in resolveWeaponAttack. Critical hits never actually occur.",
+      "recommendation": "Implement critical hit mechanic in combat system (e.g., roll 95-100 = critical, double damage) and pass isCrit=true to spawnDamageNumber."
+    },
+    {
+      "severity": "low",
+      "design_doc": "design/ui-ux/spy-network-ui.md",
+      "design_spec": "Active Spy Summary:\n  Offensive Spies: 4 (funded by SPYING budget)\n  Counter-Intel: 2 (funded by SECURITY budget)\n  (Each agent costs ~5 BC/turn to maintain)",
+      "source_file": "src/ui/components/EspionagePanel.ts",
+      "source_line": 213,
+      "actual_impl": "Spy allocation uses a simple percentage slider (0-100%) of a flat pool (capped at 25 total spies). No BC/turn maintenance cost, no SPYING/SECURITY budget integration.",
+      "recommendation": "Integrate spy allocation with empire SPYING/SECURITY budget from PLANETS screen spending panel. Calculate spy count from budget (budget / 5 BC per spy)."
+    },
+    {
+      "severity": "low",
+      "design_doc": "design/ui-ux/ground-combat-ui.md",
+      "design_spec": "Troop bars:\nAttackers: ████████████████████████ 12/12 (full, green)\n           ████████████ 6/12 (half, yellow)",
+      "source_file": "src/ui/screens/GroundCombatScreen.ts",
+      "source_line": 331,
+      "actual_impl": "Troop bar color transitions work but bar shows currentTroops/totalTroops ratio against INITIAL total, not remaining. After casualties, the bar represents remaining/initial which is correct.",
+      "recommendation": "This is actually correct implementation. No change needed."
+    }
+  ],
+  "missing_from_code": [
+    {
+      "design_doc": "design/ui-ux/tactical-combat-ui.md",
+      "feature": "Missile tokens on hex grid (~M~) that advance each round and can be intercepted by point defense"
+    },
+    {
+      "design_doc": "design/ui-ux/tactical-combat-ui.md",
+      "feature": "Point Defense auto-fire when missile enters range"
+    },
+    {
+      "design_doc": "design/ui-ux/tactical-combat-ui.md",
+      "feature": "Movement Points tracking per ship per round (currently shows static speed, not consumable MP)"
+    },
+    {
+      "design_doc": "design/ui-ux/tactical-combat-ui.md",
+      "feature": "Instant animation speed option in tactical combat (only exists in ground combat)"
+    },
+    {
+      "design_doc": "design/ui-ux/tactical-combat-ui.md",
+      "feature": "Critical hit mechanic (×2 damage on natural 95-100 roll or similar)"
+    },
+    {
+      "design_doc": "design/ui-ux/tactical-combat-ui.md",
+      "feature": "Asteroid hex cover (-20% to hit) and nebula sensor disruption terrain types"
+    },
+    {
+      "design_doc": "design/ui-ux/tactical-combat-ui.md",
+      "feature": "Planet/Moon hex blocking movement and line of sight"
+    },
+    {
+      "design_doc": "design/ui-ux/tactical-combat-ui.md",
+      "feature": "Bombardment phase trigger after combat (BOMBARDMENT_PHASE state)"
+    },
+    {
+      "design_doc": "design/ui-ux/tactical-combat-ui.md",
+      "feature": "Special Systems panel (cloak, repair bots, tractor beam, teleporter)"
+    },
+    {
+      "design_doc": "design/ui-ux/tactical-combat-ui.md",
+      "feature": "Multi-faction combat (3+ factions in one battle)"
+    },
+    {
+      "design_doc": "design/ui-ux/spy-network-ui.md",
+      "feature": "SPYING/SECURITY budget integration from PLANETS screen"
+    },
+    {
+      "design_doc": "design/ui-ux/spy-network-ui.md",
+      "feature": "Frame Empire mission type (diplomatic warfare to blame another empire)"
+    },
+    {
+      "design_doc": "design/ui-ux/spy-network-ui.md",
+      "feature": "Sabotage Missile Bases mission type"
+    },
+    {
+      "design_doc": "design/ui-ux/spy-network-ui.md",
+      "feature": "Spy caught response options (APOLOGIZE vs DENY) in notification popup"
+    },
+    {
+      "design_doc": "design/ui-ux/spy-network-ui.md",
+      "feature": "Enemy spy caught options (EXECUTE/IMPRISON/RELEASE) in notification popup"
+    },
+    {
+      "design_doc": "design/ui-ux/ground-combat-ui.md",
+      "feature": "Transport ship capacity display (Ship Type | Troop Capacity table)"
+    }
+  ],
+  "not_in_design": [
+    {
+      "source_file": "src/ui/components/CommandBar.ts",
+      "feature": "REPORTS button (F7) - explicitly removed from design per screen-inventory.md"
+    },
+    {
+      "source_file": "src/ui/components/EspionagePanel.ts",
+      "feature": "intelligence_gathering mission type (separate from infiltration) - design only mentions Steal Technology, Sabotage Factories/Bases, Frame Empire"
+    },
+    {
+      "source_file": "src/ui/components/EspionagePanel.ts",
+      "feature": "frame_job mission type with BC cost - design calls it 'Frame Empire' with no cost specified"
+    },
+    {
+      "source_file": "src/ui/components/EspionagePanel.ts",
+      "feature": "Cumulative Hostility score display in counter-espionage section - not specified in design"
+    },
+    {
+      "source_file": "src/ui/screens/CombatScreen.ts",
+      "feature": "DEV_ENABLE_DEMO_COMBAT flag for testing combat UI with demo fleets - development convenience not in design"
+    }
+  ]
+}

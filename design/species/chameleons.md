@@ -44,7 +44,7 @@ Everyone is a potential mark. Trust is a weakness to exploit. They particularly 
 ### Starting Technologies
 - Hyper-X Rockets (fast, stealthy scouts)
 - ECM Jammer Mark I
-- Stealth Suit (ground infiltration)
+- Cloaking Device (ship stealth)
 - Battle Scanner (intelligence gathering)
 
 ### Unique Units/Buildings/Technologies

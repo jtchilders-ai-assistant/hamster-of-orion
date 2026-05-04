@@ -24,6 +24,7 @@ import {
 } from '../state';
 import { ComponentData, SpecialEffect } from '../types/shipComponents';
 import componentData from '../../data/components.json';
+import { hasUniversalColonization } from './raceAbilities';
 
 // ── Component lookup ───────────────────────────────────────────────────────────
 
@@ -129,8 +130,10 @@ export function findColonyShipInFleet(
  * Returns true when all colonization preconditions are satisfied:
  *   1. The fleet is at the same star system as the planet.
  *   2. The planet is uncolonized (ownerId === null).
- *   3. The planet type is habitable.
+ *   3. The planet type is habitable (gas giants are not).
  *   4. The fleet contains at least one ship with a colony component.
+ *   5. For hostile environments: empire has Controlled [Environment] tech,
+ *      OR the race has universal_adaptation (Hermit Crabs).
  */
 export function canColonize(
   fleet: Fleet,
@@ -147,11 +150,21 @@ export function canColonize(
   if (UNINHABITABLE_TYPES.has(planet.type)) return false;
 
   // Condition 4 — fleet must contain a colony ship
+  // This is ALWAYS required, regardless of race abilities
   if (findColonyShipInFleet(fleet, state) === null) return false;
 
   // Condition 5 — hostile environments require Controlled [Environment] tech
+  // Exception: races with universal_adaptation (Hermit Crabs) can colonize
+  // any planet type without the environment tech
   // Source: design/planets/planet-types.md §Colonization Requirements
   const empire = state.empires.byId[fleet.ownerId];
+  const raceId = empire?.raceId;
+
+  // Skip hostile environment tech check for races with universal colonization
+  if (raceId && hasUniversalColonization(raceId)) {
+    return true;
+  }
+
   const completedTechs = empire?.research.completedTechs ?? [];
   if (!hasColonizationTech(planet.type, completedTechs)) return false;
 

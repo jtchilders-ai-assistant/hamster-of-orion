@@ -21,7 +21,121 @@ import {
   Empire,
   PlanetId,
   BuildingId,
+  PlanetType,
 } from '../state';
+import { cannotTerraform } from './raceAbilities';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Non-terraformable environments
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Planet types that cannot be terraformed.
+ * Gas giants and nebula have no solid surface; dead planets require
+ * atmospheric terraforming to become habitable before standard terraforming.
+ *
+ * Note: Hermit Crabs have the `cannot_terraform` ability and are checked
+ * separately via raceAbilities.cannotTerraform().
+ */
+const NON_TERRAFORMABLE_TYPES = new Set<PlanetType>([
+  'gas_giant',
+]);
+
+/**
+ * Check if a planet can be terraformed.
+ * Returns false for gas giants (unless Stellar Converter is present) and for
+ * races with `cannot_terraform` ability (Hermit Crabs).
+ */
+export function canTerraformPlanet(planet: Planet, raceId: string): boolean {
+  // Gas giants can only be terraformed with Stellar Converter
+  if (NON_TERRAFORMABLE_TYPES.has(planet.type)) {
+    // Check if planet has Stellar Converter building
+    if (planet.buildings.includes('stellar_converter')) {
+      return true;
+    }
+    return false;
+  }
+
+  // Hermit Crabs (and any race with cannot_terraform ability) cannot terraform
+  if (cannotTerraform(raceId)) {
+    return false;
+  }
+
+  return true;
+}
+
+/**
+ * Check if a Stellar Converter can be built on a planet.
+ * Can only be built on gas giants.
+ */
+export function canBuildStellarConverter(planet: Planet): boolean {
+  return planet.type === 'gas_giant' && !planet.buildings.includes('stellar_converter');
+}
+
+/**
+ * Process Stellar Converter progress for a planet.
+ * After 50 turns, converts the gas giant to a terran world.
+ */
+export interface StellarConverterProgress {
+  /** Planet has a stellar converter active. */
+  hasConverter: boolean;
+  /** Turn the converter was built (stored in planet metadata). */
+  startTurn: number | null;
+  /** Turns remaining until conversion complete. */
+  turnsRemaining: number;
+  /** Whether conversion is complete this turn. */
+  conversionComplete: boolean;
+}
+
+export function checkStellarConverterProgress(
+  planet: Planet,
+  currentTurn: number,
+): StellarConverterProgress {
+  if (!planet.buildings.includes('stellar_converter')) {
+    return {
+      hasConverter: false,
+      startTurn: null,
+      turnsRemaining: 0,
+      conversionComplete: false,
+    };
+  }
+
+  // Stellar Converter requires 50 turns to complete conversion
+  const CONVERSION_TURNS = 50;
+
+  // Find when the stellar converter was built by checking the building's index
+  // In a real implementation, this would be stored in planet metadata
+  // For now, assume it's tracked elsewhere or just started
+  const startTurn = (planet as unknown as { stellarConverterStartTurn?: number }).stellarConverterStartTurn ?? currentTurn;
+  const turnsElapsed = currentTurn - startTurn;
+  const turnsRemaining = Math.max(0, CONVERSION_TURNS - turnsElapsed);
+  const conversionComplete = turnsElapsed >= CONVERSION_TURNS && planet.type === 'gas_giant';
+
+  return {
+    hasConverter: true,
+    startTurn,
+    turnsRemaining,
+    conversionComplete,
+  };
+}
+
+/**
+ * Convert a gas giant to a terran world after Stellar Converter completes.
+ */
+export function convertGasGiantToTerran(planet: Planet): Planet {
+  if (planet.type !== 'gas_giant') {
+    return planet;
+  }
+
+  return {
+    ...planet,
+    type: 'terran',
+    maxPopulation: 100, // Base terran capacity
+    growthRate: 1.0,
+    // Remove the stellar converter building as it's consumed in the process
+    buildings: planet.buildings.filter(b => b !== 'stellar_converter'),
+  };
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Building data types (matching buildings.json schema)
@@ -41,6 +155,10 @@ export interface BuildingEffectData {
   productionPerTurn?: number;
   instantTravel?: boolean;
   planetTypeUpgrade?: boolean;
+  allowsGasGiantTerraforming?: boolean;
+  convertsGasGiantToTerran?: boolean;
+  conversionTurns?: number;
+  maxPerPlanet?: number;
   note?: string;
   [key: string]: unknown;
 }
@@ -108,6 +226,8 @@ export function getBuildingById(id: string): BuildingData | undefined {
  *   2. builtVia === 'defense_slider' or 'special_project' (DEF slider buildings)
  *   3. Not already built (planet.buildings does not contain this ID, for one-off buildings)
  *   4. For shields: only the best available tier that improves on current shield
+ *   5. Terraforming buildings: only on terraformable environments (not gas_giant, and
+ *      not for races with cannot_terraform ability like Hermit Crabs)
  *
  * Missile bases are always available (no tech requirement, unlimited count).
  * Tech-unlock buildings are empire-wide and not queued per-planet.
@@ -120,6 +240,14 @@ export function getAvailableBuildings(planet: Planet, empire: Empire): BuildingD
     // Only DEF slider and special project buildings are per-planet purchases
     if (b.builtVia !== 'defense_slider' && b.builtVia !== 'special_project') {
       return false;
+    }
+
+    // Terraforming category buildings require a terraformable environment
+    // and a race that can terraform
+    if (b.category === 'terraforming') {
+      if (!canTerraformPlanet(planet, empire.raceId)) {
+        return false;
+      }
     }
 
     // Tech-unlock scope buildings are empire-wide, not per-planet
@@ -290,23 +418,51 @@ export function processBuildingConstruction(
  *
  * Pure function — returns new GameState.
  */
+/**
+ * Result of accumulating building progress, including any overflow BC.
+ */
+export interface AccumulateBuildingResult {
+  /** Updated game state with building progress applied. */
+  state: GameState;
+  /** BC that overflowed after building completion (to add to Empire Reserve). */
+  overflow: number;
+}
+
+/**
+ * Accumulate DEF BC toward the active building in the queue.
+ *
+ * This is called each turn with the DEF BC allocated from the slider.
+ * It reduces costRemaining and, if the building is complete, calls
+ * processBuildingConstruction to apply the effects.
+ *
+ * Returns both the updated state AND overflow BC (to be added to Empire Reserve).
+ * Pure function — does not mutate state.
+ */
 export function accumulateBuildingProgress(
   state: GameState,
   planetId: PlanetId,
   defBc: number,
-): GameState {
+): AccumulateBuildingResult {
   const planet = state.planets.byId[planetId];
-  if (!planet || !planet.isColonized || planet.ownerId === null) return state;
+  if (!planet || !planet.isColonized || planet.ownerId === null) {
+    return { state, overflow: 0 };
+  }
 
   const activeIndex = planet.buildQueue.findIndex(
     (item) => item.type === 'defense',
   );
 
-  if (activeIndex === -1) return state;
+  if (activeIndex === -1) {
+    // No building in queue — all BC overflows to reserve
+    return { state, overflow: defBc };
+  }
 
   const activeItem = planet.buildQueue[activeIndex];
   const newCostRemaining = Math.max(0, activeItem.costRemaining - defBc);
-  const overflow = defBc - (activeItem.costRemaining - newCostRemaining);
+  // Overflow = BC spent beyond what was needed to complete the building
+  const overflow = newCostRemaining === 0
+    ? Math.max(0, defBc - activeItem.costRemaining)
+    : 0;
 
   const updatedQueue = planet.buildQueue.map((item, idx) =>
     idx === activeIndex
@@ -335,10 +491,7 @@ export function accumulateBuildingProgress(
     nextState = processBuildingConstruction(nextState, updatedPlanet);
   }
 
-  // Return overflow (caller can add to Empire Reserve if desired)
-  void overflow;
-
-  return nextState;
+  return { state: nextState, overflow };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -374,9 +527,20 @@ export function applyBuildingEffects(state: GameState): GameState {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
+ * Result of processing all building construction for one turn.
+ */
+export interface ProcessAllBuildingsResult {
+  /** Updated game state with all building progress applied. */
+  state: GameState;
+  /** Total BC overflow from all planets (to add to Empire Reserves). */
+  overflowByEmpire: Record<string, number>;
+}
+
+/**
  * Process building construction for all colonized planets in one turn.
  *
  * Called from processTurn() after DEF BC is allocated per planet.
+ * Returns overflow BC grouped by empire ID for reserve contribution.
  *
  * @param state          Current game state.
  * @param defBcByPlanet  Map of planetId → DEF BC allocated this turn.
@@ -384,8 +548,9 @@ export function applyBuildingEffects(state: GameState): GameState {
 export function processAllBuildingConstruction(
   state: GameState,
   defBcByPlanet: Record<PlanetId, number>,
-): GameState {
+): ProcessAllBuildingsResult {
   let nextState = state;
+  const overflowByEmpire: Record<string, number> = {};
 
   for (const planetId of nextState.planets.allIds) {
     const planet = nextState.planets.byId[planetId];
@@ -394,8 +559,18 @@ export function processAllBuildingConstruction(
     const defBc = defBcByPlanet[planetId] ?? 0;
     if (defBc === 0 && planet.buildQueue.length === 0) continue;
 
-    nextState = accumulateBuildingProgress(nextState, planetId, defBc);
+    const result = accumulateBuildingProgress(nextState, planetId, defBc);
+    nextState = result.state;
+
+    // Accumulate overflow to the planet's owning empire
+    if (result.overflow > 0) {
+      const empireId = planet.ownerId;
+      overflowByEmpire[empireId] = (overflowByEmpire[empireId] ?? 0) + result.overflow;
+    }
   }
 
-  return applyBuildingEffects(nextState);
+  return {
+    state: applyBuildingEffects(nextState),
+    overflowByEmpire,
+  };
 }

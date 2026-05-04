@@ -39,6 +39,7 @@ const MISSION_DURATION: Record<MissionType, number> = {
   propaganda:             4,
   infiltration:           5,
   assassination:          6,
+  frame_job:              2,
 };
 
 /** Base success % (0-100 integer) per mission type, from §5.1 and §6. */
@@ -49,6 +50,7 @@ const BASE_MISSION_SUCCESS: Record<MissionType, number> = {
   propaganda:             40,  // ~Incite Rebellion lite (§6.5) — area influence
   infiltration:           25,  // ~Incite Rebellion (§6.5)
   assassination:          10,  // Assassination (§6.7)
+  frame_job:              35,  // Frame Job: steal BC from target (§6.6)
 };
 
 /**
@@ -358,5 +360,6 @@ function computeReward(type: MissionType): { type: string; value: number } {
     case 'propaganda':             return { type: 'morale_reduced',     value: 5 };
     case 'infiltration':           return { type: 'rebellion_points',   value: 10 };
     case 'assassination':          return { type: 'leader_killed',      value: 1 };
+    case 'frame_job':              return { type: 'bc_stolen',          value: 0 }; // Value set during resolution
   }
 }

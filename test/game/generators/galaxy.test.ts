@@ -345,7 +345,9 @@ describe('Galaxy Generator', () => {
       const orionPlanetId = orionSystem.planetIds[0];
       const orionPlanet = result.planets[orionPlanetId];
 
-      expect(orionPlanet.type).toBe('gaia');
+      // Per design/planets/generation-tables.md §10.2: Orion is 'dead' environment
+      // (Gaia never spawns naturally), Huge size with 150 base pop, Ultra Rich
+      expect(orionPlanet.type).toBe('dead');
       expect(orionPlanet.size).toBe('huge');
       expect(orionPlanet.resourceLevel).toBe('ultra_rich');
       expect(orionPlanet.researchMultiplier).toBe(4.0);

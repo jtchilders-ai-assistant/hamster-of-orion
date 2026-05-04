@@ -48,6 +48,14 @@ export interface AiBehavior {
   volatilityFlag?: boolean;
 }
 
+export interface LeaderNames {
+  male?: string[];
+  female?: string[];
+  coordinators?: string[];  // For Ants
+  queens?: string[];        // For Ants
+  titles?: string[];
+}
+
 export interface HomeworldSpec {
   name: string;
   type: string;
@@ -71,6 +79,8 @@ export interface RaceDefinition {
   researchBonusAllFields?: boolean;
   /** +1 movement range bonus for all ships (Budgies). */
   movementRangeBonus?: number;
+  /** Special starting relationship mode (e.g., 'blood_enemies_all' for Ferrets). */
+  startingRelations?: 'blood_enemies_all' | 'neutral_all';
   /** Whether this race can send spies at all (false for Ants). */
   canConductEspionage: boolean;
   /** Whether this race is completely immune to incoming espionage (Ants). */
@@ -81,6 +91,8 @@ export interface RaceDefinition {
   startingTechnologies: string[];
   aiBehavior: AiBehavior;
   shipPrefix: string;
+  /** Race-specific leader names for AI empire creation. */
+  leaderNames?: LeaderNames;
 }
 
 // ── Constants (from design doc) ───────────────────────────────────────────────
@@ -316,4 +328,54 @@ export const MICE_FACTORY_EFFICIENCY_MULTIPLIER = 1.5;
 export function miceFactoryProduction(operatingFactories: number): number {
   const miceProductionModifier = 1 + 25 / 100; // +25% production bonus
   return operatingFactories * MICE_FACTORY_EFFICIENCY_MULTIPLIER * miceProductionModifier;
+}
+
+/**
+ * Get a random leader name for an AI empire based on race.
+ * Returns a formatted leader name using race-specific naming conventions.
+ */
+export function getRandomLeaderName(raceId: RaceId, seed?: number): string {
+  const race = getRace(raceId);
+  const names = race.leaderNames;
+  
+  if (!names) {
+    // Fallback for races without leader names defined
+    return `Emperor of ${race.name}`;
+  }
+
+  // Simple pseudo-random using seed or Date.now()
+  const randSeed = seed ?? Date.now();
+  const pseudoRandom = (max: number): number => {
+    return Math.abs((randSeed * 9301 + 49297) % 233280) % max;
+  };
+
+  // Ants use coordinators/queens instead of male/female
+  if (names.coordinators && names.queens) {
+    const pool = [...names.coordinators, ...names.queens];
+    const name = pool[pseudoRandom(pool.length)];
+    const title = names.titles?.[pseudoRandom(names.titles.length)] ?? 'Coordinator';
+    return `${title} ${name}`;
+  }
+
+  // Standard races use male/female names
+  const allNames: string[] = [];
+  if (names.male) allNames.push(...names.male);
+  if (names.female) allNames.push(...names.female);
+  
+  if (allNames.length === 0) {
+    return `Emperor of ${race.name}`;
+  }
+
+  const name = allNames[pseudoRandom(allNames.length)];
+  const title = names.titles?.[pseudoRandom(names.titles.length)];
+  
+  return title ? `${title} ${name}` : name;
+}
+
+/**
+ * Check if a race starts at war with all other races (Ferrets).
+ */
+export function isBloodEnemiesAll(raceId: RaceId): boolean {
+  const race = getRace(raceId);
+  return race.startingRelations === 'blood_enemies_all';
 }

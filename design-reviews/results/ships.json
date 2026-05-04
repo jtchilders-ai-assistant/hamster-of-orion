@@ -1,0 +1,309 @@
+{
+  "area": "ships",
+  "name": "Ships, Weapons & Combat",
+  "reviewer": "orion-reviewer-3",
+  "timestamp": "2026-05-03T03:39:00Z",
+  "summary": "Implementation is largely solid but has several significant discrepancies from design specs. The hit chance formula uses ×5 per level instead of the MOO1-canonical ×10 per level. Hull space values in code don't match design docs. Several weapon special effects (Hellfire multi-hit, boarding mechanics) are documented but incompletely implemented. The combat system core works correctly but misses some edge cases from the design.",
+  "matches": [
+    {
+      "design_doc": "design/ships/combat-algorithm.md",
+      "source_file": "src/game/systems/combat.ts",
+      "description": "Shield absorption mechanic correctly implements per-hit absorption up to shield class value"
+    },
+    {
+      "design_doc": "design/ships/combat-algorithm.md",
+      "source_file": "src/game/systems/combat.ts",
+      "description": "Armor piercing correctly halves effective shield class (floor) before absorption"
+    },
+    {
+      "design_doc": "design/ships/components-complete.md",
+      "source_file": "src/game/types/shipComponents.ts",
+      "description": "Component categories match design (weapon, armor, shield, engine, computer, fuel, special)"
+    },
+    {
+      "design_doc": "design/ships/combat-algorithm.md",
+      "source_file": "src/game/systems/combat.ts",
+      "description": "Experience accuracy bonuses match spec (rookie: -5%, regular: 0%, veteran: +5%, elite: +10%)"
+    },
+    {
+      "design_doc": "design/ships/combat-algorithm.md",
+      "source_file": "src/game/systems/combat.ts",
+      "description": "Range modifiers match spec (Point Blank +10%, Close 0%, Medium -5%, Long -10%, Very Long -20%)"
+    },
+    {
+      "design_doc": "design/ships/combat-algorithm.md",
+      "source_file": "src/game/systems/combat.ts",
+      "description": "Size modifier formula matches spec: (target_size_class - 1) × 5%"
+    },
+    {
+      "design_doc": "design/ships/combat-algorithm.md",
+      "source_file": "src/game/systems/combat.ts",
+      "description": "Displacement Device 33% hit avoidance correctly implemented"
+    },
+    {
+      "design_doc": "design/ships/combat-algorithm.md",
+      "source_file": "src/game/systems/combat.ts",
+      "description": "Retreat formula matches spec: (ownSpeed / maxEnemySpeed) × 50 + 25, clamped [0, 95]"
+    },
+    {
+      "design_doc": "design/ships/combat-algorithm.md",
+      "source_file": "src/game/systems/combat.ts",
+      "description": "Warp Dissipator prevents retreat correctly implemented"
+    },
+    {
+      "design_doc": "design/ships/combat-algorithm.md",
+      "source_file": "src/game/systems/combat.ts",
+      "description": "Chain lightning weapon effect implemented with 50% damage to adjacent ships"
+    },
+    {
+      "design_doc": "design/ships/combat-algorithm.md",
+      "source_file": "src/game/systems/combat.ts",
+      "description": "Crew kill mechanic implemented with death check at 0 crew"
+    },
+    {
+      "design_doc": "design/ships/combat-algorithm.md",
+      "source_file": "src/game/systems/combat.ts",
+      "description": "Overflow damage to stack mates implemented for Graviton/Tachyon beams"
+    },
+    {
+      "design_doc": "design/ships/ship-design.md",
+      "source_file": "src/game/systems/shipDesign.ts",
+      "description": "Miniaturization formula matches spec: −50% space per tech tier above component level"
+    },
+    {
+      "design_doc": "design/ships/combat-mechanics.md",
+      "source_file": "src/game/systems/groundCombat.ts",
+      "description": "Ground combat mechanics exist with racial bonuses applied"
+    }
+  ],
+  "mismatches": [
+    {
+      "severity": "high",
+      "design_doc": "design/ships/combat-algorithm.md",
+      "design_spec": "Hit_Chance = 50 + (Effective_Attacker_Level - Effective_Defender_Level) × 10",
+      "source_file": "src/game/systems/combat.ts",
+      "source_line": 234,
+      "actual_impl": "const differential = attacker.attackRating - target.defenseRating; let hitChance = 50 + differential * 5;",
+      "recommendation": "Change multiplier from 5 to 10 per MOO1 canonical formula. The code comment acknowledges this: 'Note: MOO1 canonical uses ×10, but this implementation uses ×5 per original task spec.' Either update the code or document this as an intentional departure."
+    },
+    {
+      "severity": "high",
+      "design_doc": "design/ships/ship-classes.md",
+      "design_spec": "Hull sizes: Small=25, Medium=70, Large=280, Huge=1400 base space",
+      "source_file": "src/game/systems/shipDesign.ts",
+      "source_line": 24,
+      "actual_impl": "HULL_SPECS: small: { space: 25, baseCost: 6 }, medium: { space: 70, baseCost: 36 }, large: { space: 280, baseCost: 200 }, huge: { space: 1400, baseCost: 1200 }",
+      "recommendation": "Code matches design spec for space values. However, ship-classes.md also says 'Base Hits: Small=3, Medium=18, Large=100, Huge=600' which needs to be verified in ship construction when calculating HP."
+    },
+    {
+      "severity": "high",
+      "design_doc": "design/ships/combat-algorithm.md",
+      "design_spec": "Base_HP by Hull Size (MOO1): Small: 3, Medium: 18, Large: 100, Huge: 600",
+      "source_file": "src/game/types/shipComponents.ts",
+      "source_line": 0,
+      "actual_impl": "No base HP by hull size constants found in shipComponents.ts. The components-complete.md JSON schema has 'base_hp_by_class' but this isn't defined as a TypeScript constant.",
+      "recommendation": "Add BASE_HP_BY_CLASS constant matching design: { small: 3, medium: 18, large: 100, huge: 600 } and ensure ship HP calculation uses it."
+    },
+    {
+      "severity": "high",
+      "design_doc": "design/ships/weapons-complete.md",
+      "design_spec": "Hellfire Torpedo: MOO1 fires 4 separate 25-damage attacks per hit (100 damage total). Each attack resolved independently through shields.",
+      "source_file": "src/game/systems/combat.ts",
+      "source_line": 0,
+      "actual_impl": "No hellfire_multi_hit effect handler found in applyWeaponEffects(). The design describes this effect in combat-algorithm.md Section 11b but the code doesn't implement the 4-hit mechanic.",
+      "recommendation": "Add hellfire_multi_hit handling in applyWeaponEffects() that fires 3 additional 25-damage attacks after the initial hit."
+    },
+    {
+      "severity": "high",
+      "design_doc": "design/ships/combat-algorithm.md",
+      "design_spec": "Boarding mechanics: Sections 36-43 detail transporter boarding with success formula, casualties, and ship capture",
+      "source_file": "src/game/systems/combat.ts",
+      "source_line": 0,
+      "actual_impl": "No boarding/transporter combat implementation found. CombatShip interface has no 'boarding_immune' or transporter-related fields. No attempt_boarding() or capture_ship() functions.",
+      "recommendation": "Implement boarding mechanics per design: add boarding fields to CombatShip, implement attempt_boarding(), resolve_boarding_casualties(), and capture_ship() functions."
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/ships/combat-algorithm.md",
+      "design_spec": "Missile fuel: 'remaining_fuel: 2 # MOO1: ship-launched missiles self-destruct after 2 turns'",
+      "source_file": "src/game/systems/combat.ts",
+      "source_line": 669,
+      "actual_impl": "launchMissile() sets remainingFuel: 2, but processMissilePhase() decrements fuel and removes expired missiles without hitting the target on the same turn they arrive.",
+      "recommendation": "Review missile timing: per MOO1 missiles should hit on the turn after they're fired. The comment says 'missiles hit on the turn after they're fired' but the fuel decrement happens before the hit check, potentially removing missiles prematurely."
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/ships/combat-algorithm.md",
+      "design_spec": "Critical Hit System: 5% base chance, +5% if Elite, +10% if Death Ray. Double damage + 50% system damage chance.",
+      "source_file": "src/game/systems/combat.ts",
+      "source_line": 0,
+      "actual_impl": "No critical hit system implemented. No critical chance calculation, no damage doubling, no system damage mechanics.",
+      "recommendation": "Implement critical hit system: add critical chance calculation in shipActs(), apply damage doubling, and add system damage effects when critical triggers."
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/ships/combat-algorithm.md",
+      "design_spec": "Crew loss penalties: <= 25% skeleton_crew (-20% accuracy, half speed, 50% weapon failure), <= 50% undermanned (-10% accuracy, speed -1)",
+      "source_file": "src/game/systems/combat.ts",
+      "source_line": 352,
+      "actual_impl": "applyCrewLossPenalties() is a stub with comment 'Full implementation would track status effects'. Only adrift (0 crew) is checked.",
+      "recommendation": "Implement crew loss penalty thresholds: add status effect tracking and apply accuracy/speed penalties at 25% and 50% crew thresholds."
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/ships/combat-algorithm.md",
+      "design_spec": "Base crew by hull: Small=20, Medium=60, Large=200, Huge=500",
+      "source_file": "src/game/systems/combat.ts",
+      "source_line": 0,
+      "actual_impl": "No BASE_CREW_BY_HULL constant defined. CombatShip has crewCurrent/crewMax optional fields but no initialization from hull size.",
+      "recommendation": "Add BASE_CREW_BY_HULL constant and initialize crew values when creating CombatShip instances."
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/ships/combat-algorithm.md",
+      "design_spec": "Initiative formula: Ship_Initiative = Base_Initiative(10) + Engine_Maneuver × 2 + Battle_Scanner(+3) + Racial + Experience + roll(1,6)",
+      "source_file": "src/game/systems/combat.ts",
+      "source_line": 514,
+      "actual_impl": "sortByInitiative() only uses ship.speed for ordering, not the full initiative formula with maneuver, scanner, racial bonuses, or random roll.",
+      "recommendation": "Implement full initiative calculation per design spec, including all component bonuses and random factor."
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/ships/combat-algorithm.md",
+      "design_spec": "Cloaking: +5 defense when cloaked, applies to effective defender level in hit chance formula",
+      "source_file": "src/game/systems/combat.ts",
+      "source_line": 257,
+      "actual_impl": "hitChance -= 50 when target.cloaked. This treats cloaking as -50% hit chance directly instead of +5 to defender level which would be -50% with ×10 multiplier, but code uses ×5 multiplier.",
+      "recommendation": "Fix cloaking penalty: should be hitChance -= 25 with ×5 multiplier (5 levels × 5 = 25), or hitChance -= 50 if using correct ×10 multiplier."
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/ships/combat-mechanics.md",
+      "design_spec": "Budgies: +3 Defense Level, +3 Initiative, +20% Evasion",
+      "source_file": "src/game/systems/combat.ts",
+      "source_line": 0,
+      "actual_impl": "No racial bonus application in combat.ts. defenseRating is taken from CombatShip but no racial modifiers are applied during combat initialization or resolution.",
+      "recommendation": "Add racial bonus application when creating CombatShip instances or in calcHitChanceVs(). Reference races.ts for racial modifiers."
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/ships/weapons-complete.md",
+      "design_spec": "Anti-Missile Rockets: destroys 40% of incoming missiles (−1% per missile tech level)",
+      "source_file": "src/game/systems/combat.ts",
+      "source_line": 457,
+      "actual_impl": "calculateInterceptionChance() checks weapon.name.toLowerCase().includes('anti-missile') for 40% base interception. This string matching is fragile.",
+      "recommendation": "Add a dedicated 'pointDefense' or 'isAntiMissile' flag to WeaponInstance/WeaponEffect and check that instead of name matching."
+    },
+    {
+      "severity": "low",
+      "design_doc": "design/ships/combat-algorithm.md",
+      "design_spec": "MOO1 damage-mapped-to-roll: 'A roll exactly at the hit threshold = minimum damage. A roll of 100 = maximum damage.'",
+      "source_file": "src/game/systems/combat.ts",
+      "source_line": 309,
+      "actual_impl": "rollDamage() implements this correctly but uses the d100 hit roll. Per design, this should use a separate roll or the same roll context needs validation.",
+      "recommendation": "Verify that using the hit roll for damage mapping is intentional. The implementation looks correct for MOO1 behavior."
+    },
+    {
+      "severity": "low",
+      "design_doc": "design/ships/components-complete.md",
+      "design_spec": "Cloaking Device tech_level: 30, Improved Cloaking: 40, Perfect Cloaking: 50",
+      "source_file": "src/game/types/shipComponents.ts",
+      "source_line": 0,
+      "actual_impl": "Component tech levels are defined in components.json, not TypeScript. The types file correctly describes the schema but actual values are in JSON data.",
+      "recommendation": "Verify components.json cloaking device tech levels match design spec (30/40/50)."
+    },
+    {
+      "severity": "low",
+      "design_doc": "design/ships/weapons-complete.md",
+      "design_spec": "Neutron Pellet Gun tech_level: 7",
+      "source_file": "src/game/types/shipComponents.ts",
+      "source_line": 0,
+      "actual_impl": "JSON schema shows tech_level 5 in weapons-complete.md but the table says tech_level 7. There's an inconsistency in the design doc itself.",
+      "recommendation": "Reconcile tech level discrepancy in weapons-complete.md: table says 7, JSON says 5."
+    }
+  ],
+  "missing_from_code": [
+    {
+      "design_doc": "design/ships/combat-algorithm.md",
+      "feature": "Boarding mechanics (Sections 36-43): Transporter-based ship capture, boarding parties, crew casualties, prize ship status"
+    },
+    {
+      "design_doc": "design/ships/combat-algorithm.md",
+      "feature": "Critical hit system (Section 14): 5% base chance, double damage, system damage effects"
+    },
+    {
+      "design_doc": "design/ships/combat-algorithm.md",
+      "feature": "Repair systems: Automated Repair (+15% HP/turn), Advanced Damage Control (+30% HP/turn)"
+    },
+    {
+      "design_doc": "design/ships/combat-algorithm.md",
+      "feature": "Stasis Field combat special: disables target for 2 turns (Section 25)"
+    },
+    {
+      "design_doc": "design/ships/combat-algorithm.md",
+      "feature": "Repulsor Beam: push ships 1 hex away"
+    },
+    {
+      "design_doc": "design/ships/combat-algorithm.md",
+      "feature": "Tractor Beam: pull ships 1 hex closer"
+    },
+    {
+      "design_doc": "design/ships/combat-algorithm.md",
+      "feature": "Full initiative formula with maneuver rating, battle scanner, racial bonuses, experience"
+    },
+    {
+      "design_doc": "design/ships/combat-algorithm.md",
+      "feature": "Crew loss penalty thresholds (skeleton_crew at 25%, undermanned at 50%)"
+    },
+    {
+      "design_doc": "design/ships/combat-algorithm.md",
+      "feature": "Hellfire Torpedo multi-hit effect (4 separate 25-damage attacks)"
+    },
+    {
+      "design_doc": "design/ships/combat-algorithm.md",
+      "feature": "Planetary bombardment phase (Section 35): bomb damage distribution to population/factories/defenses"
+    },
+    {
+      "design_doc": "design/ships/combat-mechanics.md",
+      "feature": "Shield regeneration between battles"
+    },
+    {
+      "design_doc": "design/ships/special-systems.md",
+      "feature": "Lightning Shield: 50% damage reflection (design departure from MOO1)"
+    },
+    {
+      "design_doc": "design/ships/combat-mechanics.md",
+      "feature": "Missile base combat participation (Section on Missile Bases)"
+    },
+    {
+      "design_doc": "design/ships/components-complete.md",
+      "feature": "Racial component modifiers: Budgies +3 Defense, Hermit Crabs +25% Armor HP, Mice -15% Component Space, Ants -10% Component Cost"
+    }
+  ],
+  "not_in_design": [
+    {
+      "source_file": "src/game/systems/combat.ts",
+      "feature": "getDifficultyLevel combat modifiers (getCombatAttackModifier, getCombatDefenseModifier) - difficulty scaling is implemented but not detailed in combat design docs"
+    },
+    {
+      "source_file": "src/game/systems/combat.ts",
+      "feature": "Black Hole Generator implementation with d4 roll for 25-100% destruction - referenced in special-systems.md but implementation details (penaltyPerShield, cooldown) aren't in the ships design docs"
+    },
+    {
+      "source_file": "src/game/systems/combat.ts",
+      "feature": "High Energy Focus one-time +1 attack rating bonus - mentioned in components but combat behavior not detailed in algorithm doc"
+    },
+    {
+      "source_file": "src/game/systems/combat.ts",
+      "feature": "activateDisplacementDevice() as an active ability (removes ship for 1 round) vs the passive 33% hit avoidance - design only mentions passive avoidance"
+    },
+    {
+      "source_file": "src/game/systems/shipConstruction.ts",
+      "feature": "Ship experience starting at 'green' level - design uses 'rookie' as the lowest level"
+    },
+    {
+      "source_file": "src/game/systems/groundCombat.ts",
+      "feature": "Morale system ('unrest' after capture) - not detailed in ships design docs though may be in a separate design doc"
+    }
+  ]
+}

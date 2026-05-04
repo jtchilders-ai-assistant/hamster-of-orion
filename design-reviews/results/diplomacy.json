@@ -1,0 +1,422 @@
+{
+  "area": "diplomacy",
+  "name": "Diplomacy, AI & Espionage",
+  "reviewer": "orion-reviewer-5",
+  "timestamp": "2026-05-03T03:39:00.000Z",
+  "summary": "The diplomacy, AI, and espionage systems are partially implemented with solid foundations but have several significant mismatches with design specifications. The relationship system, treaty mechanics, and council voting are well-implemented, but key constants and formulas deviate from design. The espionage system is functional but missing several design-specified features. AI personalities are well-aligned with design archetypes, though some numeric values differ.",
+  "matches": [
+    {
+      "design_doc": "design/diplomacy/relationship-formulas.md",
+      "source_file": "src/game/systems/diplomacy.ts",
+      "description": "Relationship scale constants match: RELATION_MIN=-100, RELATION_MAX=+100, base decay rate 0.02"
+    },
+    {
+      "design_doc": "design/diplomacy/relationship-formulas.md",
+      "source_file": "src/game/systems/diplomacy.ts",
+      "description": "Diplomatic state thresholds correctly implemented: War<-50, Unfriendly<0, Neutral≤49, Friendly≤79, Allied>79"
+    },
+    {
+      "design_doc": "design/diplomacy/treaties.md",
+      "source_file": "src/game/systems/treaties.ts",
+      "description": "TRADE_RAMP_TURNS=30 correctly matches design specification"
+    },
+    {
+      "design_doc": "design/diplomacy/treaties.md",
+      "source_file": "src/game/systems/treaties.ts",
+      "description": "Trade renegotiation retention (0.5 = 50%) correctly implemented"
+    },
+    {
+      "design_doc": "design/diplomacy/treaties.md",
+      "source_file": "src/game/systems/treaties.ts",
+      "description": "Hamster trade bonus of 1.25 (25%) correctly implemented"
+    },
+    {
+      "design_doc": "design/diplomacy/council.md",
+      "source_file": "src/game/systems/council.ts",
+      "description": "Council interval of 25 turns matches design"
+    },
+    {
+      "design_doc": "design/diplomacy/council.md",
+      "source_file": "src/game/systems/council.ts",
+      "description": "Victory threshold of 2/3 (66.67%) correctly implemented"
+    },
+    {
+      "design_doc": "design/diplomacy/council.md",
+      "source_file": "src/game/systems/council.ts",
+      "description": "Vote weight calculation using population percentages matches design"
+    },
+    {
+      "design_doc": "design/diplomacy/council.md",
+      "source_file": "src/game/systems/council.ts",
+      "description": "Racial fear modifiers (Guinea Pigs 0.1, Ferrets 0.3, Budgies 0.4, Rats 1.5, Rabbits 2.0, etc.) match design"
+    },
+    {
+      "design_doc": "design/diplomacy/council.md",
+      "source_file": "src/game/systems/council.ts",
+      "description": "HAMSTER_COUNCIL_BONUS=5 correctly implemented"
+    },
+    {
+      "design_doc": "design/diplomacy/council.md",
+      "source_file": "src/game/systems/council.ts",
+      "description": "DOMINANCE_THRESHOLD=0.40 (40%) and DOMINANCE_COUNCIL_PENALTY=-20 match design"
+    },
+    {
+      "design_doc": "design/diplomacy/council.md",
+      "source_file": "src/game/systems/council.ts",
+      "description": "HERMIT_CRAB_ABSTAIN_CHANCE=0.25 (25%) matches design"
+    },
+    {
+      "design_doc": "design/diplomacy/espionage.md",
+      "source_file": "src/game/systems/espionage.ts",
+      "description": "BASE_EFFECTIVENESS=30 matches design"
+    },
+    {
+      "design_doc": "design/diplomacy/espionage.md",
+      "source_file": "src/game/systems/espionage.ts",
+      "description": "TECH_MODIFIER=2 (each tech level = 2% success modifier) matches design"
+    },
+    {
+      "design_doc": "design/diplomacy/espionage.md",
+      "source_file": "src/game/systems/espionage.ts",
+      "description": "MIN_SUCCESS=5, MAX_SUCCESS=95 clamping matches design"
+    },
+    {
+      "design_doc": "design/diplomacy/espionage.md",
+      "source_file": "src/game/systems/espionage.ts",
+      "description": "Racial aggression multipliers (Chameleons 1.60, Ferrets 1.10, others 1.00) correctly implemented"
+    },
+    {
+      "design_doc": "design/diplomacy/espionage.md",
+      "source_file": "src/game/systems/espionage.ts",
+      "description": "Spy effectiveness formula structure matches design: (BASE + racialBonus + spyRollBonus + techBonus - targetSecurity) × multiplier"
+    },
+    {
+      "design_doc": "design/diplomacy/ai-personalities.md",
+      "source_file": "src/game/ai/ai-personalities.ts",
+      "description": "Hamster personality archetype correctly marked as 'balanced' with honorable trait"
+    },
+    {
+      "design_doc": "design/diplomacy/ai-personalities.md",
+      "source_file": "src/game/ai/ai-personalities.ts",
+      "description": "Chameleon personality correctly includes 'backstabber' trait with high backstabTendency (70)"
+    },
+    {
+      "design_doc": "design/diplomacy/ai-personalities.md",
+      "source_file": "src/game/ai/ai-personalities.ts",
+      "description": "Rabbit personality correctly marked as 'defensive' and 'peaceful'"
+    },
+    {
+      "design_doc": "design/diplomacy/ai-personalities.md",
+      "source_file": "src/game/ai/ai-personalities.ts",
+      "description": "Ant personality correctly includes 'hive_mind' trait"
+    },
+    {
+      "design_doc": "design/technical/ai-implementation.md",
+      "source_file": "src/game/ai/strategies.ts",
+      "description": "Game phase thresholds match design: early≤50, mid≤150, late>150 turns"
+    }
+  ],
+  "mismatches": [
+    {
+      "severity": "high",
+      "design_doc": "design/diplomacy/relationship-formulas.md",
+      "design_spec": "Section 5.2: Hamster Universal Diplomat ability grants a separate 2× multiplier on positive diplomatic action effects... Combined effective multiplier for positive actions = 1.30 × 2.0 = 2.60",
+      "source_file": "src/game/systems/diplomacy.ts",
+      "source_line": 0,
+      "actual_impl": "No Hamster Universal Diplomat multiplier implemented. The diplomacy.ts file has no race-specific relation change modifiers. Relationship changes are applied uniformly regardless of initiating race.",
+      "recommendation": "Implement applyRelationModifier() to check initiating race and apply HAMSTER_POSITIVE_COMBINED (2.60) multiplier for positive actions when Hamsters initiate. Add constants HAMSTER_DIPLOMACY_BASE=1.30 and HAMSTER_POSITIVE_MULTIPLIER=2.0."
+    },
+    {
+      "severity": "high",
+      "design_doc": "design/diplomacy/relationship-formulas.md",
+      "design_spec": "Section 2.2: 'Establish trade agreement' base change = +20, 'Sign non-aggression pact' = +10, 'Sign defensive pact' = +30, 'Form military alliance' = +50",
+      "source_file": "src/game/systems/treaties.ts",
+      "source_line": 227,
+      "actual_impl": "RELATION_BONUS_FOR_TYPE shows: non_aggression=10 (correct), trade=20 (correct), research=15 (correct), military_alliance=50 (correct), defensive_pact=30 (correct). However, these bonuses are applied directly without the racial diplomacy modifiers specified in the design.",
+      "recommendation": "Apply racial diplomacy modifiers to treaty relationship bonuses. For Hamsters establishing treaties, the bonus should be multiplied by 2.60 (combined diplomacy modifier)."
+    },
+    {
+      "severity": "high",
+      "design_doc": "design/diplomacy/relationship-formulas.md",
+      "design_spec": "Section 5.3: Racial Attitude Matrix starting modifiers - Guinea Pigs→Hamsters: -30, Chameleons→Everyone: -10, Everyone→Chameleons: -10 (separate incoming distrust), Hamsters→Everyone: +10",
+      "source_file": "src/game/systems/diplomacy.ts",
+      "source_line": 61,
+      "actual_impl": "makeNeutralRelation() initializes all relations to value=0. No racial attitude matrix is applied at relationship initialization.",
+      "recommendation": "Modify initializeRelations() to apply starting racial modifiers from the design's Racial Attitude Matrix. Add RACIAL_ATTITUDE_MATRIX constant and apply it when creating initial relations."
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/diplomacy/relationship-formulas.md",
+      "design_spec": "Section 3.1: Treaty Maintenance Bonuses - Trade Agreement +0.20/turn, Research Pact +0.15/turn, Non-Aggression Pact +0.10/turn, Defensive Pact +0.20/turn, Military Alliance +0.30/turn, with Maximum Treaty Maintenance Cap of +10 total per turn",
+      "source_file": "src/game/systems/treaties.ts",
+      "source_line": 0,
+      "actual_impl": "No per-turn treaty maintenance relationship bonuses are implemented. Treaties only provide the initial relation bonus on signing, not ongoing maintenance bonuses.",
+      "recommendation": "Add per-turn treaty maintenance logic in processTreatyEffects() that accumulates fractional relationship bonuses per active treaty, capped at +10 total per turn."
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/diplomacy/relationship-formulas.md",
+      "design_spec": "Section 3.3: Treaty Duration Bonus formula: TreatyDurationBonus = floor(TurnsActive / 25) × 5, Maximum Duration Bonus: +20",
+      "source_file": "src/game/systems/treaties.ts",
+      "source_line": 0,
+      "actual_impl": "No treaty duration bonus is implemented. Long-held treaties do not generate additional trust bonuses.",
+      "recommendation": "Add treaty duration bonus calculation in processTreatyEffects() that awards +5 relationship bonus at 25, 50, 75, and 100+ turns of treaty duration."
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/diplomacy/relationship-formulas.md",
+      "design_spec": "Section 4: War Weariness - BaseDuration = floor(TurnsAtWar / 10), CasualtyFactor = floor(ShipsLost × ShipWeight + PopulationLost × 0.01), EconomicStrain = floor((WarMaintenanceCost / TotalIncome) × 20). Racial multipliers: Guinea Pigs 0.5×, Ferrets 0.7×, Budgies 0.75×, etc.",
+      "source_file": "src/game/systems/diplomacy.ts",
+      "source_line": 6,
+      "actual_impl": "War weariness is simplified: WAR_WEARINESS_MORALE_PER_TURN=1 (1 morale penalty per turn at war), capped at WAR_WEARINESS_MAX_PENALTY=20. No casualty factor, no economic strain, no racial multipliers.",
+      "recommendation": "Implement full war weariness formula with BaseDuration, CasualtyFactor, and EconomicStrain components. Add racial war weariness multipliers from design Section 4.2."
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/diplomacy/relationship-formulas.md",
+      "design_spec": "Section 6: Decay Rate Modifiers - Active trade agreement: 0.5× (slower decay), Military alliance: 0.25× (much slower decay), Recent war: 2.0× (faster decay), Treaty breaker reputation: 1.5× (faster decay), Shared enemy: 0.5× (slower decay), Border friction: 1.5× (faster decay)",
+      "source_file": "src/game/systems/diplomacy.ts",
+      "source_line": 98,
+      "actual_impl": "processRelations() uses a fixed DECAY_RATE=0.02 without any situational modifiers.",
+      "recommendation": "Implement decay rate modifiers in processRelations() that check for active treaties, recent wars, treaty breaker status, shared enemies, and border friction."
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/diplomacy/relationship-formulas.md",
+      "design_spec": "Section 6.3: Border Friction = ContestedSystems × 5, applied as negative modifier each turn (maximum -25). Contested System Definition: Both races have colonies within 3 parsecs, etc.",
+      "source_file": "src/game/systems/diplomacy.ts",
+      "source_line": 0,
+      "actual_impl": "No border friction system is implemented. Contested systems do not affect relations.",
+      "recommendation": "Implement border friction calculation that counts contested systems and applies per-turn relation penalties up to -25."
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/diplomacy/relationship-formulas.md",
+      "design_spec": "Section 7: Population Dominance Coalition - DOMINANCE_WARNING_THRESHOLD=0.33, DOMINANCE_COALITION_THRESHOLD=0.40, DOMINANCE_PENALTY_PER_TURN=2, DOMINANCE_PENALTY_MAX=-30. When empire controls 40%+ of galactic population, -2 relations per turn from all other empires.",
+      "source_file": "src/game/systems/diplomacy.ts",
+      "source_line": 0,
+      "actual_impl": "No population dominance coalition system is implemented in diplomacy.ts. Council.ts has DOMINANCE_THRESHOLD for voting but not the per-turn relation penalties.",
+      "recommendation": "Implement population dominance tracking in processRelations() that applies DOMINANCE_PENALTY_PER_TURN (-2) to all relations when an empire controls 40%+ of galactic population, capped at -30 from this mechanic."
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/diplomacy/relationship-formulas.md",
+      "design_spec": "Section 8: Reputation System - Four tracks: Honor (-100 to +100), Peace (-100 to +100), Fairness (-100 to +100), Mercy (-100 to +100). ReputationModifier = (Honor + Peace + Fairness + Mercy) / 400, producing EffectiveReputation = 1.0 + (ReputationModifier × 0.5)",
+      "source_file": "src/game/systems/diplomacy.ts",
+      "source_line": 0,
+      "actual_impl": "No reputation tracking system exists. Council.ts uses relation value as a proxy for reputation, but the four-track system (Honor, Peace, Fairness, Mercy) is not implemented.",
+      "recommendation": "Implement ReputationState type with four tracks. Add reputation change events and calculate ReputationModifier for diplomatic calculations."
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/diplomacy/espionage.md",
+      "design_spec": "Section 2.1: Chameleon SpyRollBonus = +30 (flat bonus added directly to spy rolls, MOO1 mechanic)",
+      "source_file": "src/game/systems/espionage.ts",
+      "source_line": 47,
+      "actual_impl": "calculateSpyEffectiveness() references senderRace.spyRollBonus but this field is not defined on the Race type. The races.ts file would need to include this property.",
+      "recommendation": "Verify Race type includes spyRollBonus field. Add spyRollBonus: 30 for Chameleons, 0 for all other races in the race definitions."
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/diplomacy/espionage.md",
+      "design_spec": "Section 2.2: Defensive Security Bonuses - Ants: Immune (cannot spy on), Chameleons: +30, Mice: +10, Rats: +5, Rabbits: -5, Hermit Crabs: -10",
+      "source_file": "src/game/systems/espionage.ts",
+      "source_line": 66,
+      "actual_impl": "RACIAL_DEFENSE_BONUS has Ants=999 (should use immuneToEspionage flag), Chameleons=30, Mice=10, Rats=5, Rabbits=-5, Hermit Crabs=-10. Values match but implementation note for Ants says 'immune — handled by flag, not formula'.",
+      "recommendation": "Verify that immuneToEspionage flag properly blocks all espionage against Ants. The 999 value is defensive but the flag check should take precedence."
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/diplomacy/espionage.md",
+      "design_spec": "Section 1.3: All Spies Fail - Catastrophic Result: When detection_roll == 100 (natural 100 on d100), ALL of empire's currently-infiltrated spies lose their next action turn",
+      "source_file": "src/game/systems/espionage.ts",
+      "source_line": 0,
+      "actual_impl": "No 'All Spies Fail' catastrophic result is implemented. processEspionageTurns() only checks individual mission detection, not the catastrophic failure case.",
+      "recommendation": "Add catastrophic failure check: if detectionRoll === 100 (before scaling to 0-1), set skip_turns += 1 for all infiltrated spies of the attacker."
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/diplomacy/espionage.md",
+      "design_spec": "Section 4.1: Security Level table - Level 0: 0 BC, 10% detection; Level 1: 50 BC, 20% detection; ... Level 10: 2750 BC, 99% detection. Cost formula: RequiredSpending = (SecurityLevel × (SecurityLevel + 1) / 2) × 50 + (SecurityLevel × 50)",
+      "source_file": "src/game/systems/espionage.ts",
+      "source_line": 0,
+      "actual_impl": "Security level costs are not implemented. The espionage system uses securityLevel directly but there's no BC cost associated with setting security levels.",
+      "recommendation": "Implement security spending system where empires allocate BC to security and the security level is calculated from spending amount using the design formula."
+    },
+    {
+      "severity": "low",
+      "design_doc": "design/diplomacy/espionage.md",
+      "design_spec": "Section 6.5: Incite Rebellion requires target planet morale < 70%",
+      "source_file": "src/ui/components/EspionagePanel.ts",
+      "source_line": 42,
+      "actual_impl": "MISSION_DEFS.propaganda (mapped to Incite Rebellion lite) has no morale requirement check. Any espionage mission can be launched regardless of target conditions.",
+      "recommendation": "Add morale requirement validation for rebellion/propaganda missions before allowing launch."
+    },
+    {
+      "severity": "low",
+      "design_doc": "design/diplomacy/espionage.md",
+      "design_spec": "Section 6.2: Tech Theft - TechValueModifier: Tier 1-3 techs: +10, Tier 4-6: +0, Tier 7-9: -5, Tier 10-12: -10, Tier 13+: -15",
+      "source_file": "src/game/systems/espionage.ts",
+      "source_line": 0,
+      "actual_impl": "No tech tier modifier is applied to theft mission success calculations. BASE_MISSION_SUCCESS.theft is a flat 30%.",
+      "recommendation": "Implement tech tier modifier when calculating theft success probability, adjusting based on the specific tech being targeted."
+    },
+    {
+      "severity": "low",
+      "design_doc": "design/diplomacy/ai-personalities.md",
+      "design_spec": "Hamsters: baseFriendliness=20, warReluctance=30, treatyBonus=15",
+      "source_file": "src/game/ai/ai-personalities.ts",
+      "source_line": 78,
+      "actual_impl": "HAMSTER_PROFILE has baseFriendliness=20 (correct), warReluctance=30 (correct), treatyBonus=15 (correct). However, design also specifies diplomacy modifier +30% and Universal Diplomat 2× bonus which are not present in the personality profile.",
+      "recommendation": "Consider adding diplomacyModifier: 1.30 and positiveActionMultiplier: 2.0 to HAMSTER_PROFILE to match relationship-formulas.md Section 5.2."
+    },
+    {
+      "severity": "low",
+      "design_doc": "design/diplomacy/council.md",
+      "design_spec": "Section 4.4: Bribery Factor = (Bribe_Value / Voter_Economy) × BRIBERY_WEIGHT × Racial_Bribe_Modifier. Tech_Value(tech) = Tech_Tier × 50 + (1000 if voter_does_not_have)",
+      "source_file": "src/game/systems/council.ts",
+      "source_line": 188,
+      "actual_impl": "calculateVoteScore() has briberyFactor = 0 with comment 'zero until bribe system is implemented'. Bribery is not functional.",
+      "recommendation": "Implement bribery system for council votes including tech value calculation and racial bribe modifiers."
+    },
+    {
+      "severity": "low",
+      "design_doc": "design/diplomacy/council.md",
+      "design_spec": "Section 7.6: Alliance Voting - 80% chance to vote for allied candidate, 20% independent. Chameleons: Only 50% alliance loyalty.",
+      "source_file": "src/game/systems/council.ts",
+      "source_line": 0,
+      "actual_impl": "No alliance voting loyalty system. Allies vote based purely on vote score calculation, not a forced loyalty percentage.",
+      "recommendation": "Add alliance loyalty check in runAIVotes() that gives 80% chance (50% for Chameleons) to vote for allied candidate regardless of score."
+    },
+    {
+      "severity": "low",
+      "design_doc": "design/technical/ai-implementation.md",
+      "design_spec": "Section 1.3: Military Threat Component - Ship_Power formula includes Hull_HP × Armor_Multiplier × 0.5 + Total_Weapon_Damage × 2.0 + Shield_Class × 5 + Speed × 3",
+      "source_file": "src/game/ai/strategies.ts",
+      "source_line": 63,
+      "actual_impl": "getEmpireFleetSize() only counts total ship count (fleet.shipIds.length). No fleet power calculation based on hull, armor, weapons, shields, or speed.",
+      "recommendation": "Implement proper fleet power calculation using the design formula instead of simple ship count."
+    },
+    {
+      "severity": "low",
+      "design_doc": "design/technical/ai-implementation.md",
+      "design_spec": "Section 3.5: Racial Research Preferences table with specific multipliers (e.g., guinea_pigs.weapons=1.4, chameleons.computers=1.5, rabbits.planetology=1.5)",
+      "source_file": "src/game/ai/researchAI.ts",
+      "source_line": 68,
+      "actual_impl": "PERSONALITY_FIELD_WEIGHTS uses 0-100 scores, not multipliers. E.g., aggressive.weapons=80 vs design's 1.4 multiplier. The score-based system is different from the multiplier-based design.",
+      "recommendation": "Either convert design multipliers to 0-100 scores (1.0→50, 1.4→70, 1.5→75) or implement multiplier-based system to match design precisely."
+    }
+  ],
+  "missing_from_code": [
+    {
+      "design_doc": "design/diplomacy/relationship-formulas.md",
+      "feature": "Section 7.2: Dominance Warning system - diplomatic message when any empire crosses 33% of galactic population threshold"
+    },
+    {
+      "design_doc": "design/diplomacy/relationship-formulas.md",
+      "feature": "Section 7.4: Coalition AI Behavior Trigger - COALITION_WAR_BOOST (+20 war tendency vs dominant empire), COALITION_ALLIANCE_BOOST (+30 alliance acceptance among non-dominant races)"
+    },
+    {
+      "design_doc": "design/diplomacy/relationship-formulas.md",
+      "feature": "Section 8.2: Reputation Change Events - specific events that modify Honor, Peace, Fairness, and Mercy tracks"
+    },
+    {
+      "design_doc": "design/diplomacy/relationship-formulas.md",
+      "feature": "Section 3.2: Treaty Violation Penalties - 'Treaty Breaker' reputation flag with duration tracking (50 turns base, +25 per additional violation)"
+    },
+    {
+      "design_doc": "design/diplomacy/espionage.md",
+      "feature": "Section 8: Counter-Espionage Operations - Active Counter-Intelligence bonus, Spy Hunt Mode (200 BC), turning spies into double agents"
+    },
+    {
+      "design_doc": "design/diplomacy/espionage.md",
+      "feature": "Section 10.1: Chameleon Sleeper Agents - 150 BC to plant, 50 BC/turn maintenance, +30% to next mission bonus"
+    },
+    {
+      "design_doc": "design/diplomacy/espionage.md",
+      "feature": "Section 10.2: False Flag Operations - planting evidence suggesting third party conducted espionage"
+    },
+    {
+      "design_doc": "design/diplomacy/espionage.md",
+      "feature": "Section 10.3: Technology Sabotage - delay enemy research by removing 15-30% of accumulated research points"
+    },
+    {
+      "design_doc": "design/diplomacy/espionage.md",
+      "feature": "Section 9.2: Cumulative Espionage Hostility tracking with decay (SuccessfulMissions×5 + CaughtMissions×15, threshold 100, decay 2/turn)"
+    },
+    {
+      "design_doc": "design/diplomacy/council.md",
+      "feature": "Section 6.1-6.3: Pre-Vote Lobbying Phase - 5 turns before council meeting with bribery interface, vote requests"
+    },
+    {
+      "design_doc": "design/diplomacy/council.md",
+      "feature": "Section 6.5-6.6: Post-Vote Options - player can reject their own victory (-30 relation with supporters) or reject opponent's victory (triggers galactic war)"
+    },
+    {
+      "design_doc": "design/diplomacy/trade.md",
+      "feature": "Pirates & Space Monsters affecting trade routes with 20-50% income reduction"
+    },
+    {
+      "design_doc": "design/diplomacy/trade.md",
+      "feature": "Trade Sanctions as Council action - all trade with target banned, -50% their income"
+    },
+    {
+      "design_doc": "design/diplomacy/treaties.md",
+      "feature": "Research Agreement +10% research bonus to both sides (TREATY_DEFAULTS has researchBonus:10 but implementation in processTreatyEffects comments says 'handled by research system; no-op here')"
+    },
+    {
+      "design_doc": "design/technical/ai-implementation.md",
+      "feature": "Section 1.4: Economic Threat Component formula - Enemy_Production / Our_Production × 50"
+    },
+    {
+      "design_doc": "design/technical/ai-implementation.md",
+      "feature": "Section 1.5: Technology Threat Component formula - Tech_Gap × 10 based on average tech levels"
+    },
+    {
+      "design_doc": "design/technical/ai-implementation.md",
+      "feature": "Section 1.8: Racial Threat Perception Modifiers (Guinea Pigs 0.70, Rabbits 1.30, etc.)"
+    },
+    {
+      "design_doc": "design/technical/ai-implementation.md",
+      "feature": "Section 2: Full Expansion Priority Scoring with Environment_Modifier, Resource_Modifier, Strategic_Bonus, Competition_Modifier"
+    },
+    {
+      "design_doc": "design/technical/ai-implementation.md",
+      "feature": "Section 4: Fleet Deployment Decisions with Fleet Role Classification, Deployment Target Scoring, Combat Engagement Decision formula"
+    }
+  ],
+  "not_in_design": [
+    {
+      "source_file": "src/game/systems/treaties.ts",
+      "feature": "TREATY_MAINTENANCE_BONUSES - maintenance cost reduction per treaty type (trade: 5%, military_alliance: 15%, defensive_pact: 10%). Not specified in design documents."
+    },
+    {
+      "source_file": "src/game/systems/treaties.ts",
+      "feature": "calculateTreatyMaintenanceBonus() function with 50% maximum cap. Not specified in relationship-formulas.md or treaties.md."
+    },
+    {
+      "source_file": "src/game/systems/treaties.ts",
+      "feature": "BREAK_DEFENSIVE_PACT_EARLY_PENALTY = -50 as separate penalty from normal break penalty. Design mentions fixed 30-turn duration but not specific early-break penalty."
+    },
+    {
+      "source_file": "src/game/systems/treaties.ts",
+      "feature": "TRADE_BASE_OFFSET = 5 added to base trade income calculation. Design formula is (Production_A + Production_B) / 20 without a base offset."
+    },
+    {
+      "source_file": "src/game/ai/diplomacyAI.ts",
+      "feature": "DiplomaticDecision priority scoring (1-10 scale) not specified in design documents. AI decision priority weighting is implementation detail."
+    },
+    {
+      "source_file": "src/game/ai/ai-personalities.ts",
+      "feature": "AIPersonalityProfile.research field (0-100) not present in design personality definitions. Design focuses on expansion, military, diplomacy, technology preferences but not a general 'research' stat."
+    },
+    {
+      "source_file": "src/ui/components/EspionagePanel.ts",
+      "feature": "Spy allocation slider (0-100% of 25 total spies). Design uses per-spy cost model rather than percentage-based allocation."
+    },
+    {
+      "source_file": "src/game/systems/espionage.ts",
+      "feature": "MissionType includes 'propaganda' and 'infiltration' as separate types. Design only specifies: reconnaissance, theft, sabotage_factories, sabotage_bases, incite_rebellion, frame, assassination."
+    }
+  ]
+}

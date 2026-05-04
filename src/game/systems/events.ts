@@ -13,6 +13,7 @@
  */
 
 import { GameState, PlanetId, NotificationType, EmpireId } from '../state';
+import { getEventFrequencyMultiplier } from './difficulty';
 import eventsData from '../../data/events.json';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -56,13 +57,7 @@ const BASE_EVENT_CHANCE = 0.03;
 const TURN_PROBABILITY_INCREMENT = 0.001;
 const MAX_EVENT_CHANCE = 0.15;
 
-const DIFFICULTY_EVENT_MULTIPLIER: Record<string, number> = {
-  easy: 0.75,
-  normal: 1.0,
-  hard: 1.25,
-  impossible: 1.5,
-  custom: 1.0,
-};
+// Legacy difficulty multiplier removed — now using getEventFrequencyMultiplier() from ./difficulty.
 
 // Category weights from the design doc
 const CATEGORY_WEIGHTS: Record<GameEventCategory, number> = {
@@ -163,8 +158,8 @@ export function rollRandomEvents(
   rng: () => number = Math.random,
 ): GameEvent[] {
   const turn = state.turn;
-  const difficultyMultiplier =
-    DIFFICULTY_EVENT_MULTIPLIER[state.difficulty] ?? 1.0;
+  // Use the difficulty system's event frequency multiplier
+  const difficultyMultiplier = getEventFrequencyMultiplier(state.difficulty);
 
   const eventChance = Math.min(
     BASE_EVENT_CHANCE + turn * TURN_PROBABILITY_INCREMENT,

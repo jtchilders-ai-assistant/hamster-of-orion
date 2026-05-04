@@ -4,6 +4,9 @@
  * Handles relationship values between empires on a -100 (war) to +100 (allied)
  * scale, with per-empire modifier stacking and per-turn decay toward neutral.
  *
+ * Also implements war weariness: prolonged war causes morale degradation and
+ * production penalties. Each turn at war reduces morale by 1, capped at -20.
+ *
  * All formulas follow design/diplomacy/relationship-formulas.md.
  */
 
@@ -15,6 +18,17 @@ import {
   GameState,
   RelationModifier,
 } from '../state';
+
+// ── War Weariness Constants ───────────────────────────────────────────────────
+
+/** Morale penalty per turn at war. */
+export const WAR_WEARINESS_MORALE_PER_TURN = 1;
+
+/** Maximum war weariness morale penalty. */
+export const WAR_WEARINESS_MAX_PENALTY = 20;
+
+/** Production penalty percentage per 5 morale points lost to war weariness. */
+export const WAR_WEARINESS_PRODUCTION_PENALTY_PER_5_MORALE = 2;
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -230,4 +244,185 @@ export function getRelationValue(
   const relation = getRelation(state, empireAId, empireBId);
   if (!relation) return RELATION_NEUTRAL;
   return relation.value;
+}
+
+// ── War Weariness ─────────────────────────────────────────────────────────────
+
+/**
+ * Calculate the war weariness penalty for an empire based on active wars.
+ * Returns the total morale penalty from all active wars.
+ */
+export function calculateWarWeariness(
+  state: GameState,
+  empireId: EmpireId,
+): number {
+  const empire = state.empires.byId[empireId];
+  if (!empire) return 0;
+
+  let totalWeariness = 0;
+
+  for (const otherId of Object.keys(empire.relations)) {
+    if (otherId === empireId) continue;
+
+    const rel = empire.relations[otherId];
+    if (!rel) continue;
+
+    // Check if at war (state is 'war' and warStartTurn is set)
+    if (rel.state === 'war' && rel.warStartTurn !== null) {
+      const turnsAtWar = state.turn - rel.warStartTurn;
+      // 1 morale penalty per turn at war, capped at 20 per war
+      const weariness = Math.min(turnsAtWar * WAR_WEARINESS_MORALE_PER_TURN, WAR_WEARINESS_MAX_PENALTY);
+      totalWeariness += weariness;
+    }
+  }
+
+  // Global cap at 20 total (sum of all wars)
+  return Math.min(totalWeariness, WAR_WEARINESS_MAX_PENALTY);
+}
+
+/**
+ * Calculate the production penalty percentage from war weariness.
+ * Returns a percentage reduction (e.g., 8 means -8% production).
+ */
+export function calculateWarWearinessProductionPenalty(
+  state: GameState,
+  empireId: EmpireId,
+): number {
+  const weariness = calculateWarWeariness(state, empireId);
+  // 2% production penalty per 5 morale points lost
+  return Math.floor(weariness / 5) * WAR_WEARINESS_PRODUCTION_PENALTY_PER_5_MORALE;
+}
+
+/**
+ * Get the number of turns an empire has been at war with another empire.
+ * Returns 0 if not at war or if warStartTurn is not set.
+ */
+export function getTurnsAtWar(
+  state: GameState,
+  empireAId: EmpireId,
+  empireBId: EmpireId,
+): number {
+  const relation = getRelation(state, empireAId, empireBId);
+  if (!relation || relation.state !== 'war' || relation.warStartTurn === null) {
+    return 0;
+  }
+  return state.turn - relation.warStartTurn;
+}
+
+/**
+ * Start a war between two empires. Sets warStartTurn and updates state to war.
+ */
+export function declareWar(
+  state: GameState,
+  attackerId: EmpireId,
+  defenderId: EmpireId,
+): GameState {
+  const relation = getRelation(state, attackerId, defenderId);
+  if (!relation) return state;
+
+  // Already at war
+  if (relation.state === 'war') return state;
+
+  const newRelations = { ...state.empires.byId[attackerId].relations };
+  newRelations[defenderId] = {
+    ...relation,
+    value: RELATION_MIN,
+    state: 'war',
+    warStartTurn: state.turn,
+    modifiers: [
+      ...relation.modifiers,
+      {
+        reason: 'War declaration',
+        amount: -50,
+        expiresAtTurn: undefined, // permanent until peace
+      },
+    ],
+  };
+
+  // Update both empires' relations
+  let nextState: GameState = {
+    ...state,
+    empires: {
+      ...state.empires,
+      byId: {
+        ...state.empires.byId,
+        [attackerId]: { ...state.empires.byId[attackerId], relations: newRelations },
+      },
+    },
+  };
+
+  // Mirror the war state for the defender
+  const defenderRelations = { ...nextState.empires.byId[defenderId].relations };
+  defenderRelations[attackerId] = {
+    ...defenderRelations[attackerId],
+    value: RELATION_MIN,
+    state: 'war',
+    warStartTurn: state.turn,
+  };
+
+  nextState = {
+    ...nextState,
+    empires: {
+      ...nextState.empires,
+      byId: {
+        ...nextState.empires.byId,
+        [defenderId]: { ...nextState.empires.byId[defenderId], relations: defenderRelations },
+      },
+    },
+  };
+
+  return nextState;
+}
+
+/**
+ * End a war between two empires. Clears warStartTurn and updates state.
+ */
+export function makePeace(
+  state: GameState,
+  empireAId: EmpireId,
+  empireBId: EmpireId,
+): GameState {
+  const relation = getRelation(state, empireAId, empireBId);
+  if (!relation || relation.state !== 'war') return state;
+
+  const newRelationsA = { ...state.empires.byId[empireAId].relations };
+  newRelationsA[empireBId] = {
+    ...relation,
+    value: -45, // Just above war threshold
+    state: 'unfriendly',
+    warStartTurn: null,
+  };
+
+  let nextState: GameState = {
+    ...state,
+    empires: {
+      ...state.empires,
+      byId: {
+        ...state.empires.byId,
+        [empireAId]: { ...state.empires.byId[empireAId], relations: newRelationsA },
+      },
+    },
+  };
+
+  // Mirror for the other empire
+  const newRelationsB = { ...nextState.empires.byId[empireBId].relations };
+  newRelationsB[empireAId] = {
+    ...newRelationsB[empireAId],
+    value: -45,
+    state: 'unfriendly',
+    warStartTurn: null,
+  };
+
+  nextState = {
+    ...nextState,
+    empires: {
+      ...nextState.empires,
+      byId: {
+        ...nextState.empires.byId,
+        [empireBId]: { ...nextState.empires.byId[empireBId], relations: newRelationsB },
+      },
+    },
+  };
+
+  return nextState;
 }

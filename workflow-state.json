@@ -1,32 +1,11 @@
 {
   "state": "IDLE",
-  "phase": "phase4b-ui-integration",
-  "current_task": "constants-to-code",
-  "verification_result": {
-    "task": "constants-to-code",
-    "status": "approved",
-    "checked_at": "2026-04-21T22:23:00Z",
-    "typecheck": "pass",
-    "tests": {
-      "total": 925,
-      "passed": 925,
-      "failed": 0
-    },
-    "check_design": "pass (0 violations)",
-    "design_docs_verified": [
-      "design/economy/factory-formulas.md",
-      "design/economy/population-growth.md",
-      "design/economy/slider-mathematics.md",
-      "design/ships/combat-algorithm.md",
-      "design/diplomacy/relationship-formulas.md",
-      "design/technology/research-formulas.md"
-    ],
-    "notes": "All 6 design docs fully represented in src/game/constants.ts. All formulas and constants match design specs."
-  },
-  "last_check": "2026-04-22T00:57:00Z",
-  "last_completed": "hotkey-navigation",
-  "task_count": 16,
-  "completed_count": 16,
-  "last_commit": "3167c0b",
-  "notes": "VERIFICATION COMPLETE: All 16/16 tasks done. Phase 4B fully complete."
+  "phase": "phase5-design-compliance-fixes",
+  "current_task": null,
+  "last_check": "2026-05-04T02:44:00.000Z",
+  "total_tasks": 85,
+  "completed_count": 1,
+  "skipped_count": 0,
+  "blocked_count": 0,
+  "notes": "fix-1 completed: Fixed 16 issues in combat.ts + test fixes for race IDs and difficulty levels"
 }

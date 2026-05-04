@@ -4,7 +4,13 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { calculateBaseProduction, getRichnessMultiplier, distributeProduction } from '../../../src/game/systems/production';
+import {
+  calculateBaseProduction,
+  getRichnessMultiplier,
+  allocateSliders,
+  calculateNetProduction,
+  DEFAULT_PRODUCTION_CONTEXT,
+} from '../../../src/game/systems/production';
 import { Planet } from '../../../src/game/state';
 
 describe('Production System', () => {
@@ -64,7 +70,7 @@ describe('Production System', () => {
     expect(getRichnessMultiplier(normalPlanet)).toBe(1.0);
   });
 
-  it('distributes production according to sliders', () => {
+  it('allocates production according to sliders (modern API)', () => {
     const planet: Planet = {
       id: 'p1',
       name: 'Test',
@@ -83,6 +89,8 @@ describe('Production System', () => {
       factories: 100,
       maxFactories: 100,
       waste: 0,
+      // TECH at 25% diverts pop from labor; SHIP/DEF/IND/ECO split the remaining
+      // net production. Here: SHIP=50, IND=25, ECO=0, DEF=0 (sum=75, renormalizes)
       production: { ship: 50, defense: 0, industry: 25, ecology: 0, research: 25 },
       buildQueue: [],
       buildings: [],
@@ -99,13 +107,18 @@ describe('Production System', () => {
       startingFactories: null,
     };
 
-    const output = distributeProduction(planet);
-    const total = calculateBaseProduction(planet);
+    const netResult = calculateNetProduction(planet, DEFAULT_PRODUCTION_CONTEXT);
+    const allocation = allocateSliders(planet, netResult.netProduction, DEFAULT_PRODUCTION_CONTEXT);
     
-    expect(output.ship).toBeCloseTo(total * 0.5);
-    expect(output.defense).toBe(0);
-    expect(output.industry).toBeCloseTo(total * 0.25);
-    expect(output.ecology).toBe(0);
-    expect(output.research).toBeCloseTo(total * 0.25);
+    // Non-TECH sliders: ship=50, def=0, ind=25, eco=0 (total 75).
+    // Renormalized: ship=66.7%, ind=33.3%
+    // Ship should get ~2/3 of net, industry ~1/3.
+    const netProd = netResult.netProduction;
+    expect(allocation.ship).toBeCloseTo(Math.floor(netProd * (50 / 75)), 0);
+    expect(allocation.defense).toBe(0);
+    expect(allocation.industry).toBeCloseTo(Math.floor(netProd * (25 / 75)), 0);
+    expect(allocation.ecology).toBe(0);
+    // TECH generates RP from scientists (population × 25% = 25 scientists × 1.0 = 25 RP)
+    expect(allocation.techRP).toBeCloseTo(25, 0);
   });
 });

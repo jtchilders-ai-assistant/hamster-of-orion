@@ -24,6 +24,7 @@ import { VictoryScreen } from './screens/VictoryScreen';
 import { SaveLoadScreen } from './screens/SaveLoadScreen';
 import { GroundCombatScreen } from './screens/GroundCombatScreen';
 import { ReportsScreen } from './screens/ReportsScreen';
+import { HallOfFameScreen } from './screens/HallOfFameScreen';
 
 // ── F-key → Screen mapping ────────────────────────────────────────────────────
 // Canonical source: design/ui-ux/interaction-spec.md §2.1 (Global Shortcuts)
@@ -125,8 +126,7 @@ export class App {
   }
 
   private buildScreens(root: HTMLElement, store: Store<GameState>): Map<ScreenType, Screen> {
-    const galaxyEl = root.querySelector<HTMLElement>('#galaxy-screen')
-      ?? this.makeScreenContainer(root, 'galaxy-screen');
+    console.log('[App.buildScreens] root =', root?.id ?? 'null', 'children before =', root?.children.length);
 
     const coloniesEl   = this.makeScreenContainer(root, 'colonies-screen');
     const planetEl     = this.makeScreenContainer(root, 'planet-screen');
@@ -135,34 +135,48 @@ export class App {
     const diplomacyEl  = this.makeScreenContainer(root, 'diplomacy-screen');
     const designEl     = this.makeScreenContainer(root, 'design-screen');
     const newGameEl    = this.makeScreenContainer(root, 'new-game-screen');
+    const galaxyEl     = this.makeScreenContainer(root, 'galaxy-screen');
     const combatEl          = this.makeScreenContainer(root, 'combat-screen');
     const groundCombatEl   = this.makeScreenContainer(root, 'ground-combat-screen');
     const councilEl        = this.makeScreenContainer(root, 'council-screen');
     const saveLoadEl       = this.makeScreenContainer(root, 'save-load-screen');
     const turnSummaryEl    = this.makeScreenContainer(root, 'turn-summary-screen');
-    const turnSummary      = new TurnSummaryScreen(turnSummaryEl, store);
     const victoryEl        = this.makeScreenContainer(root, 'victory-screen');
-    const victory          = new VictoryScreen(victoryEl, store);
+    const reportsEl   = this.makeScreenContainer(root, 'reports-screen');
+    const hallOfFameEl = this.makeScreenContainer(root, 'hall-of-fame-screen');
 
-    const reportsEl = this.makeScreenContainer(root, 'reports-screen');
+    // Wrap screen instantiation in try/catch — one failure shouldn't kill all screens
+    const screenInstances: [ScreenType, Screen][] = [];
+    try {
+      const turnSummary = new TurnSummaryScreen(turnSummaryEl, store);
+      const victory = new VictoryScreen(victoryEl, store);
 
-    return new Map<ScreenType, Screen>([
-      ['new_game',         new NewGameScreen(newGameEl, store)],
-      ['galaxy',           new GalaxyScreen(galaxyEl, store)],
-      ['planet',           new PlanetScreen(planetEl, store)],
-      ['planet_list',      new ColoniesScreen(coloniesEl, store)],
-      ['fleet',            new FleetsScreen(fleetsEl, store)],
-      ['research',         new ResearchScreen(researchEl, store)],
-      ['diplomacy',        new DiplomacyScreen(diplomacyEl)],
-      ['ship_design',      new DesignScreen(designEl, store)],
-      ['reports',          new ReportsScreen(reportsEl, store)],
-      ['combat',           new CombatScreen(combatEl, store)],
-      ['ground_combat',    new GroundCombatScreen(groundCombatEl, store)],
-      ['council',          new CouncilScreen(councilEl)],
-      ['save_load',        new SaveLoadScreen(saveLoadEl, store)],
-      ['turn_summary',     turnSummary],
-      ['victory',          victory],
-    ]);
+      screenInstances.push(
+        ['new_game',         new NewGameScreen(newGameEl, store)],
+        ['galaxy',           new GalaxyScreen(galaxyEl, store)],
+        ['planet',           new PlanetScreen(planetEl, store)],
+        ['planet_list',      new ColoniesScreen(coloniesEl, store)],
+        ['fleet',            new FleetsScreen(fleetsEl, store)],
+        ['research',         new ResearchScreen(researchEl, store)],
+        ['diplomacy',        new DiplomacyScreen(diplomacyEl)],
+        ['ship_design',      new DesignScreen(designEl, store)],
+        ['reports',          new ReportsScreen(reportsEl, store)],
+        ['combat',           new CombatScreen(combatEl, store)],
+        ['ground_combat',    new GroundCombatScreen(groundCombatEl, store)],
+        ['council',          new CouncilScreen(councilEl)],
+        ['save_load',        new SaveLoadScreen(saveLoadEl, store)],
+        ['turn_summary',     turnSummary],
+        ['victory',          victory],
+        ['hall_of_fame',   new HallOfFameScreen(hallOfFameEl, store)],
+      );
+    } catch (err) {
+      console.error('[App.buildScreens] ERROR creating screens:', err);
+      // Fall back to just the new-game screen
+      screenInstances.push(['new_game', new NewGameScreen(newGameEl, store)]);
+    }
+
+    console.log('[App.buildScreens] Creating map with', screenInstances.length, 'screens');
+    return new Map(screenInstances);
   }
 
   private bindKeyboard(): void {
@@ -188,21 +202,52 @@ export class App {
       // Combat and ground-combat handle their own keys internally.
       if (MODAL_SCREENS.has(this.currentScreen)) return;
 
-      // ── 3. ESC: open game menu from any non-modal screen ────────────────
+      // ── 3. ESC: return to galaxy map OR open game menu ────────────────
+      // Per navigation-flow.md: "ESC from any main screen returns to the Galaxy Map (F1)."
+      // From galaxy map, ESC opens the game menu.
       if (e.key === 'Escape') {
         e.preventDefault();
-        this.navigate('menu');
+        if (this.currentScreen === 'galaxy') {
+          // From galaxy map, open the game menu
+          this.navigate('menu');
+        } else if (this.currentScreen === 'save_load') {
+          // From save/load screen, return to galaxy map
+          this.navigate('galaxy');
+        } else if (this.currentScreen === 'menu') {
+          // From game menu, return to galaxy map (close menu)
+          this.navigate('galaxy');
+        } else {
+          // From any other main screen, return to galaxy map
+          this.navigate('galaxy');
+        }
         return;
       }
 
-      // ── 4. Enter / Space: end turn ────────────────────────────────
-      if (e.key === 'Enter' || e.key === ' ') {
+      // ── 4. Ctrl+S: Quick Save ────────────────────────────────────────
+      // Per interaction-spec.md §2.1: Ctrl+S = Quick Save
+      if (e.key === 's' && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        this.quickSave();
+        return;
+      }
+
+      // ── 5. Ctrl+L: Load Game ─────────────────────────────────────────
+      // Per interaction-spec.md §2.1: Ctrl+L = Load Game (open load dialog)
+      if (e.key === 'l' && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        this.navigate('save_load');
+        return;
+      }
+
+      // ── 6. Enter / Space: end turn ────────────────────────────────
+      // Only on galaxy map — other screens may use Enter/Space differently
+      if ((e.key === 'Enter' || e.key === ' ') && this.currentScreen === 'galaxy') {
         e.preventDefault();
         this.store.dispatch({ type: 'NEXT_TURN' } as Action);
         return;
       }
 
-      // ── 5. F1–F8: global screen navigation ──────────────────────────
+      // ── 7. F1–F8: global screen navigation ──────────────────────────
       const fTarget = F_KEY_MAP[e.key];
       if (fTarget !== undefined) {
         e.preventDefault();
@@ -212,7 +257,7 @@ export class App {
         return;
       }
 
-      // ── 6. Galaxy-map-only keys ──────────────────────────────────
+      // ── 8. Galaxy-map-only keys ──────────────────────────────────
       // Arrow-key panning and +/-/0 zoom only apply on the galaxy map.
       if (this.currentScreen !== 'galaxy') return;
 
@@ -322,5 +367,26 @@ export class App {
 
     // Always render command bar (it's persistent)
     this.commandBar.render(state);
+  }
+
+  // ── Quick Save (Ctrl+S) ────────────────────────────────────────────────
+  // Saves to the autosave slot in localStorage.
+  private quickSave(): void {
+    const state = this.store.getState();
+    const envelope = {
+      version: 1,
+      savedAt: Date.now(),
+      turn: state.turn,
+      year: state.year,
+      empire: state.empires.byId[state.empires.playerId]?.name ?? 'Unknown',
+      state,
+    };
+    try {
+      localStorage.setItem('hamster_autosave', JSON.stringify(envelope));
+      console.log('[App] Quick save completed to autosave slot');
+      // TODO: Show a brief "Saved" toast notification
+    } catch (err) {
+      console.error('[App] Quick save failed:', err);
+    }
   }
 }

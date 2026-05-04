@@ -1,0 +1,323 @@
+{
+  "area": "species",
+  "name": "Species Definitions & Lore",
+  "reviewer": "orion-reviewer-10",
+  "timestamp": "2026-05-03T03:39:00.000Z",
+  "summary": "Overall good alignment between design docs and implementation. Key matches: All 10 races implemented with correct MOO1 mappings, racial bonuses match design specs, espionage isolation for Ants correctly uses boolean flags, Chameleons have correct +30 spy roll bonus, Ferrets have blood_enemies_all starting relations. Key issues found: Ants homeworld type mismatch (JSON: arid vs design: terran), Hermit Crabs homeworld type mismatch (JSON: radiated vs design: terran), Chameleons research bonus should be Computers-only but code applies +20% to general research, and several formula implementations need verification against consumer systems.",
+  "matches": [
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "source_file": "src/game/systems/races.ts",
+      "description": "All 10 race IDs correctly implemented: hamsters, ants, mice, rats, rabbits, hermit_crabs, guinea_pigs, ferrets, budgies, chameleons"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "source_file": "src/data/races.json",
+      "description": "Hamsters bonuses match: production=0, research=0, food=10, growth=0, groundCombat=-10, shipCombat=0, espionage=-20, diplomacy=30"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "source_file": "src/data/races.json",
+      "description": "Ants bonuses match: production=50, research=-10, food=20, growth=25, groundCombat=20, shipCombat=0, espionage=0, diplomacy=-30"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "source_file": "src/data/races.json",
+      "description": "Mice bonuses match: production=25, research=15, food=-50, growth=-25, groundCombat=15, shipCombat=15, espionage=0, diplomacy=-10"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "source_file": "src/data/races.json",
+      "description": "Rats bonuses match: production=-10, research=75, food=0, growth=-10, groundCombat=-20, shipCombat=10, espionage=0, diplomacy=10"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "source_file": "src/data/races.json",
+      "description": "Rabbits bonuses match: production=10, research=-10, food=25, growth=100, groundCombat=5, shipCombat=-10, espionage=-5, diplomacy=5"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "source_file": "src/data/races.json",
+      "description": "Hermit Crabs bonuses match: production=25, research=0, food=0, growth=-50, groundCombat=25, shipCombat=0, espionage=-30, diplomacy=0"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "source_file": "src/data/races.json",
+      "description": "Guinea Pigs bonuses match: production=10, research=-20, food=0, growth=10, groundCombat=50, shipCombat=10, espionage=-20, diplomacy=-20"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "source_file": "src/data/races.json",
+      "description": "Ferrets bonuses match: production=0, research=10, food=5, growth=0, groundCombat=15, shipCombat=30, espionage=10, diplomacy=-30"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "source_file": "src/data/races.json",
+      "description": "Budgies bonuses match: production=-10, research=0, food=-10, growth=0, groundCombat=-20, shipCombat=50, espionage=-10, diplomacy=0"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "source_file": "src/data/races.json",
+      "description": "Chameleons bonuses match: production=-10, research=20, food=0, growth=-10, groundCombat=0, shipCombat=-10, espionage=60, diplomacy=-15"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "source_file": "src/data/races.json",
+      "description": "Ants espionage isolation correctly implemented with boolean flags: canConductEspionage=false, immuneToEspionage=true (not numeric modifiers)"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "source_file": "src/game/systems/races.ts",
+      "description": "applyEspionageBonus() correctly returns 0 when attacker.canConductEspionage=false or defender.immuneToEspionage=true (lines 157-160)"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "source_file": "src/data/races.json",
+      "description": "Chameleons spyRollBonus=30 matches design spec '+30 flat bonus to spy rolls'"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "source_file": "src/data/races.json",
+      "description": "Ferrets startingRelations='blood_enemies_all' correctly implemented"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "source_file": "src/game/actions/newGame.ts",
+      "description": "buildRelations() correctly handles blood_enemies_all: uses isBloodEnemiesAll() to start at war and set minimum -40 relations"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "source_file": "src/game/systems/races.ts",
+      "description": "BASE_GROWTH_RATE=0.10 matches design constant (line 54)"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "source_file": "src/game/systems/races.ts",
+      "description": "BASE_ESPIONAGE_SUCCESS=0.30 matches design constant (line 55)"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "source_file": "src/game/systems/races.ts",
+      "description": "GROUND_COMBAT_BASE=3 matches design constant (line 56)"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "source_file": "src/game/systems/races.ts",
+      "description": "DIPLOMACY_UNFRIENDLY_START=-20 matches design constant (line 60)"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "source_file": "src/game/systems/races.ts",
+      "description": "Racial bonus formula implemented correctly: FinalValue = BaseValue × (1 + RacialBonus/100)"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "source_file": "src/game/systems/races.ts",
+      "description": "Minimum ground combat 10% floor correctly implemented (line 126)"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "source_file": "src/data/races.json",
+      "description": "Hamsters research field bonuses match: force_fields=40, propulsion=20, planetology=20"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "source_file": "src/data/races.json",
+      "description": "Mice research field bonuses/penalties match: computers=+40, planetology=-20"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "source_file": "src/data/races.json",
+      "description": "Rabbits research field bonus matches: planetology=+40"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "source_file": "src/data/races.json",
+      "description": "Hermit Crabs research field bonuses/penalties match: computers=+20, all others=-20"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "source_file": "src/data/races.json",
+      "description": "Guinea Pigs research field bonuses match: weapons=+20, construction=+20"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "source_file": "src/data/races.json",
+      "description": "Budgies research field bonus matches: propulsion=+40"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "source_file": "src/data/races.json",
+      "description": "Budgies movementRangeBonus=1 correctly implemented for +1 ship movement range"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "source_file": "src/data/races.json",
+      "description": "Rats researchBonusAllFields=true correctly implemented for +75% to ALL research fields"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "source_file": "src/game/systems/races.ts",
+      "description": "Mice factory efficiency multiplier correctly set to 1.5 (MICE_FACTORY_EFFICIENCY_MULTIPLIER constant, line 206)"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "source_file": "src/game/systems/races.ts",
+      "description": "miceEffectiveRCLevel() correctly adds +2 to researched RC level (line 201)"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "source_file": "src/data/races.json",
+      "description": "All starting technologies match design specs for each race"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "source_file": "src/data/races.json",
+      "description": "All special abilities correctly implemented with proper effect types and values"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "source_file": "src/data/races.json",
+      "description": "AI behavior archetypes match design: Hamsters=diplomat, Ants=industrialist, Mice=erratic_industrialist, etc."
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "source_file": "src/game/actions/newGame.ts",
+      "description": "buildResearchState() correctly initializes completedTechs from race.startingTechnologies"
+    }
+  ],
+  "mismatches": [
+    {
+      "severity": "high",
+      "design_doc": "design/species/ants.md",
+      "design_spec": "**Homeworld (Lore)**: Formicae — an arid world... **Gameplay:** The in-game starting planet is always Terran (equal starting conditions for all species)",
+      "source_file": "src/data/races.json",
+      "source_line": 108,
+      "actual_impl": "Ants homeworld type is 'arid' in JSON data",
+      "recommendation": "Change Ants homeworld.type from 'arid' to 'terran' in races.json to match the design doc's gameplay specification for equal starting conditions"
+    },
+    {
+      "severity": "high",
+      "design_doc": "design/species/hermit-crabs.md",
+      "design_spec": "**Homeworld (Lore)**: Crystalia — a harsh radiation-blasted world... **Gameplay:** The in-game starting planet is always Terran (equal starting conditions for all species)",
+      "source_file": "src/data/races.json",
+      "source_line": 525,
+      "actual_impl": "Hermit Crabs homeworld type is 'radiated' in JSON data",
+      "recommendation": "Change Hermit Crabs homeworld.type from 'radiated' to 'terran' in races.json to match the design doc's gameplay specification for equal starting conditions"
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/species/race-stats-complete.md",
+      "design_spec": "Chameleons: research: +20% Computers only (Darloks are good at Computers, not expert)",
+      "source_file": "src/data/races.json",
+      "source_line": 965,
+      "actual_impl": "Chameleons have bonuses.research=20 (general bonus) AND researchFieldBonuses.computers=20 (field bonus), which would stack to +40% Computers",
+      "recommendation": "Set Chameleons bonuses.research=0 and keep only researchFieldBonuses.computers=20. The +20% should apply ONLY to Computers, not as a general research bonus"
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/species/race-stats-complete.md",
+      "design_spec": "Ship combat bonuses apply to attack rolls: EffectiveAttack = BaseAttack + (ShipCombatBonus / 10)",
+      "source_file": "src/game/systems/races.ts",
+      "source_line": 133,
+      "actual_impl": "applyShipAttackBonus and applyShipDefenseBonus both use the same bonuses.shipCombat value for both attack AND defense",
+      "recommendation": "The design shows ship combat bonus applies to both attack and defense equally (both /10), but Budgies' Superior Pilots ability grants separate +3 defense levels. Verify the Superior Pilots ability is applied separately from the base shipCombat bonus in combat resolution"
+    },
+    {
+      "severity": "medium",
+      "design_doc": "design/species/race-stats-complete.md",
+      "design_spec": "InitialRelationship = DIPLOMACY_UNFRIENDLY_START + (DiplomacyBonus / 3)",
+      "source_file": "src/game/systems/races.ts",
+      "source_line": 175,
+      "actual_impl": "startingRelationship() adds both races' diplomacy/3 values: offset = raceA.bonus/3 + raceB.bonus/3",
+      "recommendation": "The implementation sums both races' diplomacy bonuses, which differs from the design formula showing only one race's bonus. Clarify in design doc whether bilateral diplomacy bonuses should stack, or change code to use only initiating race's bonus"
+    },
+    {
+      "severity": "low",
+      "design_doc": "design/species/race-stats-complete.md",
+      "design_spec": "Ferrets special ability 'Deadly Accuracy': All weapons gain +4 Attack Levels (equivalent to 4 tiers of targeting computers)",
+      "source_file": "src/data/races.json",
+      "source_line": 798,
+      "actual_impl": "Effect uses 'attackLevelBonus: 4' but no code in races.ts implements this attack level bonus in combat",
+      "recommendation": "Add applyDeadlyAccuracyBonus() function to races.ts that applies +4 attack levels for Ferrets, or verify combat system consumes this ability effect correctly"
+    },
+    {
+      "severity": "low",
+      "design_doc": "design/species/race-stats-complete.md",
+      "design_spec": "Budgies special ability 'Superior Pilots': All ships gain +3 combat initiative, +3 defense level, and +20% evasion",
+      "source_file": "src/data/races.json",
+      "source_line": 877,
+      "actual_impl": "Effect defined with initiativeBonus: 3, defenseLevelBonus: 3, evasionBonus: 20, but no code in races.ts applies these values",
+      "recommendation": "Add applySuperiorPilotsBonus() function to races.ts, or verify combat system consumes the Superior Pilots ability effect correctly"
+    },
+    {
+      "severity": "low",
+      "design_doc": "design/species/race-stats-complete.md",
+      "design_spec": "Hermit Crabs ability 'Armored Shell': Natural +50% defense bonus in ground combat",
+      "source_file": "src/data/races.json",
+      "source_line": 587,
+      "actual_impl": "Effect type is 'ground_defense_bonus' with value: 50, but applyGroundCombatBonus() in races.ts only applies the base groundCombat bonus, not special ability bonuses",
+      "recommendation": "Modify applyGroundCombatBonus() to check for 'armored_shell' ability and add its ground_defense_bonus, or create separate function for defensive ground combat"
+    }
+  ],
+  "missing_from_code": [
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "feature": "No implementation found for BASE_PRODUCTION_PER_POP constant usage - constant defined (1.0) but no function uses it"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "feature": "No implementation found for BASE_RESEARCH_PER_SCIENTIST constant usage - constant defined (1.0) but no function uses it"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "feature": "No food bonus application function (applyFoodBonus) despite food bonus being defined for all races"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "feature": "No implementation of Hamsters 'Universal Diplomat' ability effect (all races start at Neutral vs Unfriendly)"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "feature": "No implementation of Hamsters 'Trade Hub' ability (+25% trade credits)"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "feature": "No implementation of Hamsters 'Council Favorite' ability (+1 vote)"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "feature": "No implementation of Hermit Crabs 'Cannot Terraform' restriction (restrictedTechs defined but no enforcement code)"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "feature": "No implementation of Hermit Crabs 'No Food Requirement' ability in resource allocation"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "feature": "No implementation of Mice 'No Refit Costs' ability (noRefitCosts flag defined but no ship refit code)"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "feature": "No implementation of Ants 'Perfect Efficiency' morale immunity (immune_to_unrest defined but no morale system code)"
+    },
+    {
+      "design_doc": "design/species/race-stats-complete.md",
+      "feature": "No implementation of volatilityFlag for Mice AI behavior randomness"
+    }
+  ],
+  "not_in_design": [
+    {
+      "source_file": "src/game/actions/newGame.ts",
+      "feature": "Player bonus +10 to starting relations (line in buildRelations: 'if (isPlayer) baseRelationValue += 10'). This mechanic is not documented in design specs"
+    },
+    {
+      "source_file": "src/game/systems/races.ts",
+      "feature": "isBloodEnemiesAll() helper function exists but blood_enemies_all mechanic is only briefly mentioned in race-stats-complete.md without full specification"
+    },
+    {
+      "source_file": "src/data/races.json",
+      "feature": "leaderNames.titles array exists for all races but usage in getRandomLeaderName() is inconsistent (only used when titles array exists, but logic for including titles is unclear)"
+    }
+  ]
+}

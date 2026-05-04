@@ -17,7 +17,8 @@
  * design/economy/factory-formulas.md.  No DOM, no side effects.
  */
 
-import { Planet, ResourceLevel } from '../state';
+import { Planet, ResourceLevel, DifficultyLevel } from '../state';
+import { getProductionMultiplier } from './difficulty';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -64,6 +65,9 @@ export interface ProductionContext {
 
   /** Racial research modifier applied to RP output. */
   racialResearchModifier: number;
+
+  /** Difficulty-based production multiplier (derived from difficulty + isPlayer). */
+  difficultyProductionModifier: number;
 
   /**
    * Robotic Controls level (how many factories each colonist can operate).
@@ -123,6 +127,7 @@ export interface ProductionContext {
 export const DEFAULT_PRODUCTION_CONTEXT: ProductionContext = {
   racialProductionModifier: 1.0,
   racialResearchModifier:   1.0,
+  difficultyProductionModifier: 1.0,
   roboticControlsLevel:     2,
   planetologyTL:            1,
   wasteRate:                1.0,
@@ -132,6 +137,23 @@ export const DEFAULT_PRODUCTION_CONTEXT: ProductionContext = {
   terraformTierCost:        200,
   factoryEfficiencyMultiplier: 1.0,
 };
+
+/**
+ * Create a production context with difficulty modifiers applied.
+ * @param baseContext The base context without difficulty applied.
+ * @param difficulty  Game difficulty level.
+ * @param isPlayer    Whether this is for the player empire.
+ */
+export function applyDifficultyToContext(
+  baseContext: ProductionContext,
+  difficulty: DifficultyLevel,
+  isPlayer: boolean,
+): ProductionContext {
+  return {
+    ...baseContext,
+    difficultyProductionModifier: getProductionMultiplier(difficulty, isPlayer),
+  };
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Basic helpers
@@ -222,12 +244,16 @@ export function calculateGrossProduction(
   const opFac = operatingFactories(planet, ctx);
   const idleFac = planet.factories - opFac;
 
-  // Factory output — Mice have a factoryEfficiencyMultiplier of 1.5
-  const factoryBC = opFac * BASE_FACTORY_OUTPUT * ctx.factoryEfficiencyMultiplier * ctx.racialProductionModifier;
+  // Factory output — races with factory efficiency bonuses (e.g., Mice = 1.5x)
+  // use factoryEfficiencyMultiplier directly. racialProductionModifier applies
+  // ONLY to population labor, not factory output, to avoid double-counting.
+  // See design/economy/factory-formulas.md §Mice worked example.
+  const factoryBC = opFac * BASE_FACTORY_OUTPUT * ctx.factoryEfficiencyMultiplier 
+    * ctx.difficultyProductionModifier;
 
-  // Population labor output
+  // Population labor output — apply difficulty modifier
   const popRate = basePopOutput(ctx.planetologyTL);
-  const popBC = activePop * popRate * ctx.racialProductionModifier;
+  const popBC = activePop * popRate * ctx.racialProductionModifier * ctx.difficultyProductionModifier;
 
   const grossBeforeRichness = factoryBC + popBC;
   const richness = getRichnessMultiplier(planet);
@@ -388,7 +414,10 @@ export function allocateSliders(
 
   // TECH: scientists = population × (TECH% / 100), RP per scientist = 1.0 × racialResearchModifier
   const scientists = planet.population * (p.research / 100);
-  const techRP = scientists * 1.0 * ctx.racialResearchModifier;
+  const baseRP = scientists * 1.0 * ctx.racialResearchModifier;
+  // Apply planet-specific research multiplier (Orion=4.0, Artifacts=2.0, default=1.0)
+  const researchMultiplier = planet.researchMultiplier ?? 1.0;
+  const techRP = baseRP * researchMultiplier;
 
   return { ship, defense, industry, ecology, techRP, scientists };
 }
@@ -715,48 +744,27 @@ export function rebalanceSliders(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Legacy distributeProduction (used by existing tests)
+// REMOVED DEPRECATED FUNCTIONS (2026-04-29)
 // ─────────────────────────────────────────────────────────────────────────────
-
-/**
- * Distribute production output according to slider percentages.
- *
- * @deprecated  Use allocateSliders() with a ProductionContext for new code.
- *              Kept for backwards compatibility with existing tests.
- */
-export interface ProductionOutput {
-  ship: number;
-  defense: number;
-  industry: number;
-  ecology: number;
-  research: number;
-}
-
-/**
- * @deprecated  Use allocateSliders() with a ProductionContext for new code.
- */
-export function distributeProduction(planet: Planet): ProductionOutput {
-  const base = calculateBaseProduction(planet);
-  const p = planet.production;
-
-  // Normalize sliders (they should sum to 100, but guard against edge cases)
-  const total = p.ship + p.defense + p.industry + p.ecology + p.research;
-  const scale = total > 0 ? 100 / total : 0;
-
-  return {
-    ship:     (base * p.ship     * scale) / 100,
-    defense:  (base * p.defense  * scale) / 100,
-    industry: (base * p.industry * scale) / 100,
-    ecology:  (base * p.ecology  * scale) / 100,
-    research: (base * p.research * scale) / 100,
-  };
-}
-
-/**
- * Calculate maximum factories for a planet (based on population).
- *
- * @deprecated  Use planet.maxPopulation × ctx.roboticControlsLevel.
- */
-export function calculateMaxFactories(population: number): number {
-  return Math.floor(population);
-}
+//
+// The following functions were REMOVED (not just deprecated) because they
+// produced incorrect results and were superseded by modern implementations:
+//
+// 1. distributeProduction(planet)
+//    PROBLEM: Incorrectly included TECH in net production allocation.
+//             TECH doesn't consume BC—it diverts population from labor.
+//    REPLACEMENT: Use allocateSliders(planet, netProduction, ctx) which
+//                 correctly handles TECH as population diversion and
+//                 splits only SHIP/DEF/IND/ECO across net production.
+//
+// 2. calculateMaxFactories(population)
+//    PROBLEM: Returned floor(population), ignoring Robotic Controls level.
+//             This is only correct for RC II (2:1 ratio) early game.
+//    REPLACEMENT: Use planet.maxPopulation * ctx.roboticControlsLevel.
+//                 RC levels range from 2 (RC II) to 7 (RC VII).
+//
+// If you have code that depended on these functions, migrate to:
+//   - processPlanetProduction() for full turn production
+//   - allocateSliders() for slider allocation
+//   - operatingFactories(planet, ctx) for factory operations
+// ─────────────────────────────────────────────────────────────────────────────

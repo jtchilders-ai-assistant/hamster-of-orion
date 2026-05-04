@@ -8,7 +8,7 @@
 import { Action } from './store';
 import { GameState, ScreenType } from './state';
 import { executeGroundCombat } from './systems/groundCombat';
-import { turnReducer } from './actions/turn';
+import { turnReducer, NEXT_TURN, SKIP_TURN_SUMMARY, SET_TURN_PHASE } from './actions/turn';
 import { newGameReducer } from './actions/newGame';
 import { fleetReducer, MOVE_FLEET, MERGE_FLEETS, SPLIT_FLEET, SCRAP_FLEET, PROCESS_FLEET_MOVEMENT, OPEN_FLEET_DEPLOYMENT, UPDATE_DEPLOYMENT_SHIPS, SET_DEPLOYMENT_DESTINATION, CANCEL_FLEET_DEPLOYMENT } from './actions/fleet';
 import { colonize } from './systems/colonization';
@@ -157,7 +157,7 @@ export function rootReducer(state: GameState, action: Action): GameState {
   }
 
   // Route to sub-reducers
-  if (action.type === 'NEXT_TURN') {
+  if (action.type === NEXT_TURN || action.type === SKIP_TURN_SUMMARY || action.type === SET_TURN_PHASE) {
     return turnReducer(state, action);
   }
 
@@ -399,6 +399,19 @@ export function rootReducer(state: GameState, action: Action): GameState {
           y: delta === 0 ? 0 : state.ui.camera.y,
         },
       },
+    };
+  }
+
+  // ── Game speed setting ───────────────────────────────────────────────────
+  //
+  // SET_GAME_SPEED: Updates animation speed (slow, normal, fast).
+  // Affects combat animations, map transitions, and other timed effects.
+
+  if (action.type === 'SET_GAME_SPEED') {
+    const { speed } = action.payload as { speed: import('./state').GameSpeed };
+    return {
+      ...state,
+      gameSpeed: speed,
     };
   }
 

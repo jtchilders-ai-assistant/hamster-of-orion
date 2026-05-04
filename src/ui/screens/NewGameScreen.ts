@@ -72,7 +72,7 @@ export class NewGameScreen {
       step: 1,
       galaxySize: 'medium',
       opponents: 5,
-      difficulty: 'normal',
+      difficulty: 'average',
       galaxyAge: 'average',
       raceId: defaultRace.id,
       empireColor: EMPIRE_COLORS[0].value,

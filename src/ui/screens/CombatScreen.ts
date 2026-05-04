@@ -43,7 +43,7 @@ import {
 // ── Hex grid constants ─────────────────────────────────────────────────────────
 
 const GRID_COLS = 15;
-const GRID_ROWS = 11;
+const GRID_ROWS = 15;
 const HEX_SIZE = 32; // pixels, flat-top hex radius
 
 // Flat-top hex geometry
@@ -78,9 +78,19 @@ interface ExplosionParticle {
   framesLeft: number;
 }
 
-// ── Demo fleet builders ────────────────────────────────────────────────────────
+// ── Environment flag for development mode ───────────────────────────────────
+
+/** Set to true to enable demo fleets for combat UI testing. Disable in production. */
+const DEV_ENABLE_DEMO_COMBAT = false;
+
+// ── Demo fleet builders (DEV ONLY) ─────────────────────────────────────────
+// These functions are only used for testing the combat UI.
+// In production, combat data comes from the game state.
 
 function buildDemoAttackerFleet(): FleetForCombat {
+  if (!DEV_ENABLE_DEMO_COMBAT) {
+    console.warn('[CombatScreen] Demo fleets disabled. Combat should come from game state.');
+  }
   return {
     ships: [
       {
@@ -89,6 +99,7 @@ function buildDemoAttackerFleet(): FleetForCombat {
         side: 'attacker',
         hp: 60,
         maxHp: 60,
+        hullSize: 'medium',
         shieldClass: 3,
         weapons: [
           { id: 'w1', name: 'Fusion Beam', category: 'beam', damageMin: 8, damageMax: 16, attacksPerRound: 1 },
@@ -105,6 +116,7 @@ function buildDemoAttackerFleet(): FleetForCombat {
         side: 'attacker',
         hp: 100,
         maxHp: 100,
+        hullSize: 'large',
         shieldClass: 5,
         weapons: [
           { id: 'w2', name: 'Plasma Cannon', category: 'beam', damageMin: 15, damageMax: 30, attacksPerRound: 2 },
@@ -120,6 +132,9 @@ function buildDemoAttackerFleet(): FleetForCombat {
 }
 
 function buildDemoDefenderFleet(): FleetForCombat {
+  if (!DEV_ENABLE_DEMO_COMBAT) {
+    console.warn('[CombatScreen] Demo fleets disabled. Combat should come from game state.');
+  }
   return {
     ships: [
       {
@@ -128,6 +143,7 @@ function buildDemoDefenderFleet(): FleetForCombat {
         side: 'defender',
         hp: 30,
         maxHp: 30,
+        hullSize: 'small',
         shieldClass: 1,
         weapons: [
           { id: 'w3', name: 'Laser', category: 'beam', damageMin: 4, damageMax: 10, attacksPerRound: 1 },
@@ -144,6 +160,7 @@ function buildDemoDefenderFleet(): FleetForCombat {
         side: 'defender',
         hp: 45,
         maxHp: 45,
+        hullSize: 'small',
         shieldClass: 2,
         weapons: [
           { id: 'w4', name: 'Neutron Pellet Gun', category: 'beam', damageMin: 6, damageMax: 12, attacksPerRound: 1, armorPiercing: true },
@@ -160,6 +177,7 @@ function buildDemoDefenderFleet(): FleetForCombat {
         side: 'defender',
         hp: 60,
         maxHp: 60,
+        hullSize: 'medium',
         shieldClass: 3,
         weapons: [
           { id: 'w5', name: 'Mass Driver', category: 'beam', damageMin: 10, damageMax: 20, attacksPerRound: 1, armorPiercing: true },
@@ -416,17 +434,59 @@ export class CombatScreen {
   // Auto-resolve animation
   private autoResolveAnimId: number | null = null;
 
+  // Ships that have used WAIT this round (will act at end of initiative)
+  private waitingShipIds: Set<string> = new Set();
+
+  // Ships that are marked DONE this round (cannot act again until next round)
+  private doneShipIds: Set<string> = new Set();
+
   constructor(container: HTMLElement, store: Store<GameState>) {
     this.container = container;
     this.store = store;
 
-    this.attackerFleet = buildDemoAttackerFleet();
-    this.defenderFleet = buildDemoDefenderFleet();
+    // Try to load combat from game state; fall back to demo fleets if DEV mode enabled
+    const state = store.getState();
+    const fleets = this.loadCombatFleets(state);
+    this.attackerFleet = fleets.attacker;
+    this.defenderFleet = fleets.defender;
 
     this.buildLayout();
     this.initCombat();
     // Start hidden — show() will make it visible when combat begins
     this.container.style.display = 'none';
+  }
+
+  /**
+   * Load combat fleets from game state, or fall back to demo fleets in dev mode.
+   */
+  private loadCombatFleets(state: GameState): { attacker: FleetForCombat; defender: FleetForCombat } {
+    // Check if there's an active combat in the game state
+    const activeCombatId = state.combats?.activeCombatId;
+    if (activeCombatId) {
+      const combat = state.combats.byId[activeCombatId];
+      if (combat) {
+        // TODO: Convert Combat state to FleetForCombat format
+        // For now, this is a placeholder for the real implementation
+        console.log('[CombatScreen] Loading combat from state:', activeCombatId);
+      }
+    }
+
+    // No active combat in state — use demo fleets only if dev mode is enabled
+    if (DEV_ENABLE_DEMO_COMBAT) {
+      console.log('[CombatScreen] Using demo fleets (DEV mode)');
+      return {
+        attacker: buildDemoAttackerFleet(),
+        defender: buildDemoDefenderFleet(),
+      };
+    }
+
+    // Production mode with no active combat — return empty fleets
+    // Combat screen shouldn't be shown in this case
+    console.warn('[CombatScreen] No active combat and demo mode disabled');
+    return {
+      attacker: { ships: [] },
+      defender: { ships: [] },
+    };
   }
 
   // ── Screen interface ──────────────────────────────────────────────────────────
@@ -643,6 +703,18 @@ export class CombatScreen {
     autoBtn.addEventListener('click', () => this.doAutoResolve());
     this.controlsEl.appendChild(autoBtn);
 
+    // WAIT — yield ship's turn order, move to end of initiative
+    const waitBtn = this.makeButton('WAIT', '#2a2a3a', '#8888ff');
+    waitBtn.title = 'Yield selected ship\'s turn order (move to end of initiative queue)';
+    waitBtn.addEventListener('click', () => this.doWait());
+    this.controlsEl.appendChild(waitBtn);
+
+    // DONE — mark ship as finished for this round
+    const doneBtn = this.makeButton('DONE', '#2a3a2a', '#88cc88');
+    doneBtn.title = 'Mark selected ship as finished for this combat round';
+    doneBtn.addEventListener('click', () => this.doDone());
+    this.controlsEl.appendChild(doneBtn);
+
     // Retreat — attempt fleet retreat per combat-algorithm.md §28-29
     // Retreat chance = clamp((ownSpeed / maxEnemySpeed) × 50 + 25, 0, 95)
     const retreatBtn = this.makeButton('RETREAT', '#3a2a00', '#ffaa00');
@@ -687,6 +759,8 @@ export class CombatScreen {
     this.interactionMode = 'select';
     this.moveableHexes.clear();
     this.targetableShipIds.clear();
+    this.waitingShipIds.clear();
+    this.doneShipIds.clear();
     this.damageNumbers = [];
     this.explosionParticles = [];
     this.combatState = initiateCombat(this.attackerFleet, this.defenderFleet);
@@ -841,6 +915,9 @@ export class CombatScreen {
   private stepRound(): void {
     if (!this.combatState || this.combatState.status !== 'ongoing') return;
     this.clearInteractionMode();
+    // Clear WAIT/DONE state at the start of each new round
+    this.waitingShipIds.clear();
+    this.doneShipIds.clear();
     processRound(this.combatState);
 
     // Check for newly destroyed ships and spawn explosions
@@ -896,6 +973,112 @@ export class CombatScreen {
 
     this.renderAll();
     this.finishCombat();
+  }
+
+  /**
+   * WAIT action: yield selected ship's turn order, move it to the end of
+   * the initiative queue for this round. The ship can still act later.
+   */
+  private doWait(): void {
+    if (!this.combatState || this.combatState.status !== 'ongoing') return;
+    if (!this.selectedShipId) {
+      this.combatState.log.push({
+        round: this.combatState.round,
+        message: `[WAIT] No ship selected.`,
+      });
+      this.renderLog();
+      return;
+    }
+
+    const ship = this.findShipById(this.selectedShipId);
+    if (!ship || ship.hp <= 0 || ship.retreated) {
+      this.combatState.log.push({
+        round: this.combatState.round,
+        message: `[WAIT] Selected ship is not available.`,
+      });
+      this.renderLog();
+      return;
+    }
+
+    // Only attacker ships (player-controlled) can use WAIT
+    if (ship.side !== 'attacker') {
+      this.combatState.log.push({
+        round: this.combatState.round,
+        message: `[WAIT] Can only use WAIT on friendly ships.`,
+      });
+      this.renderLog();
+      return;
+    }
+
+    if (this.doneShipIds.has(this.selectedShipId)) {
+      this.combatState.log.push({
+        round: this.combatState.round,
+        message: `[WAIT] ${ship.designId} is already marked DONE this round.`,
+      });
+      this.renderLog();
+      return;
+    }
+
+    // Add to waiting list (will act at end of initiative order)
+    this.waitingShipIds.add(this.selectedShipId);
+    this.combatState.log.push({
+      round: this.combatState.round,
+      message: `[WAIT] ${ship.designId} yields turn order — will act at end of initiative.`,
+    });
+
+    this.clearInteractionMode();
+    this.selectedShipId = null;
+    this.renderAll();
+  }
+
+  /**
+   * DONE action: mark the selected ship as finished for this combat round.
+   * The ship cannot act again until the next round.
+   */
+  private doDone(): void {
+    if (!this.combatState || this.combatState.status !== 'ongoing') return;
+    if (!this.selectedShipId) {
+      this.combatState.log.push({
+        round: this.combatState.round,
+        message: `[DONE] No ship selected.`,
+      });
+      this.renderLog();
+      return;
+    }
+
+    const ship = this.findShipById(this.selectedShipId);
+    if (!ship || ship.hp <= 0 || ship.retreated) {
+      this.combatState.log.push({
+        round: this.combatState.round,
+        message: `[DONE] Selected ship is not available.`,
+      });
+      this.renderLog();
+      return;
+    }
+
+    // Only attacker ships (player-controlled) can use DONE
+    if (ship.side !== 'attacker') {
+      this.combatState.log.push({
+        round: this.combatState.round,
+        message: `[DONE] Can only use DONE on friendly ships.`,
+      });
+      this.renderLog();
+      return;
+    }
+
+    // Mark as done — cannot act again this round
+    this.doneShipIds.add(this.selectedShipId);
+    // Also remove from waiting list if it was there
+    this.waitingShipIds.delete(this.selectedShipId);
+
+    this.combatState.log.push({
+      round: this.combatState.round,
+      message: `[DONE] ${ship.designId} is finished for this round.`,
+    });
+
+    this.clearInteractionMode();
+    this.selectedShipId = null;
+    this.renderAll();
   }
 
   /**

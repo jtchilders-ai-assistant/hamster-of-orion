@@ -139,6 +139,16 @@ export interface PlanetRPInput {
   hasArtifacts: boolean;
   /** True if this planet is Orion (+400% RP, i.e. ×4). */
   isOrion: boolean;
+  /**
+   * Planet-specific research multiplier (default 1.0).
+   * - Standard planets: 1.0
+   * - Artifacts worlds: 2.0
+   * - Orion / Gaia: 4.0
+   *
+   * When provided, this replaces the hasArtifacts/isOrion boolean logic.
+   * If omitted, falls back to boolean-based multipliers for backwards compat.
+   */
+  researchMultiplier?: number;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -284,11 +294,19 @@ export function calculatePlanetRP(planet: PlanetRPInput, raceId: RaceId): number
 
   let planetRP = scientists * BASE_RP_PER_SCIENTIST * labMultiplier * racialModifier;
 
-  if (planet.hasArtifacts) {
-    planetRP *= technologiesData.special_rp_bonuses.artifacts_world_multiplier;
-  }
-  if (planet.isOrion) {
-    planetRP *= technologiesData.special_rp_bonuses.orion_planet_multiplier;
+  // Apply planet-specific research multiplier if provided.
+  // If researchMultiplier is set, it takes precedence over boolean flags.
+  // This allows Gaia (4.0), Artifacts (2.0), etc. to be data-driven.
+  if (planet.researchMultiplier !== undefined && planet.researchMultiplier !== 1.0) {
+    planetRP *= planet.researchMultiplier;
+  } else {
+    // Backwards-compat: use boolean flags when researchMultiplier not provided
+    if (planet.hasArtifacts) {
+      planetRP *= technologiesData.special_rp_bonuses.artifacts_world_multiplier;
+    }
+    if (planet.isOrion) {
+      planetRP *= technologiesData.special_rp_bonuses.orion_planet_multiplier;
+    }
   }
 
   return planetRP;
