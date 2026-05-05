@@ -258,7 +258,7 @@ describe('sendSpyMission', () => {
     const ant = makeEmpire('emp2', 'ants', 10, 0);
     const state = makeState({ emp1: chameleon, emp2: ant });
 
-    const newState = sendSpyMission(state, 'emp1', 'emp2', 'propaganda');
+    const newState = sendSpyMission(state, 'emp1', 'emp2', 'sabotage_bases');
 
     expect(newState.spyMissions).toHaveLength(0);
   });
@@ -329,7 +329,7 @@ describe('foilMission', () => {
     const hamster = makeEmpire('emp2', 'hamsters', 10, 0);
     let state = makeState({ emp1: chameleon, emp2: hamster });
 
-    state = sendSpyMission(state, 'emp1', 'emp2', 'propaganda');
+    state = sendSpyMission(state, 'emp1', 'emp2', 'frame_race');
     const missionId = state.spyMissions[0].id;
 
     state = foilMission(state, missionId);
@@ -385,7 +385,7 @@ describe('getActiveMissions', () => {
       },
       {
         id: 'm3',
-        type: 'propaganda',
+        type: 'frame_race',
         senderId: 'emp2',
         targetId: 'emp1',
         startTurn: 1,
@@ -421,5 +421,177 @@ describe('applyMissionEffect', () => {
 
     // applyMissionEffect is a pure pass-through for now
     expect(newState).toBe(state);
+  });
+});
+
+// Tests for §6.2 Tech Theft Tier Modifiers
+import { getTechTheftTierModifier, calculateTechTheftProbability } from '../../../src/game/systems/espionage';
+
+describe('getTechTheftTierModifier (§6.2)', () => {
+  it('returns +10 for Tier 1-3 (easier to steal basic tech)', () => {
+    expect(getTechTheftTierModifier(1)).toBe(10);
+    expect(getTechTheftTierModifier(2)).toBe(10);
+    expect(getTechTheftTierModifier(3)).toBe(10);
+  });
+
+  it('returns +0 for Tier 4-6', () => {
+    expect(getTechTheftTierModifier(4)).toBe(0);
+    expect(getTechTheftTierModifier(5)).toBe(0);
+    expect(getTechTheftTierModifier(6)).toBe(0);
+  });
+
+  it('returns -5 for Tier 7-9', () => {
+    expect(getTechTheftTierModifier(7)).toBe(-5);
+    expect(getTechTheftTierModifier(8)).toBe(-5);
+    expect(getTechTheftTierModifier(9)).toBe(-5);
+  });
+
+  it('returns -10 for Tier 10-12', () => {
+    expect(getTechTheftTierModifier(10)).toBe(-10);
+    expect(getTechTheftTierModifier(11)).toBe(-10);
+    expect(getTechTheftTierModifier(12)).toBe(-10);
+  });
+
+  it('returns -15 for Tier 13+ (hardest to steal advanced tech)', () => {
+    expect(getTechTheftTierModifier(13)).toBe(-15);
+    expect(getTechTheftTierModifier(14)).toBe(-15);
+    expect(getTechTheftTierModifier(20)).toBe(-15);
+  });
+});
+
+describe('calculateTechTheftProbability (§6.2)', () => {
+  it('low tier tech has higher success rate', () => {
+    const sender = { raceId: 'hamsters', computerTechLevel: 10 };
+    const target = { raceId: 'hamsters', computerTechLevel: 10, securityLevel: 0 };
+
+    const lowTierProb = calculateTechTheftProbability(sender, target, 2);
+    const highTierProb = calculateTechTheftProbability(sender, target, 14);
+
+    // Tier 2 gets +10, Tier 14 gets -15 = 25 point difference
+    expect(lowTierProb).toBeGreaterThan(highTierProb);
+    expect(lowTierProb - highTierProb).toBeCloseTo(0.25, 2);
+  });
+
+  it('Chameleons stealing tier 1 tech have maximum success (capped at 95%)', () => {
+    const sender = { raceId: 'chameleons', computerTechLevel: 10 };
+    const target = { raceId: 'rabbits', computerTechLevel: 5, securityLevel: 0 };
+
+    const prob = calculateTechTheftProbability(sender, target, 1);
+
+    expect(prob).toBe(0.95); // Capped at 95%
+  });
+
+  it('returns 0 when targeting Ants (immune)', () => {
+    const sender = { raceId: 'chameleons', computerTechLevel: 10 };
+    const target = { raceId: 'ants', computerTechLevel: 10, securityLevel: 0 };
+
+    const prob = calculateTechTheftProbability(sender, target, 5);
+
+    expect(prob).toBe(0);
+  });
+});
+
+// Tests for §1.3 All Spies Fail
+describe('All Spies Fail (§1.3)', () => {
+  it('skipTurns is decremented each turn for active missions', () => {
+    const hamster1 = makeEmpire('emp1', 'hamsters', 10, 0);
+    const hamster2 = makeEmpire('emp2', 'hamsters', 10, 0);
+    let state = makeState({ emp1: hamster1, emp2: hamster2 }, 5);
+
+    // Add a mission with skipTurns
+    state.spyMissions = [{
+      id: 'm1',
+      type: 'steal_technology',
+      senderId: 'emp1',
+      targetId: 'emp2',
+      startTurn: 1,
+      durationTurns: 3,
+      successProbability: 0.5,
+      status: 'active',
+      skipTurns: 2,
+    }];
+
+    // Process turn - should decrement skipTurns
+    const newState = processEspionageTurns(state, () => 0.99); // Won't succeed or detect
+
+    expect(newState.spyMissions[0].skipTurns).toBe(1);
+  });
+
+  it('missions with skipTurns > 0 are not processed', () => {
+    const hamster1 = makeEmpire('emp1', 'hamsters', 10, 0);
+    const hamster2 = makeEmpire('emp2', 'hamsters', 10, 0);
+    let state = makeState({ emp1: hamster1, emp2: hamster2 }, 5);
+
+    // Add a mission that should be ready but has skipTurns = 2
+    // After first pass decrement, skipTurns = 1 (still > 0, so not processed)
+    state.spyMissions = [{
+      id: 'm1',
+      type: 'reconnaissance',
+      senderId: 'emp1',
+      targetId: 'emp2',
+      startTurn: 1,
+      durationTurns: 1,
+      successProbability: 0.99, // Would almost certainly succeed
+      status: 'active',
+      skipTurns: 2,
+    }];
+
+    // Process turn with guaranteed success roll
+    const newState = processEspionageTurns(state, () => 0.01);
+
+    // Mission should still be active (not processed), skipTurns decremented to 1
+    expect(newState.spyMissions[0].status).toBe('active');
+    expect(newState.spyMissions[0].skipTurns).toBe(1);
+  });
+
+  it('catastrophic roll (100) penalizes all sender\'s active spies', () => {
+    const hamster1 = makeEmpire('emp1', 'hamsters', 10, 0);
+    const hamster2 = makeEmpire('emp2', 'hamsters', 10, 5);
+    let state = makeState({ emp1: hamster1, emp2: hamster2 }, 5);
+
+    // Add two missions from same sender
+    state.spyMissions = [
+      {
+        id: 'm1',
+        type: 'sabotage_factories',
+        senderId: 'emp1',
+        targetId: 'emp2',
+        startTurn: 1,
+        durationTurns: 2,
+        successProbability: 0.5,
+        status: 'active',
+      },
+      {
+        id: 'm2',
+        type: 'reconnaissance',
+        senderId: 'emp1',
+        targetId: 'emp2',
+        startTurn: 1,
+        durationTurns: 1,
+        successProbability: 0.5,
+        status: 'active',
+      },
+    ];
+
+    // Use RNG that returns exactly 1.0 (after ceiling * 100 = 100) for detection
+    // First call: success roll, second call: detection (must be exactly 1.0 for 100)
+    let callCount = 0;
+    const catastrophicRng = () => {
+      callCount++;
+      // Success roll (fails)
+      if (callCount % 2 === 1) return 0.99;
+      // Detection roll - exactly 1.0 means ceil(1.0 * 100) = 100
+      return 0.9999999999; // Close to 1.0, will ceil to 100
+    };
+
+    const newState = processEspionageTurns(state, catastrophicRng);
+
+    // Both missions should have skipTurns set to 1
+    const m1 = newState.spyMissions.find(m => m.id === 'm1');
+    const m2 = newState.spyMissions.find(m => m.id === 'm2');
+
+    // Both should have skipTurns added (either existing mission or foiled but penalty applied)
+    expect(m1?.skipTurns).toBe(1);
+    expect(m2?.skipTurns).toBe(1);
   });
 });

@@ -1,8 +1,8 @@
 /**
  * Espionage system — pure TypeScript, NO DOM.
  *
- * Implements spy missions between empires: intelligence gathering, technology
- * theft, sabotage, propaganda, infiltration, and assassination.
+ * Implements spy missions between empires: reconnaissance, technology theft,
+ * sabotage (factories/bases), inciting rebellion, framing races, and assassination.
  *
  * All formulas follow design/diplomacy/espionage.md (spec-017, v1.4).
  *
@@ -11,6 +11,8 @@
  *  - Frame jobs are a standalone mission type (HoO original; see design doc §6.6).
  *  - Racial aggression multipliers scale spy effectiveness (v1.4, §1.2).
  *  - Ants: cannot conduct espionage AND are immune to it (two separate flags).
+ *  - All Spies Fail catastrophic result on natural 100 (§1.3).
+ *  - Tech theft includes tier-based value modifiers (§6.2).
  */
 
 import { EmpireId, GameState, MissionType, SpyMission } from '../state';
@@ -30,6 +32,7 @@ const MAX_DETECTION = 99;
 const MIN_SUCCESS = 5;
 const MAX_SUCCESS = 95;
 const SECURITY_DETECTION_PER_LEVEL = 10; // +10% detection per security level
+const ALL_SPIES_FAIL_THRESHOLD = 100;    // §1.3: Natural 100 on d100 detection = catastrophic failure
 
 /** Duration in turns for each mission type. */
 const MISSION_DURATION: Record<MissionType, number> = {
@@ -44,14 +47,26 @@ const MISSION_DURATION: Record<MissionType, number> = {
 
 /** Base success % (0-100 integer) per mission type, from §5.1 and §6. */
 const BASE_MISSION_SUCCESS: Record<MissionType, number> = {
-  reconnaissance: 80,  // maps to Reconnaissance (§6.1)
-  steal_technology: 30,  // Steal Technology (§6.2)
-  sabotage_factories: 40,  // Sabotage Factories (§6.3)
-  sabotage_bases: 20,  // ~Incite Rebellion lite (§6.5) — area influence
-  incite_rebellion: 25,  // ~Incite Rebellion (§6.5)
-  assassination:          10,  // Assassination (§6.7)
-  frame_race: 50,  // Frame Job: steal BC from target (§6.6)
+  reconnaissance: 80,     // §6.1 Reconnaissance (Passive Intelligence)
+  steal_technology: 30,   // §6.2 Steal Technology
+  sabotage_factories: 40, // §6.3 Sabotage Factories
+  sabotage_bases: 35,     // §6.4 Sabotage Missile Bases (medium-high risk)
+  incite_rebellion: 25,   // §6.5 Incite Rebellion (high risk)
+  assassination: 10,      // §6.7 Assassination (extreme risk)
+  frame_race: 50,         // §6.6 Frame Another Race (high risk)
 };
+
+/**
+ * Tech theft tier-based value modifiers from §6.2.
+ * Lower tiers are easier to steal; higher tiers are harder.
+ */
+const TECH_THEFT_TIER_MODIFIERS: Array<{ maxTier: number; modifier: number }> = [
+  { maxTier: 3, modifier: 10 },   // Tier 1-3: +10 (easier to steal basic tech)
+  { maxTier: 6, modifier: 0 },    // Tier 4-6: +0
+  { maxTier: 9, modifier: -5 },   // Tier 7-9: -5
+  { maxTier: 12, modifier: -10 }, // Tier 10-12: -10
+  { maxTier: Infinity, modifier: -15 }, // Tier 13+: -15 (hardest to steal advanced tech)
+];
 
 /**
  * Racial aggression multipliers from §2.1 (v1.4).
@@ -96,6 +111,19 @@ function clamp(value: number, min: number, max: number): number {
 let _missionCounter = 0;
 function newMissionId(): string {
   return `mission_${++_missionCounter}_${Date.now()}`;
+}
+
+/**
+ * Get the tech theft modifier for a given tech tier (§6.2).
+ * Lower tier techs are easier to steal; higher tier techs are harder.
+ */
+export function getTechTheftTierModifier(techTier: number): number {
+  for (const entry of TECH_THEFT_TIER_MODIFIERS) {
+    if (techTier <= entry.maxTier) {
+      return entry.modifier;
+    }
+  }
+  return -15; // Fallback for tier 13+
 }
 
 // ── Core formula: spy effectiveness (§1.2) ───────────────────────────────────
@@ -199,6 +227,42 @@ export function calculateMissionProbability(
 }
 
 /**
+ * Calculate tech theft success probability with tier modifier (§6.2).
+ * Uses the base steal_technology success formula, plus a tier-based modifier:
+ *   - Tier 1-3: +10 (easier to steal basic tech)
+ *   - Tier 4-6: +0
+ *   - Tier 7-9: -5
+ *   - Tier 10-12: -10
+ *   - Tier 13+: -15 (hardest to steal advanced tech)
+ */
+export function calculateTechTheftProbability(
+  sender: { raceId: string; computerTechLevel: number },
+  target: { raceId: string; computerTechLevel: number; securityLevel: number },
+  techTier: number,
+): number {
+  const targetRace = getRace(target.raceId);
+  if (targetRace.immuneToEspionage) return 0;
+
+  const senderRace = getRace(sender.raceId);
+  if (!senderRace.canConductEspionage) return 0;
+
+  const effectiveness = calculateSpyEffectiveness(
+    sender.raceId,
+    target.raceId,
+    sender.computerTechLevel,
+    target.computerTechLevel,
+    target.securityLevel,
+  );
+
+  const base = BASE_MISSION_SUCCESS.steal_technology;
+  const tierModifier = getTechTheftTierModifier(techTier);
+  const raw = base + effectiveness + tierModifier;
+  const pct = clamp(raw, MIN_SUCCESS, MAX_SUCCESS);
+
+  return Math.round(pct) / 100;
+}
+
+/**
  * Send a spy mission from sender to target.
  * Returns an updated GameState with the new SpyMission appended to spyMissions.
  *
@@ -252,8 +316,11 @@ export function sendSpyMission(
  * Process all active spy missions for the current turn.
  *
  * For each active mission whose durationTurns have elapsed since startTurn:
+ *  - If mission has skipTurns > 0, decrement and skip processing
  *  - Roll against successProbability → if succeeds: 'completed', apply reward
- *  - Roll against detectionChance   → if detected: 'foiled'
+ *  - Roll against detectionChance → if detected: 'foiled'
+ *  - §1.3 All Spies Fail: if detection roll is exactly 100 (d100), ALL of the
+ *    sender's active spies skip their next turn
  *
  * Uses a deterministic PRNG seeded on mission id + turn to keep state pure
  * (no real random in the hot path — callers may inject a rng for testing).
@@ -263,24 +330,44 @@ export function processEspionageTurns(
   rng: () => number = Math.random,
 ): GameState {
   let nextState = state;
+  const allSpiesFailSenders = new Set<EmpireId>(); // Track empires that rolled catastrophic failure
 
+  // First pass: decrement skipTurns for all active missions
   for (const mission of state.spyMissions) {
     if (mission.status !== 'active') continue;
+    if (mission.skipTurns && mission.skipTurns > 0) {
+      const decremented = { ...mission, skipTurns: mission.skipTurns - 1 };
+      nextState = replaceMission(nextState, decremented);
+    }
+  }
+
+  // Second pass: process missions that are ready
+  for (const mission of nextState.spyMissions) {
+    if (mission.status !== 'active') continue;
+
+    // Skip if this spy is still skipping turns
+    if (mission.skipTurns && mission.skipTurns > 0) continue;
 
     const elapsed = state.turn - mission.startTurn;
     if (elapsed < mission.durationTurns) continue;
 
-    const target = state.empires.byId[mission.targetId];
+    const target = nextState.empires.byId[mission.targetId];
     if (!target) continue;
 
     // Roll for success
     const successRoll = rng();
-    const succeeded   = successRoll < mission.successProbability;
+    const succeeded = successRoll < mission.successProbability;
 
-    // Roll for detection
+    // Roll for detection (as d100: 1-100)
     const detectionChance = calculateDetectionChance(target.raceId, target.securityLevel) / 100;
-    const detectionRoll   = rng();
-    const detected        = detectionRoll < detectionChance;
+    const detectionRollRaw = rng();
+    const detectionRoll = Math.ceil(detectionRollRaw * 100); // Convert to 1-100 scale
+    const detected = detectionRollRaw < detectionChance;
+
+    // §1.3: Check for catastrophic "All Spies Fail" (natural 100 on d100)
+    if (detectionRoll === ALL_SPIES_FAIL_THRESHOLD) {
+      allSpiesFailSenders.add(mission.senderId);
+    }
 
     let updatedMission: SpyMission;
 
@@ -298,6 +385,35 @@ export function processEspionageTurns(
     if (updatedMission.status === 'completed') {
       nextState = applyMissionEffect(nextState, updatedMission);
     }
+  }
+
+  // Third pass: apply "All Spies Fail" catastrophic result
+  // All active spies from the affected empires lose their next turn (§1.3)
+  if (allSpiesFailSenders.size > 0) {
+    nextState = applyAllSpiesFailPenalty(nextState, allSpiesFailSenders);
+  }
+
+  return nextState;
+}
+
+/**
+ * Apply the "All Spies Fail" catastrophic penalty (§1.3).
+ * All active spy missions from the affected empires skip their next turn.
+ */
+function applyAllSpiesFailPenalty(
+  state: GameState,
+  affectedEmpires: Set<EmpireId>,
+): GameState {
+  let nextState = state;
+
+  for (const mission of state.spyMissions) {
+    if (mission.status !== 'active') continue;
+    if (!affectedEmpires.has(mission.senderId)) continue;
+
+    // Add 1 skip turn to this spy
+    const currentSkip = mission.skipTurns ?? 0;
+    const penalized = { ...mission, skipTurns: currentSkip + 1 };
+    nextState = replaceMission(nextState, penalized);
   }
 
   return nextState;

@@ -1,3 +1,3 @@
-# Current Task: fix-28 — Production Screen Design Doc Fixes
+# Current Task: fix-20 — Tactical Combat UI Design Doc Fixes
 
-**ID**: fix-28 | **Severity**: medium | **Source**: src/ui/components/ProductionScreen.ts
+**ID**: fix-20 | **Severity**: medium | **Source**: design/ui-ux/tactical-combat-ui.md

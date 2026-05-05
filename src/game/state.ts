@@ -219,6 +219,8 @@ export interface SpyMission {
   successProbability: number; // 0-1
   status: 'active' | 'completed' | 'foiled';
   reward?: { type: string; value: number };
+  /** Turns to skip before this spy can act again (§1.3 All Spies Fail). */
+  skipTurns?: number;
 }
 
 export type TreatyType = 'peace' | 'non_aggression' | 'trade' | 'research' | 'military_alliance' | 'defensive_pact';
