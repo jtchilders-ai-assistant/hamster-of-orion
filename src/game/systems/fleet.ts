@@ -6,11 +6,13 @@
  *
  * References:
  *   design/technical/data-structures.md — Fleet, Ship interfaces
+ *   design/galaxy/travel.md             — Star Gate travel mechanics
+ *   design/planets/buildings.md         — Star Gates building
  *   src/game/state.ts                   — GameState, Fleet, Ship
  *   src/game/types/shipComponents.ts    — ComponentData, EngineEffect
  */
 
-import { GameState, Fleet, Ship, FleetId, ShipId, SystemId } from '../state';
+import { GameState, Fleet, Ship, FleetId, ShipId, SystemId, BuildingId } from '../state';
 import { ComponentData, EngineEffect } from '../types/shipComponents';
 import componentData from '../../data/components.json';
 

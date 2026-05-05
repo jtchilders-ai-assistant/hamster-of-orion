@@ -1,3 +1,3 @@
-# Current Task: fix-82 — StarGate Design Doc Fixes
+# Current Task: fix-10 — Planet Design Doc Fixes
 
-**ID**: fix-82 | **Severity**: medium | **Source**: design/technology/stargate.md
+**ID**: fix-10 | **Severity**: medium | **Source**: design/galaxy/planets.md
