@@ -114,25 +114,30 @@ describe('initiateCombat', () => {
 // ── Hit-chance formula ─────────────────────────────────────────────────────────
 
 describe('calcHitChanceVs — hit chance formula', () => {
+  // Per design/ships/combat-algorithm.md Section 9:
+  // Hit_Chance = 50 + (Effective_Attacker_Level - Effective_Defender_Level) × 10
+  // Use hullSize: 'small' to avoid size modifier (+5% for medium targets)
+
   it('returns 50% when attack and defense ratings are equal', () => {
-    const attacker = makeShip('a', 'attacker', { attackRating: 3, experience: 'regular' });
-    const target = makeShip('d', 'defender', { defenseRating: 3 });
+    const attacker = makeShip('a', 'attacker', { attackRating: 3, experience: 'regular', hullSize: 'small' });
+    const target = makeShip('d', 'defender', { defenseRating: 3, hullSize: 'small' });
     const weapon = makeWeapon();
+    // diff = 0 → 50 + 0*10 = 50
     expect(calcHitChanceVs(attacker, weapon, target)).toBe(50);
   });
 
-  it('increases by 5 per point of attacker advantage (×5 per the task spec)', () => {
-    const attacker = makeShip('a', 'attacker', { attackRating: 5, experience: 'regular' });
-    const target = makeShip('d', 'defender', { defenseRating: 3 });
-    // diff = 2 → 50 + 2*5 = 60
-    expect(calcHitChanceVs(attacker, weapon, target)).toBe(60);
+  it('increases by 10 per point of attacker advantage (×10 per combat-algorithm.md)', () => {
+    const attacker = makeShip('a', 'attacker', { attackRating: 5, experience: 'regular', hullSize: 'small' });
+    const target = makeShip('d', 'defender', { defenseRating: 3, hullSize: 'small' });
+    // diff = 2 → 50 + 2*10 = 70
+    expect(calcHitChanceVs(attacker, weapon, target)).toBe(70);
   });
 
-  it('decreases by 5 per point of defender advantage', () => {
-    const attacker = makeShip('a', 'attacker', { attackRating: 1, experience: 'regular' });
-    const target = makeShip('d', 'defender', { defenseRating: 3 });
-    // diff = -2 → 50 - 10 = 40
-    expect(calcHitChanceVs(attacker, weapon, target)).toBe(40);
+  it('decreases by 10 per point of defender advantage', () => {
+    const attacker = makeShip('a', 'attacker', { attackRating: 1, experience: 'regular', hullSize: 'small' });
+    const target = makeShip('d', 'defender', { defenseRating: 3, hullSize: 'small' });
+    // diff = -2 → 50 - 2*10 = 30
+    expect(calcHitChanceVs(attacker, weapon, target)).toBe(30);
   });
 
   it('clamps to minimum 5%', () => {

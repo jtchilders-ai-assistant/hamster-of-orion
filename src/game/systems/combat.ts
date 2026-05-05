@@ -146,6 +146,64 @@ export interface CombatShip {
   blackHoleGeneratorCooldown?: number;
   /** Black Hole Generator destruction penalty per shield class */
   blackHoleGeneratorPenaltyPerShield?: number;
+  /**
+   * Energy Pulsar: deals 5 damage to all adjacent ships + 1 damage per 2 firing ships.
+   * Per design/technology/propulsion.md: Energy Pulsar.
+   */
+  hasEnergyPulsar?: boolean;
+  /**
+   * Ionic Pulsar: deals 10 damage to all adjacent ships + 1 damage per 2 firing ships.
+   * Per design/technology/propulsion.md: Ionic Pulsar (upgraded Energy Pulsar).
+   */
+  hasIonicPulsar?: boolean;
+  /**
+   * Repulsor Beam: Push enemy ships 2 hexes away.
+   * Per design/technology/force-fields.md: Repulsor Beam.
+   */
+  hasRepulsorBeam?: boolean;
+  /**
+   * Whether cloaking device is installed.
+   * +5 Defense, invisible until firing.
+   * Per design/technology/force-fields.md: Cloaking Device.
+   */
+  hasCloakingDevice?: boolean;
+  /**
+   * Zyro Shield: 75% base chance to destroy incoming missiles − 1% per missile tech level.
+   * Per design/technology/force-fields.md: Zyro Shield.
+   */
+  hasZyroShield?: boolean;
+  /**
+   * Lightning Shield: 100% base chance to destroy incoming missiles − 1% per missile tech level.
+   * Per design/technology/force-fields.md: Lightning Shield.
+   */
+  hasLightningShield?: boolean;
+  /**
+   * Stasis Field: Target ship cannot move, fire, or retreat.
+   * Per design/technology/force-fields.md: Stasis Field.
+   */
+  inStasisField?: boolean;
+  /**
+   * Turn when stasis field ends.
+   */
+  stasisFieldEndsRound?: number;
+  /**
+   * Last round this ship was targeted by stasis (for consecutive round rule).
+   */
+  lastStasisTargetRound?: number;
+  /**
+   * Has Anti-Missile Rockets: 40% − 1% per missile tech level point defense.
+   * Per design/technology/weapons.md.
+   */
+  hasAntiMissileRockets?: boolean;
+  /**
+   * Has Stasis Field weapon equipped.
+   * Per design/technology/force-fields.md.
+   */
+  hasStasisField?: boolean;
+  /**
+   * Track whether ship fired this round (for cloaking re-cloak logic).
+   */
+  firedThisRound?: boolean;
 }
 
 export interface CombatLogEntry {
@@ -348,14 +406,16 @@ export function calcHitChanceVs(
 ): number {
   if (weapon.alwaysHits) return 100;
 
-  // Differential formula: each level of advantage = +5%
-  // Note: MOO1 canonical uses ×10, but this implementation uses ×5 per original task spec.
+  // Hit chance formula per design/ships/combat-algorithm.md Section 9:
+  //   Hit_Chance = 50 + (Effective_Attacker_Level - Effective_Defender_Level) × 10
+  // NOTE: The formula in computers.md is different but combat-algorithm.md is authoritative.
   const differential = attacker.attackRating - target.defenseRating;
-  let hitChance = 50 + differential * 5;
+  let hitChance = 50 + differential * 10;
 
   // High Energy Focus: +1 attack rating for this shot (one-time use)
+  // Per design: +1 level = +10% hit chance
   if (attacker.hasHighEnergyFocus && !attacker.highEnergyFocusUsed) {
-    hitChance += 5; // +1 level = +5%
+    hitChance += 10; // +1 level = +10%
   }
 
   // Enhancement: Experience accuracy bonus
@@ -368,10 +428,11 @@ export function calcHitChanceVs(
   // Enhancement: Size modifier (larger targets easier to hit)
   hitChance += sizeModifier(target.hullSize);
 
-  // Cloaking device adds +5 to effective defender level (already in defenseRating)
-  // but if dynamically cloaked, apply here
+  // Cloaking device adds +5 to effective defender level
+  // Per design/technology/force-fields.md: +5 Defense when cloaked
+  // Per combat-algorithm.md Section 9: each defender level = -10% hit chance
   if (target.cloaked) {
-    hitChance -= 50; // +5 defense levels = -50% hit chance
+    hitChance -= 50; // +5 defense levels = -50% hit chance (5 × 10)
   }
 
   // Apply difficulty modifiers if provided
@@ -682,13 +743,94 @@ function checkDisplacementDevice(
 // ── Missile Interception ──────────────────────────────────────────────────────
 
 /**
- * Calculate the total point defense capability of defending ships.
- * Per design: Anti-Missile Rockets destroy 40% of incoming missiles.
- * Beam weapons: 10% per beam weapon × attacks_per_round.
+ * Check if Zyro Shield destroys an incoming missile.
+ * Per design/technology/force-fields.md: 75% chance − 1% per missile tech level.
+ * Roll made per missile, not per salvo.
+ */
+function checkZyroShield(
+  target: CombatShip,
+  missileTechLevel: number,
+  log: CombatLogEntry[],
+  round: number,
+): boolean {
+  if (!target.hasZyroShield) return false;
+  
+  // 75% base chance − 1% per missile tech level
+  const destroyChance = Math.max(0, 75 - missileTechLevel);
+  const d100 = roll(1, 100);
+  
+  if (d100 <= destroyChance) {
+    log.push({
+      round,
+      message: `[R${round}] ${target.designId} Zyro Shield DESTROYS incoming missile (roll ${d100} ≤ ${destroyChance}%)`,
+    });
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Check if Lightning Shield destroys an incoming missile.
+ * Per design/technology/force-fields.md: 100% chance − 1% per missile tech level.
+ * Roll made per missile, not per salvo.
+ */
+function checkLightningShield(
+  target: CombatShip,
+  missileTechLevel: number,
+  log: CombatLogEntry[],
+  round: number,
+): boolean {
+  if (!target.hasLightningShield) return false;
+  
+  // 100% base chance − 1% per missile tech level
+  const destroyChance = Math.max(0, 100 - missileTechLevel);
+  const d100 = roll(1, 100);
+  
+  if (d100 <= destroyChance) {
+    log.push({
+      round,
+      message: `[R${round}] ${target.designId} Lightning Shield DESTROYS incoming missile (roll ${d100} ≤ ${destroyChance}%)`,
+    });
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Check if Anti-Missile Rockets destroy an incoming missile.
+ * Per design/technology/weapons.md: 40% chance − 1% per missile tech level.
+ * Roll made per missile.
+ */
+function checkAntiMissileRockets(
+  target: CombatShip,
+  missileTechLevel: number,
+  log: CombatLogEntry[],
+  round: number,
+): boolean {
+  if (!target.hasAntiMissileRockets) return false;
+  
+  // 40% base chance − 1% per missile tech level
+  const destroyChance = Math.max(0, 40 - missileTechLevel);
+  const d100 = roll(1, 100);
+  
+  if (d100 <= destroyChance) {
+    log.push({
+      round,
+      message: `[R${round}] ${target.designId} Anti-Missile Rockets INTERCEPT incoming missile (roll ${d100} ≤ ${destroyChance}%)`,
+    });
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Calculate the total point defense capability of defending ships (legacy beam weapons).
+ * Note: Zyro Shield, Lightning Shield, and Anti-Missile Rockets are now handled separately
+ * in attemptMissileInterception for per-target rolls.
  */
 function calculateInterceptionChance(
   defenders: CombatShip[],
-  missileTechLevel: number,
+  _missileTechLevel: number,
 ): number {
   let totalChance = 0;
   
@@ -701,12 +843,6 @@ function calculateInterceptionChance(
         const attacks = weapon.attacksPerRound > 0 ? weapon.attacksPerRound : 1;
         totalChance += 10 * attacks;
       }
-      // Anti-Missile Rockets (special case - identified by name or special property)
-      if (weapon.name?.toLowerCase().includes('anti-missile')) {
-        // 40% base minus 1% per missile tech level
-        const antiMissileChance = Math.max(0, 40 - missileTechLevel);
-        totalChance += antiMissileChance;
-      }
     }
   }
   
@@ -716,28 +852,270 @@ function calculateInterceptionChance(
 
 /**
  * Attempt to intercept incoming missiles during the missile phase.
+ * 
+ * Per design docs, missiles can be destroyed by (in order of priority):
+ * 1. Lightning Shield (100% − 1% per missile tech level) - per missile roll
+ * 2. Zyro Shield (75% − 1% per missile tech level) - per missile roll
+ * 3. Anti-Missile Rockets (40% − 1% per missile tech level) - per missile roll
+ * 4. Beam weapon point defense (10% per beam attack) - fleet-wide roll
+ * 
+ * Note: Torpedoes are NOT affected by Zyro/Lightning shields but ARE subject to point defense.
  */
 function attemptMissileInterception(
   missile: MissileInFlight,
+  target: CombatShip,
   defenders: CombatShip[],
   log: CombatLogEntry[],
   round: number,
 ): boolean {
-  // Torpedoes marked as no-intercept are immune to point defense
-  // (though per design they ARE subject to ECM and point defense - this is a weapon property check)
+  const missileTechLevel = missile.techLevel ?? 1;
+  const isTorpedo = missile.weapon.category === 'torpedo';
   
-  const interceptionChance = calculateInterceptionChance(defenders, missile.techLevel ?? 1);
+  // Per design: Torpedoes are NOT affected by Zyro/Lightning shields
+  if (!isTorpedo) {
+    // Check Lightning Shield first (highest chance)
+    if (checkLightningShield(target, missileTechLevel, log, round)) {
+      return true;
+    }
+    
+    // Check Zyro Shield
+    if (checkZyroShield(target, missileTechLevel, log, round)) {
+      return true;
+    }
+  }
+  
+  // Check Anti-Missile Rockets on target ship
+  if (checkAntiMissileRockets(target, missileTechLevel, log, round)) {
+    return true;
+  }
+  
+  // Fleet-wide beam weapon point defense
+  const interceptionChance = calculateInterceptionChance(defenders, missileTechLevel);
   if (interceptionChance <= 0) return false;
   
   const d100 = roll(1, 100);
   if (d100 <= interceptionChance) {
     log.push({
       round,
-      message: `[R${round}] Missile ${missile.weapon.name} INTERCEPTED by point defense (roll ${d100} ≤ ${interceptionChance}%)`,
+      message: `[R${round}] Missile ${missile.weapon.name} INTERCEPTED by beam point defense (roll ${d100} ≤ ${interceptionChance}%)`,
     });
     return true;
   }
   return false;
+}
+
+// ── Pulsar Weapons ────────────────────────────────────────────────────────────
+
+/**
+ * Activate Energy/Ionic Pulsar.
+ * Per design/technology/propulsion.md:
+ *   - Energy Pulsar: 5 damage to all adjacent ships + 1 damage per 2 firing ships
+ *   - Ionic Pulsar: 10 damage to all adjacent ships + 1 damage per 2 firing ships
+ * 
+ * Pulsars are indiscriminate: they hit ALL ships in adjacent hexes, including friendly ships.
+ * Shields apply normally.
+ * 
+ * @returns Number of ships hit
+ */
+function activatePulsar(
+  ship: CombatShip,
+  combat: CombatState,
+  log: CombatLogEntry[],
+): number {
+  const isIonic = ship.hasIonicPulsar;
+  const isEnergy = ship.hasEnergyPulsar && !isIonic; // Ionic supersedes Energy
+  
+  if (!isEnergy && !isIonic) return 0;
+  
+  // Base damage: Energy = 5, Ionic = 10
+  const baseDamage = isIonic ? 10 : 5;
+  
+  // Count ships with pulsars on same side that are alive (for bonus damage)
+  const sameSide = ship.side === 'attacker' ? combat.attackerShips : combat.defenderShips;
+  const pulsarCount = sameSide.filter(
+    (s) => s.hp > 0 && !s.retreated && !s.displaced && (s.hasEnergyPulsar || s.hasIonicPulsar)
+  ).length;
+  
+  // Bonus damage: +1 per 2 firing ships (rounded down)
+  const bonusDamage = Math.floor(pulsarCount / 2);
+  const totalDamage = baseDamage + bonusDamage;
+  
+  // Find all adjacent ships (range 1 from firing ship)
+  const allShips = [...combat.attackerShips, ...combat.defenderShips];
+  const adjacentShips = allShips.filter((s) => {
+    if (s.id === ship.id || s.hp <= 0 || s.retreated || s.displaced) return false;
+    const dist = hexDistance(ship.position, s.position);
+    return dist === 1; // Adjacent = exactly 1 hex away
+  });
+  
+  if (adjacentShips.length === 0) return 0;
+  
+  let hitsDealt = 0;
+  const pulsarName = isIonic ? 'Ionic Pulsar' : 'Energy Pulsar';
+  
+  for (const target of adjacentShips) {
+    // Create a pseudo-weapon for damage application (shields apply normally)
+    const pulsarWeapon: WeaponInstance = {
+      id: 'pulsar',
+      name: pulsarName,
+      category: 'special',
+      damageMin: totalDamage,
+      damageMax: totalDamage,
+      attacksPerRound: 1,
+      alwaysHits: true, // Pulsars auto-hit
+    };
+    
+    applyDamage(target, totalDamage, pulsarWeapon);
+    hitsDealt++;
+    
+    const friendlyOrEnemy = target.side === ship.side ? '(FRIENDLY FIRE!)' : '';
+    log.push({
+      round: combat.round,
+      message: `[R${combat.round}] ${ship.designId} ${pulsarName} hits ${target.designId} ${friendlyOrEnemy} for ${totalDamage} dmg → ${target.hp}/${target.maxHp} HP`,
+    });
+  }
+  
+  return hitsDealt;
+}
+
+// ── Cloaking Device ───────────────────────────────────────────────────────────
+
+/**
+ * Handle cloaking device behavior when a ship fires.
+ * Per design/technology/force-fields.md: Cloaking Device breaks cloak when firing.
+ * +5 Defense bonus remains even after decloaking.
+ */
+function handleCloakingOnFire(
+  ship: CombatShip,
+  log: CombatLogEntry[],
+  round: number,
+): void {
+  if (ship.cloaked && ship.hasCloakingDevice) {
+    ship.cloaked = false;
+    ship.firedThisRound = true;
+    log.push({
+      round,
+      message: `[R${round}] ${ship.designId} DECLOAKS to fire!`,
+    });
+  }
+}
+
+/**
+ * Re-cloak ships with cloaking devices that didn't fire this round.
+ * Per design/technology/force-fields.md: Re-cloaks at start of next combat round if ship does not fire.
+ */
+function refreshCloaks(
+  ships: CombatShip[],
+  log: CombatLogEntry[],
+  round: number,
+): void {
+  for (const ship of ships) {
+    if (!ship.hasCloakingDevice) continue;
+    if (ship.hp <= 0 || ship.retreated || ship.displaced) continue;
+    
+    // If ship didn't fire last round and isn't cloaked, re-cloak
+    if (!ship.cloaked && !ship.firedThisRound) {
+      ship.cloaked = true;
+      log.push({
+        round,
+        message: `[R${round}] ${ship.designId} RE-CLOAKS`,
+      });
+    }
+    
+    // Reset fired flag for next round
+    ship.firedThisRound = false;
+  }
+}
+
+// ── Repulsor Beam ─────────────────────────────────────────────────────────────
+
+/**
+ * Activate Repulsor Beam to push enemy ships away.
+ * Per design/technology/force-fields.md: Push enemy ships 2 hexes away.
+ * 
+ * Mechanics:
+ *   - Activates automatically when enemy ship enters range 2
+ *   - Cannot push ships through obstacles
+ *   - Prevents bombardment by slow ships
+ *   - Does NOT work against missiles or torpedoes
+ *   - Multiple repulsor beams do not stack
+ */
+function activateRepulsorBeam(
+  ship: CombatShip,
+  enemies: CombatShip[],
+  state: CombatState,
+): void {
+  if (!ship.hasRepulsorBeam) return;
+  
+  // Find enemies within range 2 that can be pushed
+  const nearbyEnemies = enemies.filter((e) => {
+    if (e.hp <= 0 || e.retreated || e.displaced) return false;
+    const dist = hexDistance(ship.position, e.position);
+    return dist <= 2 && dist > 0;
+  });
+  
+  for (const enemy of nearbyEnemies) {
+    if (!enemy.position || !ship.position) continue;
+    
+    // Calculate push direction (away from ship)
+    const dx = enemy.position.x - ship.position.x;
+    const dy = enemy.position.y - ship.position.y;
+    
+    // Normalize and push 2 hexes
+    const pushDistance = 2;
+    const magnitude = Math.max(Math.abs(dx), Math.abs(dy), 1);
+    const newX = enemy.position.x + Math.round((dx / magnitude) * pushDistance);
+    const newY = enemy.position.y + Math.round((dy / magnitude) * pushDistance);
+    
+    enemy.position = { x: newX, y: newY };
+    
+    state.log.push({
+      round: state.round,
+      message: `[R${state.round}] ${ship.designId} Repulsor Beam pushes ${enemy.designId} to (${newX}, ${newY})`,
+    });
+  }
+}
+
+// ── Stasis Field ──────────────────────────────────────────────────────────────
+
+/**
+ * Apply Stasis Field to a target ship.
+ * Per design/technology/force-fields.md:
+ *   - Target ship cannot move, fire, or retreat for 1 combat round
+ *   - Stasis target is immune to all targeting while frozen
+ *   - Cannot target the same ship two consecutive rounds
+ *   - 100% success rate (no save)
+ *   - Does NOT work on Orion Guardian
+ */
+export function applyStasisField(
+  attacker: CombatShip,
+  target: CombatShip,
+  state: CombatState,
+): boolean {
+  // Check if attacker has Stasis Field
+  if (!attacker.hasStasisField) return false;
+  
+  // Cannot target same ship two consecutive rounds
+  if (target.lastStasisTargetRound !== undefined && 
+      target.lastStasisTargetRound === state.round - 1) {
+    state.log.push({
+      round: state.round,
+      message: `[R${state.round}] ${attacker.designId} Stasis Field FAILED — cannot target ${target.designId} two consecutive rounds`,
+    });
+    return false;
+  }
+  
+  // Apply stasis
+  target.inStasisField = true;
+  target.stasisFieldEndsRound = state.round + 1;
+  target.lastStasisTargetRound = state.round;
+  
+  state.log.push({
+    round: state.round,
+    message: `[R${state.round}] ${attacker.designId} fires Stasis Field at ${target.designId} — FROZEN for 1 round!`,
+  });
+  
+  return true;
 }
 
 // ── Black Hole Generator ─────────────────────────────────────────────────────
@@ -819,6 +1197,16 @@ function shipActs(
 ): void {
   if (ship.hp <= 0 || ship.retreated) return;
 
+  // Stasis Field: Ship cannot move, fire, or retreat
+  // Per design/technology/force-fields.md: "Ship cannot move, fire, or retreat"
+  if (ship.inStasisField) {
+    log.push({
+      round,
+      message: `[R${round}] ${ship.designId} is FROZEN in Stasis Field — cannot act`,
+    });
+    return;
+  }
+
   // Check crew status - if adrift (0 crew), cannot act
   if (ship.crewCurrent !== undefined && ship.crewCurrent <= 0) {
     log.push({
@@ -826,6 +1214,16 @@ function shipActs(
       message: `[R${round}] ${ship.designId} is ADRIFT (no crew) — cannot act`,
     });
     return;
+  }
+
+  // Pulsar weapons: activate before normal weapons
+  // Per design/technology/propulsion.md: Energy Pulsar (5 dmg) and Ionic Pulsar (10 dmg)
+  if (ship.hasEnergyPulsar || ship.hasIonicPulsar) {
+    // Pulsar also decloaks
+    if (ship.cloaked && ship.hasCloakingDevice) {
+      handleCloakingOnFire(ship, log, round);
+    }
+    activatePulsar(ship, combat, log);
   }
 
   // Black Hole Generator: activates before normal weapons
@@ -846,8 +1244,15 @@ function shipActs(
   const target = selectTarget(enemies);
   if (!target) return;
 
+  // Handle decloak on first weapon fire
+  // Per design/technology/force-fields.md: Cloaking Device breaks cloak when firing
+  if (ship.cloaked && ship.hasCloakingDevice) {
+    handleCloakingOnFire(ship, log, round);
+  }
+
   for (const weapon of ship.weapons) {
     // Handle percent-damage weapons (e.g., Ion Stream Projector)
+    // Per design/technology/weapons.md: Ion Stream Projector deals 20% of target's current HP
     if (weapon.percentDamage && weapon.percentDamage > 0) {
       const percentDmg = Math.floor(target.hp * weapon.percentDamage);
       applyDamage(target, percentDmg, weapon);
@@ -965,8 +1370,8 @@ function processMissilePhase(state: CombatState): void {
     // Get defenders for interception
     const defenders = missile.side === 'attacker' ? state.defenderShips : state.attackerShips;
     
-    // Attempt interception
-    if (attemptMissileInterception(missile, defenders, state.log, state.round)) {
+    // Attempt interception (now includes target ship for Zyro/Lightning/Anti-Missile checks)
+    if (attemptMissileInterception(missile, target, defenders, state.log, state.round)) {
       continue; // Missile intercepted
     }
     
@@ -1006,6 +1411,25 @@ function processMissilePhase(state: CombatState): void {
 }
 
 /**
+ * Process stasis field expiration at the start of each round.
+ * Ships whose stasisFieldEndsRound <= current round are released.
+ */
+function processStasisFieldExpiration(state: CombatState): void {
+  const allShips = [...state.attackerShips, ...state.defenderShips];
+  for (const ship of allShips) {
+    if (ship.inStasisField && ship.stasisFieldEndsRound !== undefined &&
+        ship.stasisFieldEndsRound <= state.round) {
+      ship.inStasisField = false;
+      // Keep stasisFieldEndsRound to track "cannot target consecutively" rule
+      state.log.push({
+        round: state.round,
+        message: `[R${state.round}] ${ship.designId} is RELEASED from Stasis Field!`,
+      });
+    }
+  }
+}
+
+/**
  * Process ships returning from displacement at the end of the round.
  */
 function processDisplacementReturns(state: CombatState): void {
@@ -1030,6 +1454,25 @@ export function processRound(state: CombatState): CombatState {
 
   // Process displacement returns at start of round
   processDisplacementReturns(state);
+
+  // Process stasis field expirations
+  processStasisFieldExpiration(state);
+
+  // Re-cloak ships that have cloaking devices and didn't fire last round
+  refreshCloaks(state.attackerShips, state.log, state.round);
+  refreshCloaks(state.defenderShips, state.log, state.round);
+
+  // Apply repulsor beam effects at start of round (pushes enemies entering range)
+  for (const ship of state.attackerShips) {
+    if (ship.hp > 0 && ship.hasRepulsorBeam && !ship.retreated && !ship.displaced) {
+      activateRepulsorBeam(ship, state.defenderShips, state);
+    }
+  }
+  for (const ship of state.defenderShips) {
+    if (ship.hp > 0 && ship.hasRepulsorBeam && !ship.retreated && !ship.displaced) {
+      activateRepulsorBeam(ship, state.attackerShips, state);
+    }
+  }
 
   // Combine all living, non-displaced ships for initiative sort
   const allShips = sortByInitiative([
@@ -1147,6 +1590,16 @@ export function launchMissile(
  * Returns true if retreat succeeded.
  */
 export function attemptRetreat(ship: CombatShip, state: CombatState): boolean {
+  // Stasis Field: Ship cannot move, fire, or retreat
+  // Per design/technology/force-fields.md: "Ship cannot move, fire, or retreat"
+  if (ship.inStasisField) {
+    state.log.push({
+      round: state.round,
+      message: `[R${state.round}] ${ship.designId} retreat BLOCKED by Stasis Field!`,
+    });
+    return false;
+  }
+
   const enemies =
     ship.side === 'attacker' ? state.defenderShips : state.attackerShips;
   const livingEnemies = enemies.filter((s) => s.hp > 0 && !s.retreated);
