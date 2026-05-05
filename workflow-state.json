@@ -1,27 +1,48 @@
 {
   "state": "COMPLETED",
   "phase": "phase5-design-compliance-fixes",
-  "current_task": "fix-76",
-  "last_check": "2026-05-05T03:15:00.000Z",
+  "current_task": "fix-78",
+  "last_check": "2026-05-05T03:21:00.000Z",
   "total_tasks": 85,
-  "completed_count": 12,
+  "completed_count": 13,
   "skipped_count": 0,
   "blocked_count": 0,
-  "notes": "fix-76 completed: Updated ground-combat-ui.md transport ship capacity table to match ship-costs.md §16B authoritative values",
+  "notes": "fix-78 completed: Implemented racial research preferences from design/technical/ai-implementation.md §3.5 in researchAI.ts",
   "worker_output": {
     "files_created": [],
     "files_modified": [
-      "design/ui-ux/ground-combat-ui.md"
+      "src/game/ai/researchAI.ts",
+      "test/game/ai/researchAI.test.ts"
     ],
-    "tests_added": [],
-    "summary": "Fixed transport ship capacity display in ground-combat-ui.md §6 to match authoritative source ship-costs.md §16B. Old values (Small: 1, Large: 4) replaced with correct Military Transport values (Light: 5, Heavy: 10, Assault: 20). Also clarified distinction between Military Transports (troops) and Colony Transports (population), and updated Fleet Deployment wireframe example to show realistic troop counts.",
+    "tests_added": [
+      "chameleons race prioritizes computers (design doc §3.5)",
+      "rabbits race prioritizes planetology (design doc §3.5)",
+      "hermit_crabs prioritizes force_fields (design doc §3.5)"
+    ],
+    "summary": "Replaced personality-based field weights with racial research preferences per design/technical/ai-implementation.md §3.5. Added RACIAL_RESEARCH_PREFERENCES constant with exact multipliers for all 10 races (hamsters, guinea_pigs, chameleons, budgies, ants, mice, ferrets, rats, rabbits, hermit_crabs). Updated selectResearchPriorities() and evaluateTechValue() to use racial preference formula: floor(20 × (Racial_Weight - 1.0) × 10). Updated tests to verify race-specific behavior.",
     "design_compliance": [
       {
-        "doc": "design/economy/ship-costs.md",
-        "section": "§16B Military (Troop) Transports",
-        "quote": "Light Transport: 5 troops, Heavy Transport: 10 troops, Assault Transport: 20 troops",
-        "impl_file": "design/ui-ux/ground-combat-ui.md",
-        "impl_line": "§6 Troop Sources and Transport Ships",
+        "doc": "design/technical/ai-implementation.md",
+        "section": "§3.5 Racial Research Preferences",
+        "quote": "guinea_pigs: { weapons: 1.4, propulsion: 0.8, construction: 1.2, computers: 0.7, force_fields: 1.1, planetology: 0.8 }",
+        "impl_file": "src/game/ai/researchAI.ts",
+        "impl_line": 90,
+        "verified": true
+      },
+      {
+        "doc": "design/technical/ai-implementation.md",
+        "section": "§3.5 Racial Research Preferences",
+        "quote": "chameleons: { weapons: 0.9, propulsion: 1.0, construction: 0.9, computers: 1.5, force_fields: 0.9, planetology: 0.8 }",
+        "impl_file": "src/game/ai/researchAI.ts",
+        "impl_line": 96,
+        "verified": true
+      },
+      {
+        "doc": "design/technical/ai-implementation.md",
+        "section": "§3.5 Racial Research Preferences",
+        "quote": "Racial_Preference = floor(20 × (Racial_Weight - 1.0) × 10)",
+        "impl_file": "src/game/ai/researchAI.ts",
+        "impl_line": 176,
         "verified": true
       }
     ],

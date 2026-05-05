@@ -1,3 +1,3 @@
-# Current Task: fix-55 — Slider Mathematics Design Doc Fixes
+# Current Task: fix-82 — StarGate Design Doc Fixes
 
-**ID**: fix-55 | **Severity**: medium | **Source**: design/economy/slider-mathematics.md
+**ID**: fix-82 | **Severity**: medium | **Source**: design/technology/stargate.md

@@ -3,16 +3,16 @@
  * src/game/ai/researchAI.ts
  *
  * Selects research priorities and picks specific techs to research each turn
- * based on empire personality, situational analysis, and racial field bonuses.
+ * based on racial research preferences, situational analysis, and personality.
  *
  * Decision flow:
- *   1. selectResearchPriorities() — rank all 6 fields by personality + situation
+ *   1. selectResearchPriorities() — rank all 6 fields by racial preference + situation
  *   2. aiChooseTech()             — pick the highest-value available tech
  *   3. evaluateTechValue()        — score a single tech for a given empire
  *   4. processAIResearch()        — orchestrate per-turn research for all AI empires
  *
  * References:
- *   design/ai-personalities.md          — per-race field preferences
+ *   design/technical/ai-implementation.md §3.5 — Racial Research Preferences
  *   src/game/state.ts                   — GameState, Empire, AIEmpire, TechField
  *   src/game/systems/research.ts        — ResearchField, ALL_RESEARCH_FIELDS
  */
@@ -61,88 +61,125 @@ export interface ResearchDecision {
   reason: string;
 }
 
-// ── Per-personality field weights ───────────────────────────────────────────
+// ── Racial Research Preferences ─────────────────────────────────────────────
 
 /**
- * Base field-priority lookup by personality archetype.
- * Values are 0–100 starting weights before situational modifiers.
+ * Racial research preference multipliers from design/technical/ai-implementation.md §3.5.
  *
- * Derived from design/ai-personalities.md race descriptions and MOO1 bonuses.
+ * Each race has inherent preferences represented as multipliers:
+ *   1.0 = neutral (no preference)
+ *   >1.0 = favors this field (e.g., 1.4 = +40% priority)
+ *   <1.0 = disfavors this field (e.g., 0.8 = -20% priority)
+ *
+ * The formula for racial preference score contribution is:
+ *   Racial_Preference = floor(20 × (Racial_Weight - 1.0) × 10)
+ *
+ * Example: Guinea Pigs researching Weapons (1.4 weight):
+ *   Racial_Preference = floor(20 × (1.4 - 1.0) × 10) = floor(80) = 80
  */
-const PERSONALITY_FIELD_WEIGHTS: Record<string, Partial<Record<ResearchField, number>>> = {
-  // Hamsters: Honorable Diplomat — Force Fields +40%, Propulsion +20%, Planetology +20%
-  balanced: {
-    force_fields: 70,
-    propulsion:   60,
-    planetology:  60,
-    weapons:      40,
-    computers:    40,
-    construction: 40,
+const RACIAL_RESEARCH_PREFERENCES: Record<string, Record<ResearchField, number>> = {
+  hamsters: {
+    weapons: 1.0,
+    propulsion: 1.0,
+    construction: 1.0,
+    computers: 1.1,
+    force_fields: 1.0,
+    planetology: 1.0,
   },
-  // Rats: Psilons equivalent — ALL fields bonus; pure science
-  scientific: {
-    computers:    90,
-    weapons:      70,
-    propulsion:   70,
-    construction: 70,
-    force_fields: 70,
-    planetology:  70,
+  guinea_pigs: {
+    weapons: 1.4,
+    propulsion: 0.8,
+    construction: 1.2,
+    computers: 0.7,
+    force_fields: 1.1,
+    planetology: 0.8,
   },
-  // Budgies: Proud Warriors — Propulsion + Computers
-  aggressive: {
-    weapons:      80,
-    propulsion:   75,
-    computers:    70,
-    construction: 40,
-    force_fields: 35,
-    planetology:  20,
+  chameleons: {
+    weapons: 0.9,
+    propulsion: 1.0,
+    construction: 0.9,
+    computers: 1.5,
+    force_fields: 0.9,
+    planetology: 0.8,
   },
-  // Mice: Builders — Production focus; Construction first
-  builder: {
-    construction: 80,
-    computers:    60,
-    propulsion:   50,
-    force_fields: 40,
-    weapons:      35,
-    planetology:  55,
+  budgies: {
+    weapons: 1.1,
+    propulsion: 1.3,
+    construction: 0.9,
+    computers: 1.2,
+    force_fields: 0.9,
+    planetology: 0.8,
   },
-  // Expansionist: needs propulsion and planetology for wide colonies
-  expansionist: {
-    propulsion:   80,
-    planetology:  75,
-    construction: 55,
-    weapons:      45,
-    computers:    40,
-    force_fields: 30,
+  ants: {
+    weapons: 0.9,
+    propulsion: 1.0,
+    construction: 1.4,
+    computers: 1.0,
+    force_fields: 1.0,
+    planetology: 1.1,
   },
-  // Diplomatic: prefers non-combat techs; force fields for defence
-  diplomatic: {
-    force_fields: 65,
-    planetology:  60,
-    computers:    55,
-    propulsion:   50,
-    construction: 45,
-    weapons:      30,
+  mice: {
+    weapons: 1.0,
+    propulsion: 1.0,
+    construction: 1.3,
+    computers: 1.3,
+    force_fields: 1.0,
+    planetology: 0.9,
   },
-  // Erratic: nearly uniform, slight random skew applied at runtime
-  erratic: {
-    weapons:      55,
-    propulsion:   55,
-    construction: 55,
-    computers:    55,
-    force_fields: 55,
-    planetology:  55,
+  ferrets: {
+    weapons: 1.4,
+    propulsion: 1.1,
+    construction: 0.9,
+    computers: 1.1,
+    force_fields: 0.8,
+    planetology: 0.7,
+  },
+  rats: {
+    weapons: 1.0,
+    propulsion: 1.0,
+    construction: 1.0,
+    computers: 1.2,
+    force_fields: 1.0,
+    planetology: 1.0,
+  },
+  rabbits: {
+    weapons: 0.7,
+    propulsion: 1.0,
+    construction: 0.9,
+    computers: 0.8,
+    force_fields: 0.8,
+    planetology: 1.5,
+  },
+  hermit_crabs: {
+    weapons: 0.8,
+    propulsion: 0.8,
+    construction: 1.3,
+    computers: 0.9,
+    force_fields: 1.4,
+    planetology: 1.0,
   },
 };
 
-const DEFAULT_FIELD_WEIGHTS: Record<ResearchField, number> = {
-  weapons:      50,
-  propulsion:   50,
-  construction: 50,
-  computers:    50,
-  force_fields: 50,
-  planetology:  50,
+/** Default multiplier for unknown races (neutral preference). */
+const DEFAULT_RACIAL_PREFERENCE: Record<ResearchField, number> = {
+  weapons: 1.0,
+  propulsion: 1.0,
+  construction: 1.0,
+  computers: 1.0,
+  force_fields: 1.0,
+  planetology: 1.0,
 };
+
+/**
+ * Calculate the racial preference score contribution for a field.
+ * Formula from design/technical/ai-implementation.md §3.5:
+ *   Racial_Preference = floor(20 × (Racial_Weight - 1.0) × 10)
+ */
+function calculateRacialPreference(raceId: string, field: ResearchField): number {
+  const prefs = RACIAL_RESEARCH_PREFERENCES[raceId] ?? DEFAULT_RACIAL_PREFERENCE;
+  const weight = prefs[field];
+  return Math.floor(20 * (weight - 1.0) * 10);
+}
 
 // ── selectResearchPriorities ────────────────────────────────────────────────
 
@@ -150,7 +187,7 @@ const DEFAULT_FIELD_WEIGHTS: Record<ResearchField, number> = {
  * Return a ranked list of ResearchDecisions for all 6 fields.
  *
  * Factors:
- *   - Base weights from personality archetype (aiPersonality string)
+ *   - Racial research preferences from design/technical/ai-implementation.md §3.5
  *   - Per-empire AIWeights field priorities stored in aiEmpire.weights
  *   - Situational modifiers: at war → boost weapons; late game → boost construction
  *   - Availability modifier: fields with more available techs score slightly higher
@@ -161,10 +198,13 @@ export function selectResearchPriorities(
   state: GameState,
   empireId: EmpireId,
   availableTechs: string[],
-  aiPersonality: string,
+  _aiPersonality: string,
 ): ResearchDecision[] {
   const aiEmpire = state.aiEmpires[empireId];
   const empire   = state.empires.byId[empireId];
+
+  // Get the race ID for racial preference lookup
+  const raceId = aiEmpire?.raceId ?? 'hamsters';
 
   // Count available techs per field for the availability modifier
   const techsPerField: Record<ResearchField, number> = {
@@ -188,41 +228,45 @@ export function selectResearchPriorities(
   const isEarlyGame = turn < 30;
   const isLateGame  = turn > 100;
 
-  const personalityWeights = PERSONALITY_FIELD_WEIGHTS[aiPersonality] ?? {};
-
   const decisions: ResearchDecision[] = ALL_RESEARCH_FIELDS.map(field => {
     const reasons: string[] = [];
 
-    // 1. Personality base weight (0–100)
-    let score = personalityWeights[field] ?? DEFAULT_FIELD_WEIGHTS[field];
-    reasons.push(`personality base ${score}`);
+    // 1. Base score (neutral starting point)
+    let score = 50;
 
-    // 2. AIWeights field priorities (stored as 0–100 in state)
+    // 2. Racial research preference (design/technical/ai-implementation.md §3.5)
+    // Formula: Racial_Preference = floor(20 × (Racial_Weight - 1.0) × 10)
+    const racialPref = calculateRacialPreference(raceId, field);
+    score += racialPref;
+    reasons.push(`racial preference (${raceId}) ${racialPref >= 0 ? '+' : ''}${racialPref}`);
+
+    // 3. AIWeights field priorities (stored as 0–100 in state)
     if (aiEmpire) {
       const wt = aiWeightForField(aiEmpire.weights, field);
-      score = (score + wt) / 2;
+      // Blend AI weights with current score
+      score = Math.round((score + wt) / 2);
       reasons.push(`ai weight ${wt}`);
     }
 
-    // 3. Situational: war → weapons +20
+    // 4. Situational: war → weapons +20
     if (isAtWar && field === 'weapons') {
       score += 20;
       reasons.push('at war +20');
     }
 
-    // 4. Situational: early game → propulsion bonus for expansion
+    // 5. Situational: early game → propulsion bonus for expansion
     if (isEarlyGame && field === 'propulsion') {
       score += 10;
       reasons.push('early game propulsion +10');
     }
 
-    // 5. Situational: late game → construction for ship hulls
+    // 6. Situational: late game → construction for ship hulls
     if (isLateGame && field === 'construction') {
       score += 15;
       reasons.push('late game construction +15');
     }
 
-    // 6. Availability: more options in a field = slight preference
+    // 7. Availability: more options in a field = slight preference
     const avail = techsPerField[field];
     if (avail > 0) {
       const bonus = Math.min(avail * 2, 10);
@@ -251,17 +295,21 @@ export function selectResearchPriorities(
  * Returns null when no techs are available or the empire is not found.
  */
 export function aiChooseTech(
-  _state: GameState,
+  state: GameState,
   empireId: EmpireId,
   availableTechs: string[],
 ): TechId | null {
   if (availableTechs.length === 0) return null;
 
+  // Get the race ID for racial preference lookup
+  const aiEmpire = state.aiEmpires[empireId];
+  const raceId = aiEmpire?.raceId ?? 'hamsters';
+
   let bestId: TechId | null = null;
   let bestScore = -Infinity;
 
   for (const techId of availableTechs) {
-    const score = evaluateTechValue(empireId, techId, availableTechs);
+    const score = evaluateTechValue(raceId, techId, availableTechs);
     if (score > bestScore) {
       bestScore = score;
       bestId = techId;
@@ -277,12 +325,12 @@ export function aiChooseTech(
  * Score a single tech 0–100+ for a specific empire.
  *
  * Factors:
- *   - Field alignment with empire's AIWeights priorities
+ *   - Racial research preference (design/technical/ai-implementation.md §3.5)
  *   - Tier value (higher tier → higher score, tempered by affordability)
  *   - Uniqueness: being the only option in a field boosts the score
  */
 export function evaluateTechValue(
-  empireId: string,
+  raceId: string,
   techId: string,
   availableTechs: string[],
 ): number {
@@ -290,12 +338,18 @@ export function evaluateTechValue(
   if (!entry) return 0;
 
   // Base score from tier (higher tier techs are generally more impactful)
-  let score = entry.tier * 5;
+  // Formula from design doc §3.3: Base_Tech_Value = Tech_Tier × 10
+  let score = entry.tier * 10;
 
   // Field value from the tech's field category
   const rf = techFieldToResearchField(entry.field);
   if (rf !== null) {
     score += FIELD_BASE_VALUE[rf];
+
+    // Add racial preference score (design/technical/ai-implementation.md §3.5)
+    // Formula: Racial_Preference = floor(20 × (Racial_Weight - 1.0) × 10)
+    const racialPref = calculateRacialPreference(raceId, rf);
+    score += racialPref;
   }
 
   // Uniqueness bonus: fewer alternatives in the same field = higher urgency
@@ -306,9 +360,6 @@ export function evaluateTechValue(
   if (sameField.length === 1) {
     score += 15; // only option in that field
   }
-
-  // Normalise empireId use: suppress "unused parameter" in strict mode
-  void empireId;
 
   return Math.max(0, score);
 }

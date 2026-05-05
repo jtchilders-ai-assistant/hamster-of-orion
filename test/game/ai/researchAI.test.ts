@@ -195,13 +195,75 @@ describe('selectResearchPriorities', () => {
     expect(ffDecision.priority).toBeGreaterThanOrEqual(weapDecision.priority);
   });
 
-  it('aggressive personality puts weapons at top', () => {
-    const state   = makeBaseState();
+  it('guinea_pigs race puts weapons at top (racial preference)', () => {
+    // Guinea Pigs have weapons=1.4 (highest weapon preference per design doc)
+    const state   = makeBaseState(1, {
+      aiEmpires: {
+        ai1: {
+          ...makeAIEmpire('ai1'),
+          raceId: 'guinea_pigs',
+        },
+      },
+    });
     const techs   = allAvailable(state, 'ai1');
     const results = selectResearchPriorities(state, 'ai1', techs, 'aggressive');
 
     const top2Fields = results.slice(0, 2).map((d: ResearchDecision) => d.field);
     expect(top2Fields).toContain('weapons');
+  });
+
+  it('chameleons race prioritizes computers (design doc §3.5)', () => {
+    // Chameleons have computers=1.5 (highest computer preference per design doc)
+    const state   = makeBaseState(1, {
+      aiEmpires: {
+        ai1: {
+          ...makeAIEmpire('ai1'),
+          raceId: 'chameleons',
+        },
+      },
+    });
+    const techs   = allAvailable(state, 'ai1');
+    const results = selectResearchPriorities(state, 'ai1', techs, 'balanced');
+
+    const compDecision = results.find((d: ResearchDecision) => d.field === 'computers')!;
+    const weapDecision = results.find((d: ResearchDecision) => d.field === 'weapons')!;
+    expect(compDecision.priority).toBeGreaterThan(weapDecision.priority);
+  });
+
+  it('rabbits race prioritizes planetology (design doc §3.5)', () => {
+    // Rabbits have planetology=1.5 (highest planetology preference per design doc)
+    const state   = makeBaseState(1, {
+      aiEmpires: {
+        ai1: {
+          ...makeAIEmpire('ai1'),
+          raceId: 'rabbits',
+        },
+      },
+    });
+    const techs   = allAvailable(state, 'ai1');
+    const results = selectResearchPriorities(state, 'ai1', techs, 'balanced');
+
+    const plnDecision = results.find((d: ResearchDecision) => d.field === 'planetology')!;
+    const weapDecision = results.find((d: ResearchDecision) => d.field === 'weapons')!;
+    expect(plnDecision.priority).toBeGreaterThan(weapDecision.priority);
+  });
+
+  it('hermit_crabs prioritizes force_fields (design doc §3.5)', () => {
+    // Hermit Crabs have force_fields=1.4 (high defensive preference)
+    const state   = makeBaseState(1, {
+      aiEmpires: {
+        ai1: {
+          ...makeAIEmpire('ai1'),
+          raceId: 'hermit_crabs',
+        },
+      },
+    });
+    const techs   = allAvailable(state, 'ai1');
+    const results = selectResearchPriorities(state, 'ai1', techs, 'balanced');
+
+    const ffDecision = results.find((d: ResearchDecision) => d.field === 'force_fields')!;
+    const weapDecision = results.find((d: ResearchDecision) => d.field === 'weapons')!;
+    expect(ffDecision.priority).toBeGreaterThan(weapDecision.priority);
   });
 
   it('applies war-time weapons bonus', () => {
