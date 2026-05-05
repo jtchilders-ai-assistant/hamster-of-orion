@@ -833,6 +833,14 @@ export class CombatScreen {
     return this.movementPointsRemaining.get(shipId) ?? 0;
   }
 
+  /**
+   * Get the maximum movement points (combat_speed) for a ship.
+   */
+  private getMaxMovementPoints(shipId: string): number {
+    const ship = this.findShipById(shipId);
+    return ship?.speed ?? 0;
+  }
+
   // ── Effect animation loop ─────────────────────────────────────────────────────
 
   private startEffectLoop(): void {
