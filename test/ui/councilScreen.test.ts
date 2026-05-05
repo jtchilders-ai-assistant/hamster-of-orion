@@ -120,6 +120,7 @@ function makeState(
     fleets: { byId: {}, allIds: [] },
     ships: { byId: {}, allIds: [] },
     turn,
+    difficulty: 'average', // Council formation threshold = 50% on average
     currentScreen: 'council',
     previousScreen: null,
     selectedPlanetId: null,

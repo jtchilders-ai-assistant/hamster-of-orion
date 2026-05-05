@@ -530,3 +530,243 @@ export function getStartingConditions(difficulty: DifficultyLevel, isPlayer: boo
   }
   return STARTING_CONDITIONS[difficulty];
 }
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AI Starting Tech Bonuses
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * AI starting tech bonus configuration by difficulty.
+ * From design/game-mechanics/difficulty.md §AI Starting Tech Bonuses.
+ *
+ * | Difficulty | Bonus Techs | Starting Tier | Fields                            |
+ * |------------|-------------|---------------|-----------------------------------|
+ * | Simple     | 0           | 1             | none                              |
+ * | Easy       | 0           | 1             | none                              |
+ * | Average    | 0           | 1             | none                              |
+ * | Hard       | 2           | 1             | racial_preference, random         |
+ * | Impossible | 4           | 2             | 2×racial_pref, weapons, random    |
+ */
+export interface AIStartingTechBonus {
+  /** Number of bonus starting techs for AI. */
+  bonusTechs: number;
+  /** Starting tech tier (1 = normal, 2 = advanced start for Impossible). */
+  startingTier: number;
+  /**
+   * Fields to select bonus techs from:
+   *   'racial_preference' — pick from race's preferred tech field
+   *   'random' — pick any tier-appropriate tech
+   *   'weapons' — guarantee early weapon upgrade
+   */
+  bonusTechFields: Array<'racial_preference' | 'random' | 'weapons'>;
+}
+
+/**
+ * AI starting tech bonus table by difficulty.
+ */
+export const AI_STARTING_TECH_BONUSES: Record<Exclude<DifficultyLevel, 'custom'>, AIStartingTechBonus> = {
+  simple: {
+    bonusTechs: 0,
+    startingTier: 1,
+    bonusTechFields: [],
+  },
+  easy: {
+    bonusTechs: 0,
+    startingTier: 1,
+    bonusTechFields: [],
+  },
+  average: {
+    bonusTechs: 0,
+    startingTier: 1,
+    bonusTechFields: [],
+  },
+  hard: {
+    bonusTechs: 2,
+    startingTier: 1,
+    bonusTechFields: ['racial_preference', 'random'],
+  },
+  impossible: {
+    bonusTechs: 4,
+    startingTier: 2,
+    bonusTechFields: ['racial_preference', 'racial_preference', 'weapons', 'random'],
+  },
+};
+
+/**
+ * Get AI starting tech bonuses for a difficulty level.
+ * @param difficulty Game difficulty level.
+ * @returns AI starting tech bonus configuration.
+ */
+export function getAIStartingTechBonus(difficulty: DifficultyLevel): AIStartingTechBonus {
+  if (difficulty === 'custom' || !(difficulty in AI_STARTING_TECH_BONUSES)) {
+    return AI_STARTING_TECH_BONUSES.average;
+  }
+  return AI_STARTING_TECH_BONUSES[difficulty];
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Guardian of Orion Stats
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Guardian of Orion stats by difficulty level.
+ * From design/game-mechanics/difficulty.md §Guardian of Orion Modifiers.
+ *
+ * | Stat          | Simple | Easy   | Average | Hard   | Impossible |
+ * |---------------|--------|--------|---------|--------|------------|
+ * | HP            | 16,000 | 24,000 | 32,000  | 40,000 | 48,000     |
+ * | Attack Rating | +5     | +7     | +10     | +12    | +15        |
+ * | Shield Class  | X (10) | XII    | XV      | XVIII  | XX (20)    |
+ * | Armor Mult    | ×2.0   | ×3.0   | ×4.0    | ×5.0   | ×6.0       |
+ * | Speed         | 2      | 3      | 4       | 5      | 6          |
+ *
+ * Effective HP = Base HP × Armor Multiplier
+ */
+export interface GuardianStats {
+  /** Base HP (before armor multiplier). */
+  hp: number;
+  /** Attack rating bonus. */
+  attackRating: number;
+  /** Shield class (damage absorbed per hit). */
+  shieldClass: number;
+  /** Armor multiplier (effective HP = hp × armorMultiplier). */
+  armorMultiplier: number;
+  /** Combat speed (hexes per turn). */
+  speed: number;
+}
+
+/**
+ * Guardian stats table by difficulty level.
+ */
+export const GUARDIAN_STATS: Record<Exclude<DifficultyLevel, 'custom'>, GuardianStats> = {
+  simple: {
+    hp: 16000,
+    attackRating: 5,
+    shieldClass: 10,
+    armorMultiplier: 2.0,
+    speed: 2,
+  },
+  easy: {
+    hp: 24000,
+    attackRating: 7,
+    shieldClass: 12,
+    armorMultiplier: 3.0,
+    speed: 3,
+  },
+  average: {
+    hp: 32000,
+    attackRating: 10,
+    shieldClass: 15,
+    armorMultiplier: 4.0,
+    speed: 4,
+  },
+  hard: {
+    hp: 40000,
+    attackRating: 12,
+    shieldClass: 18,
+    armorMultiplier: 5.0,
+    speed: 5,
+  },
+  impossible: {
+    hp: 48000,
+    attackRating: 15,
+    shieldClass: 20,
+    armorMultiplier: 6.0,
+    speed: 6,
+  },
+};
+
+/**
+ * Get Guardian of Orion stats for a difficulty level.
+ * @param difficulty Game difficulty level.
+ * @returns Guardian combat stats.
+ */
+export function getGuardianStats(difficulty: DifficultyLevel): GuardianStats {
+  if (difficulty === 'custom' || !(difficulty in GUARDIAN_STATS)) {
+    return GUARDIAN_STATS.average;
+  }
+  return GUARDIAN_STATS[difficulty];
+}
+
+/**
+ * Calculate effective HP for Guardian (HP × armor multiplier).
+ * From design/game-mechanics/difficulty.md §Guardian Effective HP Calculation:
+ *   - Simple: 16,000 × 2.0 = 32,000 effective HP
+ *   - Impossible: 48,000 × 6.0 = 288,000 effective HP
+ *
+ * @param difficulty Game difficulty level.
+ * @returns Effective HP after armor.
+ */
+export function getGuardianEffectiveHP(difficulty: DifficultyLevel): number {
+  const stats = getGuardianStats(difficulty);
+  return stats.hp * stats.armorMultiplier;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Diplomacy & Council Accessors
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Get the probability of AI forming an anti-player coalition.
+ * From design/game-mechanics/difficulty.md §Anti-Player Coalition:
+ *   - Simple: 0%, Easy: 10%, Average: 25%, Hard: 50%, Impossible: 75%
+ *
+ * Coalition triggers when player has 1.5× average AI power.
+ *
+ * @param difficulty Game difficulty level.
+ * @returns Coalition probability (0.0–1.0).
+ */
+export function getCoalitionProbability(difficulty: DifficultyLevel): number {
+  return getDifficultyModifiers(difficulty).coalitionProbability;
+}
+
+/**
+ * Get the council formation threshold (galaxy colonization percentage).
+ * From design/game-mechanics/difficulty.md §Council Formation Timing:
+ *   - Simple: 60%, Easy: 55%, Average: 50%, Hard: 45%, Impossible: 40%
+ *
+ * @param difficulty Game difficulty level.
+ * @returns Colonization percentage required (0.0–1.0).
+ */
+export function getCouncilFormationThreshold(difficulty: DifficultyLevel): number {
+  return getDifficultyModifiers(difficulty).councilFormationThreshold;
+}
+
+/**
+ * Get the bribe effectiveness multiplier for council votes.
+ * From design/game-mechanics/difficulty.md §AI Vote Behavior:
+ *   - Simple: 1.50×, Easy: 1.25×, Average: 1.00×, Hard: 0.75×, Impossible: 0.50×
+ *
+ * @param difficulty Game difficulty level.
+ * @returns Bribe effectiveness multiplier.
+ */
+export function getBribeEffectiveness(difficulty: DifficultyLevel): number {
+  return getDifficultyModifiers(difficulty).bribeEffectiveness;
+}
+
+/**
+ * Get the AI war declaration threshold modifier.
+ * From design/game-mechanics/difficulty.md §AI Diplomatic Behavior:
+ *   - Simple: +30 (very reluctant), Easy: +15, Average: 0, Hard: -15, Impossible: -30
+ * Negative values mean AI is more eager to declare war.
+ *
+ * @param difficulty Game difficulty level.
+ * @returns War threshold modifier (additive to relation level).
+ */
+export function getAIWarThreshold(difficulty: DifficultyLevel): number {
+  return getDifficultyModifiers(difficulty).aiWarThreshold;
+}
+
+/**
+ * Get the AI diplomatic forgiveness rate multiplier.
+ * From design/game-mechanics/difficulty.md §AI Diplomatic Behavior:
+ *   - Simple: 1.50×, Easy: 1.25×, Average: 1.00×, Hard: 0.75×, Impossible: 0.50×
+ * Higher = faster relation recovery after negative events.
+ *
+ * @param difficulty Game difficulty level.
+ * @returns Forgiveness multiplier.
+ */
+export function getAIForgiveness(difficulty: DifficultyLevel): number {
+  return getDifficultyModifiers(difficulty).aiForgiveness;
+}

@@ -7,6 +7,7 @@
 
 import { EmpireId, GameState, Planet, PlanetType } from '../state';
 import { getRelationValue } from './diplomacy';
+import { getCouncilFormationThreshold } from './difficulty';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -369,12 +370,17 @@ export function checkDiplomaticVictory(
 // ── Council formation check ───────────────────────────────────────────────────
 
 /**
- * Check whether the council formation condition is met:
- * ≥50% of habitable planets are colonised.
+ * Check whether the council formation condition is met.
+ *
+ * The threshold varies by difficulty:
+ *   - Simple: 60%, Easy: 55%, Average: 50%, Hard: 45%, Impossible: 40%
+ *
+ * Design compliance: design/game-mechanics/difficulty.md §Council Formation Timing
  */
 export function isCouncilFormationMet(state: GameState): boolean {
   const habitable = habitablePlanets(state);
   if (habitable.length === 0) return false;
   const colonised = habitable.filter(p => p.isColonized).length;
-  return colonised / habitable.length >= 0.5;
+  const threshold = getCouncilFormationThreshold(state.difficulty);
+  return colonised / habitable.length >= threshold;
 }

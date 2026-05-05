@@ -139,7 +139,7 @@ function makeState(
     seed: 'test',
     turn,
     year: 2450,
-    difficulty: 'normal',
+    difficulty: 'average',
     isPaused: false,
     gameSpeed: 'normal',
     currentScreen: 'galaxy',
@@ -541,6 +541,64 @@ describe('isCouncilFormationMet', () => {
     const state = makeState([empA], [p1, p2]);
 
     // Only 1 habitable (terran), it's colonised → 100% ≥ 50%
+    expect(isCouncilFormationMet(state)).toBe(true);
+  });
+
+  it('uses difficulty-based threshold: Simple requires 60%, Impossible allows 40%', () => {
+    // Create 10 planets, colonise 5 (50%)
+    const planets: Planet[] = [];
+    const colonisedIds: PlanetId[] = [];
+    for (let i = 0; i < 10; i++) {
+      const isColonised = i < 5;
+      const ownerId = isColonised ? 'A' : null;
+      planets.push({ ...makePlanet(`p${i}`, ownerId, isColonised ? 100 : 0), isColonized: isColonised });
+      if (isColonised) colonisedIds.push(`p${i}`);
+    }
+
+    const empA = makeEmpire('A', 'hamsters', colonisedIds);
+    
+    // With Simple difficulty (60% threshold), 50% colonised should NOT meet threshold
+    const stateSimple = { ...makeState([empA], planets), difficulty: 'simple' as const };
+    expect(isCouncilFormationMet(stateSimple)).toBe(false);
+
+    // With Impossible difficulty (40% threshold), 50% colonised SHOULD meet threshold
+    const stateImpossible = { ...makeState([empA], planets), difficulty: 'impossible' as const };
+    expect(isCouncilFormationMet(stateImpossible)).toBe(true);
+  });
+
+  it('Simple difficulty requires 60% colonised for council formation', () => {
+    // Create 10 planets, colonise 6 (60%)
+    const planets: Planet[] = [];
+    const colonisedIds: PlanetId[] = [];
+    for (let i = 0; i < 10; i++) {
+      const isColonised = i < 6;
+      const ownerId = isColonised ? 'A' : null;
+      planets.push({ ...makePlanet(`p${i}`, ownerId, isColonised ? 100 : 0), isColonized: isColonised });
+      if (isColonised) colonisedIds.push(`p${i}`);
+    }
+
+    const empA = makeEmpire('A', 'hamsters', colonisedIds);
+    const state = { ...makeState([empA], planets), difficulty: 'simple' as const };
+    
+    // 60% exactly meets Simple's 60% threshold
+    expect(isCouncilFormationMet(state)).toBe(true);
+  });
+
+  it('Impossible difficulty allows council at 40% colonised', () => {
+    // Create 10 planets, colonise 4 (40%)
+    const planets: Planet[] = [];
+    const colonisedIds: PlanetId[] = [];
+    for (let i = 0; i < 10; i++) {
+      const isColonised = i < 4;
+      const ownerId = isColonised ? 'A' : null;
+      planets.push({ ...makePlanet(`p${i}`, ownerId, isColonised ? 100 : 0), isColonized: isColonised });
+      if (isColonised) colonisedIds.push(`p${i}`);
+    }
+
+    const empA = makeEmpire('A', 'hamsters', colonisedIds);
+    const state = { ...makeState([empA], planets), difficulty: 'impossible' as const };
+    
+    // 40% exactly meets Impossible's 40% threshold
     expect(isCouncilFormationMet(state)).toBe(true);
   });
 });
