@@ -35,8 +35,8 @@ interface MissionDef {
 }
 
 const MISSION_DEFS: Record<MissionType, MissionDef> = {
-  sabotage: {
-    type: 'sabotage',
+  sabotage_factories: {
+    type: 'sabotage_factories',
     label: 'Sabotage Factories',
     baseSuccess: 40,
     cost: 100,
@@ -44,8 +44,8 @@ const MISSION_DEFS: Record<MissionType, MissionDef> = {
     deathRisk: 20,
     relationPenalty: -30,
   },
-  theft: {
-    type: 'theft',
+  steal_technology: {
+    type: 'steal_technology',
     label: 'Steal Technology',
     baseSuccess: 30,
     cost: 100,
@@ -53,8 +53,8 @@ const MISSION_DEFS: Record<MissionType, MissionDef> = {
     deathRisk: 15,
     relationPenalty: -20,
   },
-  propaganda: {
-    type: 'propaganda',
+  sabotage_bases: {
+    type: 'sabotage_bases',
     label: 'Incite Rebellion',
     baseSuccess: 25,
     cost: 200,
@@ -62,8 +62,8 @@ const MISSION_DEFS: Record<MissionType, MissionDef> = {
     deathRisk: 30,
     relationPenalty: -50,
   },
-  infiltration: {
-    type: 'infiltration',
+  incite_rebellion: {
+    type: 'incite_rebellion',
     label: 'Intelligence Gathering',
     baseSuccess: 80,
     cost: 0,
@@ -80,8 +80,8 @@ const MISSION_DEFS: Record<MissionType, MissionDef> = {
     deathRisk: 50,
     relationPenalty: -100,
   },
-  intelligence_gathering: {
-    type: 'intelligence_gathering',
+  reconnaissance: {
+    type: 'reconnaissance',
     label: 'Reconnaissance',
     baseSuccess: 80,
     cost: 0,
@@ -89,8 +89,8 @@ const MISSION_DEFS: Record<MissionType, MissionDef> = {
     deathRisk: 5,
     relationPenalty: -10,
   },
-  frame_job: {
-    type: 'frame_job',
+  frame_race: {
+    type: 'frame_race',
     label: 'Credit Theft',
     baseSuccess: 35,
     cost: 3,
@@ -177,7 +177,7 @@ export class EspionagePanel {
   private readonly container: HTMLElement;
   private panelState: PanelState = {
     allocatedPct: 50,
-    selectedMission: 'sabotage',
+    selectedMission: 'reconnaissance',
     targetEmpireId: null,
   };
   private _lastState: GameState | null = null;

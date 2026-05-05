@@ -160,7 +160,7 @@ describe('calculateMissionProbability', () => {
     const sender = { raceId: 'hamsters', computerTechLevel: 10 };
     const target = { raceId: 'hamsters', computerTechLevel: 10, securityLevel: 0 };
 
-    const prob = calculateMissionProbability(sender, target, 'intelligence_gathering');
+    const prob = calculateMissionProbability(sender, target, 'reconnaissance');
 
     // Base for intelligence_gathering = 80
     // Hamsters espionage bonus = -20 (from races.json)
@@ -173,7 +173,7 @@ describe('calculateMissionProbability', () => {
     const sender = { raceId: 'chameleons', computerTechLevel: 10 };
     const target = { raceId: 'hamsters', computerTechLevel: 10, securityLevel: 0 };
 
-    const prob = calculateMissionProbability(sender, target, 'theft');
+    const prob = calculateMissionProbability(sender, target, 'steal_technology');
 
     // Chameleons: espionage +60, spyRollBonus +30, aggression 1.60
     // SpyEffectiveness = (30 + 60 + 30 + 0 - 0) × 1.60 = 120 × 1.60 = 192
@@ -186,7 +186,7 @@ describe('calculateMissionProbability', () => {
     const sender = { raceId: 'hamsters', computerTechLevel: 15 };
     const target = { raceId: 'hamsters', computerTechLevel: 10, securityLevel: 0 };
 
-    const prob = calculateMissionProbability(sender, target, 'sabotage');
+    const prob = calculateMissionProbability(sender, target, 'sabotage_factories');
 
     // Tech bonus = (15 - 10) × 2 = 10
     // SpyEffectiveness = (30 + (-20) + 0 + 10 - 0) × 1.00 = 20
@@ -212,7 +212,7 @@ describe('calculateMissionProbability', () => {
     const sender = { raceId: 'ants', computerTechLevel: 10 };
     const target = { raceId: 'hamsters', computerTechLevel: 10, securityLevel: 0 };
 
-    const prob = calculateMissionProbability(sender, target, 'theft');
+    const prob = calculateMissionProbability(sender, target, 'steal_technology');
 
     expect(prob).toBe(0);
   });
@@ -221,7 +221,7 @@ describe('calculateMissionProbability', () => {
     const sender = { raceId: 'chameleons', computerTechLevel: 10 };
     const target = { raceId: 'ants', computerTechLevel: 10, securityLevel: 0 };
 
-    const prob = calculateMissionProbability(sender, target, 'sabotage');
+    const prob = calculateMissionProbability(sender, target, 'sabotage_factories');
 
     expect(prob).toBe(0);
   });
@@ -233,10 +233,10 @@ describe('sendSpyMission', () => {
     const hamster = makeEmpire('emp2', 'hamsters', 10, 2);
     const state = makeState({ emp1: chameleon, emp2: hamster });
 
-    const newState = sendSpyMission(state, 'emp1', 'emp2', 'theft');
+    const newState = sendSpyMission(state, 'emp1', 'emp2', 'steal_technology');
 
     expect(newState.spyMissions).toHaveLength(1);
-    expect(newState.spyMissions[0].type).toBe('theft');
+    expect(newState.spyMissions[0].type).toBe('steal_technology');
     expect(newState.spyMissions[0].senderId).toBe('emp1');
     expect(newState.spyMissions[0].targetId).toBe('emp2');
     expect(newState.spyMissions[0].status).toBe('active');
@@ -248,7 +248,7 @@ describe('sendSpyMission', () => {
     const hamster = makeEmpire('emp2', 'hamsters', 10, 0);
     const state = makeState({ emp1: ant, emp2: hamster });
 
-    const newState = sendSpyMission(state, 'emp1', 'emp2', 'sabotage');
+    const newState = sendSpyMission(state, 'emp1', 'emp2', 'sabotage_factories');
 
     expect(newState.spyMissions).toHaveLength(0);
   });
@@ -267,7 +267,7 @@ describe('sendSpyMission', () => {
     const hamster = makeEmpire('emp1', 'hamsters', 10, 0);
     const state = makeState({ emp1: hamster });
 
-    const newState = sendSpyMission(state, 'emp1', 'emp1', 'theft');
+    const newState = sendSpyMission(state, 'emp1', 'emp1', 'steal_technology');
 
     expect(newState.spyMissions).toHaveLength(0);
   });
@@ -280,7 +280,7 @@ describe('processEspionageTurns', () => {
     let state = makeState({ emp1: chameleon, emp2: hamster }, 1);
 
     // Send a theft mission (duration = 3 turns)
-    state = sendSpyMission(state, 'emp1', 'emp2', 'theft');
+    state = sendSpyMission(state, 'emp1', 'emp2', 'steal_technology');
     expect(state.spyMissions[0].status).toBe('active');
 
     // Fast-forward 3 turns with guaranteed success
@@ -299,7 +299,7 @@ describe('processEspionageTurns', () => {
     const hamster2 = makeEmpire('emp2', 'hamsters', 5, 5); // high security
     let state = makeState({ emp1: hamster1, emp2: hamster2 }, 1);
 
-    state = sendSpyMission(state, 'emp1', 'emp2', 'sabotage');
+    state = sendSpyMission(state, 'emp1', 'emp2', 'sabotage_factories');
     state = { ...state, turn: 3 }; // sabotage duration = 2
 
     // Force detection with high detection roll
@@ -340,7 +340,7 @@ describe('foilMission', () => {
   it('does not affect already completed missions', () => {
     const mission: SpyMission = {
       id: 'mission_1',
-      type: 'theft',
+      type: 'steal_technology',
       senderId: 'emp1',
       targetId: 'emp2',
       startTurn: 1,
@@ -365,7 +365,7 @@ describe('getActiveMissions', () => {
     state.spyMissions = [
       {
         id: 'm1',
-        type: 'theft',
+        type: 'steal_technology',
         senderId: 'emp1',
         targetId: 'emp2',
         startTurn: 1,
@@ -375,7 +375,7 @@ describe('getActiveMissions', () => {
       },
       {
         id: 'm2',
-        type: 'sabotage',
+        type: 'sabotage_factories',
         senderId: 'emp1',
         targetId: 'emp3',
         startTurn: 1,
@@ -406,7 +406,7 @@ describe('applyMissionEffect', () => {
   it('returns state unchanged (effects handled by turn reducer)', () => {
     const mission: SpyMission = {
       id: 'mission_1',
-      type: 'sabotage',
+      type: 'sabotage_factories',
       senderId: 'emp1',
       targetId: 'emp2',
       startTurn: 1,

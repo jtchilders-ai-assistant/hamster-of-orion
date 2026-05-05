@@ -33,24 +33,24 @@ const SECURITY_DETECTION_PER_LEVEL = 10; // +10% detection per security level
 
 /** Duration in turns for each mission type. */
 const MISSION_DURATION: Record<MissionType, number> = {
-  intelligence_gathering: 1,
-  theft:                  3,
-  sabotage:               2,
-  propaganda:             4,
-  infiltration:           5,
+  reconnaissance: 1,
+  steal_technology: 3,
+  sabotage_factories: 2,
+  sabotage_bases: 2,
+  incite_rebellion: 4,
   assassination:          6,
-  frame_job:              2,
+  frame_race: 2,
 };
 
 /** Base success % (0-100 integer) per mission type, from §5.1 and §6. */
 const BASE_MISSION_SUCCESS: Record<MissionType, number> = {
-  intelligence_gathering: 80,  // maps to Reconnaissance (§6.1)
-  theft:                  30,  // Steal Technology (§6.2)
-  sabotage:               40,  // Sabotage Factories (§6.3)
-  propaganda:             40,  // ~Incite Rebellion lite (§6.5) — area influence
-  infiltration:           25,  // ~Incite Rebellion (§6.5)
+  reconnaissance: 80,  // maps to Reconnaissance (§6.1)
+  steal_technology: 30,  // Steal Technology (§6.2)
+  sabotage_factories: 40,  // Sabotage Factories (§6.3)
+  sabotage_bases: 20,  // ~Incite Rebellion lite (§6.5) — area influence
+  incite_rebellion: 25,  // ~Incite Rebellion (§6.5)
   assassination:          10,  // Assassination (§6.7)
-  frame_job:              35,  // Frame Job: steal BC from target (§6.6)
+  frame_race: 50,  // Frame Job: steal BC from target (§6.6)
 };
 
 /**
@@ -354,12 +354,12 @@ function replaceMission(state: GameState, updated: SpyMission): GameState {
 /** Compute a simple reward descriptor for a completed mission. */
 function computeReward(type: MissionType): { type: string; value: number } {
   switch (type) {
-    case 'intelligence_gathering': return { type: 'intel',      value: 1 };
-    case 'theft':                  return { type: 'tech_stolen', value: 1 };
-    case 'sabotage':               return { type: 'factories_destroyed', value: 10 };
-    case 'propaganda':             return { type: 'morale_reduced',     value: 5 };
-    case 'infiltration':           return { type: 'rebellion_points',   value: 10 };
+    case 'reconnaissance': return { type: 'intel',      value: 1 };
+    case 'steal_technology':                  return { type: 'tech_stolen', value: 1 };
+    case 'sabotage_factories':               return { type: 'factories_destroyed', value: 10 };
+    case 'sabotage_bases':             return { type: 'morale_reduced',     value: 5 };
+    case 'incite_rebellion':           return { type: 'rebellion_points',   value: 10 };
     case 'assassination':          return { type: 'leader_killed',      value: 1 };
-    case 'frame_job':              return { type: 'bc_stolen',          value: 0 }; // Value set during resolution
+    case 'frame_race':              return { type: 'bc_stolen',          value: 0 }; // Value set during resolution
   }
 }

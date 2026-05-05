@@ -101,13 +101,13 @@ const ASSASSINATION_DURATION_TURNS = 10;
 
 /** Death risk by mission type (percentage). */
 const DEATH_RISK: Record<MissionType, number> = {
-  intelligence_gathering: 5,
-  theft: 15,
-  sabotage: 20,
-  propaganda: 30,
-  infiltration: 25,
+  reconnaissance: 5,
+  steal_technology: 15,
+  sabotage_factories: 20,
+  sabotage_bases: 20,
+  incite_rebellion: 30,
   assassination: 50,
-  frame_job: 40, // High risk - stealing money is dangerous
+  frame_race: 25, // High risk - stealing money is dangerous
 };
 
 /** Probability of catastrophic failure triggering "All Spies Fail" (2% per empire target per turn). */
@@ -119,13 +119,13 @@ const FRAME_JOB_STEAL_MAX_PERCENT = 20;
 
 /** Relation penalties when caught (from design doc §9.1). */
 const RELATION_PENALTY: Record<MissionType, number> = {
-  intelligence_gathering: -10,
-  theft: -20,
-  sabotage: -30,
-  propaganda: -50,
-  infiltration: -20,
+  reconnaissance: -10,
+  steal_technology: -20,
+  sabotage_factories: -30,
+  sabotage_bases: -30,
+  incite_rebellion: -50,
   assassination: -100,
-  frame_job: -35, // Stealing money is a serious offense
+  frame_race: -75, // Stealing money is a serious offense
 };
 
 // ── Helper: generate modifier ID ──────────────────────────────────────────────
@@ -352,26 +352,26 @@ function applyMissionEffect(
   const target = state.empires.byId[mission.targetId];
 
   switch (mission.type) {
-    case 'sabotage':
-      return applySabotageProduction(state, mission, target, rng);
+    case 'reconnaissance':
+      return applyReconnaissance(state, mission, target);
 
-    case 'theft':
+    case 'steal_technology':
       return applyStealTechnology(state, mission, sender, target, rng);
 
-    case 'propaganda':
-      return applyBuildSabotage(state, mission, target, rng);
+    case 'sabotage_factories':
+      return applySabotageProduction(state, mission, target, rng);
+
+    case 'sabotage_bases':
+      return applySabotageBases(state, mission, target, rng);
+
+    case 'incite_rebellion':
+      return applyInciteRebellion(state, mission, target, rng);
+
+    case 'frame_race':
+      return applyFrameRace(state, mission, sender, target, rng);
 
     case 'assassination':
       return applyAssassination(state, mission, target);
-
-    case 'infiltration':
-      return applyInfiltration(state, mission, target);
-
-    case 'intelligence_gathering':
-      return applyIntelligenceGathering(state, mission, target);
-
-    case 'frame_job':
-      return applyFrameJob(state, mission, sender, target, rng);
 
     default:
       return {
@@ -384,7 +384,7 @@ function applyMissionEffect(
 
 // ── Frame Job (Steal BC) ──────────────────────────────────────────────────
 
-function applyFrameJob(
+function applyFrameRace(
   state: GameState,
   _mission: SpyMission,
   senderEmpire: Empire,
@@ -491,7 +491,67 @@ function applySabotageProduction(
   };
 }
 
-// ── Steal Technology ──────────────────────────────────────────────────────────
+// ── Sabotage Bases (§6.4) ──────────────────────────────────────────────────────────
+
+function applySabotageBases(
+  state: GameState,
+  _mission: SpyMission,
+  target: Empire,
+  rng: () => number,
+): { state: GameState; effect: MissionEffect; description: string } {
+  // Destroy 15-30% of target planet's missile bases (min 1, max 10 per design §6.4)
+  if (target.planets.length === 0) {
+    return {
+      state,
+      effect: { type: 'sabotage_failed' },
+      description: 'Target has no planets to sabotage.',
+    };
+  }
+
+  const planetIndex = Math.floor(rng() * target.planets.length);
+  const targetPlanetId = target.planets[planetIndex];
+  const planet = state.planets.byId[targetPlanetId];
+
+  if (!planet || planet.missileBases <= 0) {
+    return {
+      state,
+      effect: { type: 'sabotage_failed' },
+      description: 'Target planet has no missile bases.',
+    };
+  }
+
+  const destructionPercent = 15 + rng() * 15; // 15-30%
+  let basesDestroyed = Math.floor(planet.missileBases * (destructionPercent / 100));
+  basesDestroyed = Math.max(1, Math.min(10, basesDestroyed));
+
+  const updatedPlanet = {
+    ...planet,
+    missileBases: Math.max(0, planet.missileBases - basesDestroyed),
+  };
+
+  const nextState: GameState = {
+    ...state,
+    planets: {
+      ...state.planets,
+      byId: {
+        ...state.planets.byId,
+        [planet.id]: updatedPlanet,
+      },
+    },
+  };
+
+  return {
+    state: nextState,
+    effect: {
+      type: 'bases_destroyed',
+      value: basesDestroyed,
+      targetPlanetId: planet.id,
+    },
+    description: `Destroyed ${basesDestroyed} missile base(s) on ${planet.name}.`,
+  };
+}
+
+// ── Steal Technology (§6.2) ───────────────────────────────────────────────────────
 
 function applyStealTechnology(
   state: GameState,
@@ -542,7 +602,7 @@ function applyStealTechnology(
 
 // ── Build Sabotage (destroy building) ─────────────────────────────────────────
 
-function applyBuildSabotage(
+function applyInciteRebellion(
   state: GameState,
   _mission: SpyMission,
   target: Empire,
@@ -625,39 +685,9 @@ function applyAssassination(
   };
 }
 
-// ── Infiltration ──────────────────────────────────────────────────────────────
+// ── Reconnaissance (§6.1) ───────────────────────────────────────────────────
 
-function applyInfiltration(
-  state: GameState,
-  mission: SpyMission,
-  target: Empire,
-): { state: GameState; effect: MissionEffect; description: string } {
-  // Set intel visibility flag for the duration
-  const intelModifier: EspionageModifier = {
-    id: newModifierId(),
-    type: 'hasEspionageIntel',
-    sourceEmpireId: mission.senderId,
-    value: 1, // Flag value
-    appliedTurn: state.turn,
-    expiresTurn: state.turn + INFILTRATION_DURATION_TURNS,
-    reason: `Infiltration by ${state.empires.byId[mission.senderId]?.name ?? 'unknown'}`,
-  };
-
-  const updatedTarget = addEspionageModifier(target, intelModifier);
-
-  return {
-    state: updateEmpire(state, updatedTarget),
-    effect: {
-      type: 'intel_gathered',
-      value: INFILTRATION_DURATION_TURNS,
-    },
-    description: `Full intelligence on ${target.name} acquired for ${INFILTRATION_DURATION_TURNS} turns. Production, fleet, and tech status revealed.`,
-  };
-}
-
-// ── Intelligence Gathering (Reconnaissance) ──────────────────────────────────
-
-function applyIntelligenceGathering(
+function applyReconnaissance(
   state: GameState,
   mission: SpyMission,
   target: Empire,
@@ -783,13 +813,13 @@ function cleanupExpiredModifiers(state: GameState): GameState {
 
 function getEventTitle(missionType: MissionType, success: boolean, detected: boolean): string {
   const missionNames: Record<MissionType, string> = {
-    sabotage: 'Sabotage',
-    theft: 'Technology Theft',
-    propaganda: 'Building Sabotage',
-    infiltration: 'Infiltration',
+    reconnaissance: 'Reconnaissance',
+    steal_technology: 'Technology Theft',
+    sabotage_factories: 'Factory Sabotage',
+    sabotage_bases: 'Base Sabotage',
+    incite_rebellion: 'Incite Rebellion',
+    frame_race: 'Frame Race',
     assassination: 'Assassination',
-    intelligence_gathering: 'Reconnaissance',
-    frame_job: 'Credit Theft',
   };
 
   const name = missionNames[missionType];
@@ -818,7 +848,7 @@ export function getProductionSabotagePenalty(
     (m) =>
       m.status === 'completed' &&
       m.targetId === planet.ownerId &&
-      m.type === 'sabotage' &&
+      m.type === 'sabotage_factories' &&
       m.reward?.type === 'productionSabotage' &&
       state.turn <= m.startTurn + m.durationTurns + SABOTAGE_DURATION_TURNS,
   );
@@ -843,13 +873,13 @@ export function hasEspionageIntel(
       m.status === 'completed' &&
       m.senderId === observerEmpireId &&
       m.targetId === targetEmpireId &&
-      (m.type === 'infiltration' || m.type === 'intelligence_gathering') &&
+      m.type === 'reconnaissance' &&
       m.reward?.type === 'intel_gathered',
   );
 
   // Check if any are still active (within duration)
   return relevantMissions.some((m) => {
-    const duration = m.type === 'infiltration' ? INFILTRATION_DURATION_TURNS : 1;
+    const duration = m.type === 'reconnaissance' ? INFILTRATION_DURATION_TURNS : 1;
     return state.turn <= m.startTurn + m.durationTurns + duration;
   });
 }
@@ -867,7 +897,7 @@ export function getFalseAllocationPenalty(
     (m) =>
       m.status === 'completed' &&
       m.targetId === empireId &&
-      m.type === 'propaganda' &&
+      m.type === 'incite_rebellion' &&
       state.turn <= m.startTurn + m.durationTurns + DISINFORMATION_DURATION_TURNS,
   );
 

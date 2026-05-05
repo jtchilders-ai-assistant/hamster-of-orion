@@ -144,13 +144,13 @@ export type DiplomaticState = 'war' | 'unfriendly' | 'neutral' | 'friendly' | 'a
 // ── Espionage ─────────────────────────────────────────────────────────────────
 
 export type MissionType =
-  | 'sabotage'
-  | 'theft'
-  | 'propaganda'
-  | 'infiltration'
+  | 'reconnaissance'
+  | 'steal_technology'
+  | 'sabotage_factories'
+  | 'sabotage_bases'
   | 'assassination'
-  | 'intelligence_gathering'
-  | 'frame_job';
+  | 'incite_rebellion'
+  | 'frame_race';
 
 export interface SpyMission {
   id: string;
