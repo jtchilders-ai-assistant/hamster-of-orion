@@ -80,7 +80,7 @@ function createTestState(): GameState {
     movementPoints: 3,
     maxMovement: 3,
     orders: 'guard',
-    experience: 'green',
+    experience: 'rookie',
     combatId: null,
   };
 

@@ -19,6 +19,7 @@ import { Store, Action } from '../../game/store';
 import { GameState, ScreenType, GameSpeed } from '../../game/state';
 import { nextTurn } from '../../game/actions/turn';
 import { isCouncilFormationMet } from '../../game/systems/council';
+import { TurnConfirmDialog } from './TurnConfirmDialog';
 
 interface NavButton {
   label: string;
@@ -50,10 +51,12 @@ export class CommandBar {
   private readonly element: HTMLElement;
   private readonly navButtons: Map<ScreenType, HTMLButtonElement> = new Map();
   private readonly store: Store<GameState>;
+  private readonly turnConfirmDialog: TurnConfirmDialog;
   private speedControlEl: HTMLElement | null = null;
 
   constructor(container: HTMLElement, store: Store<GameState>) {
     this.store = store;
+    this.turnConfirmDialog = new TurnConfirmDialog(store);
 
     // Create or reuse the command bar element
     const existing = document.getElementById('command-bar');
@@ -146,7 +149,16 @@ export class CommandBar {
     nextTurnBtn.title = 'End your turn and process all empire actions';
     nextTurnBtn.innerHTML = `<span class="cmd-label">NEXT TURN</span><span class="cmd-fkey">ENTER</span>`;
     nextTurnBtn.addEventListener('click', () => {
-      store.dispatch(nextTurn());
+      // Per design/ui-ux/state-transitions.md §3.3: show confirmation if enabled
+      if (this.turnConfirmDialog.isOpen()) return;
+      const confirmEnabled = this.store.getState().ui.settings.confirmEndTurn ?? true;
+      if (!confirmEnabled) {
+        store.dispatch(nextTurn());
+        return;
+      }
+      this.turnConfirmDialog.show(() => {
+        store.dispatch(nextTurn());
+      });
     });
     this.element.appendChild(nextTurnBtn);
   }

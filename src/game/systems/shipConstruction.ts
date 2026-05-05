@@ -231,7 +231,7 @@ export function applyShipConstruction(
       maxHp: design.stats.hp,
       shieldHp: design.stats.shieldHp,
       maxShieldHp: design.stats.shieldHp,
-      experience: 'green',
+      experience: 'rookie',
       kills: 0,
       combatPosition: null,
       hasActed: false,
@@ -260,7 +260,7 @@ export function applyShipConstruction(
       movementPoints: 0,
       maxMovement: 0,
       orders: { type: 'none' },
-      experience: 'green',
+      experience: 'rookie',
       isInCombat: false,
       combatId: null,
     };

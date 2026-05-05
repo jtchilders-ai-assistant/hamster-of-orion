@@ -493,6 +493,12 @@ COMBAT_STATES:
 - Can be disabled with checkbox (reverts to instant end turn)
 - Enter key confirms, Escape cancels
 
+> **Implementation Status (2026-05-05):** The Turn End Confirmation Dialog is implemented in
+> `src/ui/components/TurnConfirmDialog.ts` and wired via `src/ui/app.ts` `endTurnWithConfirmation()`.
+> The dialog shows pending actions (fleet moves, ships completing, research progress, trade income)
+> and warnings (undefended colonies, idle production, 0% research allocation). Users can disable
+> future confirmations via the checkbox, which sets `ui.settings.confirmEndTurn = false` (§6.3).
+
 ---
 
 ## 4. Modal and Popup System
@@ -843,6 +849,11 @@ All destructive or irreversible actions require confirmation:
 - Default focused: Cancel (for destructive) or Confirm (for non-destructive)
 
 ### 6.3 Confirmation Bypass Options
+
+> **Implementation Note (2026-05-05):** The `confirmEndTurn` setting in `GameSettings` controls
+> whether the Turn End Confirmation Dialog (§3.3) appears. When `true` (default), the dialog shows
+> before each turn ends. When `false`, turn ends immediately (bypassed behavior). Users can toggle
+> this via the "Don't show end turn confirmation" checkbox in the dialog.
 
 ```json
 {

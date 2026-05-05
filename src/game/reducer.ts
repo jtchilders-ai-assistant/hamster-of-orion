@@ -553,6 +553,25 @@ export function rootReducer(state: GameState, action: Action): GameState {
     };
   }
 
+  // ── Settings: confirmEndTurn toggle ──────────────────────────────────────
+  //
+  // Per design/ui-ux/state-transitions.md §3.3: "Don't show end turn confirmation" checkbox.
+  // Sets settings.confirmEndTurn to the provided boolean value.
+
+  if (action.type === 'SET_CONFIRM_END_TURN') {
+    const payload = action.payload as { value: boolean };
+    return {
+      ...state,
+      ui: {
+        ...state.ui,
+        settings: {
+          ...state.ui.settings,
+          confirmEndTurn: payload.value,
+        },
+      },
+    };
+  }
+
   // Unknown action — return unchanged state
   return state;
 }

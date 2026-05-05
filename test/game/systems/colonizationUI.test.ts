@@ -156,7 +156,7 @@ function makeShip(id: string, fleetId: string, designId: string, ownerId = 'play
     maxHp: 50,
     shieldHp: 0,
     maxShieldHp: 0,
-    experience: 'green',
+    experience: 'rookie',
     kills: 0,
     combatPosition: null,
     hasActed: false,
@@ -178,7 +178,7 @@ function makeFleet(id: string, systemId: string, shipIds: string[], ownerId = 'p
     movementPoints: 0,
     maxMovement: 0,
     orders: { type: 'none' },
-    experience: 'green',
+    experience: 'rookie',
     isInCombat: false,
     combatId: null,
   };

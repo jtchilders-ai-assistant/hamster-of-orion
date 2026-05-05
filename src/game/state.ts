@@ -193,7 +193,7 @@ export type BuildingCategory = 'production' | 'research' | 'defense' | 'growth' 
 export type ShipClass = 'small' | 'medium' | 'large' | 'huge';
 export type ComponentType = 'weapon' | 'armor' | 'shield' | 'engine' | 'computer' | 'special' | 'fuel';
 export type WeaponType = 'beam' | 'missile' | 'bomb' | 'special';
-export type ExperienceLevel = 'green' | 'regular' | 'veteran' | 'elite' | 'legendary';
+export type ExperienceLevel = 'rookie' | 'regular' | 'veteran' | 'elite';
 
 export type TechField = 'weapons' | 'propulsion' | 'construction' | 'computers' | 'force_fields' | 'biotechnology';
 

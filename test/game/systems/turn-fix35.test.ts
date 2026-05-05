@@ -170,7 +170,7 @@ function makeShip(id: string, designId: string, ownerId: string, fleetId: string
     maxHp: 10,
     shieldHp: 0,
     maxShieldHp: 0,
-    experience: 'green',
+    experience: 'rookie',
     kills: 0,
     combatPosition: null,
     hasActed: false,
@@ -201,7 +201,7 @@ function makeFleet(
     movementPoints: 0,
     maxMovement: 5,
     orders: { type: 'none' },
-    experience: 'green',
+    experience: 'rookie',
     isInCombat: false,
     combatId: null,
   };

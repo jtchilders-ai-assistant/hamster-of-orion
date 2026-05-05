@@ -8,6 +8,7 @@
 
 import { Store, Action } from '../game/store';
 import { GameState, ScreenType } from '../game/state';
+import { TurnConfirmDialog } from './components/TurnConfirmDialog';
 import { GalaxyScreen } from './screens/GalaxyScreen';
 import { ColoniesScreen } from './screens/ColoniesScreen';
 import { FleetsScreen } from './screens/FleetsScreen';
@@ -68,6 +69,7 @@ export class App {
   private readonly store: Store<GameState>;
   private readonly screens: Map<ScreenType, Screen>;
   private readonly commandBar: CommandBar;
+  private readonly turnConfirmDialog: TurnConfirmDialog;
   private currentScreen: ScreenType;
   private turnSummaryActive: boolean = false;
   private victoryActive: boolean = false;
@@ -84,6 +86,9 @@ export class App {
     // Persistent command bar — rendered outside any screen container
     const cmdContainer = this.ensureCommandBarContainer(root);
     this.commandBar = new CommandBar(cmdContainer, store);
+
+    // Turn end confirmation dialog (per design/ui-ux/state-transitions.md §3.3)
+    this.turnConfirmDialog = new TurnConfirmDialog(store);
 
     // Wire F-key keyboard navigation
     this.bindKeyboard();
@@ -246,7 +251,7 @@ export class App {
       // Only on galaxy map — other screens may use Enter/Space differently
       if ((e.key === 'Enter' || e.key === ' ') && this.currentScreen === 'galaxy') {
         e.preventDefault();
-        this.store.dispatch({ type: 'NEXT_TURN' } as Action);
+        this.endTurnWithConfirmation();
         return;
       }
 
@@ -405,6 +410,24 @@ export class App {
 
     // Always render command bar (it's persistent)
     this.commandBar.render(state);
+  }
+
+  // ── End Turn with Confirmation ──────────────────────────────────────────
+  // Per design/ui-ux/state-transitions.md §3.3: show confirmation dialog if setting enabled.
+  // If confirmEndTurn is false (user opted out), dispatch NEXT_TURN immediately.
+  private endTurnWithConfirmation(): void {
+    // If dialog is already open, do nothing (debounce)
+    if (this.turnConfirmDialog.isOpen()) return;
+
+    const confirmEnabled = this.store.getState().ui.settings.confirmEndTurn ?? true;
+    if (!confirmEnabled) {
+      this.store.dispatch({ type: 'NEXT_TURN' } as Action);
+      return;
+    }
+
+    this.turnConfirmDialog.show(() => {
+      this.store.dispatch({ type: 'NEXT_TURN' } as Action);
+    });
   }
 
   // ── Quick Save (Ctrl+S) ────────────────────────────────────────────────

@@ -1,44 +1,54 @@
 {
   "state": "COMPLETED",
   "phase": "phase5-design-compliance-fixes",
-  "current_task": "fix-73",
-  "last_check": "2026-05-05T03:14:00.000Z",
+  "current_task": "fix-75",
+  "last_check": "2026-05-05T03:25:00.000Z",
   "total_tasks": 85,
-  "completed_count": 9,
+  "completed_count": 10,
   "skipped_count": 0,
   "blocked_count": 0,
-  "notes": "fix-73 completed: Navigation flow design doc fixes - added F7 Reports to F-key table, restored Reports Screen section in screen-inventory.md",
+  "notes": "fix-75 completed: Turn End Confirmation Dialog - fixed type errors in existing TurnConfirmDialog.ts, wired endTurnWithConfirmation() in app.ts, added CSS styles, updated design doc implementation notes",
   "worker_output": {
     "files_created": [],
     "files_modified": [
-      "design/ui-ux/navigation-flow.md",
-      "design/ui-ux/screen-inventory.md"
+      "src/ui/components/TurnConfirmDialog.ts",
+      "src/ui/app.ts",
+      "src/styles/main.css",
+      "design/ui-ux/state-transitions.md"
     ],
     "tests_added": [],
-    "summary": "Fixed design doc inconsistencies: (1) Added missing F7 Reports entry to navigation-flow.md Section 9 F-key table, (2) Restored Reports Screen section in screen-inventory.md (was incorrectly marked REMOVED but ReportsScreen.ts exists and is wired). Code already correctly routes MAP to separate 'map' screen (was fixed in commit b149fe3).",
+    "summary": "Fixed Turn End Confirmation Dialog implementation: (1) Fixed type errors in TurnConfirmDialog.ts - corrected treaty lookup to use playerEmpire.relations, tech lookup to use TECH_BY_ID map from tech-tree.json (2) Added missing endTurnWithConfirmation() method to App class with debounce and confirmEndTurn setting check (3) Added CSS styles for .turn-confirm-* classes per the modal hierarchy (z-index 600) (4) Updated design doc §3.3 and §6.3 implementation notes to reflect working implementation. The dialog now shows pending actions, warnings, and allows users to disable future confirmations.",
     "design_compliance": [
       {
-        "doc": "design/ui-ux/interaction-spec.md",
-        "section": "§2.1 Global Shortcuts",
-        "quote": "F7 | Reports | Switch to statistics/reports",
-        "impl_file": "design/ui-ux/navigation-flow.md",
-        "impl_line": "§9 F-Key Navigation table",
+        "doc": "design/ui-ux/state-transitions.md",
+        "section": "§3.3 Turn End Confirmation Dialog",
+        "quote": "Shows automatically when player presses Enter/End Turn. Summarizes all actions that will execute. Highlights warnings for undefended colonies, idle production.",
+        "impl_file": "src/ui/components/TurnConfirmDialog.ts",
+        "impl_line": "buildSummary() method",
         "verified": true
       },
       {
-        "doc": "design/ui-ux/interaction-spec.md",
-        "section": "§2.1 Global Shortcuts",
-        "quote": "F7 = Reports",
+        "doc": "design/ui-ux/state-transitions.md",
+        "section": "§3.3 Dialog Behavior",
+        "quote": "Can be disabled with checkbox (reverts to instant end turn)",
+        "impl_file": "src/ui/components/TurnConfirmDialog.ts",
+        "impl_line": "SET_CONFIRM_END_TURN dispatch on checkbox",
+        "verified": true
+      },
+      {
+        "doc": "design/ui-ux/state-transitions.md",
+        "section": "§6.3 Confirmation Bypass Options",
+        "quote": "bypassable: END_TURN with skipTurnConfirmation",
         "impl_file": "src/ui/app.ts",
-        "impl_line": "F_KEY_MAP: F7: 'reports'",
+        "impl_line": "endTurnWithConfirmation() checks ui.settings.confirmEndTurn",
         "verified": true
       },
       {
-        "doc": "design/ui-ux/navigation-flow.md",
-        "section": "§4.5 MAP Screen",
-        "quote": "The MAP button opens a **separate full-screen MAP view**",
-        "impl_file": "src/ui/screens/MapScreen.ts",
-        "impl_line": "MapScreen class with mode filters",
+        "doc": "design/ui-ux/state-transitions.md",
+        "section": "§4.1 Modal Hierarchy",
+        "quote": "600 = Confirmation Dialogs (End Turn Confirmation, Scrap Fleet, Declare War)",
+        "impl_file": "src/styles/main.css",
+        "impl_line": ".turn-confirm-overlay { z-index: 600 }",
         "verified": true
       }
     ],
