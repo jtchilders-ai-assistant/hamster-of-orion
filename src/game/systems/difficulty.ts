@@ -531,75 +531,78 @@ export function getStartingConditions(difficulty: DifficultyLevel, isPlayer: boo
   return STARTING_CONDITIONS[difficulty];
 }
 
-
 // ─────────────────────────────────────────────────────────────────────────────
 // AI Starting Tech Bonuses
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * AI starting tech bonus configuration by difficulty.
+ * AI starting tech bonus configuration per difficulty.
  * From design/game-mechanics/difficulty.md §AI Starting Tech Bonuses.
  *
- * | Difficulty | Bonus Techs | Starting Tier | Fields                            |
- * |------------|-------------|---------------|-----------------------------------|
- * | Simple     | 0           | 1             | none                              |
- * | Easy       | 0           | 1             | none                              |
- * | Average    | 0           | 1             | none                              |
- * | Hard       | 2           | 1             | racial_preference, random         |
- * | Impossible | 4           | 2             | 2×racial_pref, weapons, random    |
+ * Hard: 2 bonus techs (racial_preference, random)
+ * Impossible: 4 bonus techs (racial_preference x2, weapons, random), starting tier 2
  */
+export type BonusTechField = 'racial_preference' | 'random' | 'weapons';
+
 export interface AIStartingTechBonus {
   /** Number of bonus starting techs for AI. */
   bonusTechs: number;
-  /** Starting tech tier (1 = normal, 2 = advanced start for Impossible). */
+  /** Starting tech tier (1 = normal, 2 = advanced start). */
   startingTier: number;
-  /**
-   * Fields to select bonus techs from:
-   *   'racial_preference' — pick from race's preferred tech field
-   *   'random' — pick any tier-appropriate tech
-   *   'weapons' — guarantee early weapon upgrade
-   */
-  bonusTechFields: Array<'racial_preference' | 'random' | 'weapons'>;
+  /** Multiplier on AI tech costs. */
+  techCostMult: number;
+  /** Multiplier on AI research speed. */
+  researchSpeedMult: number;
+  /** Fields from which to select bonus techs (undefined = none). */
+  bonusTechFields?: BonusTechField[];
 }
 
 /**
  * AI starting tech bonus table by difficulty.
+ * Values from design/game-mechanics/difficulty.md §AI Starting Tech Bonuses.
  */
 export const AI_STARTING_TECH_BONUSES: Record<Exclude<DifficultyLevel, 'custom'>, AIStartingTechBonus> = {
   simple: {
     bonusTechs: 0,
     startingTier: 1,
-    bonusTechFields: [],
+    techCostMult: 1.50,
+    researchSpeedMult: 0.67,
   },
   easy: {
     bonusTechs: 0,
     startingTier: 1,
-    bonusTechFields: [],
+    techCostMult: 1.25,
+    researchSpeedMult: 0.80,
   },
   average: {
     bonusTechs: 0,
     startingTier: 1,
-    bonusTechFields: [],
+    techCostMult: 1.00,
+    researchSpeedMult: 1.00,
   },
   hard: {
     bonusTechs: 2,
     startingTier: 1,
+    techCostMult: 0.75,
+    researchSpeedMult: 1.33,
     bonusTechFields: ['racial_preference', 'random'],
   },
   impossible: {
     bonusTechs: 4,
     startingTier: 2,
+    techCostMult: 0.50,
+    researchSpeedMult: 2.00,
     bonusTechFields: ['racial_preference', 'racial_preference', 'weapons', 'random'],
   },
 };
 
 /**
- * Get AI starting tech bonuses for a difficulty level.
+ * Get AI starting tech bonus configuration for a difficulty level.
  * @param difficulty Game difficulty level.
  * @returns AI starting tech bonus configuration.
  */
 export function getAIStartingTechBonus(difficulty: DifficultyLevel): AIStartingTechBonus {
-  if (difficulty === 'custom' || !(difficulty in AI_STARTING_TECH_BONUSES)) {
+  if (difficulty === 'custom') {
     return AI_STARTING_TECH_BONUSES.average;
   }
   return AI_STARTING_TECH_BONUSES[difficulty];
@@ -610,34 +613,32 @@ export function getAIStartingTechBonus(difficulty: DifficultyLevel): AIStartingT
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * Guardian of Orion stats by difficulty level.
+ * Guardian of Orion combat stats by difficulty.
  * From design/game-mechanics/difficulty.md §Guardian of Orion Modifiers.
  *
  * | Stat          | Simple | Easy   | Average | Hard   | Impossible |
  * |---------------|--------|--------|---------|--------|------------|
  * | HP            | 16,000 | 24,000 | 32,000  | 40,000 | 48,000     |
  * | Attack Rating | +5     | +7     | +10     | +12    | +15        |
- * | Shield Class  | X (10) | XII    | XV      | XVIII  | XX (20)    |
- * | Armor Mult    | ×2.0   | ×3.0   | ×4.0    | ×5.0   | ×6.0       |
+ * | Shields       | X      | XII    | XV      | XVIII  | XX         |
+ * | Armor         | ×2.0   | ×3.0   | ×4.0    | ×5.0   | ×6.0       |
  * | Speed         | 2      | 3      | 4       | 5      | 6          |
- *
- * Effective HP = Base HP × Armor Multiplier
  */
 export interface GuardianStats {
-  /** Base HP (before armor multiplier). */
+  /** Guardian base HP. */
   hp: number;
   /** Attack rating bonus. */
   attackRating: number;
-  /** Shield class (damage absorbed per hit). */
+  /** Shield class (Roman numeral as number, e.g., 10 = X). */
   shieldClass: number;
-  /** Armor multiplier (effective HP = hp × armorMultiplier). */
+  /** Armor damage reduction multiplier. */
   armorMultiplier: number;
-  /** Combat speed (hexes per turn). */
+  /** Movement speed in combat. */
   speed: number;
 }
 
 /**
- * Guardian stats table by difficulty level.
+ * Guardian of Orion stats by difficulty level.
  */
 export const GUARDIAN_STATS: Record<Exclude<DifficultyLevel, 'custom'>, GuardianStats> = {
   simple: {
@@ -680,23 +681,23 @@ export const GUARDIAN_STATS: Record<Exclude<DifficultyLevel, 'custom'>, Guardian
 /**
  * Get Guardian of Orion stats for a difficulty level.
  * @param difficulty Game difficulty level.
- * @returns Guardian combat stats.
+ * @returns Guardian stats.
  */
 export function getGuardianStats(difficulty: DifficultyLevel): GuardianStats {
-  if (difficulty === 'custom' || !(difficulty in GUARDIAN_STATS)) {
+  if (difficulty === 'custom') {
     return GUARDIAN_STATS.average;
   }
   return GUARDIAN_STATS[difficulty];
 }
 
 /**
- * Calculate effective HP for Guardian (HP × armor multiplier).
- * From design/game-mechanics/difficulty.md §Guardian Effective HP Calculation:
- *   - Simple: 16,000 × 2.0 = 32,000 effective HP
- *   - Impossible: 48,000 × 6.0 = 288,000 effective HP
+ * Calculate Guardian effective HP (HP × armor multiplier).
+ * From design/game-mechanics/difficulty.md §Guardian Effective HP Calculation.
+ *
+ * Effective_HP = Base_HP × Armor_Multiplier
  *
  * @param difficulty Game difficulty level.
- * @returns Effective HP after armor.
+ * @returns Guardian effective HP.
  */
 export function getGuardianEffectiveHP(difficulty: DifficultyLevel): number {
   const stats = getGuardianStats(difficulty);
@@ -704,30 +705,237 @@ export function getGuardianEffectiveHP(difficulty: DifficultyLevel): number {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Diplomacy & Council Accessors
+// Space Monster Stats
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * Get the probability of AI forming an anti-player coalition.
- * From design/game-mechanics/difficulty.md §Anti-Player Coalition:
- *   - Simple: 0%, Easy: 10%, Average: 25%, Hard: 50%, Impossible: 75%
- *
- * Coalition triggers when player has 1.5× average AI power.
- *
+ * Space monster type identifiers.
+ */
+export type SpaceMonsterId = 'cosmic_blob' | 'crystal_horror' | 'void_wyrm';
+
+/**
+ * Difficulty scaling for space monsters.
+ */
+export interface MonsterDifficultyScaling {
+  /** HP multiplier. */
+  hpMult: number;
+  /** Damage multiplier. */
+  damageMult: number;
+  /** Regeneration multiplier (for cosmic blob). */
+  regenMult?: number;
+  /** Shield class override (for crystal horror). */
+  shieldClass?: number;
+  /** Attack rating override (for void wyrm). */
+  attackRating?: number;
+}
+
+/**
+ * Base stats for a space monster.
+ * From design/game-mechanics/difficulty.md §Monster Stats JSON Data.
+ */
+export interface SpaceMonsterStats {
+  id: SpaceMonsterId;
+  name: string;
+  description: string;
+  baseStats: {
+    hp: number;
+    regenPerTurn: number;
+    speed: number;
+    attackRating: number;
+    defenseRating: number;
+    damageMin: number;
+    damageMax: number;
+    armorClass?: number;
+    shieldClass?: number;
+  };
+  difficultyScaling: Record<Exclude<DifficultyLevel, 'custom'>, MonsterDifficultyScaling>;
+  abilities: string[];
+}
+
+/**
+ * Space monster definitions from design doc.
+ */
+export const SPACE_MONSTERS: Record<SpaceMonsterId, SpaceMonsterStats> = {
+  cosmic_blob: {
+    id: 'cosmic_blob',
+    name: 'Cosmic Blob',
+    description: 'Amorphous space creature with regenerative abilities',
+    baseStats: {
+      hp: 1000,
+      regenPerTurn: 100,
+      speed: 1,
+      attackRating: 0,
+      defenseRating: 0,
+      damageMin: 50,
+      damageMax: 100,
+      armorClass: 5,
+    },
+    difficultyScaling: {
+      simple: { hpMult: 0.75, regenMult: 0.75, damageMult: 0.75 },
+      easy: { hpMult: 0.90, regenMult: 0.90, damageMult: 0.90 },
+      average: { hpMult: 1.00, regenMult: 1.00, damageMult: 1.00 },
+      hard: { hpMult: 1.25, regenMult: 1.25, damageMult: 1.25 },
+      impossible: { hpMult: 1.50, regenMult: 1.50, damageMult: 1.50 },
+    },
+    abilities: ['regeneration', 'immune_to_missiles'],
+  },
+  crystal_horror: {
+    id: 'crystal_horror',
+    name: 'Crystal Horror',
+    description: 'Crystalline entity with powerful energy shields',
+    baseStats: {
+      hp: 800,
+      regenPerTurn: 0,
+      speed: 2,
+      attackRating: 3,
+      defenseRating: 2,
+      damageMin: 75,
+      damageMax: 125,
+      shieldClass: 10,
+    },
+    difficultyScaling: {
+      simple: { hpMult: 0.75, shieldClass: 8, damageMult: 0.75 },
+      easy: { hpMult: 0.90, shieldClass: 9, damageMult: 0.90 },
+      average: { hpMult: 1.00, shieldClass: 10, damageMult: 1.00 },
+      hard: { hpMult: 1.25, shieldClass: 11, damageMult: 1.25 },
+      impossible: { hpMult: 1.50, shieldClass: 12, damageMult: 1.50 },
+    },
+    abilities: ['reflect_beam_weapons', 'shield_regeneration'],
+  },
+  void_wyrm: {
+    id: 'void_wyrm',
+    name: 'Void Wyrm',
+    description: 'Massive serpentine creature capable of devastating attacks',
+    baseStats: {
+      hp: 1500,
+      regenPerTurn: 0,
+      speed: 3,
+      attackRating: 5,
+      defenseRating: 3,
+      damageMin: 100,
+      damageMax: 200,
+      armorClass: 8,
+    },
+    difficultyScaling: {
+      simple: { hpMult: 0.75, damageMult: 0.75, attackRating: 3 },
+      easy: { hpMult: 0.90, damageMult: 0.90, attackRating: 4 },
+      average: { hpMult: 1.00, damageMult: 1.00, attackRating: 5 },
+      hard: { hpMult: 1.25, damageMult: 1.25, attackRating: 6 },
+      impossible: { hpMult: 1.50, damageMult: 1.50, attackRating: 7 },
+    },
+    abilities: ['multi_attack', 'armor_piercing'],
+  },
+};
+
+/**
+ * Get space monster base stats.
+ * @param monsterId Monster type identifier.
+ * @returns Base monster stats definition.
+ */
+export function getSpaceMonsterStats(monsterId: SpaceMonsterId): SpaceMonsterStats {
+  return SPACE_MONSTERS[monsterId];
+}
+
+/**
+ * Get scaled monster stats for a given difficulty.
+ * @param monsterId Monster type identifier.
  * @param difficulty Game difficulty level.
- * @returns Coalition probability (0.0–1.0).
+ * @returns Scaled monster stats with difficulty adjustments applied.
+ */
+export function getScaledMonsterStats(
+  monsterId: SpaceMonsterId,
+  difficulty: DifficultyLevel,
+): {
+  hp: number;
+  regenPerTurn: number;
+  speed: number;
+  attackRating: number;
+  defenseRating: number;
+  damageMin: number;
+  damageMax: number;
+  armorClass?: number;
+  shieldClass?: number;
+  abilities: string[];
+} {
+  const monster = SPACE_MONSTERS[monsterId];
+  const diffKey = difficulty === 'custom' ? 'average' : difficulty;
+  const scaling = monster.difficultyScaling[diffKey];
+  const base = monster.baseStats;
+
+  return {
+    hp: Math.round(base.hp * scaling.hpMult),
+    regenPerTurn: scaling.regenMult
+      ? Math.round(base.regenPerTurn * scaling.regenMult)
+      : base.regenPerTurn,
+    speed: base.speed,
+    attackRating: scaling.attackRating ?? base.attackRating,
+    defenseRating: base.defenseRating,
+    damageMin: Math.round(base.damageMin * scaling.damageMult),
+    damageMax: Math.round(base.damageMax * scaling.damageMult),
+    armorClass: base.armorClass,
+    shieldClass: scaling.shieldClass ?? base.shieldClass,
+    abilities: monster.abilities,
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Coalition & Diplomacy
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Coalition check constants from design/game-mechanics/difficulty.md.
+ */
+export const COALITION_CONSTANTS = {
+  /** Turns between coalition formation checks. */
+  CHECK_INTERVAL: 25,
+  /** Power ratio (leader vs. average AI) required to trigger coalition. */
+  LEADER_THRESHOLD: 1.5,
+} as const;
+
+/**
+ * Get the anti-player coalition probability for a difficulty level.
+ * @param difficulty Game difficulty level.
+ * @returns Probability (0.0–1.0) of AI forming anti-player coalition.
  */
 export function getCoalitionProbability(difficulty: DifficultyLevel): number {
   return getDifficultyModifiers(difficulty).coalitionProbability;
 }
 
 /**
- * Get the council formation threshold (galaxy colonization percentage).
- * From design/game-mechanics/difficulty.md §Council Formation Timing:
- *   - Simple: 60%, Easy: 55%, Average: 50%, Hard: 45%, Impossible: 40%
+ * Get the AI war threshold modifier for a difficulty level.
+ * Negative values mean AI is more eager to declare war.
+ * @param difficulty Game difficulty level.
+ * @returns War threshold modifier.
+ */
+export function getAIWarThreshold(difficulty: DifficultyLevel): number {
+  return getDifficultyModifiers(difficulty).aiWarThreshold;
+}
+
+/**
+ * Get the AI diplomatic forgiveness multiplier.
+ * Higher values mean AI forgives transgressions more quickly.
+ * @param difficulty Game difficulty level.
+ * @returns Forgiveness multiplier.
+ */
+export function getAIForgiveness(difficulty: DifficultyLevel): number {
+  return getDifficultyModifiers(difficulty).aiForgiveness;
+}
+
+/**
+ * Get the council formation threshold for a difficulty level.
+ * Council forms when this percentage of habitable planets are colonized.
+ * From design/game-mechanics/difficulty.md §Council Voting Modifiers.
+ *
+ * | Difficulty | Council Formation |
+ * |------------|-------------------|
+ * | Simple     | 60% colonized     |
+ * | Easy       | 55% colonized     |
+ * | Average    | 50% colonized     |
+ * | Hard       | 45% colonized     |
+ * | Impossible | 40% colonized     |
  *
  * @param difficulty Game difficulty level.
- * @returns Colonization percentage required (0.0–1.0).
+ * @returns Council formation threshold as decimal (0.0–1.0).
  */
 export function getCouncilFormationThreshold(difficulty: DifficultyLevel): number {
   return getDifficultyModifiers(difficulty).councilFormationThreshold;
@@ -735,9 +943,6 @@ export function getCouncilFormationThreshold(difficulty: DifficultyLevel): numbe
 
 /**
  * Get the bribe effectiveness multiplier for council votes.
- * From design/game-mechanics/difficulty.md §AI Vote Behavior:
- *   - Simple: 1.50×, Easy: 1.25×, Average: 1.00×, Hard: 0.75×, Impossible: 0.50×
- *
  * @param difficulty Game difficulty level.
  * @returns Bribe effectiveness multiplier.
  */
@@ -745,28 +950,78 @@ export function getBribeEffectiveness(difficulty: DifficultyLevel): number {
   return getDifficultyModifiers(difficulty).bribeEffectiveness;
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Difficulty Constants
+// ─────────────────────────────────────────────────────────────────────────────
+
 /**
- * Get the AI war declaration threshold modifier.
- * From design/game-mechanics/difficulty.md §AI Diplomatic Behavior:
- *   - Simple: +30 (very reluctant), Easy: +15, Average: 0, Hard: -15, Impossible: -30
- * Negative values mean AI is more eager to declare war.
- *
- * @param difficulty Game difficulty level.
- * @returns War threshold modifier (additive to relation level).
+ * General difficulty system constants.
+ * From design/game-mechanics/difficulty.md §Constants Summary.
  */
-export function getAIWarThreshold(difficulty: DifficultyLevel): number {
-  return getDifficultyModifiers(difficulty).aiWarThreshold;
+export const DIFFICULTY_CONSTANTS = {
+  /** Number of difficulty levels (excluding custom). */
+  DIFFICULTY_COUNT: 5,
+  /** Simple difficulty index (0-indexed). */
+  MIN_DIFFICULTY_INDEX: 0,
+  /** Impossible difficulty index (0-indexed). */
+  MAX_DIFFICULTY_INDEX: 4,
+  /** Default difficulty index (Average). */
+  DEFAULT_DIFFICULTY: 2,
+  /** Turns between coalition checks. */
+  COALITION_CHECK_INTERVAL: 25,
+  /** Power ratio to trigger coalition. */
+  COALITION_LEADER_THRESHOLD: 1.5,
+  /** AI grace period (no aggression). */
+  AI_GRACE_PERIOD_TURNS: 50,
+  /** Minimum factory output per turn. */
+  MIN_FACTORY_OUTPUT_PER_TURN: 1,
+  /** Turn limit for AI to research tier 1 tech. */
+  TIER_1_TECH_TURN_LIMIT: 20,
+} as const;
+
+/**
+ * Score multipliers for leaderboards/achievements by difficulty.
+ * From design/game-mechanics/difficulty.md §Constants JSON Data.
+ */
+export const SCORE_MULTIPLIERS: Record<Exclude<DifficultyLevel, 'custom'>, number> = {
+  simple: 0.50,
+  easy: 0.75,
+  average: 1.00,
+  hard: 1.50,
+  impossible: 2.00,
+};
+
+/**
+ * Get score multiplier for a difficulty level.
+ * @param difficulty Game difficulty level.
+ * @returns Score multiplier.
+ */
+export function getScoreMultiplier(difficulty: DifficultyLevel): number {
+  if (difficulty === 'custom') {
+    return SCORE_MULTIPLIERS.average;
+  }
+  return SCORE_MULTIPLIERS[difficulty];
 }
 
 /**
- * Get the AI diplomatic forgiveness rate multiplier.
- * From design/game-mechanics/difficulty.md §AI Diplomatic Behavior:
- *   - Simple: 1.50×, Easy: 1.25×, Average: 1.00×, Hard: 0.75×, Impossible: 0.50×
- * Higher = faster relation recovery after negative events.
- *
- * @param difficulty Game difficulty level.
- * @returns Forgiveness multiplier.
+ * Difficulty level names for display.
  */
-export function getAIForgiveness(difficulty: DifficultyLevel): number {
-  return getDifficultyModifiers(difficulty).aiForgiveness;
+export const DIFFICULTY_NAMES: Record<Exclude<DifficultyLevel, 'custom'>, string> = {
+  simple: 'Simple',
+  easy: 'Easy',
+  average: 'Average',
+  hard: 'Hard',
+  impossible: 'Impossible',
+};
+
+/**
+ * Get display name for a difficulty level.
+ * @param difficulty Difficulty level.
+ * @returns Human-readable difficulty name.
+ */
+export function getDifficultyName(difficulty: DifficultyLevel): string {
+  if (difficulty === 'custom') {
+    return 'Custom';
+  }
+  return DIFFICULTY_NAMES[difficulty];
 }
