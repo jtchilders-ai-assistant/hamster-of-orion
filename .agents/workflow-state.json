@@ -1,52 +1,46 @@
 {
-  "state": "TESTING",
-  "current_task": "fix-25",
+  "state": "COMPLETED",
   "phase": "phase5-design-compliance-fixes",
-  "last_completed": "fix-38",
-  "last_check": "2026-05-04T21:52:00Z",
+  "current_task": "fix-60",
+  "last_check": "2026-05-05T02:58:00.000Z",
+  "total_tasks": 85,
+  "completed_count": 8,
+  "skipped_count": 0,
+  "blocked_count": 0,
+  "notes": "fix-60 completed: Production design doc fixes - ECO priority order corrected to match slider-mathematics.md and implementation, ship display format fixed",
   "worker_output": {
     "files_created": [],
     "files_modified": [
-      "design/technology/planetology.md",
-      "src/game/constants.ts",
-      "src/game/systems/population.ts",
-      "test/game/systems/population.test.ts"
+      "design/planets/production.md"
     ],
     "tests_added": [],
-    "summary": "Fixed Cloning Technology inconsistencies in planetology.md. The design doc had conflicting information: the §Cloning Technology section correctly described flat +2/+5 pop/turn bonuses, but tier tables, JSON schema, and Formulas Summary section incorrectly showed BC-invested growth model. Now all sections consistently describe flat per-turn bonuses. Also updated code (constants.ts, population.ts) and tests to use correct tech levels (21/42) per the design doc tier tables.",
+    "summary": "Fixed design/planets/production.md to match authoritative slider-mathematics.md and actual code: (1) ECO priority order corrected from 'cleanup→terraform→growth' to 'cleanup→growth→terraform', (2) Ship display format fixed from '(Ship Name) & Turns' to '{Ship Name} {Turns}' to match example and implementation",
     "design_compliance": [
       {
-        "doc": "design/technology/planetology.md",
-        "section": "§Cloning Technology",
-        "quote": "Cloning provides a flat bonus to population growth per turn... +2 pop/turn (TL 21), +5 pop/turn (TL 42)",
-        "impl_file": "src/game/constants.ts",
-        "impl_line": 157,
+        "doc": "design/economy/slider-mathematics.md",
+        "section": "§ECO Spending Priority",
+        "quote": "1. Pollution Cleanup, 2. Population Growth Bonus, 3. Terraforming",
+        "impl_file": "design/planets/production.md",
+        "impl_line": "§4. Ecology - Strategy",
         "verified": true
       },
       {
-        "doc": "design/technology/planetology.md",
-        "section": "§Cloning Technology",
-        "quote": "Total_Growth = Natural_Growth + Cloning_Bonus",
-        "impl_file": "src/game/systems/population.ts",
-        "impl_line": 207,
+        "doc": "src/game/systems/production.ts",
+        "section": "processEcoPhases()",
+        "quote": "Phase 1: Pollution cleanup, Phase 2: Population growth bonus, Phase 3: Terraforming",
+        "impl_file": "design/planets/production.md",
+        "impl_line": "§4. Ecology - Strategy",
         "verified": true
       },
       {
-        "doc": "design/technology/planetology.md",
-        "section": "Tier 7 (Cloning) & Tier 11 (Advanced Cloning)",
-        "quote": "Tech levels 21 and 42 respectively",
-        "impl_file": "src/game/systems/population.ts",
-        "impl_line": 201,
+        "doc": "src/ui/screens/ColoniesScreen.ts",
+        "section": "getBuildingDescription()",
+        "quote": "return `${design.name} ${turnsRemaining}`",
+        "impl_file": "design/planets/production.md",
+        "impl_line": "§1. Ship Construction - Display Text",
         "verified": true
       }
     ],
-    "design_gaps": [
-      {
-        "issue": "Bio weapon combat integration",
-        "status": "documented_but_not_implemented",
-        "notes": "Bio weapons (Death Spores, Doom Virus, Bio Terminator) have constants and population effects defined, but combat.ts does not integrate them. This is a separate implementation task, not a design doc fix."
-      }
-    ]
-  },
-  "notes": "fix-25 complete. Cloning tech level and formula inconsistencies resolved. npm run typecheck, npm run test (1497 tests), and npm run check-design all pass."
+    "design_gaps": []
+  }
 }

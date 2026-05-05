@@ -11,7 +11,7 @@ The heart of planet management: five sliding scales allocate population/resource
 **Allocates**: Production capacity to building ships
 **Range**: 0-100%  
 **Output**: BC toward current ship project
-**Display Text**: `(Ship Name) & Turns` (e.g., "Scout 4")
+**Display Text**: `{Ship Name} {Turns}` (e.g., "Scout 4")
 **Strategy**: 
 - High when building fleets
 - Low during peacetime
@@ -43,10 +43,12 @@ The heart of planet management: five sliding scales allocate population/resource
 **Range**: 0-100%
 **Output**: Reduces pollution, then funds terraforming/population growth
 **Display Text**: `Clean / Terraform` status
-**Strategy**:
-- Priority 1: Waste Cleanup (Clean). 
-- Priority 2: Terraforming (once pollution is 0).
-- Priority 3: Population Growth (once terraforming is current max).
+**Strategy** (in priority order):
+- Priority 1: Waste Cleanup (Clean) — mandatory first charge.
+- Priority 2: Population Growth Bonus — accelerate population toward max.
+- Priority 3: Terraforming — permanently increase planet max population.
+
+*Note: See `../economy/slider-mathematics.md` §ECO for exact formulas.*
 
 ### 5. Research
 **Allocates**: Scientists to current research project
