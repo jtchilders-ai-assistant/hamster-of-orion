@@ -11,7 +11,10 @@ import { describe, it, expect } from 'vitest';
 import {
   canColonize,
   colonize,
+  colonizeWithDetails,
   findColonyShipInFleet,
+  grantArtifactsTechBonus,
+  getTechName,
   COLONY_STARTING_POPULATION,
   COLONY_STARTING_FACTORIES,
   COLONY_STARTING_MORALE,
@@ -88,6 +91,7 @@ function makePlanet(
     isPoor: false,
     isGaia: false,
     hasArtifacts: false,
+    artifactsTechClaimed: false,
     currentDesignId: null,
     shipyardProgress: 0,
     resourceLevel: 'normal',
