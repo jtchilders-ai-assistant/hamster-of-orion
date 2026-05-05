@@ -1,3 +1,3 @@
-# Current Task: fix-10 — Planet Design Doc Fixes
+# Current Task: fix-28 — Production Screen Design Doc Fixes
 
-**ID**: fix-10 | **Severity**: medium | **Source**: design/galaxy/planets.md
+**ID**: fix-28 | **Severity**: medium | **Source**: src/ui/components/ProductionScreen.ts

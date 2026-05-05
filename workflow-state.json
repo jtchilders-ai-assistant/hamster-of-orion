@@ -1,70 +1,61 @@
 {
   "state": "COMPLETED",
   "phase": "phase5-design-compliance-fixes",
-  "current_task": "fix-57",
+  "current_task": "fix-13",
   "last_check": "2026-05-05T03:40:00.000Z",
   "total_tasks": 85,
-  "completed_count": 15,
+  "completed_count": 16,
   "skipped_count": 0,
   "blocked_count": 0,
-  "notes": "fix-57 completed: Star Gate travel + fuel range integration per design/galaxy/travel.md. Star gates use ETA=1 instant travel. getFleetFuelRange() uses actual fuel cells + bonus tanks instead of hardcoded 50 in StarMap.",
+  "notes": "fix-13 completed: Force Fields accelerated cost schedule fix per design/technology/research-formulas.md §6 and force-fields.md. applyResearchRP() now uses tech-specific costs from tech-tree.json instead of global tier table lookup.",
   "worker_output": {
     "files_created": [],
     "files_modified": [
-      "src/game/systems/fleet.ts",
-      "src/ui/components/StarMap.ts",
-      "test/game/systems/fleet.test.ts"
+      "src/game/systems/research.ts",
+      "test/game/systems/research.test.ts"
     ],
     "tests_added": [
-      "systemHasStarGate: returns false if system has no planets",
-      "systemHasStarGate: returns false if planet has no star gate",
-      "systemHasStarGate: returns true if planet has star gate owned by empire",
-      "systemHasStarGate: returns false if star gate planet owned by different empire",
-      "systemHasStarGate: returns false for uncolonized planet with star gate",
-      "canUseStarGateTravel: returns true when both systems have star gates",
-      "canUseStarGateTravel: returns false when origin has no star gate",
-      "canUseStarGateTravel: returns false when destination has no star gate",
-      "canUseStarGateTravel: returns false when destination gate owned by different empire",
-      "calculateEta: returns ETA=1 for star gate travel regardless of distance",
-      "calculateEta: returns normal ETA when star gates not available",
-      "moveFleet: sets ETA=1 when using star gate travel",
-      "getShipFuelRange: returns base range from fuel cell (standard = 4 parsecs)",
-      "getShipFuelRange: returns base + bonus for fuel cell + reserve tanks (+3)",
-      "getShipFuelRange: returns base + bonus for fuel cell + extended tanks (+5)",
-      "getShipFuelRange: returns Infinity for ship with thorium_cells",
-      "getFleetFuelRange: returns the minimum range ship in the fleet",
-      "getFleetFuelRange: returns Infinity if all ships have unlimited range"
+      "getTechBaseCostById: returns correct cost for a Weapons tech",
+      "getTechBaseCostById: returns undefined for unknown tech ID",
+      "getTechTierById: returns correct tier for a Force Fields tech",
+      "getTechTierById: returns undefined for unknown tech ID",
+      "Force Fields Tier 14 tech (deflector_15_tech) costs 50000 RP, not 18000",
+      "Force Fields Tier 13 tech (deflector_14_tech) costs 30000 RP",
+      "applyResearchRP uses tech-specific cost for Force Fields",
+      "would NOT complete with global tier 14 cost (18000)",
+      "galaxy size modifier applies to Force Fields tech cost",
+      "AI difficulty modifier applies to Force Fields tech cost"
     ],
-    "summary": "Implemented Star Gate travel and fuel range per design/galaxy/travel.md. Added systemHasStarGate(), canUseStarGateTravel(), getShipFuelRange(), getFleetFuelRange() to fleet.ts. calculateEta() now returns 1 turn for star gate travel. StarMap.ts uses actual fleet fuel range instead of hardcoded 50 for pathfinding. Note: extended_reserve_tanks uses bonusRange=5 per components-complete.md (travel.md says +6 - design gap documented).",
+    "summary": "Fixed Force Fields accelerated cost schedule. applyResearchRP() now uses getTechBaseCostById() to look up per-tech costs from tech-tree.json, falling back to tier-based lookup only if tech not found. This ensures Force Fields Tier 14 costs 50,000 RP (not 18,000 from global table). Added getTechBaseCostById() and getTechTierById() exports. Added comprehensive tests verifying Force Fields costs and modifiers.",
     "design_compliance": [
       {
-        "doc": "design/galaxy/travel.md",
-        "section": "§Star Gates",
-        "quote": "Ships travel instantly between any gated planets. Ignores fuel range for gate-to-gate travel.",
-        "impl_file": "src/game/systems/fleet.ts",
-        "impl_line": "canUseStarGateTravel(), calculateEta()",
+        "doc": "design/technology/research-formulas.md",
+        "section": "§6 Base Tech Cost by Tier",
+        "quote": "Force Fields Tier 14 costs 50,000 RP (equivalent to global Tier 18), not 18,000 RP. Always look up Force Fields costs in force-fields.md directly.",
+        "impl_file": "src/game/systems/research.ts",
+        "impl_line": "getTechBaseCostById(), applyResearchRP()",
         "verified": true
       },
       {
-        "doc": "design/galaxy/travel.md",
-        "section": "§Reserve Fuel Tanks",
-        "quote": "Reserve Fuel Tanks: +3 parsecs to ship range",
-        "impl_file": "src/game/systems/fleet.ts",
-        "impl_line": "getShipFuelRange()",
+        "doc": "design/technology/force-fields.md",
+        "section": "Tier cost mapping",
+        "quote": "Force Fields Tier 14 = 50,000 RP = Global Tier 18",
+        "impl_file": "src/data/tech-tree.json",
+        "impl_line": "deflector_15_tech cost: 50000",
         "verified": true
       },
       {
-        "doc": "design/ships/components-complete.md",
-        "section": "§Reserve Fuel Tank table",
-        "quote": "Extended Reserve Tank | 15 | +5 range",
-        "impl_file": "src/data/components.json",
-        "impl_line": "extended_reserve_tanks bonusRange: 5",
+        "doc": "design/technology/research-formulas.md",
+        "section": "§4 Artifacts World",
+        "quote": "ongoing +25% RP from that planet via multiplier 1.25",
+        "impl_file": "src/data/technologies.json",
+        "impl_line": "special_rp_bonuses.artifacts_world: 1.25",
         "verified": true
       }
     ],
     "design_gaps": [
       {
-        "gap": "Extended Fuel Tank range bonus conflict: design/galaxy/travel.md says +6 parsecs, design/ships/components-complete.md says +5 range. Implementation uses +5 (components-complete.md as more specific spec). Needs human review to resolve canonical value."
+        "gap": "miniaturization_minimum_scale constant (0.50) is in technologies.json but the design doc prose only mentions '50% max reduction' without explicitly naming this constant. The JSON schema section does define miniaturization_minimum: 0.50, so this is consistent but could be more explicitly documented in the prose."
       }
     ]
   }

@@ -754,6 +754,164 @@ describe('constants', () => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
+// 14. Force Fields accelerated cost schedule (fix-13)
+// Per design/technology/research-formulas.md §6 and design/technology/force-fields.md
+// ─────────────────────────────────────────────────────────────────────────────
+
+import {
+  getTechBaseCostById,
+  getTechTierById,
+} from '../../../src/game/systems/research';
+
+describe('getTechBaseCostById', () => {
+  it('returns correct cost for a Weapons tech (laser_tech tier 1 = 50)', () => {
+    expect(getTechBaseCostById('laser_tech')).toBe(50);
+  });
+
+  it('returns undefined for unknown tech ID', () => {
+    expect(getTechBaseCostById('nonexistent_tech')).toBeUndefined();
+  });
+});
+
+describe('getTechTierById', () => {
+  it('returns correct tier for a Force Fields tech', () => {
+    expect(getTechTierById('deflector_15_tech')).toBe(14);
+  });
+
+  it('returns undefined for unknown tech ID', () => {
+    expect(getTechTierById('nonexistent_tech')).toBeUndefined();
+  });
+});
+
+describe('Force Fields accelerated cost schedule (design/technology/force-fields.md)', () => {
+  /**
+   * Force Fields has 14 internal tiers but uses an accelerated RP cost schedule.
+   * Per research-formulas.md §6:
+   *   "Force Fields Tier 14 costs 50,000 RP (equivalent to global Tier 18), not 18,000 RP."
+   *
+   * This test ensures applyResearchRP uses the tech-specific cost, not the global tier table.
+   */
+
+  it('Force Fields Tier 14 tech (deflector_15_tech) costs 50000 RP, not 18000', () => {
+    // Verify tech-tree.json has the correct cost
+    const cost = getTechBaseCostById('deflector_15_tech');
+    expect(cost).toBe(50000);
+
+    // Confirm this differs from the global tier 14 cost (18000)
+    expect(getBaseTierCost(14)).toBe(18000);
+    expect(cost).not.toBe(getBaseTierCost(14));
+  });
+
+  it('Force Fields Tier 13 tech (deflector_14_tech) costs 30000 RP', () => {
+    expect(getTechBaseCostById('deflector_14_tech')).toBe(30000);
+    // Global tier 13 = 14000 RP
+    expect(getBaseTierCost(13)).toBe(14000);
+  });
+
+  it('applyResearchRP uses tech-specific cost for Force Fields', () => {
+    // Set up Force Fields research targeting tier 14 tech (50000 base cost)
+    let fields = createDefaultFieldResearch();
+    fields = setResearchTarget(fields, 'force_fields', 'deflector_15_tech', 14);
+    // Pre-fill to 49999 RP (just under completion)
+    fields = {
+      ...fields,
+      force_fields: { ...fields.force_fields, progressRP: 49999 },
+    };
+
+    // Add 2 RP → total 50001 ≥ 50000 → should complete
+    const fieldRP: ResearchAllocation = {
+      weapons: 0,
+      propulsion: 0,
+      construction: 0,
+      computers: 0,
+      force_fields: 2,
+      planetology: 0,
+    };
+
+    const { completions, updatedFields } = applyResearchRP(fields, fieldRP, 'medium', false);
+
+    expect(completions).toHaveLength(1);
+    expect(completions[0].field).toBe('force_fields');
+    expect(completions[0].completedTechId).toBe('deflector_15_tech');
+    expect(completions[0].overflowRP).toBeCloseTo(1, 5); // 50001 - 50000 = 1
+    expect(updatedFields.force_fields.progressRP).toBeCloseTo(1, 5);
+  });
+
+  it('would NOT complete with global tier 14 cost (18000)', () => {
+    // If we used global tier cost (18000), 18500 RP would complete.
+    // With correct accelerated cost (50000), it should NOT complete.
+    let fields = createDefaultFieldResearch();
+    fields = setResearchTarget(fields, 'force_fields', 'deflector_15_tech', 14);
+    fields = {
+      ...fields,
+      force_fields: { ...fields.force_fields, progressRP: 18500 },
+    };
+
+    const fieldRP: ResearchAllocation = {
+      weapons: 0,
+      propulsion: 0,
+      construction: 0,
+      computers: 0,
+      force_fields: 0,
+      planetology: 0,
+    };
+
+    const { completions } = applyResearchRP(fields, fieldRP, 'medium', false);
+
+    // Should NOT complete because 18500 < 50000
+    expect(completions).toHaveLength(0);
+  });
+
+  it('galaxy size modifier applies to Force Fields tech cost', () => {
+    // Huge galaxy: 50000 × 1.5 = 75000 RP
+    let fields = createDefaultFieldResearch();
+    fields = setResearchTarget(fields, 'force_fields', 'deflector_15_tech', 14);
+    fields = {
+      ...fields,
+      force_fields: { ...fields.force_fields, progressRP: 74999 },
+    };
+
+    const fieldRP: ResearchAllocation = {
+      weapons: 0,
+      propulsion: 0,
+      construction: 0,
+      computers: 0,
+      force_fields: 2,
+      planetology: 0,
+    };
+
+    const { completions } = applyResearchRP(fields, fieldRP, 'huge', false);
+
+    expect(completions).toHaveLength(1);
+    expect(completions[0].overflowRP).toBeCloseTo(1, 5); // 75001 - 75000 = 1
+  });
+
+  it('AI difficulty modifier applies to Force Fields tech cost', () => {
+    // Impossible AI: 50000 × 1.0 (medium) × 0.5 = 25000 RP
+    let fields = createDefaultFieldResearch();
+    fields = setResearchTarget(fields, 'force_fields', 'deflector_15_tech', 14);
+    fields = {
+      ...fields,
+      force_fields: { ...fields.force_fields, progressRP: 24999 },
+    };
+
+    const fieldRP: ResearchAllocation = {
+      weapons: 0,
+      propulsion: 0,
+      construction: 0,
+      computers: 0,
+      force_fields: 2,
+      planetology: 0,
+    };
+
+    const { completions } = applyResearchRP(fields, fieldRP, 'medium', true, 'impossible');
+
+    expect(completions).toHaveLength(1);
+    expect(completions[0].overflowRP).toBeCloseTo(1, 5); // 25001 - 25000 = 1
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
 // 13. Edge cases
 // ─────────────────────────────────────────────────────────────────────────────
 

@@ -10,6 +10,7 @@
  */
 
 import technologiesData from '../../data/technologies.json';
+import techTreeData from '../../data/tech-tree.json';
 import { GalaxySize, RaceId } from '../state';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -209,6 +210,41 @@ const DIFFICULTY_AI_MODS: Readonly<Record<string, number>> =
 const RACIAL_RESEARCH_MODS: Readonly<Record<string, number>> =
   technologiesData.racial_research_modifiers as Record<string, number>;
 
+/**
+ * Tech entry from tech-tree.json.
+ * Used to look up per-tech costs (important for Force Fields which uses
+ * an accelerated cost schedule per design/technology/force-fields.md).
+ */
+interface TechEntry {
+  id: string;
+  name: string;
+  field: string;
+  tier: number;
+  cost: number;
+  unlocks?: string[];
+  description?: string;
+}
+
+/**
+ * Tech cost lookup by tech ID. Built once at module load.
+ * Force Fields and other fields may have per-tech costs that differ from
+ * the global tier table (research-formulas.md §6).
+ */
+const TECH_COST_MAP: ReadonlyMap<string, number> = new Map(
+  (techTreeData.technologies as TechEntry[]).map(
+    (tech) => [tech.id, tech.cost] as [string, number],
+  ),
+);
+
+/**
+ * Tech tier lookup by tech ID.
+ */
+const TECH_TIER_MAP: ReadonlyMap<string, number> = new Map(
+  (techTreeData.technologies as TechEntry[]).map(
+    (tech) => [tech.id, tech.tier] as [string, number],
+  ),
+);
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
 // ─────────────────────────────────────────────────────────────────────────────
@@ -315,6 +351,9 @@ export function calculatePlanetRP(planet: PlanetRPInput, raceId: RaceId): number
 /**
  * Returns the base tech cost for a given tier from the tier cost table.
  *
+ * NOTE: This uses the GLOBAL tier cost table. For techs in fields with
+ * accelerated schedules (Force Fields), use getTechBaseCostById() instead.
+ *
  * @throws {Error} if the tier is not in the table.
  */
 export function getBaseTierCost(tier: number): number {
@@ -323,6 +362,33 @@ export function getBaseTierCost(tier: number): number {
     throw new Error(`No tech cost defined for tier ${tier}`);
   }
   return cost;
+}
+
+/**
+ * Returns the base tech cost for a specific tech ID from tech-tree.json.
+ *
+ * This is the preferred method for looking up tech costs because it handles
+ * fields with accelerated cost schedules (e.g., Force Fields has 14 tiers
+ * but Tier 14 costs 50,000 RP, not 18,000 RP from the global table).
+ *
+ * Per design/technology/research-formulas.md §6:
+ *   "Always look up Force Fields costs in force-fields.md directly."
+ *
+ * @param techId The tech ID to look up.
+ * @returns The base RP cost for the tech, or undefined if not found.
+ */
+export function getTechBaseCostById(techId: string): number | undefined {
+  return TECH_COST_MAP.get(techId);
+}
+
+/**
+ * Returns the tier for a specific tech ID from tech-tree.json.
+ *
+ * @param techId The tech ID to look up.
+ * @returns The tier for the tech, or undefined if not found.
+ */
+export function getTechTierById(techId: string): number | undefined {
+  return TECH_TIER_MAP.get(techId);
 }
 
 /**
@@ -509,9 +575,16 @@ export function applyResearchRP(
     // Check for completion if we have a targeted tech
     if (fieldState.currentTechId !== null && fieldState.currentTechTier !== null) {
       const tier = fieldState.currentTechTier;
-      const actualCost = isAI
-        ? getTechCostAI(tier, galaxySize, difficulty)
-        : getTechCost(tier, galaxySize);
+      const techId = fieldState.currentTechId;
+
+      // Use tech-specific cost from tech-tree.json if available.
+      // This is important for Force Fields which uses an accelerated cost
+      // schedule (Tier 14 = 50,000 RP, not 18,000 from global table).
+      // Per design/technology/research-formulas.md §6.
+      const baseCost = getTechBaseCostById(techId) ?? getBaseTierCost(tier);
+      const galaxySizeMod = getGalaxySizeModifier(galaxySize);
+      const difficultyMod = isAI ? getDifficultyAICostModifier(difficulty) : 1.0;
+      const actualCost = baseCost * galaxySizeMod * difficultyMod;
 
       if (fieldState.progressRP >= actualCost) {
         const overflowRP = fieldState.progressRP - actualCost;
