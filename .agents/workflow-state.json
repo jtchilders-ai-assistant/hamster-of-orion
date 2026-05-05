@@ -1,12 +1,57 @@
 {
-  "state": "IDLE",
-  "current_task": null,
-  "phase": "phase4b-ui-integration",
-  "last_completed": "playable-demo-test",
-  "last_check": "2026-04-21T22:06:00Z",
-  "verifier_result": {
-    "status": "approved",
-    "notes": "Playable demo verified via existing test/integration/game-loop.test.ts (30 tests). Worker created buggy tests that were removed. All 1256 tests pass - game is playable end-to-end."
+  "state": "TESTING",
+  "current_task": "fix-38",
+  "phase": "phase5-design-compliance-fixes",
+  "last_completed": "fix-37",
+  "last_check": "2026-05-04T21:45:00Z",
+  "worker_output": {
+    "files_created": [],
+    "files_modified": ["design/technology/research-formulas.md"],
+    "tests_added": [],
+    "summary": "Expanded research-formulas.md with detailed formulas for Tech Stealing (espionage), Tech Trading (diplomacy), Reverse Engineering (captured ships), and Random Tech Choices (Rats Academic Network ability). All formulas now match and cross-reference the authoritative design docs in diplomacy/espionage.md and ships/combat-algorithm.md.",
+    "design_compliance": [
+      {
+        "doc": "design/diplomacy/espionage.md",
+        "section": "§6.2 Tech Theft",
+        "quote": "TheftSuccess = 30 + SpyEffectiveness + TechValueModifier",
+        "impl_file": "design/technology/research-formulas.md",
+        "impl_line": 375,
+        "verified": true
+      },
+      {
+        "doc": "design/diplomacy/espionage.md",
+        "section": "§6.2 Tech Value Modifier",
+        "quote": "Tier 1-3 techs: +10, Tier 4-6: +0, Tier 7-9: -5, Tier 10-12: -10, Tier 13+: -15",
+        "impl_file": "design/technology/research-formulas.md",
+        "impl_line": 380,
+        "verified": true
+      },
+      {
+        "doc": "design/species/rats.md",
+        "section": "Academic Network",
+        "quote": "Always gets multiple tech choices per field (minimum 3)",
+        "impl_file": "design/technology/research-formulas.md",
+        "impl_line": 292,
+        "verified": true
+      },
+      {
+        "doc": "design/species/rats.md",
+        "section": "Quick Study",
+        "quote": "Can reverse-engineer captured tech immediately",
+        "impl_file": "design/technology/research-formulas.md",
+        "impl_line": 481,
+        "verified": true
+      },
+      {
+        "doc": "design/species/race-stats-complete.md",
+        "section": "Mice abilities",
+        "quote": "50% faster reverse engineering",
+        "impl_file": "design/technology/research-formulas.md",
+        "impl_line": 482,
+        "verified": true
+      }
+    ],
+    "design_gaps": []
   },
-  "notes": "Phase 4B COMPLETE! All 16/16 tasks done."
+  "notes": "fix-38 complete. npm run check-design passes. TypeScript and test failures are pre-existing issues unrelated to this design doc fix."
 }

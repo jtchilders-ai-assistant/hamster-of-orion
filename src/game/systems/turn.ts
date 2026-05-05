@@ -69,6 +69,20 @@ import {
   processActiveEvents,
   processMonsterMovement,
 } from './events';
+import {
+  getFactoryEfficiencyMultiplier,
+  getRoboticControlsBonus,
+  getPollutionReduction,
+} from './raceAbilities';
+import {
+  RACIAL_PRODUCTION_MODIFIERS,
+  ROBOTIC_CONTROLS,
+  WASTE_REDUCTION,
+  ECO_RESTORATION,
+  INDUSTRIAL_TECH_FACTORY_COSTS,
+  TERRAFORMING_BONUSES,
+} from '../constants';
+import { RaceId } from '../state';
 
 // ── Bankruptcy Constants (design/game-mechanics/turn-structure.md) ────────────
 
@@ -118,17 +132,205 @@ type PhaseProcessor = (state: GameState, preTurnState: GameState) => PhaseProces
 
 // ── Internal helpers ───────────────────────────────────────────────────────────
 
+// ── Tech Level Helpers (derive from completedTechs) ─────────────────────────────
+
 /**
- * Build a ProductionContext for an empire using baseline values.
+ * Get the highest Robotic Controls level from completed techs.
+ * Returns the factory_ratio (2-7) based on researched RC techs.
+ * Default: 2 (RC II, starting tech).
  *
- * In a fully-featured game this would read tech levels, racial bonuses,
- * and building effects from empire state. For the current integration
- * we use DEFAULT_PRODUCTION_CONTEXT as the baseline — future tasks can
- * derive real values from the empire's research and race data.
+ * Tech IDs: robotic_controls_2_tech, robotic_controls_3_tech, etc.
  */
-function buildProductionContext(_empire: Empire): ProductionContext {
-  // TODO (future task): derive from empire.research tech levels, race bonuses.
-  return DEFAULT_PRODUCTION_CONTEXT;
+function getRoboticControlsLevel(completedTechs: string[]): number {
+  // Check from highest to lowest
+  for (let i = ROBOTIC_CONTROLS.length - 1; i >= 0; i--) {
+    const rc = ROBOTIC_CONTROLS[i];
+    // Tech IDs follow pattern: robotic_controls_N_tech where N is the Roman numeral as digit
+    const techId = `robotic_controls_${rc.factory_ratio}_tech`;
+    if (completedTechs.includes(techId)) {
+      return rc.factory_ratio;
+    }
+  }
+  // Starting tech RC II (factory_ratio 2) is always available
+  return 2;
+}
+
+/**
+ * Get the current waste rate from completed techs.
+ * Returns the waste_rate multiplier (1.0 down to 0.0) based on researched waste reduction.
+ * Default: 1.0 (no reduction).
+ *
+ * Tech IDs: reduced_industrial_waste_80_tech, reduced_industrial_waste_60_tech, etc.
+ */
+function getWasteRateFromTechs(completedTechs: string[]): number {
+  // Check from best (lowest rate) to worst
+  const techPatterns = [
+    { pattern: 'industrial_waste_elimination', rate: 0.0 },
+    { pattern: 'reduced_industrial_waste_20', rate: 0.2 },
+    { pattern: 'reduced_industrial_waste_40', rate: 0.4 },
+    { pattern: 'reduced_industrial_waste_60', rate: 0.6 },
+    { pattern: 'reduced_industrial_waste_80', rate: 0.8 },
+  ];
+
+  for (const { pattern, rate } of techPatterns) {
+    if (completedTechs.some(t => t.includes(pattern))) {
+      return rate;
+    }
+  }
+  return 1.0; // No waste reduction
+}
+
+/**
+ * Get the cleanup modifier from completed Eco Restoration techs.
+ * Returns the cleanup_modifier (1.0 down to 0.1) based on researched eco restoration.
+ * Default: 1.0 (base Ecological Restoration).
+ */
+function getCleanupModifierFromTechs(completedTechs: string[]): number {
+  // Check from best to worst
+  const techPatterns = [
+    { pattern: 'complete_eco_restoration', modifier: 0.1 },
+    { pattern: 'advanced_eco_restoration', modifier: 0.2 },
+    { pattern: 'enhanced_eco_restoration', modifier: 0.4 },
+    { pattern: 'improved_eco_restoration', modifier: 0.67 },
+  ];
+
+  for (const { pattern, modifier } of techPatterns) {
+    if (completedTechs.some(t => t.includes(pattern))) {
+      return modifier;
+    }
+  }
+  return 1.0; // Base eco restoration
+}
+
+/**
+ * Get the factory cost from completed Industrial Tech.
+ * Returns the factory cost in BC (10 down to 2) based on researched industrial tech.
+ * Default: 10 BC.
+ */
+function getFactoryCostFromTechs(completedTechs: string[]): number {
+  // Check from best (lowest cost) to worst
+  for (let i = INDUSTRIAL_TECH_FACTORY_COSTS.length - 1; i >= 0; i--) {
+    const tech = INDUSTRIAL_TECH_FACTORY_COSTS[i];
+    // Tech IDs: industrial_tech_9, industrial_tech_8, etc.
+    const techId = `industrial_tech_${tech.factory_cost}`;
+    if (completedTechs.includes(techId)) {
+      return tech.factory_cost;
+    }
+  }
+  return 10; // Base factory cost
+}
+
+/**
+ * Get the maximum terraform tier from completed terraforming techs.
+ * Returns the tier index (0-9) or null if no terraforming.
+ */
+function getMaxTerraformTierFromTechs(completedTechs: string[]): number | null {
+  // Check from highest tier to lowest
+  const terraformTechs = [
+    'terraforming_120_tech',
+    'terraforming_100_tech',
+    'terraforming_80_tech',
+    'terraforming_60_tech',
+    'terraforming_50_tech',
+    'terraforming_40_tech',
+    'terraforming_30_tech',
+    'terraforming_20_tech',
+    'terraforming_10_tech',
+  ];
+
+  for (let i = 0; i < terraformTechs.length; i++) {
+    if (completedTechs.includes(terraformTechs[i])) {
+      return TERRAFORMING_BONUSES.length - 1 - i; // Convert to tier index
+    }
+  }
+  return null; // No terraforming available
+}
+
+/**
+ * Get the Planetology tech level from completed techs.
+ * This is an approximation based on the highest planetology-category tech researched.
+ * Returns 0-50 range.
+ */
+function getPlanetologyTechLevel(completedTechs: string[]): number {
+  // The planetology TL affects population labor output.
+  // We estimate it based on terraforming techs as a proxy.
+  const terraformTier = getMaxTerraformTierFromTechs(completedTechs);
+  if (terraformTier === null) return 1; // Starting TL
+  
+  // Map tier to approximate TL (terraforming tiers map to increasing TLs)
+  const tierToTL = [0, 2, 6, 10, 14, 18, 22, 30, 38, 46];
+  return tierToTL[Math.min(terraformTier, tierToTL.length - 1)] || 1;
+}
+
+/**
+ * Build a ProductionContext for an empire based on its race and completed technologies.
+ *
+ * Derives all production parameters from:
+ *   - Racial bonuses (production modifier, RC bonus, factory efficiency)
+ *   - Completed technologies (RC level, waste rate, cleanup modifier, factory cost)
+ *   - Difficulty settings (applied separately via applyDifficultyToContext)
+ *
+ * Design source: design/economy/factory-formulas.md
+ */
+function buildProductionContext(empire: Empire): ProductionContext {
+  const completedTechs = empire.research.completedTechs;
+  const raceId = empire.raceId as RaceId;
+
+  // Racial production modifier (Ants: 1.5, Mice: 1.25, etc.)
+  const racialProductionModifier = RACIAL_PRODUCTION_MODIFIERS[raceId] ?? 1.0;
+
+  // Racial research modifier (not used in production, but included for completeness)
+  // Note: This would come from race data; using 1.0 as default.
+  const racialResearchModifier = 1.0;
+
+  // Robotic Controls level from tech, plus racial bonus (Mice: +2)
+  const baseRCLevel = getRoboticControlsLevel(completedTechs);
+  const racialRCBonus = getRoboticControlsBonus(raceId);
+
+  // Planetology tech level (affects population labor output)
+  const planetologyTL = getPlanetologyTechLevel(completedTechs);
+
+  // Waste rate from tech
+  let wasteRate = getWasteRateFromTechs(completedTechs);
+  // Apply Mice racial pollution reduction (50% less pollution)
+  const pollutionReduction = getPollutionReduction(raceId);
+  if (pollutionReduction > 0) {
+    wasteRate *= (1 - pollutionReduction / 100);
+  }
+
+  // Cleanup modifier from Eco Restoration tech
+  const cleanupModifier = getCleanupModifierFromTechs(completedTechs);
+
+  // Factory cost from Industrial Tech
+  const factoryCostBC = getFactoryCostFromTechs(completedTechs);
+
+  // Terraform tier and cost
+  const maxTerraformTier = getMaxTerraformTierFromTechs(completedTechs);
+  const terraformTierCost = 200; // Base cost per tier
+
+  // Factory efficiency multiplier (Mice: 1.5 for Automated Production)
+  const factoryEfficiencyMultiplier = getFactoryEfficiencyMultiplier(raceId);
+
+  // Ship maintenance modifiers (could be expanded later)
+  const racialMaintenanceModifier = 1.0;
+  const fleetLogisticsModifiers: number[] = [];
+
+  return {
+    racialProductionModifier,
+    racialResearchModifier,
+    difficultyProductionModifier: 1.0, // Applied separately via applyDifficultyToContext
+    roboticControlsLevel: baseRCLevel,
+    racialRCBonus,
+    planetologyTL,
+    wasteRate,
+    cleanupModifier,
+    factoryCostBC,
+    maxTerraformTier,
+    terraformTierCost,
+    factoryEfficiencyMultiplier,
+    racialMaintenanceModifier,
+    fleetLogisticsModifiers,
+  };
 }
 
 /**

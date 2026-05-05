@@ -17,8 +17,12 @@ Population is the fundamental resource. More population = more factory operators
 
 **Racial Modifiers**:
 - Rabbits: +100% population growth
-- Ants: +25% population growth (estimated)
+- Ants: +25% population growth
+- Mice: -25% population growth (slow augmentation process)
+- Hermit Crabs: -50% population growth (crystalline budding)
 - Other races: Standard growth
+
+See `../economy/population-growth.md` §4 for complete racial growth modifiers.
 
 ---
 
