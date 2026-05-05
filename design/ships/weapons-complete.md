@@ -195,12 +195,12 @@ Personal weapons provide bonuses to all ground combat.
 
 | Weapon | Tech Level | Ground Combat Bonus | Notes |
 |--------|------------|---------------------|-------|
-| Hand Lasers | 5 | +5 | Basic sidearm |
-| Gatling Laser Rifle | 12 | +10 | Rapid fire |
-| Fusion Rifle | 18 | +15 | High damage |
-| Hand Phasor | 27 | +20 | — |
-| Plasma Rifle | 38 | +25 | — |
-| Mauler Pistol | 50 | +30 | Ultimate personal weapon |
+| Hand Lasers | 2 | +5 | Basic sidearm (MOO1 L2) |
+| Gatling Laser Rifle | 12 | +10 | Rapid fire (MOO1 L12) |
+| Fusion Rifle | 24 | +20 | High damage (MOO1 L24) |
+| Hand Phasors | 31 | +25 | — (MOO1 L31) |
+| Plasma Rifle | 42 | +30 | — (MOO1 L42) |
+| Mauler Pistol | 50 | +35 | Ultimate personal weapon (Design addition) |
 
 ---
 
@@ -835,38 +835,44 @@ The following weapons are "Heavy" and have mounting limits:
     {
       "id": "hand_lasers",
       "name": "Hand Lasers",
-      "tech_level": 5,
-      "ground_combat_bonus": 5
+      "tech_level": 2,
+      "ground_combat_bonus": 5,
+      "moo1_level": 2
     },
     {
       "id": "gatling_laser_rifle",
       "name": "Gatling Laser Rifle",
       "tech_level": 12,
-      "ground_combat_bonus": 10
+      "ground_combat_bonus": 10,
+      "moo1_level": 12
     },
     {
       "id": "fusion_rifle",
       "name": "Fusion Rifle",
-      "tech_level": 18,
-      "ground_combat_bonus": 15
+      "tech_level": 24,
+      "ground_combat_bonus": 20,
+      "moo1_level": 24
     },
     {
-      "id": "hand_phasor",
-      "name": "Hand Phasor",
-      "tech_level": 27,
-      "ground_combat_bonus": 20
+      "id": "hand_phasors",
+      "name": "Hand Phasors",
+      "tech_level": 31,
+      "ground_combat_bonus": 25,
+      "moo1_level": 31
     },
     {
       "id": "plasma_rifle",
       "name": "Plasma Rifle",
-      "tech_level": 38,
-      "ground_combat_bonus": 25
+      "tech_level": 42,
+      "ground_combat_bonus": 30,
+      "moo1_level": 42
     },
     {
       "id": "mauler_pistol",
       "name": "Mauler Pistol",
       "tech_level": 50,
-      "ground_combat_bonus": 30
+      "ground_combat_bonus": 35,
+      "design_addition": true
     }
   ],
 

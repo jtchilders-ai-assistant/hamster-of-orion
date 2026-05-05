@@ -101,7 +101,7 @@
       "cost": 3,
       "effect": {
         "damage": 6,
-        "missileSpeed": 3,
+        "missileSpeed": 3.5,
         "attackRatingBonus": 1,
         "interceptable": true
       }
@@ -321,7 +321,7 @@
       "cost": 12,
       "effect": {
         "damage": 15,
-        "missileSpeed": 4,
+        "missileSpeed": 4.5,
         "attackRatingBonus": 3,
         "interceptable": true
       }
@@ -1779,7 +1779,8 @@
       "size": 5,
       "cost": 14,
       "effect": {
-        "repairPerTurn": 0.15
+        "repairPerTurn": 0.10,
+        "repairPerTurnMax": 0.15
       }
     },
     {
@@ -1823,7 +1824,7 @@
       "size": 45,
       "cost": 90,
       "effect": {
-        "disableDurationTurns": 1,
+        "disableDurationTurns": 2,
         "preventsRetreat": true
       }
     },
@@ -1858,14 +1859,14 @@
     {
       "id": "lightning_shield",
       "name": "Lightning Shield",
-      "techLevel": 46,
+      "techLevel": 25,
       "category": "special",
       "size": 15,
       "cost": 45,
       "effect": {
-        "missileDestroyChanceBase": 1.0,
-        "missileDestroyChancePenaltyPerTechLevel": 0.01
-      }
+        "damageReflection": 0.5
+      },
+      "note": "Intentional departure from MOO1: repositioned to L25 with damage reflection mechanic. MOO1's L46 missile interceptor behavior is covered by Zyro Shield."
     },
     {
       "id": "inertial_nullifier",

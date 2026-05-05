@@ -1,3 +1,3 @@
-# Current Task: fix-55 — Slider Mathematics Design Doc Fixes
+# Current Task: fix-72 — Renderer Fixes
 
-**ID**: fix-55 | **Severity**: medium | **Source**: design/economy/slider-mathematics.md
+**ID**: fix-72 | **Severity**: low | **Source**: src/ui/canvas/renderer.ts
