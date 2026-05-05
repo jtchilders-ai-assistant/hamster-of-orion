@@ -531,3 +531,150 @@ describe('calculateDifficultyGrowthModifier', () => {
     expect(calculateDifficultyGrowthModifier('impossible', false)).toBeCloseTo(1.50);
   });
 });
+
+// ── processConqueredPopulation (fix-14/17) ──────────────────────────────────
+
+import {
+  processConqueredPopulation,
+  processOvercrowding,
+  canAutoTransportOverflow,
+  calculateOverflowTransport,
+} from '../../../src/game/systems/population';
+
+describe('processConqueredPopulation', () => {
+  /**
+   * Per design/economy/population-growth.md §Conquered Population:
+   *   Conquest_Survivors = floor(Post_Bombardment_Pop × 0.50)
+   *   Ferrets: 40% reduction → 60% survival
+   */
+
+  it('most races: 50% reduction, minimum 1 survivor', () => {
+    const result = processConqueredPopulation(100, 'hamsters');
+    expect(result.survivalRate).toBe(0.5);
+    expect(result.newPopulation).toBe(50);
+    expect(result.populationLost).toBe(50);
+  });
+
+  it('ferrets: 40% reduction (60% survival)', () => {
+    const result = processConqueredPopulation(100, 'ferrets');
+    expect(result.survivalRate).toBe(0.6);
+    expect(result.newPopulation).toBe(60);
+    expect(result.populationLost).toBe(40);
+  });
+
+  it('minimum 1 survivor (cannot depopulate planet)', () => {
+    const result = processConqueredPopulation(1, 'hamsters');
+    expect(result.newPopulation).toBe(1);
+    expect(result.populationLost).toBe(0);
+  });
+
+  it('floors fractional survivors', () => {
+    // 17 × 0.5 = 8.5 → 8
+    const result = processConqueredPopulation(17, 'hamsters');
+    expect(result.newPopulation).toBe(8);
+  });
+});
+
+// ── processOvercrowding (fix-14/17) ──────────────────────────────────────────
+
+describe('processOvercrowding', () => {
+  /**
+   * Per design/economy/population-growth.md §Overcrowding:
+   *   When current_population > max_population:
+   *   - Excess pop starves at 0.5 per turn
+   *   - Population converges to max over several turns
+   */
+
+  const ctx: PopulationContext = {
+    raceId: 'hamsters',
+    techState: { terraforming_tech_level: 0, cloning_tech_level: 0 },
+  };
+
+  it('not overcrowded: no starvation', () => {
+    const planet = makePlanet({ population: 50, maxPopulation: 100, base_population: 100 });
+    const result = processOvercrowding(planet, ctx);
+    expect(result.isOvercrowded).toBe(false);
+    expect(result.starvationDeaths).toBe(0);
+    expect(result.newPopulation).toBe(50);
+  });
+
+  it('exactly at max: no starvation', () => {
+    const planet = makePlanet({ population: 100, maxPopulation: 100, base_population: 100 });
+    const result = processOvercrowding(planet, ctx);
+    expect(result.isOvercrowded).toBe(false);
+    expect(result.starvationDeaths).toBe(0);
+  });
+
+  it('overcrowded: excess population starves at 0.5 rate', () => {
+    // Pop 110, max 100 → 10 excess → floor(10 × 0.5) = 5 deaths
+    const planet = makePlanet({ population: 110, maxPopulation: 100, base_population: 100 });
+    const result = processOvercrowding(planet, ctx);
+    expect(result.isOvercrowded).toBe(true);
+    expect(result.excessPopulation).toBe(10);
+    expect(result.starvationDeaths).toBe(5);
+    expect(result.newPopulation).toBe(105);
+    expect(result.moraleDelta).toBe(-20);
+  });
+
+  it('large overcrowding converges to max over several turns', () => {
+    // Pop 160, max 100 → 60 excess → floor(60 × 0.5) = 30 deaths
+    const planet = makePlanet({ population: 160, maxPopulation: 100, base_population: 100 });
+    const result = processOvercrowding(planet, ctx);
+    expect(result.starvationDeaths).toBe(30);
+    expect(result.newPopulation).toBe(130); // Still over max, needs more turns
+  });
+});
+
+// ── Rabbits Overflow Transport (fix-14/17) ───────────────────────────────────
+
+describe('canAutoTransportOverflow', () => {
+  /**
+   * Per design/economy/population-growth.md §Overflow Population:
+   *   Rabbits Special: Can redirect overflow to transports automatically
+   */
+
+  it('rabbits can auto-transport overflow', () => {
+    expect(canAutoTransportOverflow('rabbits')).toBe(true);
+  });
+
+  it('other races cannot auto-transport overflow', () => {
+    expect(canAutoTransportOverflow('hamsters')).toBe(false);
+    expect(canAutoTransportOverflow('ferrets')).toBe(false);
+    expect(canAutoTransportOverflow('ants')).toBe(false);
+  });
+});
+
+describe('calculateOverflowTransport', () => {
+  const rabbitsCtx: PopulationContext = {
+    raceId: 'rabbits',
+    techState: DEFAULT_TECH_STATE,
+  };
+  const hamstersCtx: PopulationContext = {
+    raceId: 'hamsters',
+    techState: DEFAULT_TECH_STATE,
+  };
+
+  it('rabbits redirect overflow to transports', () => {
+    const planet = makePlanet({ population: 100, maxPopulation: 100 });
+    const result = calculateOverflowTransport(planet, rabbitsCtx, 5);
+    expect(result.redirected).toBe(true);
+    expect(result.populationRedirected).toBe(5);
+    expect(result.wastedGrowth).toBe(0);
+  });
+
+  it('non-rabbits waste overflow', () => {
+    const planet = makePlanet({ population: 100, maxPopulation: 100 });
+    const result = calculateOverflowTransport(planet, hamstersCtx, 5);
+    expect(result.redirected).toBe(false);
+    expect(result.populationRedirected).toBe(0);
+    expect(result.wastedGrowth).toBe(5);
+  });
+
+  it('zero growth: nothing to redirect', () => {
+    const planet = makePlanet({ population: 100, maxPopulation: 100 });
+    const result = calculateOverflowTransport(planet, rabbitsCtx, 0);
+    expect(result.redirected).toBe(false);
+    expect(result.populationRedirected).toBe(0);
+    expect(result.wastedGrowth).toBe(0);
+  });
+});

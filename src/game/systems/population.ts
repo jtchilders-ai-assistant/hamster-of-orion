@@ -222,8 +222,8 @@ const SOIL_ENRICHMENT_BONUS: Record<0 | 1 | 2, number> = {
 
 // ── Nebula capacity bonus ─────────────────────────────────────────────────────
 
-/** Nebula systems grant bonus population capacity from rich gases. */
-export const NEBULA_CAPACITY_BONUS = 15;
+// NOTE: Nebula capacity bonus removed per design review (fix-14)
+// Design doc (population-growth.md) does not specify nebula bonuses for population
 
 // ── Helper: get race ID from planet/empire ────────────────────────────────────
 
@@ -252,8 +252,6 @@ export interface MaxPopulationResult {
   terraformingBonus: number;
   /** Soil enrichment bonus applied. */
   soilBonus: number;
-  /** Nebula capacity bonus applied. */
-  nebulaBonus: number;
   /** Environment capacity modifier (1.0 for Hermit Crabs). */
   envCapacityModifier: number;
   /** Racial capacity modifier (1.25 for Ants, 1.0 others). */
@@ -288,8 +286,8 @@ export function calculateMaxPopulation(
   const soilLevel = (planet.soil_enrichment_level ?? 0) as 0 | 1 | 2;
   const soilBonus = SOIL_ENRICHMENT_BONUS[soilLevel];
 
-  // Nebula capacity bonus (from rich gases in nebula systems)
-  const nebulaBonus = planet.in_nebula ? NEBULA_CAPACITY_BONUS : 0;
+  // NOTE: Nebula capacity bonus removed per design review (fix-14)
+  // Design doc does not mention nebula bonuses for population capacity
 
   // Hermit Crabs ignore environment capacity
   const envCapacityModifier = isHermitCrab ? 1.0 : (ENV_CAPACITY_MODIFIER[planet.type] ?? 1.0);
@@ -297,7 +295,7 @@ export function calculateMaxPopulation(
   const racialCapacityModifier = RACIAL_CAPACITY_MODIFIER[ctx.raceId] ?? 1.0;
 
   const maxPopulation = Math.floor(
-    (basePop + terraformingBonus + soilBonus + nebulaBonus)
+    (basePop + terraformingBonus + soilBonus)
     * envCapacityModifier
     * racialCapacityModifier,
   );
@@ -307,7 +305,6 @@ export function calculateMaxPopulation(
     basePop,
     terraformingBonus,
     soilBonus,
-    nebulaBonus,
     envCapacityModifier,
     racialCapacityModifier,
   };
@@ -574,6 +571,206 @@ export const DEFAULT_TECH_STATE: TechState = {
   terraforming_tech_level: 0,
   cloning_tech_level: 0,
 };
+
+// ── Conquered Population (Post-Invasion) ─────────────────────────────────────
+
+/**
+ * Conquest population reduction modifier by race.
+ * Most races: 0.50 (50% reduction)
+ * Ferrets: 0.60 (40% reduction) — more efficient at conquest
+ *
+ * Per design/economy/population-growth.md:
+ *   "Post-invasion reduction: After your troops win, the surviving
+ *    post-bombardment population is reduced by 50%.
+ *    Ferrets reduce the post-invasion 50% to 40%."
+ */
+const CONQUEST_SURVIVAL_RATE: Record<string, number> = {
+  ferrets: 0.60, // 40% reduction → 60% survival
+};
+const DEFAULT_CONQUEST_SURVIVAL_RATE = 0.50; // 50% reduction → 50% survival
+
+/** Minimum population after conquest (cannot depopulate planet). */
+const MIN_CONQUEST_SURVIVORS = 1;
+
+export interface ConquestResult {
+  /** Population before conquest reduction. */
+  priorPopulation: number;
+  /** Survival rate applied (0.50 for most, 0.60 for Ferrets). */
+  survivalRate: number;
+  /** Final population after conquest reduction. */
+  newPopulation: number;
+  /** Population lost to conquest reduction. */
+  populationLost: number;
+}
+
+/**
+ * Calculate population after conquest.
+ *
+ * Per design/economy/population-growth.md §Conquered Population:
+ *   Post_Bombardment_Pop = Planet_Population - Bombardment_Kills
+ *   Conquest_Survivors = floor(Post_Bombardment_Pop × 0.50)
+ *   Final_Population = max(Conquest_Survivors, 1)
+ *
+ * Ferrets reduce the 50% to 40% (i.e., 60% survival rate).
+ *
+ * @param postBombardmentPop Population remaining after bombardment phase
+ * @param conquerorRaceId Race ID of the conquering empire
+ * @returns Conquest result with new population
+ */
+export function processConqueredPopulation(
+  postBombardmentPop: number,
+  conquerorRaceId: string,
+): ConquestResult {
+  const survivalRate = CONQUEST_SURVIVAL_RATE[conquerorRaceId] ?? DEFAULT_CONQUEST_SURVIVAL_RATE;
+  const survivors = Math.floor(postBombardmentPop * survivalRate);
+  const newPopulation = Math.max(survivors, MIN_CONQUEST_SURVIVORS);
+  const populationLost = postBombardmentPop - newPopulation;
+
+  return {
+    priorPopulation: postBombardmentPop,
+    survivalRate,
+    newPopulation,
+    populationLost,
+  };
+}
+
+// ── Overcrowding ──────────────────────────────────────────────────────────────
+
+/** Starvation rate for overcrowded population per turn. */
+const OVERCROWDING_STARVATION_RATE = 0.5;
+
+export interface OvercrowdingResult {
+  /** Whether the planet is overcrowded. */
+  isOvercrowded: boolean;
+  /** Excess population above max. */
+  excessPopulation: number;
+  /** Deaths this turn due to overcrowding starvation. */
+  starvationDeaths: number;
+  /** New population after overcrowding starvation. */
+  newPopulation: number;
+  /** Morale penalty from overcrowding starvation (-20 if starving). */
+  moraleDelta: number;
+}
+
+/**
+ * Process overcrowding when population exceeds max capacity.
+ *
+ * Per design/economy/population-growth.md §Overcrowding:
+ *   When current_population > new_max_population:
+ *     - Excess population does NOT die immediately
+ *     - Growth is suppressed to zero (handled by calculatePopulationGrowth)
+ *     - Excess population starves at Starvation_Rate (0.5) per turn
+ *     - Population converges to Max_Population over several turns
+ *
+ * This function should be called AFTER calculateMaxPopulation but BEFORE
+ * calculatePopulationGrowth. If overcrowded, the starvation here handles
+ * the reduction; processFoodAndStarvation handles normal food deficits.
+ *
+ * @param planet Planet to check for overcrowding
+ * @param ctx Population context with race and tech info
+ * @returns Overcrowding result with any starvation deaths
+ */
+export function processOvercrowding(
+  planet: Planet & PopulationPlanetFields,
+  ctx: PopulationContext,
+): OvercrowdingResult {
+  const { maxPopulation } = calculateMaxPopulation(planet, ctx);
+  const pop = planet.population;
+
+  if (pop <= maxPopulation) {
+    return {
+      isOvercrowded: false,
+      excessPopulation: 0,
+      starvationDeaths: 0,
+      newPopulation: pop,
+      moraleDelta: 0,
+    };
+  }
+
+  // Overcrowded: excess population starves
+  const excessPopulation = pop - maxPopulation;
+  const starvationDeaths = Math.floor(excessPopulation * OVERCROWDING_STARVATION_RATE);
+  const newPopulation = Math.max(maxPopulation, pop - starvationDeaths);
+
+  return {
+    isOvercrowded: true,
+    excessPopulation,
+    starvationDeaths,
+    newPopulation,
+    moraleDelta: starvationDeaths > 0 ? -20 : 0,
+  };
+}
+
+// ── Rabbits Overflow Transport Ability ────────────────────────────────────────
+
+/**
+ * Check if a race can auto-redirect overflow population to transports.
+ *
+ * Per design/economy/population-growth.md §Overflow Population:
+ *   "Rabbits Special: Can redirect overflow population to transports
+ *    automatically (unique ability)."
+ *
+ * When a planet reaches max population:
+ *   - Normal races: Growth ceases, cloning bonus wasted
+ *   - Rabbits: Excess growth can be queued to colony transports
+ *
+ * @param raceId Race identifier
+ * @returns True if race can auto-redirect overflow to transports
+ */
+export function canAutoTransportOverflow(raceId: string): boolean {
+  return raceId === 'rabbits';
+}
+
+export interface OverflowTransportResult {
+  /** Whether overflow was redirected to transports. */
+  redirected: boolean;
+  /** Population redirected to transports (0 if not applicable). */
+  populationRedirected: number;
+  /** Growth that was wasted (not redirected). */
+  wastedGrowth: number;
+}
+
+/**
+ * Calculate overflow population that can be redirected to transports.
+ *
+ * Per design/economy/population-growth.md:
+ *   When population reaches max:
+ *   - Natural growth ceases (growth factor = 0)
+ *   - Cloning bonus is wasted (does not overflow)
+ *   - Rabbits: Can redirect overflow to transports automatically
+ *
+ * This calculates how much growth would have occurred if not at max,
+ * and whether it can be redirected to transports (Rabbits only).
+ *
+ * @param planet Planet at max population
+ * @param ctx Population context
+ * @param potentialGrowth The growth that would have occurred if not at max
+ * @returns Overflow transport result
+ */
+export function calculateOverflowTransport(
+  _planet: Planet & PopulationPlanetFields,
+  ctx: PopulationContext,
+  potentialGrowth: number,
+): OverflowTransportResult {
+  const canRedirect = canAutoTransportOverflow(ctx.raceId);
+
+  if (!canRedirect || potentialGrowth <= 0) {
+    return {
+      redirected: false,
+      populationRedirected: 0,
+      wastedGrowth: potentialGrowth > 0 ? potentialGrowth : 0,
+    };
+  }
+
+  // Rabbits can redirect overflow to transports
+  // Only natural growth can be redirected; cloning bonus is still wasted
+  // For simplicity, we allow all potential growth to be redirected
+  return {
+    redirected: true,
+    populationRedirected: Math.floor(potentialGrowth),
+    wastedGrowth: 0,
+  };
+}
 
 // ── Re-export env tables for callers that need them ───────────────────────────
 
