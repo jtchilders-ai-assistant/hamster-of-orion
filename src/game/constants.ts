@@ -142,6 +142,11 @@ export const INITIAL_COLONY_POPULATION = 2;
 export const COLONY_SHIP_COST = 50;
 export const POPULATION_TRANSPORT_CAPACITY = 1; // 1 million pop per transport
 
+// Population transport cost and maintenance
+// Design source: population-growth.md §7 Population Transport
+export const COLONY_TRANSPORT_COST = 50; // 50 BC to build
+export const COLONY_TRANSPORT_MAINTENANCE = 1; // 1 BC/turn maintenance
+
 // Food
 export const BASE_FOOD_PER_COLONIST = 1.0;
 export const BASE_FOOD_PER_WORKER = 2.0;
@@ -291,6 +296,59 @@ export const MORALE_DIVISOR = 200;
 // Conquest population reduction
 export const CONQUEST_POPULATION_REDUCTION = 0.5; // 50% default
 export const FERRET_CONQUEST_REDUCTION = 0.4; // Ferrets: 40%
+
+// ================================================================
+// Bio Weapon Max Population Reduction (population-growth.md, planetology.md)
+// ================================================================
+// Bio weapons permanently reduce a planet's maximum population capacity.
+// This reduction persists until the planet is re-terraformed.
+
+/**
+ * Bio weapon definitions with kill rate and max population reduction.
+ * Design source: design/economy/population-growth.md §Edge Cases - Biological Weapon Damage
+ * Design source: design/technology/planetology.md §Biological Weapons
+ */
+export const BIO_WEAPONS = {
+  death_spores: {
+    techLevel: 10,
+    killRatePerRound: 1, // 1M pop killed per combat round
+    maxPopReduction: 0.10, // -10% max pop permanent
+    spaceCost: 150,
+    buildCost: 100,
+  },
+  doom_virus: {
+    techLevel: 25,
+    killRatePerRound: 2, // 2M pop killed per combat round
+    maxPopReduction: 0.25, // -25% max pop permanent
+    spaceCost: 200,
+    buildCost: 200,
+  },
+  bio_terminator: {
+    techLevel: 33,
+    killRatePerRound: 3, // 3M pop killed per combat round
+    maxPopReduction: 0.50, // -50% max pop permanent
+    spaceCost: 250,
+    buildCost: 300,
+  },
+} as const;
+
+/** Type for bio weapon IDs */
+export type BioWeaponType = keyof typeof BIO_WEAPONS;
+
+/**
+ * Get the max population reduction for a bio weapon type.
+ * @param weaponType Bio weapon identifier
+ * @returns Reduction factor (0.10 = 10% reduction)
+ */
+export function getBioWeaponMaxPopReduction(weaponType: BioWeaponType): number {
+  return BIO_WEAPONS[weaponType].maxPopReduction;
+}
+
+/**
+ * Bio weapon diplomacy penalty.
+ * Design source: design/technology/planetology.md §Constants Reference
+ */
+export const BIO_WEAPON_DIPLOMACY_PENALTY = -100;
 
 // Planet size reference — NOT to be used in formulas.
 // See design docs: "Economy formulas must use the planet's generated base_population value."
@@ -466,7 +524,7 @@ export const SYSTEM_DAMAGE_EFFECTS: Record<string, string> = {
 };
 
 // ================================================================
-// Trade (trade-formulas.md)
+// Trade (trade-formulas.md, design/diplomacy/trade.md)
 // ================================================================
 
 // Trade deal progression over 30 turns
@@ -475,6 +533,48 @@ export const TRADE_MONTHLY_BENEFIT_PER_POINT = 1.0;
 export const TRADE_VALUE_PER_POINT = 1.5;
 export const TRADE_MONTHS = 30;
 export const TRADE_RENEGOTIATION_RETENTION = 0.5;
+
+// ── Pirates & Space Monsters Trade Disruption ─────────────────────────────────
+// Design source: design/diplomacy/trade.md §Pirates & Space Monsters
+
+/**
+ * Minimum trade income reduction from pirates.
+ * Pirates reduce income by 20-50%.
+ */
+export const PIRATE_TRADE_REDUCTION_MIN = 0.20;
+
+/**
+ * Maximum trade income reduction from pirates.
+ * Pirates reduce income by 20-50%.
+ */
+export const PIRATE_TRADE_REDUCTION_MAX = 0.50;
+
+/**
+ * Base pirate trade reduction when a piracy event is active.
+ * The actual reduction scales with pirate severity/presence.
+ */
+export const PIRATE_TRADE_REDUCTION_BASE = 0.20;
+
+/**
+ * Trade income reduction when a space monster is present in a trade route system.
+ * Space monsters block trade routes entirely when in the path.
+ */
+export const SPACE_MONSTER_TRADE_REDUCTION = 1.00;
+
+// ── Trade Sanctions (Council Action) ──────────────────────────────────────────
+// Design source: design/diplomacy/trade.md §Trade Sanctions
+
+/**
+ * Trade income penalty applied to a sanctioned empire.
+ * Council sanctions reduce the target's total trade income by 50%.
+ */
+export const SANCTION_TRADE_INCOME_PENALTY = 0.50;
+
+/**
+ * Relation penalty for breaking trade sanctions.
+ * Breaking sanctions: -30 relations with all races.
+ */
+export const SANCTION_BREAK_RELATION_PENALTY = -30;
 
 // ================================================================
 // Diplomacy & Relationships (relationship-formulas.md)

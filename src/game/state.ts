@@ -131,6 +131,63 @@ export type GalaxyRegion = 'safe_zones' | 'wild_pellet_fields' | 'dark_sectors' 
 export type PlanetSize = 'tiny' | 'small' | 'medium' | 'large' | 'huge';
 export type Morale = 'ecstatic' | 'happy' | 'content' | 'unrest' | 'rebellion';
 export type MonsterType = 'amoeba' | 'crystal' | 'dragon';
+
+// ── Active Events ─────────────────────────────────────────────────────────────
+
+/**
+ * Event types that can persist across multiple turns.
+ * Design source: design/game-mechanics/random-events.md
+ */
+export type ActiveEventType =
+  | 'plague'
+  | 'comet'
+  | 'supernova'
+  | 'computer_virus'
+  | 'piracy'
+  | 'rebellion'
+  | 'scientist_recruitment'
+  | 'leader_emergence'
+  | 'fertile_planet_growth';
+
+/**
+ * An active event that persists across turns until resolved or expired.
+ * Design source: design/game-mechanics/random-events.md §Duration Fields Summary
+ */
+export interface ActiveEvent {
+  id: string;
+  type: ActiveEventType;
+  /** Turn the event started. */
+  startTurn: number;
+  /** Turn the event will end (null for events that must be resolved). */
+  endTurn: number | null;
+  /** Target planet ID (if planet-specific). */
+  targetPlanetId: PlanetId | null;
+  /** Target system ID (if system-specific). */
+  targetSystemId: SystemId | null;
+  /** Target empire ID (if targeting another empire). */
+  targetEmpireId: EmpireId | null;
+  /** Additional event-specific data. */
+  data: Record<string, unknown>;
+}
+
+/**
+ * A space monster roaming the galaxy.
+ * Design source: design/game-mechanics/random-events.md §Space Monsters
+ */
+export interface SpaceMonster {
+  id: string;
+  type: 'cosmic_blob' | 'crystal_horror' | 'void_wyrm';
+  /** Current system location. */
+  systemId: SystemId;
+  /** Current HP (starts at max). */
+  hp: number;
+  /** Maximum HP. */
+  maxHp: number;
+  /** Whether the monster roams toward colonies. */
+  isRoaming: boolean;
+  /** Turn the monster spawned. */
+  spawnTurn: number;
+}
 export type BuildingCategory = 'production' | 'research' | 'defense' | 'growth' | 'morale' | 'special';
 
 export type ShipClass = 'small' | 'medium' | 'large' | 'huge';
@@ -668,6 +725,24 @@ export interface CouncilVote {
   votes: Record<EmpireId, EmpireId>;
 }
 
+/**
+ * A trade sanction imposed by the Council on an empire.
+ * Design source: design/diplomacy/trade.md §Trade Sanctions
+ *
+ * Effects:
+ *   - All trade with the sanctioned empire is banned
+ *   - The sanctioned empire receives -50% total trade income
+ *   - Breaking sanctions: -30 relations with all races
+ */
+export interface TradeSanction {
+  /** The empire being sanctioned. */
+  targetEmpireId: EmpireId;
+  /** Turn when the sanction was imposed. */
+  imposedTurn: number;
+  /** Empires that voted for the sanction. */
+  supportingEmpires: EmpireId[];
+}
+
 export interface HighCouncil {
   isActive: boolean;
   formationTurn: number;
@@ -675,6 +750,8 @@ export interface HighCouncil {
   voteFrequency: number;
   voteHistory: CouncilVote[];
   voteShares: Record<EmpireId, number>;
+  /** Active trade sanctions imposed by the Council. */
+  sanctions: TradeSanction[];
 }
 
 // ── Empire ────────────────────────────────────────────────────────────────────
@@ -880,6 +957,12 @@ export interface GameSettings {
   highContrast: boolean;
   screenReaderEnabled: boolean;
   customHotkeys: Record<string, string>;
+  /**
+   * Quick combat: auto-resolve all battles without showing tactical screen.
+   * Design source: design/game-mechanics/turn-structure.md
+   *   "Quick Combat: Auto-resolve all battles"
+   */
+  quickCombat: boolean;
 }
 
 export interface UIState {
@@ -1011,6 +1094,12 @@ export interface GameState {
   highCouncil: HighCouncil | null;
 
   spyMissions: SpyMission[];
+
+  /** Active multi-turn events (plague, comet countdown, etc.). */
+  activeEvents: ActiveEvent[];
+
+  /** Active space monsters roaming the galaxy. */
+  monsters: SpaceMonster[];
 
   /** Events that occurred during the current turn, shown on the turn summary screen. */
   turnEvents: TurnEvent[];

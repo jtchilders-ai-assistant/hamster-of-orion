@@ -9,14 +9,24 @@
  */
 
 import {
+  ActiveEvent,
   DiplomaticRelations,
   Empire,
   EmpireId,
   GameState,
+  SpaceMonster,
+  TradeSanction,
   Treaty,
   TreatyTerms,
   TreatyType,
 } from '../state';
+import {
+  PIRATE_TRADE_REDUCTION_BASE,
+  PIRATE_TRADE_REDUCTION_MAX,
+  SANCTION_BREAK_RELATION_PENALTY,
+  SANCTION_TRADE_INCOME_PENALTY,
+  SPACE_MONSTER_TRADE_REDUCTION,
+} from '../constants';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -780,4 +790,323 @@ export function isDefensivePactEarlyBreak(
 
   const turnsActive = state.turn - pact.signedTurn;
   return turnsActive < DEFENSIVE_PACT_FIXED_DURATION;
+}
+
+// ── Trade Disruption: Pirates & Space Monsters ───────────────────────────────
+// Design source: design/diplomacy/trade.md §Pirates & Space Monsters
+
+/**
+ * Check if an empire has an active piracy event affecting trade.
+ * Design source: design/diplomacy/trade.md §Pirates (early game)
+ *
+ * Piracy events can reduce trade income by 20-50% depending on severity.
+ */
+export function hasActivePiracyEvent(
+  state: GameState,
+  empireId: EmpireId,
+): boolean {
+  if (!state.activeEvents) return false;
+  return state.activeEvents.some(
+    (event: ActiveEvent) =>
+      event.type === 'piracy' &&
+      event.targetEmpireId === empireId,
+  );
+}
+
+/**
+ * Calculate trade income reduction from active piracy.
+ * Design source: design/diplomacy/trade.md §Pirates
+ *
+ * Returns a multiplier (0.50-0.80) to apply to trade income.
+ * - No piracy: returns 1.0 (no reduction)
+ * - Active piracy: returns 0.50-0.80 (20-50% reduction)
+ *
+ * The reduction severity scales with the piracy event's severity data if present.
+ */
+export function calculatePiracyTradeMultiplier(
+  state: GameState,
+  empireId: EmpireId,
+): number {
+  if (!state.activeEvents) return 1.0;
+
+  const piracyEvent = state.activeEvents.find(
+    (event: ActiveEvent) =>
+      event.type === 'piracy' &&
+      event.targetEmpireId === empireId,
+  );
+
+  if (!piracyEvent) return 1.0;
+
+  // Extract severity from event data (0.0-1.0), default to base severity
+  const severity = (piracyEvent.data?.severity as number) ?? 0.0;
+
+  // Reduction ranges from PIRATE_TRADE_REDUCTION_BASE (20%) to PIRATE_TRADE_REDUCTION_MAX (50%)
+  const reductionRange = PIRATE_TRADE_REDUCTION_MAX - PIRATE_TRADE_REDUCTION_BASE;
+  const actualReduction = PIRATE_TRADE_REDUCTION_BASE + (severity * reductionRange);
+
+  return 1.0 - actualReduction;
+}
+
+/**
+ * Check if any space monsters are blocking trade routes for an empire.
+ * Design source: design/diplomacy/trade.md §Space Monsters
+ *
+ * Space monsters block trade routes when present in systems along the path.
+ * For simplicity, we check if any monster is in a system owned by the empire.
+ */
+export function hasSpaceMonsterDisruption(
+  state: GameState,
+  empireId: EmpireId,
+): boolean {
+  if (!state.monsters || state.monsters.length === 0) return false;
+
+  const empire = state.empires.byId[empireId];
+  if (!empire) return false;
+
+  // Check if any monster is in a system where this empire has colonies
+  const empireSystems = new Set<string>();
+  for (const planetId of empire.planets) {
+    const planet = state.planets.byId[planetId];
+    if (planet?.systemId) {
+      empireSystems.add(planet.systemId);
+    }
+  }
+
+  return state.monsters.some((monster: SpaceMonster) =>
+    empireSystems.has(monster.systemId),
+  );
+}
+
+/**
+ * Calculate trade income reduction from space monsters.
+ * Design source: design/diplomacy/trade.md §Space Monsters
+ *
+ * Returns a multiplier to apply to trade income.
+ * - No monster disruption: returns 1.0
+ * - Monster in trade route: returns 0.0 (100% reduction for that route)
+ *
+ * Note: In practice, this applies per-agreement when monsters block specific routes.
+ * This simplified version checks if ANY monster disrupts empire trade.
+ */
+export function calculateMonsterTradeMultiplier(
+  state: GameState,
+  empireId: EmpireId,
+): number {
+  if (hasSpaceMonsterDisruption(state, empireId)) {
+    return 1.0 - SPACE_MONSTER_TRADE_REDUCTION;
+  }
+  return 1.0;
+}
+
+/**
+ * Calculate the combined trade disruption multiplier for an empire.
+ * Combines effects from piracy and space monsters.
+ *
+ * Design source: design/diplomacy/trade.md §Pirates & Space Monsters
+ *
+ * @returns A multiplier between 0.0 and 1.0 to apply to trade income
+ */
+export function calculateTradeDisruptionMultiplier(
+  state: GameState,
+  empireId: EmpireId,
+): number {
+  const piracyMult = calculatePiracyTradeMultiplier(state, empireId);
+  const monsterMult = calculateMonsterTradeMultiplier(state, empireId);
+
+  // Combine multiplicatively (worst-case scenario)
+  return piracyMult * monsterMult;
+}
+
+// ── Trade Sanctions (Council Action) ────────────────────────────────────────
+// Design source: design/diplomacy/trade.md §Trade Sanctions
+
+/**
+ * Check if an empire is currently under trade sanctions.
+ * Design source: design/diplomacy/trade.md §Trade Sanctions
+ *
+ * Sanctions are imposed by Council vote and ban all trade with the target.
+ */
+export function isUnderSanctions(
+  state: GameState,
+  empireId: EmpireId,
+): boolean {
+  if (!state.highCouncil?.sanctions) return false;
+  return state.highCouncil.sanctions.some(
+    (sanction: TradeSanction) => sanction.targetEmpireId === empireId,
+  );
+}
+
+/**
+ * Get the sanction record for an empire, if any.
+ */
+export function getSanction(
+  state: GameState,
+  empireId: EmpireId,
+): TradeSanction | undefined {
+  if (!state.highCouncil?.sanctions) return undefined;
+  return state.highCouncil.sanctions.find(
+    (sanction: TradeSanction) => sanction.targetEmpireId === empireId,
+  );
+}
+
+/**
+ * Calculate trade income penalty from sanctions.
+ * Design source: design/diplomacy/trade.md §Trade Sanctions
+ *
+ * Returns a multiplier to apply to the sanctioned empire's trade income.
+ * - Not sanctioned: returns 1.0
+ * - Sanctioned: returns 0.50 (-50% trade income)
+ */
+export function calculateSanctionTradeMultiplier(
+  state: GameState,
+  empireId: EmpireId,
+): number {
+  if (isUnderSanctions(state, empireId)) {
+    return 1.0 - SANCTION_TRADE_INCOME_PENALTY;
+  }
+  return 1.0;
+}
+
+/**
+ * Check if trading with a sanctioned empire would violate sanctions.
+ * Design source: design/diplomacy/trade.md §Trade Sanctions
+ *
+ * When an empire is sanctioned, all trade with that empire is banned.
+ * Trading with a sanctioned empire results in -30 relations with all races.
+ */
+export function wouldViolateSanctions(
+  state: GameState,
+  empireAId: EmpireId,
+  empireBId: EmpireId,
+): boolean {
+  return isUnderSanctions(state, empireAId) || isUnderSanctions(state, empireBId);
+}
+
+/**
+ * Impose trade sanctions on an empire.
+ * Design source: design/diplomacy/trade.md §Trade Sanctions
+ *
+ * This is called when the Council votes to sanction a race.
+ * Effects:
+ *   - All trade agreements with the target are suspended
+ *   - Target receives -50% trade income
+ *   - Breaking sanctions incurs -30 relations with all races
+ */
+export function imposeSanctions(
+  state: GameState,
+  targetEmpireId: EmpireId,
+  supportingEmpires: EmpireId[],
+): GameState {
+  // Don't double-sanction
+  if (isUnderSanctions(state, targetEmpireId)) return state;
+
+  const sanction: TradeSanction = {
+    targetEmpireId,
+    imposedTurn: state.turn,
+    supportingEmpires,
+  };
+
+  const existingSanctions = state.highCouncil?.sanctions ?? [];
+
+  // Create or update highCouncil with new sanction
+  const highCouncil = state.highCouncil ?? {
+    isActive: true,
+    formationTurn: state.turn,
+    nextVoteTurn: state.turn + 25,
+    voteFrequency: 25,
+    voteHistory: [],
+    voteShares: {},
+    sanctions: [],
+  };
+
+  return {
+    ...state,
+    highCouncil: {
+      ...highCouncil,
+      sanctions: [...existingSanctions, sanction],
+    },
+  };
+}
+
+/**
+ * Lift trade sanctions on an empire.
+ * This is called when the Council votes to remove sanctions.
+ */
+export function liftSanctions(
+  state: GameState,
+  targetEmpireId: EmpireId,
+): GameState {
+  if (!state.highCouncil?.sanctions) return state;
+
+  const updatedSanctions = state.highCouncil.sanctions.filter(
+    (sanction: TradeSanction) => sanction.targetEmpireId !== targetEmpireId,
+  );
+
+  return {
+    ...state,
+    highCouncil: {
+      ...state.highCouncil,
+      sanctions: updatedSanctions,
+    },
+  };
+}
+
+/**
+ * Apply penalty for violating trade sanctions.
+ * Design source: design/diplomacy/trade.md §Trade Sanctions
+ *
+ * Breaking sanctions results in -30 relations with all races.
+ */
+export function applySanctionViolationPenalty(
+  state: GameState,
+  violatorId: EmpireId,
+): GameState {
+  let next = state;
+
+  for (const empireId of next.empires.allIds) {
+    if (empireId === violatorId) continue;
+
+    // Apply -30 relation penalty to all other empires
+    next = nudgeRelation(next, violatorId, empireId, SANCTION_BREAK_RELATION_PENALTY);
+    next = nudgeRelation(next, empireId, violatorId, SANCTION_BREAK_RELATION_PENALTY);
+  }
+
+  return next;
+}
+
+/**
+ * Compute trade income with all disruption factors applied.
+ * Design source: design/diplomacy/trade.md
+ *
+ * This is the full trade income calculation including:
+ *   - Base ramp-up over 30 turns
+ *   - Racial bonuses (Hamsters +25%)
+ *   - Piracy disruption (20-50% reduction)
+ *   - Space monster disruption (route blocked)
+ *   - Council sanctions (-50% for sanctioned empire)
+ *
+ * @param baseIncome - The base trade income from computeBaseTradeIncome()
+ * @param turnsActive - Turns since the trade agreement was signed
+ * @param receivingEmpire - The empire receiving the income
+ * @param state - Current game state for disruption checks
+ */
+export function computeTradeIncomeWithDisruption(
+  baseIncome: number,
+  turnsActive: number,
+  receivingEmpire: Empire,
+  state: GameState,
+): number {
+  // Start with base trade income (includes ramp-up and racial bonus)
+  let income = computeTradeIncome(baseIncome, turnsActive, receivingEmpire);
+
+  // Apply piracy disruption
+  income *= calculatePiracyTradeMultiplier(state, receivingEmpire.id);
+
+  // Apply space monster disruption
+  income *= calculateMonsterTradeMultiplier(state, receivingEmpire.id);
+
+  // Apply sanctions penalty if this empire is sanctioned
+  income *= calculateSanctionTradeMultiplier(state, receivingEmpire.id);
+
+  return income;
 }

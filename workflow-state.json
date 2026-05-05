@@ -1,57 +1,60 @@
 {
   "state": "COMPLETED",
   "phase": "phase5-design-compliance-fixes",
-  "current_task": "fix-77",
+  "current_task": "fix-52",
   "last_check": "2026-05-05T02:32:00.000Z",
   "total_tasks": 85,
-  "completed_count": 4,
+  "completed_count": 5,
   "skipped_count": 0,
   "blocked_count": 0,
-  "notes": "fix-77 completed: Verified Ship_Power formula implementation and updated diplomacyAI.ts to use fleet power",
+  "notes": "fix-52 completed: Implemented trade disruption from pirates/space monsters (20-50% income reduction) and Council trade sanctions (-50% income, all trade banned)",
   "worker_output": {
     "files_created": [
-      "test/game/ai/strategies-power.test.ts"
+      "test/game/systems/tradeDisruption.test.ts"
     ],
     "files_modified": [
-      "src/game/ai/diplomacyAI.ts"
+      "src/game/state.ts",
+      "src/game/constants.ts",
+      "src/game/systems/treaties.ts"
     ],
     "tests_added": [
-      "test/game/ai/strategies-power.test.ts (13 tests for calculateShipPower, calculateFleetPower, getEmpireFleetPower)"
+      "test/game/systems/tradeDisruption.test.ts (38 tests for piracy disruption, monster disruption, sanctions, combined disruption)"
     ],
-    "summary": "fix-77: The Ship_Power formula from design/technical/ai-implementation.md §1.3 was already implemented in strategies.ts. Updated diplomacyAI.ts to use getEmpireFleetPower() instead of getEmpireFleetSize() for proper military strength comparison. Added 13 comprehensive tests verifying the formula: HP component (Hull_HP × Armor_Multiplier × 0.5), weapon damage (Total × 2.0), shields (Shield_Class × 5), and speed (Speed × 3). Tests verify damage string parsing, armor multiplier lookup, HP-ratio adjustment for damaged ships, and the worked example from the design doc.",
+    "summary": "fix-52: Implemented trade disruption mechanics from design/diplomacy/trade.md. Added TradeSanction interface to state.ts with HighCouncil.sanctions array. Added constants for pirate trade reduction (20-50%), space monster disruption (100%), and sanction penalties (-50% income, -30 relations for violation). Implemented functions: hasActivePiracyEvent, calculatePiracyTradeMultiplier, hasSpaceMonsterDisruption, calculateMonsterTradeMultiplier, calculateTradeDisruptionMultiplier, isUnderSanctions, getSanction, calculateSanctionTradeMultiplier, wouldViolateSanctions, imposeSanctions, liftSanctions, applySanctionViolationPenalty, computeTradeIncomeWithDisruption. All 38 tests pass.",
     "design_compliance": [
       {
-        "doc": "design/technical/ai-implementation.md",
-        "section": "1.3 Military Threat Component - Ship_Power formula",
-        "quote": "Ship_Power = floor((Hull_HP × Armor_Multiplier × 0.5) + (Total_Weapon_Damage × 2.0) + (Shield_Class × 5) + (Speed × 3))",
-        "impl_file": "src/game/ai/strategies.ts",
-        "impl_line": 104,
+        "doc": "design/diplomacy/trade.md",
+        "section": "Pirates & Space Monsters - Pirates",
+        "quote": "Reduce income 20-50%",
+        "impl_file": "src/game/systems/treaties.ts",
+        "impl_line": 824,
         "verified": true
       },
       {
-        "doc": "design/technical/ai-implementation.md",
-        "section": "1.3 Military Threat Component - Fleet_Power",
-        "quote": "Fleet_Power = Σ (Ship_Power × Ship_Count) for all ship designs",
-        "impl_file": "src/game/ai/strategies.ts",
-        "impl_line": 155,
+        "doc": "design/diplomacy/trade.md",
+        "section": "Pirates & Space Monsters - Space Monsters",
+        "quote": "Block trade routes, Must defeat to restore trade",
+        "impl_file": "src/game/systems/treaties.ts",
+        "impl_line": 869,
         "verified": true
       },
       {
-        "doc": "design/technical/ai-implementation.md",
-        "section": "1.3 Military Threat Component - Military_Threat",
-        "quote": "Military_Threat = floor(min(100, (Enemy_Fleet_Power / Our_Fleet_Power) × 50))",
-        "impl_file": "src/game/ai/diplomacyAI.ts",
-        "impl_line": 88,
+        "doc": "design/diplomacy/trade.md",
+        "section": "Trade Sanctions - Council Action",
+        "quote": "All trade with target banned, -50% their income",
+        "impl_file": "src/game/systems/treaties.ts",
+        "impl_line": 945,
+        "verified": true
+      },
+      {
+        "doc": "design/diplomacy/trade.md",
+        "section": "Trade Sanctions - Breaking Sanctions",
+        "quote": "Breaking Sanctions: -30 relations all races",
+        "impl_file": "src/game/systems/treaties.ts",
+        "impl_line": 1024,
         "verified": true
       }
     ],
-    "design_gaps": [
-      {
-        "doc": "design/technical/ai-implementation.md",
-        "section": "1.3 Armor Multipliers",
-        "issue": "Design doc lists Duralloy (1.5), Andrium (2.5), Tritanium (3.0), Adamantium (3.5), Neutronium (4.0) but constants.ts has different armor types (monomolecular, composite, ferrocarbide). The Zortrium value also differs (2.0 in doc vs 1.8 in constants). This may be intentional game balance or needs review.",
-        "severity": "low"
-      }
-    ]
+    "design_gaps": []
   }
 }
