@@ -553,14 +553,19 @@ Maximum space available for components (MOO1 hull sizes):
 
 ---
 
-## Racial Component Modifiers
+## Racial Ship Combat Modifiers
 
-| Race | Modifier | Effect |
-|------|----------|--------|
-| Budgies | +3 Defense | Ships are harder to hit |
-| Hermit Crabs | +25% Armor HP | More durable ships |
-| Mice | -15% Component Space | More room for equipment |
-| Ants | -10% Component Cost | Cheaper to build |
+These modifiers are applied to ships belonging to each race. See `../species/race-stats-complete.md` for complete racial abilities.
+
+| Race | Modifier | Source Ability | Notes |
+|------|----------|----------------|-------|
+| Budgies | +3 Defense Level, +3 Initiative, +20% Evasion | Superior Pilots | Ships harder to hit, act earlier in combat |
+| Ferrets | +4 Attack Levels | Deadly Accuracy | Hit chance bonus only (no damage bonus) |
+| Ants | -10% Ship/Troop Cost | Expendable Units | Applies to production cost |
+| Mice | +50% Factory Efficiency, +2 RC Levels | Automated Production, Cybernetic Workers | Indirect benefit: more production for ships |
+| Rabbits | -15% Ship Cost | Swarm Tactics | Can field larger fleets cheaply |
+
+**Note:** Hermit Crabs' "Armored Shell" ability (+50% defense) applies to **ground combat** only, not ship armor. Racial research bonuses (e.g., Budgies +40% Propulsion, Mice +40% Computers) affect component unlock timing but not component stats directly.
 
 ---
 
