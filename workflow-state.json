@@ -1,48 +1,57 @@
 {
-  "state": "COMPLETED",
+  "state": "TESTING",
   "phase": "phase5-design-compliance-fixes",
-  "current_task": "fix-78",
-  "last_check": "2026-05-05T03:21:00.000Z",
+  "current_task": "fix-82",
+  "last_check": "2026-05-05T03:33:00.000Z",
   "total_tasks": 85,
-  "completed_count": 13,
+  "completed_count": 14,
   "skipped_count": 0,
   "blocked_count": 0,
-  "notes": "fix-78 completed: Implemented racial research preferences from design/technical/ai-implementation.md §3.5 in researchAI.ts",
+  "notes": "fix-82 completed: Implemented Star Gate travel mechanics per design/galaxy/travel.md and design/planets/buildings.md in fleet.ts",
   "worker_output": {
     "files_created": [],
     "files_modified": [
-      "src/game/ai/researchAI.ts",
-      "test/game/ai/researchAI.test.ts"
+      "src/game/systems/fleet.ts",
+      "test/game/systems/fleet.test.ts"
     ],
     "tests_added": [
-      "chameleons race prioritizes computers (design doc §3.5)",
-      "rabbits race prioritizes planetology (design doc §3.5)",
-      "hermit_crabs prioritizes force_fields (design doc §3.5)"
+      "systemHasStarGate returns false if system has no planets",
+      "systemHasStarGate returns false if planet has no star gate",
+      "systemHasStarGate returns true if planet has star gate owned by empire",
+      "systemHasStarGate returns false if star gate planet owned by different empire",
+      "systemHasStarGate returns false for uncolonized planet with star gate",
+      "canUseStarGateTravel returns true when both systems have star gates",
+      "canUseStarGateTravel returns false when origin has no star gate",
+      "canUseStarGateTravel returns false when destination has no star gate",
+      "canUseStarGateTravel returns false when neither system has star gate",
+      "canUseStarGateTravel returns false when destination gate owned by different empire",
+      "calculateEta returns ETA=1 for star gate travel regardless of distance",
+      "moveFleet sets ETA=1 when using star gate travel"
     ],
-    "summary": "Replaced personality-based field weights with racial research preferences per design/technical/ai-implementation.md §3.5. Added RACIAL_RESEARCH_PREFERENCES constant with exact multipliers for all 10 races (hamsters, guinea_pigs, chameleons, budgies, ants, mice, ferrets, rats, rabbits, hermit_crabs). Updated selectResearchPriorities() and evaluateTechValue() to use racial preference formula: floor(20 × (Racial_Weight - 1.0) × 10). Updated tests to verify race-specific behavior.",
+    "summary": "Implemented Star Gate instant travel mechanics in fleet.ts. Added systemHasStarGate() to check if a system has a planet with a star gate building owned by a given empire. Added canUseStarGateTravel() to verify both origin and destination have gates. Modified calculateEta() to return ETA=1 for star gate travel (instant). Added 12 unit tests verifying star gate behavior per design docs.",
     "design_compliance": [
       {
-        "doc": "design/technical/ai-implementation.md",
-        "section": "§3.5 Racial Research Preferences",
-        "quote": "guinea_pigs: { weapons: 1.4, propulsion: 0.8, construction: 1.2, computers: 0.7, force_fields: 1.1, planetology: 0.8 }",
-        "impl_file": "src/game/ai/researchAI.ts",
-        "impl_line": 90,
+        "doc": "design/galaxy/travel.md",
+        "section": "§Star Gates",
+        "quote": "Ships travel instantly between any two planets with Star Gates",
+        "impl_file": "src/game/systems/fleet.ts",
+        "impl_line": 175,
         "verified": true
       },
       {
-        "doc": "design/technical/ai-implementation.md",
-        "section": "§3.5 Racial Research Preferences",
-        "quote": "chameleons: { weapons: 0.9, propulsion: 1.0, construction: 0.9, computers: 1.5, force_fields: 0.9, planetology: 0.8 }",
-        "impl_file": "src/game/ai/researchAI.ts",
-        "impl_line": 96,
+        "doc": "design/galaxy/travel.md",
+        "section": "§Star Gates",
+        "quote": "Ignores fuel range for gate-to-gate travel",
+        "impl_file": "src/game/systems/fleet.ts",
+        "impl_line": 126,
         "verified": true
       },
       {
-        "doc": "design/technical/ai-implementation.md",
-        "section": "§3.5 Racial Research Preferences",
-        "quote": "Racial_Preference = floor(20 × (Racial_Weight - 1.0) × 10)",
-        "impl_file": "src/game/ai/researchAI.ts",
-        "impl_line": 176,
+        "doc": "design/planets/buildings.md",
+        "section": "§Star Gates",
+        "quote": "Ships can travel instantly between any two planets with Star Gates",
+        "impl_file": "src/game/systems/fleet.ts",
+        "impl_line": 175,
         "verified": true
       }
     ],

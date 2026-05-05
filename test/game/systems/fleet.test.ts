@@ -18,8 +18,10 @@ import {
   calculateEta,
   distanceBetweenSystems,
   getFleetWarpSpeed,
+  systemHasStarGate,
+  canUseStarGateTravel,
 } from '../../../src/game/systems/fleet';
-import { GameState, Fleet, Ship, ShipDesign, StarSystem, Empire } from '../../../src/game/state';
+import { GameState, Fleet, Ship, ShipDesign, StarSystem, Empire, Planet, BuildingId, PlanetId } from '../../../src/game/state';
 import { initialState } from '../../../src/game/initialState';
 
 // ── Test fixture helpers ───────────────────────────────────────────────────────
@@ -588,5 +590,243 @@ describe('splitFleet', () => {
     expect(result.success).toBe(true);
     const empire = result.state.empires.byId['player'];
     expect(empire.fleets).toContain(result.newFleetId);
+  });
+});
+
+// ── Star Gate travel tests (design/galaxy/travel.md §Star Gates) ───────────────
+
+function makePlanet(
+  id: string,
+  systemId: string,
+  ownerId: string | null,
+  buildings: BuildingId[] = [],
+): Planet {
+  return {
+    id: id as PlanetId,
+    name: `Planet ${id}`,
+    systemId,
+    orbit: 1,
+    type: 'terran',
+    size: 'medium',
+    gravity: 1.0,
+    ownerId,
+    isColonized: ownerId !== null,
+    isHomeworld: false,
+    population: ownerId ? 50 : 0,
+    maxPopulation: 100,
+    growthRate: 0.1,
+    morale: 'content',
+    factories: 0,
+    maxFactories: 100,
+    waste: 0,
+    production: { ship: 0, defense: 0, industry: 100, ecology: 0, research: 0 },
+    buildQueue: [],
+    buildings,
+    missileBases: 0,
+    maxMissileBases: 10,
+    planetaryShield: 0,
+    groundAttack: 0,
+    groundDefense: 0,
+    isRich: false,
+    isPoor: false,
+    isGaia: false,
+    hasArtifacts: false,
+    artifactsClaimed: false,
+    isHomeBase: false,
+    spacePort: false,
+    pollution: 0,
+    terraformLevel: 0,
+    currentDesignId: null,
+    shipyardProgress: 0,
+    defenseProgress: 0,
+    industryProgress: 0,
+    ecologyProgress: 0,
+  };
+}
+
+/**
+ * Build a GameState with star gates for testing instant travel.
+ *
+ * Creates two systems far apart (distance = 50 parsecs):
+ *   - s1 at (0,0) with planet p1
+ *   - s2 at (30,40) with planet p2 (distance = 50)
+ *
+ * Star gates can be added to either planet via options.
+ */
+function buildStarGateState({
+  s1HasGate = false,
+  s2HasGate = false,
+  s1OwnerId = 'player',
+  s2OwnerId = 'player',
+}: {
+  s1HasGate?: boolean;
+  s2HasGate?: boolean;
+  s1OwnerId?: string | null;
+  s2OwnerId?: string | null;
+} = {}): GameState {
+  const designId = 'design1';
+  const design = makeDesignWithEngine(designId, 'retro_engines'); // warpSpeed=1
+
+  const ship1 = makeShip('ship1', 'f1', designId);
+  const fleet1 = makeFleet('f1', 's1', ['ship1']);
+
+  const sys1 = makeSystem('s1', 0, 0);
+  const sys2 = makeSystem('s2', 30, 40); // distance = 50
+  sys1.fleetIds = ['f1'];
+  sys1.planetIds = ['p1'];
+  sys2.planetIds = ['p2'];
+
+  const p1Buildings: BuildingId[] = s1HasGate ? ['star_gate' as BuildingId] : [];
+  const p2Buildings: BuildingId[] = s2HasGate ? ['star_gate' as BuildingId] : [];
+
+  const planet1 = makePlanet('p1', 's1', s1OwnerId, p1Buildings);
+  const planet2 = makePlanet('p2', 's2', s2OwnerId, p2Buildings);
+
+  return {
+    ...initialState,
+    galaxy: {
+      ...initialState.galaxy,
+      systems: {
+        byId: { s1: sys1, s2: sys2 },
+        allIds: ['s1', 's2'],
+      },
+    },
+    planets: {
+      byId: {
+        p1: planet1,
+        p2: planet2,
+      },
+      allIds: ['p1', 'p2'],
+    },
+    ships: {
+      byId: { ship1 },
+      allIds: ['ship1'],
+    },
+    shipDesigns: {
+      byId: { [designId]: design },
+      allIds: [designId],
+    },
+    fleets: {
+      byId: { f1: fleet1 },
+      allIds: ['f1'],
+    },
+    empires: {
+      byId: {
+        player: makeEmpire('player', ['f1']),
+      },
+      allIds: ['player'],
+      playerId: 'player',
+    },
+  };
+}
+
+describe('systemHasStarGate (design/galaxy/travel.md §Star Gates)', () => {
+  it('returns false if system has no planets', () => {
+    const state = buildState(); // default: no planets in system
+    expect(systemHasStarGate('s1', 'player', state)).toBe(false);
+  });
+
+  it('returns false if planet has no star gate', () => {
+    const state = buildStarGateState({ s1HasGate: false });
+    expect(systemHasStarGate('s1', 'player', state)).toBe(false);
+  });
+
+  it('returns true if planet has star gate owned by empire', () => {
+    const state = buildStarGateState({ s1HasGate: true, s1OwnerId: 'player' });
+    expect(systemHasStarGate('s1', 'player', state)).toBe(true);
+  });
+
+  it('returns false if star gate planet owned by different empire', () => {
+    const state = buildStarGateState({ s1HasGate: true, s1OwnerId: 'other_empire' });
+    expect(systemHasStarGate('s1', 'player', state)).toBe(false);
+  });
+
+  it('returns false for uncolonized planet with star gate', () => {
+    const state = buildStarGateState({ s1HasGate: true, s1OwnerId: null });
+    expect(systemHasStarGate('s1', 'player', state)).toBe(false);
+  });
+});
+
+describe('canUseStarGateTravel (design/galaxy/travel.md §Star Gates)', () => {
+  it('returns true when both systems have star gates', () => {
+    const state = buildStarGateState({ s1HasGate: true, s2HasGate: true });
+    const fleet = state.fleets.byId['f1'];
+    expect(canUseStarGateTravel(fleet, 's2', state)).toBe(true);
+  });
+
+  it('returns false when origin has no star gate', () => {
+    const state = buildStarGateState({ s1HasGate: false, s2HasGate: true });
+    const fleet = state.fleets.byId['f1'];
+    expect(canUseStarGateTravel(fleet, 's2', state)).toBe(false);
+  });
+
+  it('returns false when destination has no star gate', () => {
+    const state = buildStarGateState({ s1HasGate: true, s2HasGate: false });
+    const fleet = state.fleets.byId['f1'];
+    expect(canUseStarGateTravel(fleet, 's2', state)).toBe(false);
+  });
+
+  it('returns false when neither system has star gate', () => {
+    const state = buildStarGateState({ s1HasGate: false, s2HasGate: false });
+    const fleet = state.fleets.byId['f1'];
+    expect(canUseStarGateTravel(fleet, 's2', state)).toBe(false);
+  });
+
+  it('returns false when destination gate owned by different empire', () => {
+    const state = buildStarGateState({
+      s1HasGate: true,
+      s2HasGate: true,
+      s1OwnerId: 'player',
+      s2OwnerId: 'other_empire',
+    });
+    const fleet = state.fleets.byId['f1'];
+    expect(canUseStarGateTravel(fleet, 's2', state)).toBe(false);
+  });
+});
+
+describe('calculateEta with star gates (design/galaxy/travel.md §Star Gates)', () => {
+  it('returns ETA=1 for star gate travel regardless of distance', () => {
+    // Distance = 50 parsecs, warp speed 1 = would normally be 50 turns
+    const state = buildStarGateState({ s1HasGate: true, s2HasGate: true });
+    const fleet = state.fleets.byId['f1'];
+    expect(calculateEta(fleet, 's2', state)).toBe(1);
+  });
+
+  it('returns normal ETA when star gates not available', () => {
+    // Distance = 50 parsecs, warp speed 1 = 50 turns
+    const state = buildStarGateState({ s1HasGate: false, s2HasGate: false });
+    const fleet = state.fleets.byId['f1'];
+    expect(calculateEta(fleet, 's2', state)).toBe(50);
+  });
+
+  it('returns normal ETA when only origin has star gate', () => {
+    const state = buildStarGateState({ s1HasGate: true, s2HasGate: false });
+    const fleet = state.fleets.byId['f1'];
+    expect(calculateEta(fleet, 's2', state)).toBe(50);
+  });
+
+  it('returns normal ETA when only destination has star gate', () => {
+    const state = buildStarGateState({ s1HasGate: false, s2HasGate: true });
+    const fleet = state.fleets.byId['f1'];
+    expect(calculateEta(fleet, 's2', state)).toBe(50);
+  });
+});
+
+describe('moveFleet with star gates (design/galaxy/travel.md §Star Gates)', () => {
+  it('sets ETA=1 when using star gate travel', () => {
+    const state = buildStarGateState({ s1HasGate: true, s2HasGate: true });
+    const result = moveFleet(state, 'f1', 's2');
+    expect(result.success).toBe(true);
+    const movedFleet = result.state.fleets.byId['f1'];
+    expect(movedFleet.destination).toBe('s2');
+    expect(movedFleet.eta).toBe(1);
+  });
+
+  it('sets normal ETA without star gates', () => {
+    const state = buildStarGateState({ s1HasGate: false, s2HasGate: false });
+    const result = moveFleet(state, 'f1', 's2');
+    expect(result.success).toBe(true);
+    const movedFleet = result.state.fleets.byId['f1'];
+    expect(movedFleet.eta).toBe(50);
   });
 });
