@@ -811,15 +811,19 @@ function cleanupExpiredModifiers(state: GameState): GameState {
 
 // ── Event title helper ────────────────────────────────────────────────────────
 
+/**
+ * Generate event title for turn summary.
+ * Labels per design/ui-ux/spy-network-ui.md §3 Mission Types.
+ */
 function getEventTitle(missionType: MissionType, success: boolean, detected: boolean): string {
   const missionNames: Record<MissionType, string> = {
     reconnaissance: 'Reconnaissance',
     steal_technology: 'Technology Theft',
     sabotage_factories: 'Factory Sabotage',
-    sabotage_bases: 'Base Sabotage',
+    sabotage_bases: 'Missile Base Sabotage',  // per design doc
     incite_rebellion: 'Incite Rebellion',
-    frame_race: 'Frame Race',
-    assassination: 'Assassination',
+    frame_race: 'Frame Empire',  // per design doc: diplomatic warfare
+    assassination: 'Leader Assassination',  // per design doc: "Assassinate Leader"
   };
 
   const name = missionNames[missionType];

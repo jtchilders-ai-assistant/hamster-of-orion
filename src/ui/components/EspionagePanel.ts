@@ -2,16 +2,25 @@
  * Espionage panel — spy allocation and mission controls.
  * src/ui/components/EspionagePanel.ts
  *
+ * Design doc: design/ui-ux/spy-network-ui.md
+ *
  * Integrates with DiplomacyScreen. Shown when viewing an empire's diplomatic
  * details and the player has chosen the espionage tab.
  *
- * Renders:
- *  1. Spy count per target empire (active missions)
- *  2. Slider to allocate spies (0-100% of total available)
- *  3. Mission type selector
- *  4. Success probability based on spy count vs target security
- *  5. Results display when mission completes
- *  6. Counter-espionage events (caught spies)
+ * Renders per design doc §2 Spy Assignment Screen:
+ *  1. Empire-wide espionage budget display (SPYING/SECURITY from PLANETS screen)
+ *  2. Active spy count (funded by SPYING budget)
+ *  3. Target Empire selector
+ *  4. Mission type selector with radio buttons:
+ *     - Steal Technology (~35% success)
+ *     - Sabotage Factories (~28% success)
+ *     - Sabotage Missile Bases (~28% success)
+ *     - Frame Empire (~20% success, diplomatic warfare)
+ *  5. Success rate display with spy power vs security comparison
+ *  6. Counter-espionage events and detection risk
+ *
+ * Per design doc §6, spy count is budget-based (not a fixed headcount slider).
+ * The "agent count" display is derived from budget / cost-per-agent (~5 BC/turn).
  */
 
 import {
@@ -55,7 +64,7 @@ const MISSION_DEFS: Record<MissionType, MissionDef> = {
   },
   sabotage_bases: {
     type: 'sabotage_bases',
-    label: 'Incite Rebellion',
+    label: 'Sabotage Missile Bases',  // per design doc
     baseSuccess: 25,
     cost: 200,
     riskLevel: 'High',
@@ -64,7 +73,7 @@ const MISSION_DEFS: Record<MissionType, MissionDef> = {
   },
   incite_rebellion: {
     type: 'incite_rebellion',
-    label: 'Intelligence Gathering',
+    label: 'Incite Rebellion',
     baseSuccess: 80,
     cost: 0,
     riskLevel: 'Very Low',
@@ -73,7 +82,7 @@ const MISSION_DEFS: Record<MissionType, MissionDef> = {
   },
   assassination: {
     type: 'assassination',
-    label: 'Assassination',
+    label: 'Assassinate Leader',  // per design doc
     baseSuccess: 10,
     cost: 300,
     riskLevel: 'Extreme',
@@ -91,7 +100,7 @@ const MISSION_DEFS: Record<MissionType, MissionDef> = {
   },
   frame_race: {
     type: 'frame_race',
-    label: 'Credit Theft',
+    label: 'Frame Empire',  // per design doc
     baseSuccess: 35,
     cost: 3,
     riskLevel: 'High',
@@ -430,6 +439,7 @@ export class EspionagePanel {
 
   /**
    * Format the reward/effect from a completed mission for display.
+   * Labels per design/ui-ux/spy-network-ui.md §4 Spy Results Notifications.
    */
   private formatReward(mission: SpyMission): string {
     if (!mission.reward) return '';
@@ -440,6 +450,14 @@ export class EspionagePanel {
 
       case 'tech_stolen':
         return `<span style="color:#66ccff">🔬 Technology stolen!</span>`;
+
+      case 'bases_destroyed':
+        // Per design doc §4.2: "Sabotage Missile Bases" result
+        return `<span style="color:#ff5533">🛡️ ${mission.reward.value} missile base(s) destroyed</span>`;
+
+      case 'factories_destroyed':
+        // Per design doc §4.2: "Sabotage Factories" result
+        return `<span style="color:#ff9933">🏭 ${mission.reward.value} factories destroyed</span>`;
 
       case 'building_destroyed':
         return `<span style="color:#ff5533">🏗️ Building destroyed</span>`;
@@ -453,9 +471,17 @@ export class EspionagePanel {
       case 'reconnaissance':
         return `<span style="color:#66cc66">🔍 Basic intelligence gathered</span>`;
 
+      case 'bc_stolen':
+        // Per design doc: Frame Empire success (diplomatic warfare)
+        return `<span style="color:#ffcc00">💰 ${mission.reward.value} BC stolen (framing another empire)</span>`;
+
+      case 'rebellion_points':
+        return `<span style="color:#ff6633">⚔️ Rebellion incited! +${mission.reward.value} unrest</span>`;
+
       case 'sabotage_failed':
       case 'theft_failed':
       case 'build_sabotage_failed':
+      case 'frame_job_failed':
         return `<span style="color:#888">No valid target found</span>`;
 
       default:
