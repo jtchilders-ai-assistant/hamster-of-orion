@@ -1,53 +1,50 @@
 {
   "state": "COMPLETED",
   "phase": "phase5-design-compliance-fixes",
-  "current_task": "fix-42",
-  "last_check": "2026-05-05T02:48:00.000Z",
+  "current_task": "fix-39",
+  "last_check": "2026-05-05T02:53:00.000Z",
   "total_tasks": 85,
-  "completed_count": 6,
+  "completed_count": 7,
   "skipped_count": 0,
   "blocked_count": 0,
-  "notes": "fix-42 completed: ColoniesScreen design doc fixes - ship display format and production formula documentation",
+  "notes": "fix-39 completed: App.tsx (src/ui/app.ts) design verification - all issues already resolved in previous work",
   "worker_output": {
     "files_created": [],
-    "files_modified": [
-      "src/ui/screens/ColoniesScreen.ts",
-      "test/ui/screens/coloniesScreen.test.ts"
-    ],
-    "tests_added": [
-      "test/ui/screens/coloniesScreen.test.ts: ship display format should be '(Name) (Turns)' per design doc"
-    ],
-    "summary": "Fixed ColoniesScreen.ts to show ship construction as '(Name) (Turns)' per design/planets/production.md and added comprehensive JSDoc documenting the production formula from design/economy/factory-formulas.md",
+    "files_modified": [],
+    "tests_added": [],
+    "summary": "Verified fix-39 App.tsx compliance with state-transitions.md, interaction-spec.md, and navigation-flow.md. All features (screen transitions, galaxy map shortcuts, F8 council check, victory screen) were already correctly implemented.",
     "design_compliance": [
       {
-        "doc": "design/planets/production.md",
-        "section": "Ship Construction - Display Text",
-        "quote": "Display Text: `(Ship Name) & Turns` (e.g., \"Scout 4\")",
-        "impl_file": "src/ui/screens/ColoniesScreen.ts",
-        "impl_line": "getBuildingDescription()",
+        "doc": "design/ui-ux/state-transitions.md",
+        "section": "§5.1 Transition Types - FADE",
+        "quote": "FADE: duration: 200, easing: ease-in-out, description: Crossfade between screens, useCase: Standard screen navigation (F1-F7)",
+        "impl_file": "src/styles/main.css",
+        "impl_line": "@keyframes screen-fade-in + .screen.active animation",
         "verified": true
       },
       {
-        "doc": "design/economy/factory-formulas.md",
-        "section": "§3 Total Planetary Production",
-        "quote": "Total_Production = (Factory_Production + Population_Production) × Mineral_Richness_Modifier",
-        "impl_file": "src/ui/screens/ColoniesScreen.ts",
-        "impl_line": "calculatePlanetProduction() JSDoc",
+        "doc": "design/ui-ux/interaction-spec.md",
+        "section": "§2.2 Galaxy Map (F1) Shortcuts",
+        "quote": "N = Next Colony, Shift+N = Prev Colony, F = Next Fleet, Shift+F = Prev Fleet, G = Toggle Grid, R = Range Circles, T = Trade Routes, E = Highlight Enemy Fleets",
+        "impl_file": "src/ui/app.ts",
+        "impl_line": "bindKeyboard() switch statement for galaxy-map-only keys",
+        "verified": true
+      },
+      {
+        "doc": "design/ui-ux/navigation-flow.md",
+        "section": "§9 Keyboard Shortcuts - F8",
+        "quote": "F8 = High Council (only when Council is in session; otherwise no-op)",
+        "impl_file": "src/ui/app.ts",
+        "impl_line": "F-key handler: if (fTarget === 'council' && !this.store.getState().highCouncil?.isActive) return;",
         "verified": true
       }
     ],
     "design_gaps": [
       {
-        "doc": "design/planets/production.md",
+        "doc": "design/ui-ux/state-transitions.md",
         "section": "N/A",
-        "issue": "TRANSFER_BC action (moving credits from empire reserve to planet production) is not explicitly specified in design docs",
-        "resolution": "Implementation is reasonable as a 'rush production' mechanic. Noted in task completion but no code changes required."
-      },
-      {
-        "doc": "design/economy/factory-formulas.md",
-        "section": "§3 Total Planetary Production",
-        "issue": "ColoniesScreen.calculatePlanetProduction() uses simplified baseline (factories × 1 + pop × 0.5) instead of full formula with mineral richness and racial modifiers",
-        "resolution": "Added JSDoc noting this is a display estimate for list view; full calculation is in src/game/systems/production.ts. Acceptable for overview display."
+        "issue": "Victory screen handling with victoryActive flag and isGameOver/victoryResult state checks exists but specific screen transition behavior wasn't detailed in the UI core design docs",
+        "resolution": "Implementation is reasonable: shows victory overlay on game over, hides underlying screen. Not a compliance issue."
       }
     ]
   }

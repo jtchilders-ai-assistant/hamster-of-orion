@@ -46,6 +46,16 @@ html, body {
 
 /* ── Screens ── */
 
+/**
+ * Screen Transitions (state-transitions.md §5.1)
+ * Standard screen navigation (F1-F7) uses FADE transition:
+ * - Duration: 200ms
+ * - Easing: ease-in-out
+ *
+ * Note: Full CSS transition support would require refactoring
+ * from display:none/flex to opacity/visibility approach.
+ * The .screen-fade-in class provides animation for new screens.
+ */
 .screen {
   display: none;
   width: 100%;
@@ -56,11 +66,18 @@ html, body {
   left: 0;
   right: 0;
   bottom: var(--command-bar-height);
+  opacity: 0;
 }
 
 .screen.active {
   display: flex;
   flex-direction: column;
+  animation: screen-fade-in 200ms ease-in-out forwards;
+}
+
+@keyframes screen-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* ── Galaxy Screen Layout ── */
