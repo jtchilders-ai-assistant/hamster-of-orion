@@ -1,145 +1,101 @@
 {
-  "task": "fix-3",
-  "title": "Economy Issues in production.ts",
-  "status": "complete",
-  "severity": "high",
-  "issues_fixed": 8,
-  "summary": "Fixed all 8 economy issues in production.ts per design docs",
-  "details": {
-    "issues": [
-      {
-        "id": 1,
-        "description": "Effective_Factory_Output formula: Operating_Factories × Base_Factory_Output × Racial_Production_Modifier",
-        "status": "fixed",
-        "implementation": "Updated calculateGrossProduction() to apply racialProductionModifier to factory output (line ~175)",
-        "design_doc": "design/economy/factory-formulas.md §2"
-      },
-      {
-        "id": 2,
-        "description": "Difficulty Modifiers apply to net production after cleanup costs",
-        "status": "fixed",
-        "implementation": "Moved difficulty modifier application from gross production to calculateNetProduction() after cleanup is subtracted (line ~215)",
-        "design_doc": "design/economy/factory-formulas.md §Difficulty Modifiers"
-      },
-      {
-        "id": 3,
-        "description": "Ship_Maintenance = Ship_Cost × 0.02, with racial/tech modifiers, min 1 BC",
-        "status": "fixed",
-        "implementation": "Added calculateShipMaintenance() and calculateFleetMaintenance() functions with SHIP_MAINTENANCE_RATE=0.02 constant",
-        "design_doc": "design/economy/ship-costs.md §5"
-      },
-      {
-        "id": 4,
-        "description": "Bankruptcy: scuttle ships at 10% emergency scrap rate until treasury positive",
-        "status": "fixed",
-        "implementation": "Added handleBankruptcy() function with EMERGENCY_SCRAP_RATE=0.10 constant",
-        "design_doc": "design/economy/ship-costs.md §10"
-      },
-      {
-        "id": 5,
-        "description": "Mice (Meklars) receive +2 to effective Robotic Controls level",
-        "status": "fixed",
-        "implementation": "Added racialRCBonus field to ProductionContext and getEffectiveRCLevel() helper function",
-        "design_doc": "design/economy/factory-formulas.md §1"
-      },
-      {
-        "id": 6,
-        "description": "At least one slider must remain unlocked",
-        "status": "fixed",
-        "implementation": "Added canLockSlider() and lockSlider() functions with validation, added CANNOT_LOCK_LAST_SLIDER error type",
-        "design_doc": "design/economy/slider-mathematics.md §7"
-      },
-      {
-        "id": 7,
-        "description": "factoryEfficiencyMultiplier in ProductionContext",
-        "status": "verified",
-        "implementation": "Already exists in ProductionContext, verified correct usage in calculateGrossProduction()",
-        "design_doc": "design/economy/factory-formulas.md §2"
-      },
-      {
-        "id": 8,
-        "description": "researchMultiplier on Planet (Orion=4.0, Artifacts=2.0)",
-        "status": "verified",
-        "implementation": "Already exists on Planet type and used in allocateSliders() (line ~277)",
-        "design_doc": "design/economy/slider-mathematics.md"
-      }
-    ],
-    "new_constants": [
-      "SHIP_MAINTENANCE_RATE = 0.02",
-      "MINIMUM_SHIP_MAINTENANCE = 1",
-      "EMERGENCY_SCRAP_RATE = 0.10"
-    ],
-    "new_context_fields": [
-      "racialRCBonus: number",
-      "racialMaintenanceModifier: number",
-      "fleetLogisticsModifiers: number[]"
-    ],
-    "new_functions": [
-      "getEffectiveRCLevel(ctx: ProductionContext): number",
-      "calculateShipMaintenance(shipCost: number, ctx: ProductionContext): number",
-      "calculateFleetMaintenance(shipDesigns: Array<{cost, count}>, ctx: ProductionContext): number",
-      "handleBankruptcy(treasury: number, ships: ScuttleCandidate[]): BankruptcyResult",
-      "canLockSlider(current: SliderState, keyToLock: keyof SliderState): boolean",
-      "lockSlider(current: SliderState, keyToLock: keyof SliderState): RebalanceResult"
-    ],
-    "new_types": [
-      "ScuttleCandidate",
-      "BankruptcyResult"
-    ]
-  },
-  "test_results": {
-    "production_tests": "41 passed",
-    "typecheck_notes": "Production.ts compiles cleanly. Pre-existing errors in diplomacy.ts and treaties.ts are unrelated to these changes."
+  "task": "fix-5",
+  "status": "completed",
+  "timestamp": "2026-05-04T20:15:00-05:00",
+  "summary": "Fixed Artifacts research multiplier and verified other issues were already correct or intentional",
+  "fixes_applied": [
+    {
+      "issue": "Artifacts RP Multiplier",
+      "design_docs": ["design/galaxy/exploration.md", "design/technology/research-formulas.md"],
+      "specification": "Artifacts worlds: ongoing +25% RP multiplier (1.25×)",
+      "was": "2.0 (double)",
+      "now": "1.25 (+25%)",
+      "files_modified": ["src/game/generators/galaxy.ts", "test/game/generators/galaxy.test.ts"],
+      "note": "design/galaxy/generation-algorithm.md had outdated value of 2.0; authoritative sources are exploration.md and research-formulas.md which specify 1.25 (25% bonus)"
+    }
+  ],
+  "issues_already_correct": [
+    {
+      "issue": "Orion planet environment",
+      "design_doc": "design/planets/generation-tables.md §10.2",
+      "specification": "Orion is 'dead' environment (not 'gaia')",
+      "code_status": "Already correct - code uses 'dead' per generation-tables.md; generation-algorithm.md §6.1 has outdated 'gaia' value",
+      "note": "Gaia never spawns naturally per both design docs"
+    },
+    {
+      "issue": "Orion base population",
+      "design_doc": "design/planets/generation-tables.md §10.2",
+      "specification": "Orion is Huge with 150 base pop",
+      "code_status": "Already correct - code uses basePop: 150",
+      "note": "generation-algorithm.md has old value of 100"
+    },
+    {
+      "issue": "Gaia 2× growth rate",
+      "design_doc": "design/economy/population-growth.md (authoritative)",
+      "specification": "Gaia growth_modifier: 1.00 (same as Terran)",
+      "code_status": "Already correct - code has no special Gaia growth handling",
+      "note": "generation-algorithm.md §4.5 had outdated 2.0× value; population-growth.md explicitly states Gaia was never 2.0×"
+    },
+    {
+      "issue": "Duplicate Thuban in star names",
+      "design_doc": "design/galaxy/generation-algorithm.md §2.5",
+      "specification": "Star names pool should not have duplicates",
+      "code_status": "Already correct - code only has one 'Thuban'",
+      "note": "Design doc has duplicate, but code was already fixed"
+    }
+  ],
+  "issues_intentional_deviation": [
+    {
+      "issue": "minHomeworldDistance formula vs config values",
+      "design_doc": "design/galaxy/generation-algorithm.md",
+      "specification_conflict": "§1.2 config has 150/175/200/225; §8.4 formula yields 160/224/272/320",
+      "code_behavior": "Uses §1.2 config values (150/175/200/225)",
+      "justification": "Documented in code comment: formula values are too strict for reliable homeworld placement with given star counts; config values were tested and working"
+    }
+  ],
+  "issues_implementation_detail": [
+    {
+      "issue": "starClassForType() mapping",
+      "note": "Astronomical spectral class mapping (G, K, M, O, A, NS) not in design docs - implementation detail"
+    },
+    {
+      "issue": "calculatePlanetQuality() export",
+      "note": "Exported for tests; quality scoring algorithm matches design §8.5"
+    }
+  ],
+  "verification": {
+    "typecheck": "PASSED",
+    "tests": "PASSED for fix-5 scope (37 galaxy tests)",
+    "note": "5 diplomacy UI tests fail but are unrelated to fix-5; they involve pre-existing uncommitted changes from another session"
   },
   "design_compliance": [
     {
-      "doc": "design/economy/factory-formulas.md",
-      "section": "§2 Factory Output",
-      "quote": "Effective_Factory_Output = Operating_Factories × Base_Factory_Output × Racial_Production_Modifier",
-      "impl_file": "src/game/systems/production.ts",
-      "impl_line": 175,
+      "doc": "design/galaxy/exploration.md",
+      "section": "Artifacts Worlds - Ongoing RP Multiplier",
+      "quote": "all RP generated there is multiplied by 1.25 (+25%)",
+      "impl_file": "src/game/generators/galaxy.ts",
+      "impl_line": "717 and 729",
       "verified": true
     },
     {
-      "doc": "design/economy/factory-formulas.md",
-      "section": "§Difficulty Modifiers",
-      "quote": "These modifiers apply to the final net production after cleanup costs",
-      "impl_file": "src/game/systems/production.ts",
-      "impl_line": 215,
-      "verified": true
-    },
-    {
-      "doc": "design/economy/ship-costs.md",
-      "section": "§5 Per-Turn Maintenance Cost",
-      "quote": "Ship_Maintenance = Ship_Cost × Maintenance_Rate; Maintenance_Rate = 0.02 (2% of construction cost per turn); Minimum Maintenance: 1 BC per ship",
-      "impl_file": "src/game/systems/production.ts",
-      "impl_line": 530,
-      "verified": true
-    },
-    {
-      "doc": "design/economy/ship-costs.md",
-      "section": "§10 Auto-Scrap (Bankruptcy)",
-      "quote": "Emergency_Scrap_Rate = 0.10 (10% - hasty scrapping)",
-      "impl_file": "src/game/systems/production.ts",
-      "impl_line": 590,
-      "verified": true
-    },
-    {
-      "doc": "design/economy/factory-formulas.md",
-      "section": "§1 Maximum Operable Factories",
-      "quote": "Meklars (Mice) Special Ability: Mice receive +2 to their effective Robotic Controls level",
-      "impl_file": "src/game/systems/production.ts",
-      "impl_line": 115,
-      "verified": true
-    },
-    {
-      "doc": "design/economy/slider-mathematics.md",
-      "section": "§7 Locking Mechanics",
-      "quote": "At least one slider must remain unlocked (otherwise re-balancing is impossible)",
-      "impl_file": "src/game/systems/production.ts",
-      "impl_line": 640,
+      "doc": "design/technology/research-formulas.md",
+      "section": "Special RP Bonuses",
+      "quote": "Artifacts World: ongoing +25% RP from that planet",
+      "impl_file": "src/game/generators/galaxy.ts",
+      "impl_line": "717 and 729",
       "verified": true
     }
   ],
-  "design_gaps": []
+  "design_gaps": [],
+  "worker_output": {
+    "files_created": [],
+    "files_modified": [
+      "src/game/generators/galaxy.ts",
+      "test/game/generators/galaxy.test.ts"
+    ],
+    "tests_added": [],
+    "tests_modified": [
+      "test/game/generators/galaxy.test.ts (updated researchMultiplier expectation from 2.0 to 1.25)"
+    ]
+  }
 }

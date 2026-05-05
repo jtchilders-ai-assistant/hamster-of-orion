@@ -196,7 +196,8 @@ describe('Galaxy Generator', () => {
         const planetId = system.planetIds[0];
         const planet = result.planets[planetId];
         expect(planet.hasArtifacts).toBe(true);
-        expect(planet.researchMultiplier).toBe(2.0);
+        // Artifacts RP multiplier: +25% per exploration.md / research-formulas.md
+        expect(planet.researchMultiplier).toBe(1.25);
       }
     });
 

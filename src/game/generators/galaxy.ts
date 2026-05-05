@@ -714,7 +714,8 @@ function placeArtifactsWorlds(
   for (const star of midCandidates) {
     if (placed.length >= count) break;
     star.isArtifacts = true;
-    if (star.planet) star.planet.researchMultiplier = 2.0;
+    // Artifacts RP multiplier: +25% per exploration.md / research-formulas.md
+    if (star.planet) star.planet.researchMultiplier = 1.25;
     placed.push(star.id);
   }
 
@@ -725,7 +726,8 @@ function placeArtifactsWorlds(
     for (const star of remaining) {
       if (placed.length >= count) break;
       star.isArtifacts = true;
-      if (star.planet) star.planet.researchMultiplier = 2.0;
+      // Artifacts RP multiplier: +25% per exploration.md / research-formulas.md
+      if (star.planet) star.planet.researchMultiplier = 1.25;
       placed.push(star.id);
     }
   }
