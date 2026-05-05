@@ -2,10 +2,11 @@
  * Victory conditions — check end-of-turn victory states.
  * Pure TypeScript, NO DOM, no `any`.
  *
- * Two victory types per MOO1 design:
+ * Two victory types per MOO1 design (design/game-mechanics/victory-conditions.md):
  * 1. Diplomatic — win a 2/3 majority vote in the High Council
  * 2. Military   — eliminate all other empires (no colonies, no colony ships)
- * 3. Conquest   — dominate by owning 3+ star systems (including Orion)
+ *
+ * Note: There is NO conquest/research/economic victory in MOO1.
  */
 
 import { EmpireId, GameState } from '../state';
@@ -17,7 +18,7 @@ import {
   isCouncilTurn,
 } from './council';
 
-export type VictoryType = 'diplomatic' | 'military' | 'conquest';
+export type VictoryType = 'diplomatic' | 'military';
 
 export interface VictoryResult {
   winnerId: EmpireId;
@@ -25,8 +26,7 @@ export interface VictoryResult {
   description: string;
 }
 
-/** Minimum number of owned star systems for a conquest victory. */
-const CONQUEST_SYSTEM_THRESHOLD = 3;
+
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -61,20 +61,7 @@ function hasColonyShip(state: GameState, empireId: EmpireId): boolean {
   return false;
 }
 
-/**
- * Count distinct star systems owned by an empire.
- * A system is "owned" when the empire owns at least one of its planets.
- */
-function ownedSystemCount(state: GameState, empireId: EmpireId): number {
-  const empire = state.empires.byId[empireId];
-  if (!empire) return 0;
-  const systemIds = new Set<string>();
-  for (const planetId of empire.planets) {
-    const planet = state.planets.byId[planetId];
-    if (planet) systemIds.add(planet.systemId);
-  }
-  return systemIds.size;
-}
+
 
 // ── Public API ────────────────────────────────────────────────────────────────
 
@@ -82,7 +69,9 @@ function ownedSystemCount(state: GameState, empireId: EmpireId): number {
  * Check all victory conditions for the current turn.
  * Returns the first VictoryResult found, or null if none.
  *
- * Priority: military → conquest → diplomatic.
+ * Per design/game-mechanics/victory-conditions.md:
+ * - Military victory: only one empire survives
+ * - Diplomatic victory: win 2/3 vote in High Council
  */
 export function checkVictoryConditions(
   state: GameState,
@@ -98,19 +87,7 @@ export function checkVictoryConditions(
     };
   }
 
-  // 2. Conquest: an empire controls 3+ star systems.
-  const conquestWinnerId = checkConquestVictory(state);
-  if (conquestWinnerId !== null) {
-    const name = state.empires.byId[conquestWinnerId]?.name ?? 'Unknown';
-    const count = ownedSystemCount(state, conquestWinnerId);
-    return {
-      winnerId: conquestWinnerId,
-      type: 'conquest',
-      description: `${name} has established dominance over ${count} star systems`,
-    };
-  }
-
-  // 3. Diplomatic: council election on council turns.
+  // 2. Diplomatic: council election on council turns.
   if (isCouncilTurn(state.turn) && state.highCouncil?.isActive) {
     const diplomaticWinnerId = runDiplomaticCheck(state);
     if (diplomaticWinnerId !== null) {
@@ -144,20 +121,7 @@ export function checkMilitaryVictory(state: GameState): EmpireId | null {
   return winnerId;
 }
 
-/**
- * Check conquest victory: any living empire owns 3+ star systems.
- *
- * Orion counts as a normal system here; owning it is a major strategic advantage
- * but not a special-cased win condition.
- */
-export function checkConquestVictory(state: GameState): EmpireId | null {
-  for (const empireId of livingEmpireIds(state)) {
-    if (ownedSystemCount(state, empireId) >= CONQUEST_SYSTEM_THRESHOLD) {
-      return empireId;
-    }
-  }
-  return null;
-}
+
 
 /**
  * Mark an empire as defeated, returning the updated GameState.

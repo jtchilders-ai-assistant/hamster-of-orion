@@ -80,7 +80,7 @@ export interface TurnResult {
   victoryResult: { winnerId: EmpireId; type: VictoryType; description: string } | null;
 }
 export type GameSpeed = 'slow' | 'normal' | 'fast';
-export type VictoryType = 'diplomatic' | 'military' | 'conquest';
+export type VictoryType = 'diplomatic' | 'military';
 export type ScreenType =
   | 'menu'
   | 'new_game'

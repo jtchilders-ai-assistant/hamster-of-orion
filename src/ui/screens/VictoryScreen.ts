@@ -3,7 +3,7 @@
  * src/ui/screens/VictoryScreen.ts
  *
  * Shown when the game ends (isGameOver === true).
- * Displays win type (Conquest, Military, Diplomatic), game statistics,
+ * Displays win type (Military, Diplomatic), game statistics,
  * and provides buttons to start a new game or quit.
  *
  * Acceptance criteria:
@@ -20,13 +20,11 @@ import { Store } from '../../game/store';
 // ── Victory type display names ────────────────────────────────────────────────
 
 const VICTORY_TYPE_LABELS: Record<VictoryType, string> = {
-  conquest: 'Conquest Victory',
   military: 'Military Victory',
   diplomatic: 'Diplomatic Victory',
 };
 
 const VICTORY_TYPE_DESCRIPTIONS: Record<VictoryType, string> = {
-  conquest: 'Your forces have subdued all opposition across the galaxy.',
   military: 'Your fleet stands supreme — no rival power dares challenge you.',
   diplomatic: 'Through negotiation and alliance, peace reigns across the stars.',
 };
@@ -34,7 +32,6 @@ const VICTORY_TYPE_DESCRIPTIONS: Record<VictoryType, string> = {
 // ── Color palette per win type ────────────────────────────────────────────────
 
 const VICTORY_COLORS: Record<VictoryType, { bg: string; accent: string; glow: string }> = {
-  conquest: { bg: '#3a1000', accent: '#ff4422', glow: '#ff6644' },
   military: { bg: '#3a2a00', accent: '#ffaa00', glow: '#ffcc44' },
   diplomatic: { bg: '#002a3a', accent: '#44aaff', glow: '#66ccff' },
 };
@@ -201,7 +198,7 @@ export class VictoryScreen {
 
     // Victory type and styling
     const winType = victoryResult?.type ?? null;
-    const colors = winType ? VICTORY_COLORS[winType] : VICTORY_COLORS.conquest;
+    const colors = winType ? VICTORY_COLORS[winType] : VICTORY_COLORS.military;
 
     // ── Card background with gradient ──────────────────────────────────────
     content.style.cssText = `
