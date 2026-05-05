@@ -139,6 +139,7 @@ function makeState(empireIds: string[], turn = 1): GameState {
         highContrast: false,
         screenReaderEnabled: false,
         customHotkeys: {},
+        quickCombat: false,
       },
     },
   } as GameState;

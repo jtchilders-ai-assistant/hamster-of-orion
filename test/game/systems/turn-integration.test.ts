@@ -302,6 +302,7 @@ function makeMinimalState(
         highContrast: false,
         screenReaderEnabled: false,
         customHotkeys: {},
+        quickCombat: false,
       },
     },
   };

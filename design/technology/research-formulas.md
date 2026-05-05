@@ -272,13 +272,50 @@ Miniaturization applies differently per field:
 When you complete a tech tier, you're offered 2-3 random choices for the next tier:
 
 ```
-Available_Choices = random_select(All_Tier_Techs, count=2 or 3)
+Available_Choices = random_select(All_Tier_Techs, count=Tech_Choice_Count)
 ```
 
-The number of choices depends on race and random factors:
-- **Base:** 2 choices
-- **Rats:** Always 3 choices (Academic Network ability)
-- **Random Event:** May grant extra choice
+**Tech Choice Count Formula:**
+
+```
+Tech_Choice_Count = Base_Choices + Racial_Bonus + Event_Bonus
+
+Base_Choices = 2
+Racial_Bonus = 1 if race == 'rats' else 0  # Academic Network ability
+Event_Bonus = 0-1 from random events
+
+Minimum: 2 choices
+Maximum: 3 choices (cap)
+```
+
+**Rats Academic Network Ability:**
+Rats always receive 3 tech choices per tier completion, regardless of random factors. This represents their "peer review" process where multiple research approaches are always considered. The Academic Network ability is a permanent racial trait and cannot be lost or reduced.
+
+**Choice Selection Algorithm:**
+```pseudocode
+function get_tech_choices(field, tier, empire):
+    # Get all techs in this field at the target tier
+    available = get_available_techs(field, tier, game_seed)
+    
+    # Filter out already-researched techs
+    available = filter(available, lambda t: t.id not in empire.researched)
+    
+    # Calculate choice count
+    count = 2  # base
+    if empire.race == 'rats':
+        count = 3  # Academic Network
+    if empire.has_event_bonus('extra_tech_choice'):
+        count = min(count + 1, 3)  # cap at 3
+    
+    # Select random subset
+    count = min(count, len(available))  # can't offer more than exist
+    return random_select(available, count, seed=game_seed + tier)
+```
+
+**Notes:**
+- If fewer techs exist than the choice count, all available techs are offered
+- Techs not available in this game (per-game tree) cannot appear as choices
+- Choice selection is deterministic based on game seed + tier (reproducible)
 
 ### 12. Tech Trees Are Per-Game
 
@@ -341,28 +378,136 @@ Stolen techs:
 
 ### 16. Tech Trading
 
-Techs can be traded through diplomacy:
+Techs can be exchanged through diplomatic negotiation. See `diplomacy/trade.md` for full trading mechanics.
 
+**Requirements:**
+- Active trade agreement between empires
+- Friendly relations (+50 or higher)
+- Neither empire currently at war with the other
+
+**Tech Value Formula:**
 ```
-Trade_Value = Base_Tech_Cost × (1 + (Current_Tier - Tech_Tier) × 0.1)
+Tech_Value = Base_Tech_Cost × Value_Modifier × Racial_Modifier
+
+Value_Modifier = 1.0 + max(0, (Current_Tier - Tech_Tier) × 0.1)
+  # Outdated tech (lower tier) is worth less to high-tech empires
+
+Racial_Modifier:
+  - Rats: 0.8× (eager to share knowledge)
+  - Mice: 0.9× (values tech exchange)
+  - Guinea Pigs: N/A (refuse all military tech trades)
+  - Chameleons: 1.2× (prefer stealing, reluctant traders)
+  - Others: 1.0× (baseline)
 ```
 
-Trade rules:
-- Both parties must agree
-- Some races refuse military tech trades
-- Traded techs count toward miniaturization
+**Trade Negotiation:**
+```
+Trade_Balance = Our_Tech_Value - Their_Tech_Value
+
+If Trade_Balance > 0:
+    They must add BC to balance (or additional tech)
+If Trade_Balance < 0:
+    We must add BC to balance (or additional tech)
+If Trade_Balance ≈ 0:
+    Fair trade, both accept
+```
+
+**Trade Rules:**
+- Both parties must agree to terms
+- Guinea Pigs never trade military techs (Weapons, Force Fields)
+- Chameleons prefer stealing — AI will often reject favorable trades
+- Trade can include BC as balance payment
+
+**Traded Tech Properties:**
+- Immediately added to recipient's completed techs
+- **Counts toward miniaturization** (unlike stolen tech)
+- Traded tech must exist in recipient's tech tree to unlock miniaturization
+
+**AI Trade Willingness:**
+| Race | Willingness | Preferred Trade Type |
+|------|-------------|---------------------|
+| Rats | Eager | Research cooperation, any field |
+| Mice | Interested | Computer/Propulsion tech |
+| Hamsters | Moderate | Fair trades only |
+| Guinea Pigs | Reluctant | Non-military only |
+| Chameleons | Hostile | Prefers espionage |
 
 ### 17. Reverse Engineering
 
-Captured ships can be reverse-engineered:
+Captured enemy ships can be reverse-engineered to unlock their component technologies. Ships are captured through boarding actions in combat (see `ships/combat-algorithm.md` §36-43 for boarding mechanics).
 
+**Reverse Engineering Time Formula:**
 ```
-Reverse_Engineer_Time = Tech_Cost × 0.25 (turns to understand)
+Reverse_Time = Base_Time × Racial_Modifier
+
+Base_Time = Tech_Cost × 0.25  # turns per tech tier
+  # Example: Tier 10 tech (6000 RP) → 1500 turns baseline
+  # This is intentionally slow without racial bonuses
+
+Racial_Modifier:
+  - Rats: 0.0 (instant — Quick Study ability)
+  - Mice: 0.5 (50% time — cybernetic analysis)
+  - Others: 1.0 (baseline)
 ```
 
-Special abilities:
-- **Rats:** Instant reverse engineering
-- **Mice:** 50% faster reverse engineering
+**Practical Reverse Engineering Time:**
+```
+# More realistic formula (adjusted for gameplay):
+Reverse_Time_Turns = ceil(Tech_Tier × 2 × Racial_Modifier)
+
+Examples (non-Rats/Mice):
+  - Tier 5 tech: 10 turns
+  - Tier 10 tech: 20 turns
+  - Tier 15 tech: 30 turns
+
+Examples (Mice — 50% faster):
+  - Tier 5 tech: 5 turns
+  - Tier 10 tech: 10 turns
+  - Tier 15 tech: 15 turns
+
+Rats: Always 0 turns (instant upon capture)
+```
+
+**Captured Ship Analysis:**
+```pseudocode
+function analyze_captured_ship(ship, empire):
+    techs_to_learn = []
+    
+    for component in ship.components:
+        tech = component.required_tech
+        if tech not in empire.researched:
+            if tech not in empire.reverse_engineering_queue:
+                techs_to_learn.append(tech)
+    
+    for tech in techs_to_learn:
+        if empire.race == 'rats':
+            # Quick Study: instant unlock
+            empire.researched.append(tech)
+            notify("Rats instantly reverse-engineered: " + tech.name)
+        else:
+            # Add to queue with calculated completion turn
+            time = calculate_reverse_time(tech.tier, empire.race)
+            empire.reverse_engineering_queue.append({
+                tech: tech,
+                turns_remaining: time
+            })
+```
+
+**Reverse Engineered Tech Properties:**
+- Added to completed techs when reverse engineering finishes
+- **Counts toward miniaturization** (unlike stolen tech)
+- May include techs not normally in empire's tech tree
+- One ship can reveal multiple techs (all components analyzed)
+- Queue processes one tech at a time (oldest first)
+
+**Racial Special Abilities:**
+| Race | Ability | Effect |
+|------|---------|--------|
+| Rats | Quick Study | Instant reverse engineering — captured techs unlock immediately |
+| Mice | Cybernetic Analysis | 50% faster reverse engineering time |
+| Others | Standard | Full reverse engineering time |
+
+**Cross-Reference:** Ship capture mechanics are defined in `ships/combat-algorithm.md` §36-43 (Boarding Mechanics).
 
 ---
 

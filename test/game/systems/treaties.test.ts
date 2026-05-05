@@ -149,6 +149,7 @@ function makeState(
         highContrast: false,
         screenReaderEnabled: false,
         customHotkeys: {},
+        quickCombat: false,
       },
     },
   } as GameState;

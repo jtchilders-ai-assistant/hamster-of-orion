@@ -306,7 +306,8 @@ export function getDifficultyModifiers(difficulty: DifficultyLevel): DifficultyM
     // Custom difficulty defaults to Average; real custom would use per-field overrides.
     return DIFFICULTY_MODIFIERS.average;
   }
-  return DIFFICULTY_MODIFIERS[difficulty];
+  // Fall back to average for unknown/invalid difficulty values
+  return DIFFICULTY_MODIFIERS[difficulty] ?? DIFFICULTY_MODIFIERS.average;
 }
 
 /**

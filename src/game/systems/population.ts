@@ -772,6 +772,198 @@ export function calculateOverflowTransport(
   };
 }
 
+// ── Bio Weapon Max Population Reduction ───────────────────────────────────────
+
+/**
+ * Bio weapon effects on max population.
+ * Design source: design/economy/population-growth.md §Edge Cases - Biological Weapon Damage
+ * Design source: design/technology/planetology.md §Biological Weapons
+ *
+ * Bio weapons permanently reduce a planet's maximum population capacity:
+ *   - Death Spores (Planetology TL 9): -10% permanent
+ *   - Doom Virus (Planetology TL 25): -25% permanent
+ *   - Bio Terminator (Planetology TL 33): -50% permanent
+ *
+ * The reduction is permanent until the planet is re-terraformed.
+ */
+
+import {
+  BIO_WEAPONS,
+  BioWeaponType,
+  COLONY_TRANSPORT_COST,
+  COLONY_TRANSPORT_MAINTENANCE,
+  POPULATION_TRANSPORT_CAPACITY,
+} from '../constants';
+
+/** Extended planet fields for bio weapon damage tracking. */
+export interface BioWeaponPlanetFields {
+  /**
+   * Cumulative bio weapon max population reduction factor.
+   * Value between 0 and 1 (e.g., 0.10 = 10% reduction).
+   * Applied to max population calculation.
+   * Reset when planet is re-terraformed.
+   */
+  bioWeaponMaxPopReduction?: number;
+}
+
+export interface BioWeaponDamageResult {
+  /** Population killed this attack. */
+  populationKilled: number;
+  /** New population after kills. */
+  newPopulation: number;
+  /** Max pop reduction applied (0.0 to 1.0). */
+  maxPopReductionApplied: number;
+  /** New cumulative max pop reduction factor on planet. */
+  newTotalMaxPopReduction: number;
+  /** New max population after reduction. */
+  newMaxPopulation: number;
+  /** Whether planet was already at max reduction (no further reduction applied). */
+  atMaxReduction: boolean;
+}
+
+/**
+ * Maximum cumulative bio weapon max population reduction.
+ * Even multiple bio attacks cannot reduce max pop below this factor.
+ */
+const MAX_BIO_WEAPON_REDUCTION = 0.90; // Max 90% reduction, min 10% of original capacity
+
+/**
+ * Process bio weapon damage to a planet.
+ *
+ * Per design/economy/population-growth.md §Biological Weapon Damage:
+ *   Population_Killed = Weapon_Kill_Rate × Number_Of_Weapons × Combat_Rounds_Survived
+ *   New_Max_Pop = Old_Max_Pop × (1 - Max_Pop_Reduction)
+ *
+ * The max pop reduction is cumulative across multiple attacks, but capped.
+ *
+ * @param planet Planet being attacked (with population and optional bioWeaponMaxPopReduction)
+ * @param weaponType Type of bio weapon used
+ * @param weaponCount Number of weapons firing
+ * @param combatRounds Number of combat rounds the attacking ship survived
+ * @param ctx Population context for max population calculation
+ * @param antidoteReduction Casualties negated by defender's antidote tech (per attack)
+ * @returns Bio weapon damage result
+ */
+export function processBioWeaponDamage(
+  planet: Planet & PopulationPlanetFields & BioWeaponPlanetFields,
+  weaponType: BioWeaponType,
+  weaponCount: number,
+  combatRounds: number,
+  ctx: PopulationContext,
+  antidoteReduction: number = 0,
+): BioWeaponDamageResult {
+  const weapon = BIO_WEAPONS[weaponType];
+
+  // Calculate gross casualties
+  const grossKills = weapon.killRatePerRound * weaponCount * combatRounds;
+
+  // Apply antidote reduction (per round, not per weapon)
+  const antidoteTotal = antidoteReduction * combatRounds;
+  const netKills = Math.max(0, grossKills - antidoteTotal);
+
+  // Apply population kills
+  const currentPop = planet.population;
+  const populationKilled = Math.min(netKills, currentPop - 1); // Minimum 1 survivor
+  const newPopulation = currentPop - populationKilled;
+
+  // Calculate max population reduction
+  const currentReduction = planet.bioWeaponMaxPopReduction ?? 0;
+  let atMaxReduction = false;
+
+  // Check if already at max reduction
+  if (currentReduction >= MAX_BIO_WEAPON_REDUCTION) {
+    atMaxReduction = true;
+    // No further reduction, but still kill population
+    const { maxPopulation } = calculateMaxPopulation(planet, ctx);
+    const reducedMaxPop = Math.floor(maxPopulation * (1 - currentReduction));
+
+    return {
+      populationKilled,
+      newPopulation,
+      maxPopReductionApplied: 0,
+      newTotalMaxPopReduction: currentReduction,
+      newMaxPopulation: Math.max(1, reducedMaxPop),
+      atMaxReduction: true,
+    };
+  }
+
+  // Apply new reduction (cumulative)
+  const weaponReduction = weapon.maxPopReduction;
+  const newTotalReduction = Math.min(
+    currentReduction + weaponReduction,
+    MAX_BIO_WEAPON_REDUCTION,
+  );
+  const actualReductionApplied = newTotalReduction - currentReduction;
+
+  // Calculate new max population
+  const { maxPopulation: baseMaxPop } = calculateMaxPopulation(planet, ctx);
+  const newMaxPopulation = Math.max(1, Math.floor(baseMaxPop * (1 - newTotalReduction)));
+
+  return {
+    populationKilled,
+    newPopulation,
+    maxPopReductionApplied: actualReductionApplied,
+    newTotalMaxPopReduction: newTotalReduction,
+    newMaxPopulation,
+    atMaxReduction,
+  };
+}
+
+/**
+ * Clear bio weapon damage from a planet (e.g., after re-terraforming).
+ *
+ * Per design/economy/population-growth.md:
+ *   "Max population reduction is permanent until the planet is re-terraformed."
+ *
+ * @param planet Planet to clear bio weapon reduction from
+ * @returns The reduction that was cleared (0 if none)
+ */
+export function clearBioWeaponDamage(
+  planet: BioWeaponPlanetFields,
+): number {
+  const cleared = planet.bioWeaponMaxPopReduction ?? 0;
+  planet.bioWeaponMaxPopReduction = 0;
+  return cleared;
+}
+
+/**
+ * Calculate effective max population accounting for bio weapon damage.
+ *
+ * This should be called instead of calculateMaxPopulation when
+ * bio weapon damage needs to be considered.
+ *
+ * @param planet Planet with potential bio weapon damage
+ * @param ctx Population context
+ * @returns Effective max population after bio weapon reduction
+ */
+export function getEffectiveMaxPopulation(
+  planet: Planet & PopulationPlanetFields & BioWeaponPlanetFields,
+  ctx: PopulationContext,
+): number {
+  const { maxPopulation } = calculateMaxPopulation(planet, ctx);
+  const bioReduction = planet.bioWeaponMaxPopReduction ?? 0;
+
+  if (bioReduction <= 0) {
+    return maxPopulation;
+  }
+
+  return Math.max(1, Math.floor(maxPopulation * (1 - bioReduction)));
+}
+
+// ── Population Transport Constants ────────────────────────────────────────────
+
+/**
+ * Population transport ship specifications.
+ * Design source: design/economy/population-growth.md §7 Population Transport
+ *
+ * Colony Transport: 50 BC cost, 1 BC/turn maintenance, 1 million pop capacity
+ */
+export const POPULATION_TRANSPORT = {
+  cost: COLONY_TRANSPORT_COST,
+  maintenance: COLONY_TRANSPORT_MAINTENANCE,
+  capacity: POPULATION_TRANSPORT_CAPACITY,
+} as const;
+
 // ── Re-export env tables for callers that need them ───────────────────────────
 
 export { ENV_GROWTH_MODIFIER, ENV_CAPACITY_MODIFIER, ENV_FERTILITY };

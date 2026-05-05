@@ -678,3 +678,310 @@ describe('calculateOverflowTransport', () => {
     expect(result.wastedGrowth).toBe(0);
   });
 });
+
+// ── Bio Weapon Max Population Reduction (fix-53) ──────────────────────────────
+
+import {
+  processBioWeaponDamage,
+  clearBioWeaponDamage,
+  getEffectiveMaxPopulation,
+  BioWeaponPlanetFields,
+  POPULATION_TRANSPORT,
+} from '../../../src/game/systems/population';
+import { BIO_WEAPONS } from '../../../src/game/constants';
+
+describe('processBioWeaponDamage', () => {
+  const ctx = makeCtx('hamsters');
+
+  /**
+   * Per design/economy/population-growth.md §Biological Weapon Damage:
+   *   Population_Killed = Weapon_Kill_Rate × Number_Of_Weapons × Combat_Rounds_Survived
+   *   New_Max_Pop = Old_Max_Pop × (1 - Max_Pop_Reduction)
+   *
+   * Bio weapons:
+   *   Death Spores: 1M/round, -10% max pop
+   *   Doom Virus: 2M/round, -25% max pop
+   *   Bio Terminator: 3M/round, -50% max pop
+   */
+
+  it('death spores kills 1M per round per weapon', () => {
+    const planet = makePlanet({ population: 50, maxPopulation: 100, base_population: 100 });
+    const result = processBioWeaponDamage(
+      planet as Planet & BioWeaponPlanetFields,
+      'death_spores',
+      1, // 1 weapon
+      3, // 3 combat rounds
+      ctx,
+    );
+    // 1M × 1 weapon × 3 rounds = 3M killed
+    expect(result.populationKilled).toBe(3);
+    expect(result.newPopulation).toBe(47);
+  });
+
+  it('doom virus kills 2M per round per weapon', () => {
+    const planet = makePlanet({ population: 50, maxPopulation: 100, base_population: 100 });
+    const result = processBioWeaponDamage(
+      planet as Planet & BioWeaponPlanetFields,
+      'doom_virus',
+      2, // 2 weapons
+      2, // 2 combat rounds
+      ctx,
+    );
+    // 2M × 2 weapons × 2 rounds = 8M killed
+    expect(result.populationKilled).toBe(8);
+    expect(result.newPopulation).toBe(42);
+  });
+
+  it('bio terminator kills 3M per round per weapon', () => {
+    const planet = makePlanet({ population: 50, maxPopulation: 100, base_population: 100 });
+    const result = processBioWeaponDamage(
+      planet as Planet & BioWeaponPlanetFields,
+      'bio_terminator',
+      1, // 1 weapon
+      4, // 4 combat rounds
+      ctx,
+    );
+    // 3M × 1 weapon × 4 rounds = 12M killed
+    expect(result.populationKilled).toBe(12);
+    expect(result.newPopulation).toBe(38);
+  });
+
+  it('death spores reduces max pop by 10%', () => {
+    const planet = makePlanet({ population: 50, maxPopulation: 100, base_population: 100 });
+    const result = processBioWeaponDamage(
+      planet as Planet & BioWeaponPlanetFields,
+      'death_spores',
+      1,
+      1,
+      ctx,
+    );
+    expect(result.maxPopReductionApplied).toBeCloseTo(0.10);
+    expect(result.newTotalMaxPopReduction).toBeCloseTo(0.10);
+    // 100 × (1 - 0.10) = 90
+    expect(result.newMaxPopulation).toBe(90);
+  });
+
+  it('doom virus reduces max pop by 25%', () => {
+    const planet = makePlanet({ population: 50, maxPopulation: 100, base_population: 100 });
+    const result = processBioWeaponDamage(
+      planet as Planet & BioWeaponPlanetFields,
+      'doom_virus',
+      1,
+      1,
+      ctx,
+    );
+    expect(result.maxPopReductionApplied).toBeCloseTo(0.25);
+    expect(result.newTotalMaxPopReduction).toBeCloseTo(0.25);
+    // 100 × (1 - 0.25) = 75
+    expect(result.newMaxPopulation).toBe(75);
+  });
+
+  it('bio terminator reduces max pop by 50%', () => {
+    const planet = makePlanet({ population: 50, maxPopulation: 100, base_population: 100 });
+    const result = processBioWeaponDamage(
+      planet as Planet & BioWeaponPlanetFields,
+      'bio_terminator',
+      1,
+      1,
+      ctx,
+    );
+    expect(result.maxPopReductionApplied).toBeCloseTo(0.50);
+    expect(result.newTotalMaxPopReduction).toBeCloseTo(0.50);
+    // 100 × (1 - 0.50) = 50
+    expect(result.newMaxPopulation).toBe(50);
+  });
+
+  it('antidote reduces casualties per round', () => {
+    const planet = makePlanet({ population: 50, maxPopulation: 100, base_population: 100 });
+    // Death spores: 1M/round × 3 weapons × 4 rounds = 12M gross
+    // Antidote: 1M per round × 4 rounds = 4M reduction
+    // Net: 12 - 4 = 8M killed
+    const result = processBioWeaponDamage(
+      planet as Planet & BioWeaponPlanetFields,
+      'death_spores',
+      3, // 3 weapons
+      4, // 4 combat rounds
+      ctx,
+      1, // Bio Toxin Antidote: -1M per round
+    );
+    expect(result.populationKilled).toBe(8);
+    expect(result.newPopulation).toBe(42);
+  });
+
+  it('leaves at least 1 survivor', () => {
+    const planet = makePlanet({ population: 5, maxPopulation: 100, base_population: 100 });
+    // Bio terminator: 3M × 1 × 10 rounds = 30M, but only 5M pop
+    const result = processBioWeaponDamage(
+      planet as Planet & BioWeaponPlanetFields,
+      'bio_terminator',
+      1,
+      10, // 10 rounds
+      ctx,
+    );
+    // Can only kill 4, leaving 1 survivor
+    expect(result.populationKilled).toBe(4);
+    expect(result.newPopulation).toBe(1);
+  });
+
+  it('cumulative max pop reduction across multiple attacks', () => {
+    const planet: Planet & BioWeaponPlanetFields = {
+      ...makePlanet({ population: 80, maxPopulation: 100, base_population: 100 }),
+      bioWeaponMaxPopReduction: 0.10, // Already hit by death spores before
+    };
+    // Add doom virus reduction (25%)
+    const result = processBioWeaponDamage(
+      planet,
+      'doom_virus',
+      1,
+      1,
+      ctx,
+    );
+    // 0.10 + 0.25 = 0.35 total reduction
+    expect(result.newTotalMaxPopReduction).toBeCloseTo(0.35);
+    // 100 × (1 - 0.35) = 65
+    expect(result.newMaxPopulation).toBe(65);
+  });
+
+  it('max pop reduction is capped at 90%', () => {
+    const planet: Planet & BioWeaponPlanetFields = {
+      ...makePlanet({ population: 50, maxPopulation: 100, base_population: 100 }),
+      bioWeaponMaxPopReduction: 0.80, // Already heavily damaged
+    };
+    // Bio terminator would add 50%, but cap at 90%
+    const result = processBioWeaponDamage(
+      planet,
+      'bio_terminator',
+      1,
+      1,
+      ctx,
+    );
+    // Capped at 0.90
+    expect(result.newTotalMaxPopReduction).toBeCloseTo(0.90);
+    // Only applied 0.10 more
+    expect(result.maxPopReductionApplied).toBeCloseTo(0.10);
+    // baseMaxPop (99 for hamsters with default tech) × (1 - 0.90) = 9.9 → 9
+    // Minimum cap ensures at least 1
+    expect(result.newMaxPopulation).toBeGreaterThanOrEqual(1);
+    expect(result.newMaxPopulation).toBeLessThanOrEqual(10);
+  });
+
+  it('reports atMaxReduction when already at cap', () => {
+    const planet: Planet & BioWeaponPlanetFields = {
+      ...makePlanet({ population: 20, maxPopulation: 100, base_population: 100 }),
+      bioWeaponMaxPopReduction: 0.90, // Already at max reduction
+    };
+    const result = processBioWeaponDamage(
+      planet,
+      'death_spores',
+      1,
+      1,
+      ctx,
+    );
+    expect(result.atMaxReduction).toBe(true);
+    expect(result.maxPopReductionApplied).toBe(0);
+    expect(result.newTotalMaxPopReduction).toBeCloseTo(0.90);
+    // Still kills population
+    expect(result.populationKilled).toBe(1);
+  });
+});
+
+describe('clearBioWeaponDamage', () => {
+  it('clears bio weapon reduction and returns amount cleared', () => {
+    const planet: BioWeaponPlanetFields = {
+      bioWeaponMaxPopReduction: 0.35,
+    };
+    const cleared = clearBioWeaponDamage(planet);
+    expect(cleared).toBeCloseTo(0.35);
+    expect(planet.bioWeaponMaxPopReduction).toBe(0);
+  });
+
+  it('returns 0 if no damage to clear', () => {
+    const planet: BioWeaponPlanetFields = {};
+    const cleared = clearBioWeaponDamage(planet);
+    expect(cleared).toBe(0);
+  });
+});
+
+describe('getEffectiveMaxPopulation', () => {
+  const ctx = makeCtx('hamsters');
+
+  it('returns normal max pop when no bio damage', () => {
+    const planet = makePlanet({ population: 50, maxPopulation: 100, base_population: 100 });
+    const effectiveMax = getEffectiveMaxPopulation(
+      planet as Planet & BioWeaponPlanetFields,
+      ctx,
+    );
+    expect(effectiveMax).toBe(100);
+  });
+
+  it('reduces max pop by bio weapon damage factor', () => {
+    const planet: Planet & BioWeaponPlanetFields = {
+      ...makePlanet({ population: 50, maxPopulation: 100, base_population: 100 }),
+      bioWeaponMaxPopReduction: 0.25,
+    };
+    const effectiveMax = getEffectiveMaxPopulation(planet, ctx);
+    // 100 × (1 - 0.25) = 75
+    expect(effectiveMax).toBe(75);
+  });
+
+  it('returns minimum 1 even with extreme reduction', () => {
+    const planet: Planet & BioWeaponPlanetFields = {
+      ...makePlanet({ population: 5, maxPopulation: 10, base_population: 10 }),
+      bioWeaponMaxPopReduction: 0.99,
+    };
+    const effectiveMax = getEffectiveMaxPopulation(planet, ctx);
+    // 10 × (1 - 0.99) = 0.1 → floor = 0 → min 1
+    expect(effectiveMax).toBe(1);
+  });
+});
+
+describe('POPULATION_TRANSPORT constant', () => {
+  /**
+   * Per design/economy/population-growth.md §7:
+   *   Colony Transport: 50 BC cost, 1 BC/turn maintenance, 1 million pop capacity
+   */
+  it('has correct cost', () => {
+    expect(POPULATION_TRANSPORT.cost).toBe(50);
+  });
+
+  it('has correct maintenance', () => {
+    expect(POPULATION_TRANSPORT.maintenance).toBe(1);
+  });
+
+  it('has correct capacity', () => {
+    expect(POPULATION_TRANSPORT.capacity).toBe(1);
+  });
+});
+
+describe('BIO_WEAPONS constants', () => {
+  /**
+   * Per design/technology/planetology.md:
+   *   Death Spores: TL 10, 1M/round, -10% max pop, 150 space, 100 BC
+   *   Doom Virus: TL 25, 2M/round, -25% max pop, 200 space, 200 BC
+   *   Bio Terminator: TL 33, 3M/round, -50% max pop, 250 space, 300 BC
+   */
+
+  it('death spores has correct stats', () => {
+    expect(BIO_WEAPONS.death_spores.techLevel).toBe(10);
+    expect(BIO_WEAPONS.death_spores.killRatePerRound).toBe(1);
+    expect(BIO_WEAPONS.death_spores.maxPopReduction).toBe(0.10);
+    expect(BIO_WEAPONS.death_spores.spaceCost).toBe(150);
+    expect(BIO_WEAPONS.death_spores.buildCost).toBe(100);
+  });
+
+  it('doom virus has correct stats', () => {
+    expect(BIO_WEAPONS.doom_virus.techLevel).toBe(25);
+    expect(BIO_WEAPONS.doom_virus.killRatePerRound).toBe(2);
+    expect(BIO_WEAPONS.doom_virus.maxPopReduction).toBe(0.25);
+    expect(BIO_WEAPONS.doom_virus.spaceCost).toBe(200);
+    expect(BIO_WEAPONS.doom_virus.buildCost).toBe(200);
+  });
+
+  it('bio terminator has correct stats', () => {
+    expect(BIO_WEAPONS.bio_terminator.techLevel).toBe(33);
+    expect(BIO_WEAPONS.bio_terminator.killRatePerRound).toBe(3);
+    expect(BIO_WEAPONS.bio_terminator.maxPopReduction).toBe(0.50);
+    expect(BIO_WEAPONS.bio_terminator.spaceCost).toBe(250);
+    expect(BIO_WEAPONS.bio_terminator.buildCost).toBe(300);
+  });
+});

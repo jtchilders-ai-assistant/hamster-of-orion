@@ -23,6 +23,7 @@ const defaultSettings: GameSettings = {
   highContrast: false,
   screenReaderEnabled: false,
   customHotkeys: {},
+  quickCombat: false,
 };
 
 const defaultUI: UIState = {
@@ -116,6 +117,10 @@ export const initialState: GameState = {
   highCouncil: null,
 
   spyMissions: [],
+
+  activeEvents: [],
+
+  monsters: [],
 
   turnEvents: [],
 

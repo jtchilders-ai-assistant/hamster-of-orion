@@ -138,6 +138,14 @@ function makeMinimalState(turn = 0, planets: Planet[] = [], empires: Empire[] = 
     combats: { byId: {}, allIds: [], activeCombatId: null },
     aiEmpires: {},
     highCouncil: null,
+    spyMissions: [],
+    activeEvents: [],
+    monsters: [],
+    turnEvents: [],
+    currentPhase: null,
+    phaseOutputs: [],
+    isGameOver: false,
+    victoryResult: null,
     ui: {
       currentScreen: 'galaxy',
       previousScreen: null,
@@ -172,6 +180,7 @@ function makeMinimalState(turn = 0, planets: Planet[] = [], empires: Empire[] = 
         highContrast: false,
         screenReaderEnabled: false,
         customHotkeys: {},
+        quickCombat: false,
       },
     },
   };
