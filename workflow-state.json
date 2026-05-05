@@ -1,61 +1,62 @@
 {
   "state": "COMPLETED",
   "phase": "phase5-design-compliance-fixes",
-  "current_task": "fix-13",
-  "last_check": "2026-05-05T03:40:00.000Z",
+  "current_task": "fix-20",
+  "last_check": "2026-05-05T04:00:00.000Z",
   "total_tasks": 85,
-  "completed_count": 16,
+  "completed_count": 17,
   "skipped_count": 0,
   "blocked_count": 0,
-  "notes": "fix-13 completed: Force Fields accelerated cost schedule fix per design/technology/research-formulas.md §6 and force-fields.md. applyResearchRP() now uses tech-specific costs from tech-tree.json instead of global tier table lookup.",
+  "notes": "fix-20 completed: Tactical Combat UI design doc review. Added implementation status notes for unimplemented features (animation speed controls, hover tooltips). Fixed AUTO-FINISH→AUTO-RESOLVE naming in wireframe. Verified implemented features match design doc specs.",
   "worker_output": {
     "files_created": [],
     "files_modified": [
-      "src/game/systems/research.ts",
-      "test/game/systems/research.test.ts"
+      "design/ui-ux/tactical-combat-ui.md"
     ],
-    "tests_added": [
-      "getTechBaseCostById: returns correct cost for a Weapons tech",
-      "getTechBaseCostById: returns undefined for unknown tech ID",
-      "getTechTierById: returns correct tier for a Force Fields tech",
-      "getTechTierById: returns undefined for unknown tech ID",
-      "Force Fields Tier 14 tech (deflector_15_tech) costs 50000 RP, not 18000",
-      "Force Fields Tier 13 tech (deflector_14_tech) costs 30000 RP",
-      "applyResearchRP uses tech-specific cost for Force Fields",
-      "would NOT complete with global tier 14 cost (18000)",
-      "galaxy size modifier applies to Force Fields tech cost",
-      "AI difficulty modifier applies to Force Fields tech cost"
-    ],
-    "summary": "Fixed Force Fields accelerated cost schedule. applyResearchRP() now uses getTechBaseCostById() to look up per-tech costs from tech-tree.json, falling back to tier-based lookup only if tech not found. This ensures Force Fields Tier 14 costs 50,000 RP (not 18,000 from global table). Added getTechBaseCostById() and getTechTierById() exports. Added comprehensive tests verifying Force Fields costs and modifiers.",
+    "tests_added": [],
+    "summary": "Reviewed tactical-combat-ui.md against CombatScreen.ts implementation. No code changes required - implementation matches design doc for all implemented features. Updated design doc to mark unimplemented features with 🚧 status and fixed naming inconsistency.",
     "design_compliance": [
       {
-        "doc": "design/technology/research-formulas.md",
-        "section": "§6 Base Tech Cost by Tier",
-        "quote": "Force Fields Tier 14 costs 50,000 RP (equivalent to global Tier 18), not 18,000 RP. Always look up Force Fields costs in force-fields.md directly.",
-        "impl_file": "src/game/systems/research.ts",
-        "impl_line": "getTechBaseCostById(), applyResearchRP()",
+        "doc": "design/ui-ux/tactical-combat-ui.md",
+        "section": "HP bars on grid tokens",
+        "quote": "HP bar colors: Green (>50% HP), Yellow (25-50% HP), Red (<25% HP)",
+        "impl_file": "src/ui/screens/CombatScreen.ts",
+        "impl_line": "hpColor() function",
         "verified": true
       },
       {
-        "doc": "design/technology/force-fields.md",
-        "section": "Tier cost mapping",
-        "quote": "Force Fields Tier 14 = 50,000 RP = Global Tier 18",
-        "impl_file": "src/data/tech-tree.json",
-        "impl_line": "deflector_15_tech cost: 50000",
+        "doc": "design/ui-ux/tactical-combat-ui.md",
+        "section": "Movement Points (MP) display",
+        "quote": "MP: 0/4 ✓ done, MP: 4/4 ◄►, [WAIT] tag",
+        "impl_file": "src/ui/screens/CombatScreen.ts",
+        "impl_line": "renderGrid() mpLabel logic (lines 1787-1805)",
         "verified": true
       },
       {
-        "doc": "design/technology/research-formulas.md",
-        "section": "§4 Artifacts World",
-        "quote": "ongoing +25% RP from that planet via multiplier 1.25",
-        "impl_file": "src/data/technologies.json",
-        "impl_line": "special_rp_bonuses.artifacts_world: 1.25",
+        "doc": "design/ui-ux/tactical-combat-ui.md",
+        "section": "Grid Size",
+        "quote": "15×15 hexes (225 total)",
+        "impl_file": "src/ui/screens/CombatScreen.ts",
+        "impl_line": "GRID_COLS = 15, GRID_ROWS = 15",
+        "verified": true
+      },
+      {
+        "doc": "design/ui-ux/tactical-combat-ui.md",
+        "section": "Range modifiers (implicit via combat-algorithm.md reference)",
+        "quote": "Point Blank +10%, Close 0%, Medium -5%, Long -10%, Very Long -20%",
+        "impl_file": "src/game/systems/combat.ts",
+        "impl_line": "rangeModifier() function (line 452)",
         "verified": true
       }
     ],
     "design_gaps": [
       {
-        "gap": "miniaturization_minimum_scale constant (0.50) is in technologies.json but the design doc prose only mentions '50% max reduction' without explicitly naming this constant. The JSON schema section does define miniaturization_minimum: 0.50, so this is consistent but could be more explicitly documented in the prose."
+        "gap": "Animation Speed Controls (SLOW/NORM/FAST/⚡) - documented in design but not implemented. Marked with 🚧 in design doc.",
+        "status": "documented_as_future"
+      },
+      {
+        "gap": "Hover tooltip on ship tokens - documented in design but not implemented. Ship details available via click-selection. Marked with 🚧 in design doc.",
+        "status": "documented_as_future"
       }
     ]
   }

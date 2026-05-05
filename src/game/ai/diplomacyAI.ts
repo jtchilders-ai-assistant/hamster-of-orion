@@ -33,6 +33,8 @@ export interface DiplomaticDecision {
   targetId: EmpireId;
   reasoning: string;
   priority: number; // 1-10
+  /** Treaty type for propose_treaty actions. */
+  treatyType?: Treaty['type'];
 }
 
 // ── Internal helpers ───────────────────────────────────────────────────────────
@@ -156,6 +158,7 @@ export function aiDecideTreaty(
     targetId,
     reasoning: `Relation ${relValue} with ${targetId} warrants ${targetType} treaty (diplomacy score: ${diplomacyScore})`,
     priority,
+    treatyType: targetType,
   };
 }
 
@@ -246,9 +249,25 @@ export function aiDecideDeclareWar(
   const aiEmpire: AIEmpire | undefined = state.aiEmpires[empireId];
   const aggression = aiEmpire?.personality.aggression ?? profile.aggression;
 
-  // Peaceful races never start wars
+  // Peaceful races never start wars (design/diplomacy/ai-personalities.md)
   if (profile.traits.includes('peaceful')) return null;
-  if (profile.traits.includes('honorable') && relation.state !== 'unfriendly') return null;
+
+  // Honorable races with low aggression (< 50) never start wars — they only
+  // defend when attacked. This applies to Hamsters ("Never declares war first")
+  // and Hermit Crabs ("Triggers War: Direct attack only").
+  // Honorable races with high aggression (Guinea Pigs, Budgies) CAN declare war
+  // when provoked (relations are unfriendly) — they just keep their treaties.
+  const HONORABLE_AGGRESSION_THRESHOLD = 50;
+  if (profile.traits.includes('honorable')) {
+    if (aggression < HONORABLE_AGGRESSION_THRESHOLD) {
+      // Low-aggression honorable races never initiate war
+      return null;
+    }
+    // High-aggression honorable races only declare war when relations are unfriendly
+    if (relation.state !== 'unfriendly') {
+      return null;
+    }
+  }
 
   const relValue = relation.value;
   const ratio = fleetStrengthRatio(state, empireId, targetId);
@@ -313,19 +332,21 @@ export function evaluateDiplomaticOptions(
     const treatyDecision = aiDecideTreaty(state, empireId, targetId);
     if (treatyDecision) decisions.push(treatyDecision);
 
-    // Trade deal (high-diplomacy empires seek trade when friendly)
+    // Trade deal (high-diplomacy empires seek trade when relations meet threshold)
+    // Per design/diplomacy/relationship-formulas.md §5.4, trade requires +10 relations
+    const TRADE_MIN_RELATION = 10;
     const dipScore = aiState.personality.diplomacy;
     const relValue = getRelationValue(state, empireId, targetId);
 
     if (
       dipScore >= 40 &&
-      relValue > STATE_FRIENDLY_THRESHOLD &&
+      relValue >= TRADE_MIN_RELATION &&
       !hasTreatyOfType(state, empireId, targetId, 'trade')
     ) {
       decisions.push({
         action: 'trade_deal',
         targetId,
-        reasoning: `Friendly relations (${relValue}) and high diplomacy (${dipScore}) favor trade deal`,
+        reasoning: `Relations (${relValue}) and high diplomacy (${dipScore}) favor trade deal`,
         priority: Math.min(10, 3 + Math.round(dipScore / 20)),
       });
     }
@@ -377,7 +398,13 @@ export function applyAIDiplomaticDecisions(state: GameState): GameState {
           next = applyBreakTreaty(next, empireId, decision.targetId);
           break;
         case 'propose_treaty':
-          next = applyProposeTreaty(next, empireId, decision.targetId, 'non_aggression');
+          // Use the treaty type from the decision, fallback to non_aggression
+          next = applyProposeTreaty(
+            next,
+            empireId,
+            decision.targetId,
+            decision.treatyType ?? 'non_aggression',
+          );
           break;
         case 'trade_deal':
           next = applyProposeTreaty(next, empireId, decision.targetId, 'trade');
