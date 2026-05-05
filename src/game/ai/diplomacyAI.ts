@@ -15,7 +15,7 @@
  *   src/game/state.ts                     — GameState, EmpireId, AIEmpire
  */
 
-import { GameState, EmpireId, AIEmpire, DiplomaticRelations, Treaty } from '../state';
+import { GameState, EmpireId, AIEmpire, DiplomaticRelations, Treaty, TreatyType } from '../state';
 import {
   RELATION_MIN,
   STATE_WAR_THRESHOLD,
@@ -23,6 +23,7 @@ import {
   STATE_ALLIED_THRESHOLD,
   getRelationValue,
 } from '../systems/diplomacy';
+import { proposeTreaty, acceptTreaty } from '../systems/treaties';
 import { getEmpireFleetPower } from './strategies';
 import { getPersonalityProfile } from './ai-personalities';
 
@@ -511,71 +512,36 @@ function applyBreakTreaty(
   };
 }
 
+/**
+ * Apply a treaty proposal using the proper treaties.ts flow.
+ *
+ * Uses the canonical proposeTreaty function to create a pending treaty.
+ * For AI-to-AI treaties, auto-accepts immediately (since there's no UI).
+ * For AI-to-player treaties, leaves as pending for player to accept/reject.
+ *
+ * Design reference: design/diplomacy/relationship-formulas.md §9.1
+ * NOTE: Full AI acceptance formula (AcceptanceChance) is not yet implemented.
+ * Currently AI-to-AI treaties auto-accept; this should eventually use the
+ * formula: AcceptanceChance = BaseChance + RelationBonus + RacialBonus + ...
+ */
 function applyProposeTreaty(
   state: GameState,
   empireId: EmpireId,
   targetId: EmpireId,
-  type: Treaty['type'],
+  type: TreatyType,
 ): GameState {
-  const empire = state.empires.byId[empireId];
-  if (!empire) return state;
-
-  const rel = empire.relations[targetId];
-  if (!rel) return state;
-
-  // Don't duplicate treaty types
-  if (rel.treaties.some((t) => t.isActive && t.type === type)) return state;
-
-  const newTreaty: Treaty = {
-    id: `treaty-${empireId}-${targetId}-${type}-${state.turn}`,
-    type,
-    signedTurn: state.turn,
-    duration: null,
-    terms: {},
-    isActive: true,
-    canBreak: type !== 'peace',
-  };
-
   const target = state.empires.byId[targetId];
-  const targetRel = target?.relations[empireId];
+  if (!target) return state;
 
-  // When the target is the player (or any empire), populate their incomingProposals
-  // so the DiplomacyScreen can display Accept/Reject buttons.
-  const updatedById: Record<EmpireId, typeof empire> = {
-    ...state.empires.byId,
-    [empireId]: {
-      ...empire,
-      relations: {
-        ...empire.relations,
-        [targetId]: {
-          ...rel,
-          treaties: [...rel.treaties, newTreaty],
-        },
-      },
-    },
-  };
+  // Use the proper treaty proposal flow from treaties.ts
+  let next = proposeTreaty(state, empireId, targetId, type);
 
-  if (target && targetRel) {
-    updatedById[targetId] = {
-      ...target,
-      relations: {
-        ...target.relations,
-        [empireId]: {
-          ...targetRel,
-          incomingProposals: [
-            ...(targetRel.incomingProposals ?? []),
-            { type: type, fromEmpireId: empireId, proposedTurn: state.turn },
-          ],
-        },
-      },
-    };
+  // If the target is the player, leave as pending for UI acceptance.
+  // If the target is AI, auto-accept the treaty.
+  // TODO: Implement AI acceptance formula per design/diplomacy/relationship-formulas.md §9.1
+  if (!target.isPlayer) {
+    next = acceptTreaty(next, empireId, targetId, type);
   }
 
-  return {
-    ...state,
-    empires: {
-      ...state.empires,
-      byId: updatedById,
-    },
-  };
+  return next;
 }

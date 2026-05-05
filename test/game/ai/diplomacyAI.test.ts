@@ -53,6 +53,7 @@ function makeRelation(
     warStartTurn: state === 'war' ? 1 : null,
     lastContact: 1,
     modifiers: [],
+    incomingProposals: [],
   };
 }
 

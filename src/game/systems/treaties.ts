@@ -150,7 +150,7 @@ function cloneRelation(rel: DiplomaticRelations): DiplomaticRelations {
     treaties: [...rel.treaties],
     events: [...rel.events],
     modifiers: [...rel.modifiers],
-    incomingProposals: [...rel.incomingProposals],
+    incomingProposals: [...(rel.incomingProposals ?? [])],
   };
 }
 

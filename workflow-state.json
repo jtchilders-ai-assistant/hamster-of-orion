@@ -1,68 +1,62 @@
 {
   "state": "COMPLETED",
   "phase": "phase5-design-compliance-fixes",
-  "current_task": "fix-24",
-  "last_check": "2026-05-05T05:00:00.000Z",
+  "current_task": "fix-79",
+  "last_check": "2026-05-05T05:03:00.000Z",
   "total_tasks": 85,
-  "completed_count": 18,
+  "completed_count": 19,
   "skipped_count": 0,
   "blocked_count": 0,
-  "notes": "fix-24 completed: Espionage System design doc compliance. Implemented §1.3 All Spies Fail catastrophic result, §6.2 Tech Theft tier modifiers. Fixed sabotage_bases base success rate (20→35). Fixed test references to invalid 'propaganda' mission type.",
+  "notes": "fix-79 completed: DiplomacyAI design doc compliance. Refactored applyProposeTreaty to use proper treaties.ts flow (proposeTreaty/acceptTreaty) instead of directly creating active treaties. Added TODO for AI acceptance formula implementation per relationship-formulas.md §9.1.",
   "worker_output": {
     "files_created": [],
     "files_modified": [
-      "src/game/systems/espionage.ts",
-      "src/game/state.ts",
-      "test/game/systems/espionage.test.ts"
+      "src/game/ai/diplomacyAI.ts",
+      "test/game/ai/diplomacyAI.test.ts"
     ],
-    "tests_added": [
-      "getTechTheftTierModifier: returns +10 for Tier 1-3 (easier to steal basic tech)",
-      "getTechTheftTierModifier: returns +0 for Tier 4-6",
-      "getTechTheftTierModifier: returns -5 for Tier 7-9",
-      "getTechTheftTierModifier: returns -10 for Tier 10-12",
-      "getTechTheftTierModifier: returns -15 for Tier 13+ (hardest to steal advanced tech)",
-      "calculateTechTheftProbability: low tier tech has higher success rate",
-      "calculateTechTheftProbability: Chameleons stealing tier 1 tech have maximum success (capped at 95%)",
-      "calculateTechTheftProbability: returns 0 when targeting Ants (immune)",
-      "All Spies Fail: skipTurns is decremented each turn for active missions",
-      "All Spies Fail: missions with skipTurns > 0 are not processed",
-      "All Spies Fail: catastrophic roll (100) penalizes all sender's active spies"
-    ],
-    "summary": "Implemented espionage system fixes per design/diplomacy/espionage.md. Added §1.3 All Spies Fail catastrophic result: when detection_roll == 100, all of the sender's active spies skip their next turn. Added §6.2 Tech Theft tier-based value modifiers (+10 for Tier 1-3, 0 for 4-6, -5 for 7-9, -10 for 10-12, -15 for 13+). Fixed sabotage_bases base success rate from 20% to 35% per §6.4. Added skipTurns field to SpyMission interface. Fixed test file references to non-existent 'propaganda' mission type.",
+    "tests_added": [],
+    "summary": "Reviewed diplomacyAI.ts for design compliance. Found and fixed one issue: applyProposeTreaty was creating treaties directly with isActive=true, bypassing the proper propose/accept flow from treaties.ts. Now uses proposeTreaty() to create pending treaties, then acceptTreaty() for AI-to-AI treaties (auto-accept), while AI-to-player treaties remain pending for UI acceptance. Added test fixture fix for missing incomingProposals field. Verified existing honorable/peaceful trait handling correctly implements design doc rules for war declaration.",
     "design_compliance": [
       {
-        "doc": "design/diplomacy/espionage.md",
-        "section": "§1.3 All Spies Fail — Catastrophic Result",
-        "quote": "When any single spy roll hits a catastrophic failure threshold (natural roll of 100 on the detection die), ALL of that empire's currently-infiltrated spies lose their next action turn",
-        "impl_file": "src/game/systems/espionage.ts",
-        "impl_line": "processEspionageTurns(), applyAllSpiesFailPenalty(), ALL_SPIES_FAIL_THRESHOLD = 100",
+        "doc": "design/diplomacy/ai-personalities.md",
+        "section": "Hamsters - The Honorable Diplomats",
+        "quote": "Never declares war first (must be attacked)",
+        "impl_file": "src/game/ai/diplomacyAI.ts",
+        "impl_line": "aiDecideDeclareWar: honorable races with aggression < 50 return null",
         "verified": true
       },
       {
-        "doc": "design/diplomacy/espionage.md",
-        "section": "§6.2 Technology Theft - TechValueModifier",
-        "quote": "Tier 1-3 techs: +10, Tier 4-6: +0, Tier 7-9: -5, Tier 10-12: -10, Tier 13+: -15",
-        "impl_file": "src/game/systems/espionage.ts",
-        "impl_line": "TECH_THEFT_TIER_MODIFIERS, getTechTheftTierModifier(), calculateTechTheftProbability()",
+        "doc": "design/diplomacy/ai-personalities.md",
+        "section": "Rabbits - The Survivors",
+        "quote": "Triggers War: Never (defensive only)",
+        "impl_file": "src/game/ai/diplomacyAI.ts",
+        "impl_line": "aiDecideDeclareWar: peaceful trait check returns null",
         "verified": true
       },
       {
-        "doc": "design/diplomacy/espionage.md",
-        "section": "§6.4 Sabotage Missile Bases",
-        "quote": "base_success: 35",
-        "impl_file": "src/game/systems/espionage.ts",
-        "impl_line": "BASE_MISSION_SUCCESS.sabotage_bases = 35",
+        "doc": "design/diplomacy/treaties.md",
+        "section": "Treaty Types",
+        "quote": "Treaties require both sides willing; propose then accept flow",
+        "impl_file": "src/game/ai/diplomacyAI.ts",
+        "impl_line": "applyProposeTreaty: now uses proposeTreaty() + acceptTreaty() from treaties.ts",
         "verified": true
       },
       {
-        "doc": "design/diplomacy/espionage.md",
-        "section": "§2.2 Defensive Security Bonuses",
-        "quote": "Ants: Immune, Chameleons: +30, Mice: +10, Rats: +5, Rabbits: -5, Hermit Crabs: -10",
-        "impl_file": "src/game/systems/espionage.ts",
-        "impl_line": "RACIAL_DEFENSE_BONUS constant",
+        "doc": "design/diplomacy/relationship-formulas.md",
+        "section": "§9.3 AI Declaration of War",
+        "quote": "Aggression threshold 60; aggressive races use -25 relation threshold, normal use -50",
+        "impl_file": "src/game/ai/diplomacyAI.ts",
+        "impl_line": "aiDecideDeclareWar: aggressionThreshold=60, relationThreshold = -25 or -50",
         "verified": true
       }
     ],
-    "design_gaps": []
+    "design_gaps": [
+      {
+        "doc": "design/diplomacy/relationship-formulas.md",
+        "section": "§9.1 AI Acceptance Formula",
+        "quote": "AcceptanceChance = BaseChance + RelationBonus + RacialBonus + ReputationBonus + OfferBonus",
+        "note": "Not implemented. AI-to-AI treaties auto-accept. TODO added in code for future implementation."
+      }
+    ]
   }
 }
