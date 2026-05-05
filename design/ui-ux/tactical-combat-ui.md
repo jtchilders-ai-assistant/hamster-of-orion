@@ -4,6 +4,9 @@
 
 Turn-based tactical combat on a hexagonal grid. Inspired by MOO1's auto-resolve option but with full tactical control for players who want it.
 
+> **Implementation Status**: Core combat UI is implemented in `src/ui/screens/CombatScreen.ts`.
+> Features marked with 🚧 are designed but not yet implemented.
+
 ---
 
 ## Combat Initiation
@@ -107,9 +110,12 @@ This is the primary tactical combat view. Ships on the hex grid display HP bars 
 ║ │                           │  └─────────────────────┘  ║
 ║ └───────────────────────────┘                            ║
 ╠════════════════════════════════════════════════════════════╣
-║ Speed: [SLOW][NORM][FAST][⚡] │ [AUTO-FINISH] [RETREAT]   ║
+║ Speed: [SLOW][NORM][FAST][⚡] │ [AUTO-RESOLVE] [RETREAT]  ║
 ╚════════════════════════════════════════════════════════════╝
 ```
+
+> 🚧 **Animation Speed Controls**: The Speed bar (SLOW/NORM/FAST/⚡) is not yet implemented.
+> Current implementation has instant resolution with floating damage numbers.
 
 **Key UI elements explained:**
 - **Initiative strip** (top bar): All ships sorted by speed/initiative, showing faction, name, and HP. Active ship has ▶ marker.
@@ -119,7 +125,7 @@ This is the primary tactical combat view. Ships on the hex grid display HP bars 
 - **DONE button**: Confirms ship is finished for this round (same as END TURN for that ship).
 - **Missiles in flight**: `[3 in flight]` shown in weapon list; missile tokens (~M~) appear on the hex grid and advance each round.
 - **Combat log**: Scrollable event log; damage numbers shown inline (e.g. `-45 dmg`).
-- **Combat speed bar**: Slow / Normal / Fast / Instant — controls animation speed globally.
+- **Combat speed bar**: 🚧 Slow / Normal / Fast / Instant — controls animation speed globally (not yet implemented).
 
 ---
 
@@ -182,7 +188,7 @@ Each ship token on the hex grid renders a small HP bar directly beneath the ship
 - `MP: 4/4 ◄►` when a ship is selected and waiting for movement input
 - Ships that used WAIT show `[WAIT]` tag until they act
 
-**Hover tooltip** (on mouse-over of a token):
+**Hover tooltip** (on mouse-over of a token): 🚧 Not yet implemented
 ```
 ┌──────────────────────────────────────┐
 │ Destroyer "Vengeance" (Yours)       │
@@ -193,6 +199,8 @@ Each ship token on the hex grid renders a small HP bar directly beneath the ship
 │ Speed: 5  Initiative: 3rd          │
 └──────────────────────────────────────┘
 ```
+
+> Ship details are available via click-selection in the ship detail panel on the right side.
 
 ---
 
@@ -331,6 +339,9 @@ The **initiative strip** runs across the top of the combat screen as a horizonta
 5. Remove from grid
 
 ### Animation Speed Options
+
+🚧 **Not yet implemented** — current behavior is instant resolution with floating damage numbers.
+
 ```
 ┌─Combat─Speed────────────────┐
 │ Animation Speed:            │
