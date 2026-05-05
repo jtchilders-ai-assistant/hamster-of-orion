@@ -104,16 +104,19 @@ See `technology/computers.md` for scanner tech details.
 
 **Ancient Technology Sites** (randomly placed during galaxy generation). Colonizing an Artifacts world provides **two distinct bonuses** (M2 clarification):
 
-**1. One-Time Tech Unlock (upon colonization)**
+**1. One-Time Tech Unlock (upon colonization)** ✔️ Implemented
 - Immediately grants a random technology from any field
 - Could be a tech you already own — in that case, no benefit
 - Could be an advanced tech from any field — potentially a major advantage
 - This fires exactly once per planet; reconquering does not re-trigger it
+- Tracked via `planet.artifactsTechClaimed` flag
+- Implementation: `src/game/systems/colonization.ts` — `grantArtifactsTechBonus()`
 
-**2. Ongoing RP Multiplier (persistent)**
+**2. Ongoing RP Multiplier (persistent)** ✔️ Implemented
 - While the planet remains under your control, all RP generated there is multiplied by 1.25 (+25%)
 - Lost permanently if the planet is conquered or bombed to zero population
 - The Artifacts site is considered destroyed by orbital bombardment
+- Implementation: `src/game/systems/research.ts` applies the multiplier
 
 See `technology/research-formulas.md` §4 for the RP bonus formula.
 
@@ -123,30 +126,34 @@ See `technology/research-formulas.md` §4 for the RP bonus formula.
 
 ## Space Monsters (Random Events)
 
-MOO1 has two space monsters that appear as random events after Turn 100:
+Space monsters appear as random events after Turn 100. Implementation: `src/game/systems/events.ts`
 
-### Space Amoeba
-- Massive single creature
-- Regenerates health each combat round
-- Uses stream weapon (engulfs ships)
-- Moves between planets, irradiating them
-- Will slag up to 5 planets then disappear
-- Requires sustained firepower to overcome regeneration
+### Cosmic Blob (Space Amoeba)
+- **HP**: 500, **Attack/Defense**: 4/4
+- **Beam Damage**: 10-40
+- **Regeneration**: 15 HP per combat round
+- **Movement**: 2 hexes per turn (roaming)
+- **Reward**: Biotechnology field +50% research bonus for 10 turns, 200-500 BC
 
-### Space Crystal
-- Crystalline entity
-- Reflects beam weapons back at attacker
-- Vulnerable to missiles and torpedoes
-- Also moves between planets
-- Will slag up to 5 planets then disappear
+### Crystal Horror (Space Crystal)
+- **HP**: 400, **Attack/Defense**: 6/8
+- **Beam Damage**: 15-50
+- **Beam Reflection**: 25% of beam damage reflected to attacker
+- **Movement**: 3 hexes per turn (roaming)
+- **Reward**: Construction field +25% research bonus for 10 turns, 300-600 BC
+
+### Void Wyrm (Guardian variant)
+- **HP**: 750, **Attack/Defense**: 8/6
+- **Beam Damage**: 30-100
+- **Movement**: 4 hexes per turn (guards treasure location)
+- **Reward**: 2-4 random techs, 500-1000 BC, 25% chance of artifact
 
 **Defeating Monsters**:
 - Monster guards a planet until defeated
 - Requires significant fleet strength
-- Reward: Planet becomes safe to colonize
-- Monsters do NOT give tech directly (unlike Orion Guardian)
+- Reward: Planet becomes safe to colonize + field-specific bonuses
 
-**Strategy**: Avoid until fleet strong enough; use missiles against Crystal
+**Strategy**: Avoid until fleet strong enough; Crystal Horror reflects beam weapons
 
 ---
 
@@ -168,27 +175,38 @@ See `space-regions.md` for more on the Orion system.
 
 ## Random Events Affecting Exploration
 
+Random events are implemented in `src/game/systems/events.ts` and configured in `src/data/events.json`. Event processing occurs during the Events phase (Phase 9) of each turn via `processRandomEvents()`.
+
+**Implementation Notes:**
+- Events are NOT generated in the galaxy generator; they occur dynamically during gameplay
+- Event probability: 3% base + 0.1% per turn, capped at 15%
+- Minimum turns between same event: 20 turns
+- Multi-turn events (plague, comet, supernova) are tracked in `state.activeEvents`
+
 These events can occur during the game:
 
 **Beneficial**:
-- Ancient Derelict: Free technology discovery
+- Ancient Derelict: Free technology discovery (choice: salvage for BC or board for tech chance)
 - Fertile Planet: Planet becomes more habitable
 - Mineral-Rich Planet: Planet gains Rich status
 - Donation: Receive bonus credits
 
 **Harmful**:
-- Comet: Threatens to destroy a colony (can be shot down)
+- Comet: 5-turn countdown, 1000 HP, destroys colony on impact (can be shot down by fleet)
 - Depleted Planet: Planet loses mineral richness
-- Plague: Kills population (research can cure)
+- Plague: 3-5 turns, 10-20% pop loss/turn, 25% spread chance (mitigated by Bio Toxin Antidote)
+- Supernova: 5-turn warning, destroys all planets/ships in system
+- Computer Virus: 3-6 turns, reduces research/production (mitigated by ECM Jammer V)
 - Earthquake: Destroys factories
 - Industrial Accident: Damages production
 - Piracy: Lose credits to space pirates
 
 **Diplomatic**:
 - Diplomatic Blunder: Relations worsen with random race
-- Computer Virus: Lose research points
 
 **Note**: Random events can be disabled in game setup.
+
+See `game-mechanics/random-events.md` for full event specifications.
 
 ---
 

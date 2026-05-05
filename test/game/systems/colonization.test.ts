@@ -561,3 +561,234 @@ describe('findColonyShipInFleet', () => {
     expect(findColonyShipInFleet(fleet, state)).toBeNull();
   });
 });
+
+// ── Artifacts Tech Bonus tests (exploration.md / research-formulas.md) ────────
+
+describe('grantArtifactsTechBonus', () => {
+  it('grants a random tech when colonizing unclaimed artifacts world', () => {
+    // Create a state with an artifacts world that has an owner
+    const state = buildState({ withColonyShip: true });
+    const planet = state.planets.byId['p1'];
+    const artifactsPlanet = {
+      ...planet,
+      hasArtifacts: true,
+      artifactsTechClaimed: false,
+      ownerId: 'player',
+      isColonized: true,
+    };
+    const artifactsState: GameState = {
+      ...state,
+      planets: {
+        ...state.planets,
+        byId: { ...state.planets.byId, p1: artifactsPlanet },
+      },
+    };
+
+    // Fixed RNG for deterministic test
+    const fixedRng = () => 0.1;
+    const result = grantArtifactsTechBonus(artifactsState, 'p1', 'player', fixedRng);
+
+    // Tech should be granted
+    expect(result.grantedTechId).toBeDefined();
+    expect(result.grantedTechId).not.toBeNull();
+
+    // Planet should be marked as claimed
+    expect(result.state.planets.byId['p1'].artifactsTechClaimed).toBe(true);
+
+    // Tech should be in empire's completed techs
+    const completedTechs = result.state.empires.byId['player'].research.completedTechs;
+    expect(completedTechs).toContain(result.grantedTechId);
+  });
+
+  it('returns null if planet is not an artifacts world', () => {
+    const state = buildState({ withColonyShip: true });
+    const planet = state.planets.byId['p1'];
+    const normalPlanet = {
+      ...planet,
+      hasArtifacts: false,
+      artifactsTechClaimed: false,
+      ownerId: 'player',
+      isColonized: true,
+    };
+    const normalState: GameState = {
+      ...state,
+      planets: {
+        ...state.planets,
+        byId: { ...state.planets.byId, p1: normalPlanet },
+      },
+    };
+
+    const result = grantArtifactsTechBonus(normalState, 'p1', 'player');
+
+    expect(result.grantedTechId).toBeNull();
+    expect(result.state.planets.byId['p1'].artifactsTechClaimed).toBe(false);
+  });
+
+  it('returns null if artifacts bonus already claimed', () => {
+    const state = buildState({ withColonyShip: true });
+    const planet = state.planets.byId['p1'];
+    const claimedPlanet = {
+      ...planet,
+      hasArtifacts: true,
+      artifactsTechClaimed: true, // Already claimed
+      ownerId: 'player',
+      isColonized: true,
+    };
+    const claimedState: GameState = {
+      ...state,
+      planets: {
+        ...state.planets,
+        byId: { ...state.planets.byId, p1: claimedPlanet },
+      },
+    };
+
+    const result = grantArtifactsTechBonus(claimedState, 'p1', 'player');
+
+    expect(result.grantedTechId).toBeNull();
+  });
+
+  it('marks claimed even if tech already owned (per design doc)', () => {
+    // Per design: "The tech is chosen randomly; it may be one you already own (no benefit)"
+    const state = buildState({ withColonyShip: true });
+    const planet = state.planets.byId['p1'];
+
+    // Set up artifacts world
+    const artifactsPlanet = {
+      ...planet,
+      hasArtifacts: true,
+      artifactsTechClaimed: false,
+      ownerId: 'player',
+      isColonized: true,
+    };
+
+    // Fixed RNG for deterministic test
+    const fixedRng = () => 0.1;
+
+    const artifactsState: GameState = {
+      ...state,
+      planets: {
+        ...state.planets,
+        byId: { ...state.planets.byId, p1: artifactsPlanet },
+      },
+    };
+
+    const result = grantArtifactsTechBonus(artifactsState, 'p1', 'player', fixedRng);
+
+    // Planet is marked as claimed
+    expect(result.state.planets.byId['p1'].artifactsTechClaimed).toBe(true);
+    // Tech ID is still returned (even though design says "may be one you already own")
+    expect(result.grantedTechId).not.toBeNull();
+  });
+});
+
+describe('colonizeWithDetails', () => {
+  it('returns granted tech when colonizing artifacts world', () => {
+    const state = buildState({ withColonyShip: true });
+    const planet = state.planets.byId['p1'];
+    const artifactsPlanet = {
+      ...planet,
+      hasArtifacts: true,
+      artifactsTechClaimed: false,
+    };
+    const artifactsState: GameState = {
+      ...state,
+      planets: {
+        ...state.planets,
+        byId: { ...state.planets.byId, p1: artifactsPlanet },
+      },
+    };
+
+    const fixedRng = () => 0.2;
+    const result = colonizeWithDetails('f1', 'p1', artifactsState, fixedRng);
+
+    // Colonization should succeed
+    expect(result.state.planets.byId['p1'].isColonized).toBe(true);
+    expect(result.state.planets.byId['p1'].ownerId).toBe('player');
+
+    // Artifacts tech bonus should be granted
+    expect(result.grantedTechId).not.toBeNull();
+    expect(result.state.planets.byId['p1'].artifactsTechClaimed).toBe(true);
+
+    // Tech should be in empire's completed techs
+    const completedTechs = result.state.empires.byId['player'].research.completedTechs;
+    expect(completedTechs).toContain(result.grantedTechId);
+  });
+
+  it('returns null grantedTechId for normal planets', () => {
+    const state = buildState({ withColonyShip: true });
+
+    const result = colonizeWithDetails('f1', 'p1', state);
+
+    expect(result.state.planets.byId['p1'].isColonized).toBe(true);
+    expect(result.grantedTechId).toBeNull();
+  });
+});
+
+describe('colonize with artifacts world', () => {
+  it('automatically grants tech bonus when colonizing artifacts world', () => {
+    const state = buildState({ withColonyShip: true });
+    const planet = state.planets.byId['p1'];
+    const artifactsPlanet = {
+      ...planet,
+      hasArtifacts: true,
+      artifactsTechClaimed: false,
+    };
+    const artifactsState: GameState = {
+      ...state,
+      planets: {
+        ...state.planets,
+        byId: { ...state.planets.byId, p1: artifactsPlanet },
+      },
+    };
+
+    const result = colonize('f1', 'p1', artifactsState);
+
+    // Planet should be colonized
+    expect(result.planets.byId['p1'].isColonized).toBe(true);
+
+    // Artifacts bonus should be marked as claimed
+    expect(result.planets.byId['p1'].artifactsTechClaimed).toBe(true);
+
+    // Empire should have gained a tech
+    const originalTechs = artifactsState.empires.byId['player'].research.completedTechs.length;
+    const newTechs = result.empires.byId['player'].research.completedTechs.length;
+    expect(newTechs).toBe(originalTechs + 1);
+  });
+
+  it('does not grant bonus if artifacts already claimed (reconquest)', () => {
+    const state = buildState({ withColonyShip: true });
+    const planet = state.planets.byId['p1'];
+    const claimedArtifacts = {
+      ...planet,
+      hasArtifacts: true,
+      artifactsTechClaimed: true, // Bonus already claimed by previous owner
+    };
+    const claimedState: GameState = {
+      ...state,
+      planets: {
+        ...state.planets,
+        byId: { ...state.planets.byId, p1: claimedArtifacts },
+      },
+    };
+
+    const originalTechs = claimedState.empires.byId['player'].research.completedTechs.length;
+    const result = colonize('f1', 'p1', claimedState);
+
+    // No new tech should be granted
+    const newTechs = result.empires.byId['player'].research.completedTechs.length;
+    expect(newTechs).toBe(originalTechs);
+  });
+});
+
+describe('getTechName', () => {
+  it('returns tech name for valid tech ID', () => {
+    // We know at least some basic techs exist
+    const name = getTechName('laser_tech');
+    expect(name).toBeDefined();
+  });
+
+  it('returns null for invalid tech ID', () => {
+    const name = getTechName('nonexistent_tech_xyz');
+    expect(name).toBeNull();
+  });
+});
