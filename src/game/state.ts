@@ -431,6 +431,8 @@ export interface Planet {
   isPoor: boolean;
   isGaia: boolean;
   hasArtifacts: boolean;
+  /** Whether the one-time Artifacts World tech bonus has been claimed. */
+  artifactsTechClaimed?: boolean;
 
   // Shipyard construction state
   /** The design currently being built at this planet's shipyard (null = nothing queued). */

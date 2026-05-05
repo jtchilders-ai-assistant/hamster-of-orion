@@ -314,7 +314,7 @@ describe('processEspionageTurns', () => {
     const hamster = makeEmpire('emp2', 'hamsters', 10, 0);
     let state = makeState({ emp1: chameleon, emp2: hamster }, 1);
 
-    state = sendSpyMission(state, 'emp1', 'emp2', 'infiltration'); // duration = 5
+    state = sendSpyMission(state, 'emp1', 'emp2', 'assassination'); // duration = 6
     state = { ...state, turn: 3 }; // Only 2 turns elapsed
 
     state = processEspionageTurns(state);

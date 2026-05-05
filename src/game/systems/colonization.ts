@@ -7,6 +7,8 @@
  *
  * References:
  *   design/technical/data-structures.md  — Fleet, Ship, Planet interfaces
+ *   design/galaxy/exploration.md         — Artifacts world tech bonus
+ *   design/technology/research-formulas.md — §4 Artifacts World dual benefit
  *   src/game/state.ts                    — GameState type definitions
  *   src/data/components.json             — colony_base / colony_pod components
  *   .agents/task-colonization.md         — acceptance criteria & starting stats
@@ -21,9 +23,13 @@ import {
   ShipId,
   PlanetType,
   Morale,
+  TechField,
+  EmpireId,
+  TechId,
 } from '../state';
 import { ComponentData, SpecialEffect } from '../types/shipComponents';
 import componentData from '../../data/components.json';
+import techTreeData from '../../data/tech-tree.json';
 import { hasUniversalColonization } from './raceAbilities';
 
 // ── Component lookup ───────────────────────────────────────────────────────────
@@ -193,6 +199,117 @@ export const COLONY_STARTING_PRODUCTION = {
   ecology: 20,
   research: 20,
 } as const;
+
+// ── Tech tree data ───────────────────────────────────────────────────────────
+
+interface TechEntry {
+  id: string;
+  name: string;
+  field: TechField;
+  tier: number;
+  cost: number;
+  unlocks?: string[];
+  description: string;
+}
+
+const allTechs: TechEntry[] = (techTreeData as { technologies: TechEntry[] }).technologies;
+
+// ── Artifacts World Tech Bonus ───────────────────────────────────────────────
+
+/**
+ * Grants the one-time Artifacts World tech bonus upon colonization.
+ *
+ * Per design/galaxy/exploration.md §Artifacts Worlds:
+ *   "One-time tech unlock upon colonization — fires exactly once per planet.
+ *    Immediately grants a random technology from any field."
+ *
+ * Per design/technology/research-formulas.md §4:
+ *   "The tech is chosen randomly; it may be one you already own (no benefit)
+ *    or an advanced tech (major advantage)."
+ *
+ * @returns Object with the updated state and the granted tech (or null if already claimed)
+ */
+export function grantArtifactsTechBonus(
+  state: GameState,
+  planetId: PlanetId,
+  empireId: EmpireId,
+  rng: () => number = Math.random,
+): { state: GameState; grantedTechId: TechId | null } {
+  const planet = state.planets.byId[planetId];
+
+  // Verify this is an unclaimed Artifacts world
+  if (!planet?.hasArtifacts || planet.artifactsTechClaimed) {
+    return { state, grantedTechId: null };
+  }
+
+  const empire = state.empires.byId[empireId];
+  if (!empire) {
+    return { state, grantedTechId: null };
+  }
+
+  // Select a random tech from all available techs
+  // Per design: the tech is chosen randomly from any field
+  if (allTechs.length === 0) {
+    return { state, grantedTechId: null };
+  }
+
+  const randomIndex = Math.floor(rng() * allTechs.length);
+  const selectedTech = allTechs[randomIndex];
+  if (!selectedTech) {
+    return { state, grantedTechId: null };
+  }
+
+  const techId = selectedTech.id;
+  const alreadyOwned = empire.research.completedTechs.includes(techId);
+
+  // Mark planet as claimed regardless of whether tech was new
+  const updatedPlanet: Planet = {
+    ...planet,
+    artifactsTechClaimed: true,
+  };
+
+  let updatedEmpire = empire;
+
+  // Only add tech if not already owned
+  if (!alreadyOwned) {
+    updatedEmpire = {
+      ...empire,
+      research: {
+        ...empire.research,
+        completedTechs: [...empire.research.completedTechs, techId],
+      },
+    };
+  }
+
+  const nextState: GameState = {
+    ...state,
+    planets: {
+      ...state.planets,
+      byId: {
+        ...state.planets.byId,
+        [planetId]: updatedPlanet,
+      },
+    },
+    empires: {
+      ...state.empires,
+      byId: {
+        ...state.empires.byId,
+        [empireId]: updatedEmpire,
+      },
+    },
+  };
+
+  // Return techId even if already owned (per design: "may be one you already own")
+  return { state: nextState, grantedTechId: techId };
+}
+
+/**
+ * Get the name of a tech by its ID.
+ */
+export function getTechName(techId: TechId): string | null {
+  const tech = allTechs.find((t) => t.id === techId);
+  return tech?.name ?? null;
+}
 
 // ── Colonize action ───────────────────────────────────────────────────────────
 

@@ -416,7 +416,11 @@ export class ColoniesScreen {
     };
   }
 
-  /** Determine what the planet's industry is currently building. */
+  /**
+   * Determine what the planet's industry is currently building.
+   * Per design/planets/production.md §Ship Construction:
+   *   Display Text: `(Ship Name) & Turns` (e.g., "Scout 4")
+   */
   private getBuildingDescription(planet: Planet): string {
     if (planet.buildQueue.length > 0) {
       const item = planet.buildQueue[0];
@@ -424,18 +428,46 @@ export class ColoniesScreen {
     }
 
     // Check if a ship is in progress
-    if (planet.currentDesignId !== null && planet.shipyardProgress > 0) {
-      return 'SHIP';
+    if (planet.currentDesignId !== null) {
+      const state = this.store.getState();
+      const design = state.shipDesigns.byId[planet.currentDesignId];
+      if (design) {
+        const planetProduction = this.calculatePlanetProduction(planet);
+        const shipSliderAllocation = planet.production?.ship ?? 0;
+        const productionPerTurn = Math.max(1, planetProduction * (shipSliderAllocation / 100));
+        const remainingCost = Math.max(0, design.stats.cost - planet.shipyardProgress);
+        const turnsRemaining = Math.ceil(remainingCost / productionPerTurn);
+        // Per design doc: "(Ship Name) & Turns" e.g., "Scout 4"
+        return `${design.name} ${turnsRemaining}`;
+      }
     }
 
     return '—';
   }
 
-  /** Calculate planet production in BC/turn. */
+  /**
+   * Calculate planet production in BC/turn.
+   *
+   * Per design/planets/population.md and design/economy/factory-formulas.md §3:
+   *   Total_Production = (Factory_Production + Population_Production) × Mineral_Richness_Modifier
+   *   Where:
+   *     Factory_Production = Operating_Factories × 1.0 × Racial_Production_Modifier
+   *     Population_Production = Population × Base_Pop_Output × Racial_Production_Modifier
+   *     Base_Pop_Output = 0.5 + (Planetology_TL / 50 × 1.5)
+   *
+   * NOTE: This is a simplified display estimate for the colonies list view.
+   * The full production calculation with racial modifiers, mineral richness,
+   * Planetology tech scaling, and Mice factory efficiency lives in
+   * src/game/systems/production.ts and requires a full ProductionContext.
+   *
+   * For accurate display, this should ideally call the production system,
+   * but for the list view a baseline estimate (factories × 1 + pop × 0.5)
+   * provides reasonable approximation at game start (Planetology TL ≈ 1).
+   */
   private calculatePlanetProduction(planet: Planet): number {
-    // Simplified: factories × 1.0 BC + population × 0.5
-    // Full production logic with war/debt modifiers lives in src/game/systems/production.ts
-    // and requires a ProductionContext; for the list view we use a baseline.
+    // Simplified baseline estimate for list display.
+    // At game start (TL 1), Base_Pop_Output ≈ 0.53 ≈ 0.5
+    // Does not include mineral richness or racial modifiers.
     const factoryOutput = planet.factories * 1.0;
     const popOutput = planet.population * 0.5;
     return factoryOutput + popOutput;
