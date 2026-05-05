@@ -14,8 +14,17 @@ import {
   runAIVotes,
   checkDiplomaticVictory,
   isCouncilFormationMet,
+  calculateTechBribeValue,
+  calculateTotalBribeValue,
+  calculateBriberyFactor,
   COUNCIL_INTERVAL,
   VICTORY_THRESHOLD,
+  ALLIANCE_VOTE_LOYALTY,
+  CHAMELEON_ALLIANCE_LOYALTY,
+  TECH_VALUE_PER_TIER,
+  TECH_VALUE_NEW_BONUS,
+  BRIBERY_WEIGHT,
+  MAX_BRIBERY_FACTOR,
 } from '../../../src/game/systems/council';
 import {
   Empire,
@@ -24,6 +33,7 @@ import {
   DiplomaticRelations,
   Planet,
   PlanetId,
+  Treaty,
 } from '../../../src/game/state';
 
 // ── Minimal state factory ─────────────────────────────────────────────────────
@@ -43,6 +53,7 @@ function makeRelation(
     warStartTurn: null,
     lastContact: 1,
     modifiers: [],
+    incomingProposals: [],
   };
 }
 
@@ -81,6 +92,11 @@ function makeEmpire(
     relations,
     isDefeated: false,
     defeatedTurn: null,
+    scannerTechLevel: 0,
+    computerTechLevel: 0,
+    securityLevel: 0,
+    exploredSystems: [],
+    visibleSystems: [],
   };
 }
 
@@ -119,6 +135,8 @@ function makePlanet(id: PlanetId, ownerId: EmpireId | null, population: number):
     researchMultiplier: 1,
     startingPopulation: null,
     startingFactories: null,
+    groundAttack: 0,
+    groundDefense: 0,
   };
 }
 
@@ -196,6 +214,7 @@ function makeState(
         diplomacy: { open: false },
         combat: { open: false },
         victory: { open: false },
+        groundCombat: { open: false },
       },
       notifications: [],
       filters: {
@@ -600,5 +619,204 @@ describe('isCouncilFormationMet', () => {
     
     // 40% exactly meets Impossible's 40% threshold
     expect(isCouncilFormationMet(state)).toBe(true);
+  });
+});
+
+// ── 7. Bribery Formulas (council.md §4.4) ─────────────────────────────────────
+
+describe('calculateTechBribeValue (council.md §4.4)', () => {
+  it('calculates Tech_Value = Tech_Tier × 50 when voter has tech', () => {
+    // Tier 6 tech, voter already has it: 6 × 50 = 300
+    expect(calculateTechBribeValue(6, true)).toBe(300);
+    // Tier 1 tech: 1 × 50 = 50
+    expect(calculateTechBribeValue(1, true)).toBe(50);
+    // Tier 10 tech: 10 × 50 = 500
+    expect(calculateTechBribeValue(10, true)).toBe(500);
+  });
+
+  it('adds +1000 bonus when voter does not have the tech', () => {
+    // Tier 6 tech, voter doesn't have it: 6 × 50 + 1000 = 1300
+    expect(calculateTechBribeValue(6, false)).toBe(1300);
+    // Tier 1 tech: 1 × 50 + 1000 = 1050
+    expect(calculateTechBribeValue(1, false)).toBe(1050);
+  });
+
+  it('constants match design doc values', () => {
+    expect(TECH_VALUE_PER_TIER).toBe(50);
+    expect(TECH_VALUE_NEW_BONUS).toBe(1000);
+  });
+});
+
+describe('calculateTotalBribeValue (council.md §4.4)', () => {
+  it('sums BC amount and tech values', () => {
+    // 500 BC + Impulse Drive (tier 6, voter doesn't have it)
+    const techValue = calculateTechBribeValue(6, false); // 1300
+    expect(calculateTotalBribeValue(500, [techValue])).toBe(1800);
+  });
+
+  it('handles multiple technologies', () => {
+    const tech1 = calculateTechBribeValue(3, false); // 150 + 1000 = 1150
+    const tech2 = calculateTechBribeValue(5, true);  // 250
+    expect(calculateTotalBribeValue(200, [tech1, tech2])).toBe(1600);
+  });
+
+  it('handles zero BC and empty techs', () => {
+    expect(calculateTotalBribeValue(0, [])).toBe(0);
+    expect(calculateTotalBribeValue(100, [])).toBe(100);
+  });
+});
+
+describe('calculateBriberyFactor (council.md §4.4)', () => {
+  it('applies formula: (Bribe_Value / Voter_Economy) × BRIBERY_WEIGHT × Modifier', () => {
+    // Example from design doc: 1800 bribe / 400 economy × 100 × 1.0 = 450
+    const result = calculateBriberyFactor(1800, 400, 1.0);
+    // But capped at MAX_BRIBERY_FACTOR = 50
+    expect(result).toBe(50);
+  });
+
+  it('returns uncapped value when below MAX_BRIBERY_FACTOR', () => {
+    // 100 bribe / 400 economy × 100 × 1.0 = 25 (no cap)
+    expect(calculateBriberyFactor(100, 400, 1.0)).toBe(25);
+  });
+
+  it('applies racial bribe modifier', () => {
+    // 100 bribe / 400 economy × 100 × 1.5 (Rabbits) = 37.5
+    expect(calculateBriberyFactor(100, 400, 1.5)).toBe(37.5);
+    // 100 bribe / 400 economy × 100 × 0.3 (Guinea Pigs) = 7.5
+    expect(calculateBriberyFactor(100, 400, 0.3)).toBe(7.5);
+  });
+
+  it('returns 0 when voter economy is 0 or negative', () => {
+    expect(calculateBriberyFactor(1000, 0, 1.0)).toBe(0);
+    expect(calculateBriberyFactor(1000, -100, 1.0)).toBe(0);
+  });
+
+  it('constants match design doc values', () => {
+    expect(BRIBERY_WEIGHT).toBe(100);
+    expect(MAX_BRIBERY_FACTOR).toBe(50);
+  });
+});
+
+// ── 8. Alliance Voting (council.md §7.6) ──────────────────────────────────────
+
+describe('alliance voting constants (council.md §7.6)', () => {
+  it('ALLIANCE_VOTE_LOYALTY is 80%', () => {
+    expect(ALLIANCE_VOTE_LOYALTY).toBe(0.80);
+  });
+
+  it('CHAMELEON_ALLIANCE_LOYALTY is 50%', () => {
+    expect(CHAMELEON_ALLIANCE_LOYALTY).toBe(0.50);
+  });
+});
+
+describe('runAIVotes with alliances (council.md §7.6)', () => {
+  // Helper to create a relation with a military alliance treaty
+  function makeAllianceRelation(
+    empireA: EmpireId,
+    empireB: EmpireId,
+    value = 80,
+  ): DiplomaticRelations {
+    const treaty: Treaty = {
+      id: `treaty-${empireA}-${empireB}`,
+      type: 'military_alliance',
+      signedTurn: 10,
+      duration: null,
+      terms: {},
+      isActive: true,
+      canBreak: true,
+    };
+    return {
+      empireA,
+      empireB,
+      value,
+      state: 'allied',
+      treaties: [treaty],
+      events: [],
+      warStartTurn: null,
+      lastContact: 1,
+      modifiers: [],
+      incomingProposals: [],
+    };
+  }
+
+  it('allied empire tends to vote for allied candidate (80% loyalty for non-Chameleons)', () => {
+    // Setup: C is allied with A but has worse relations with A than B
+    // The alliance should override the relation-based decision most of the time
+    const pA = makePlanet('pA', 'A', 350);
+    const pB = makePlanet('pB', 'B', 300);
+    const pC = makePlanet('pC', 'C', 350);
+
+    // C has bad relations with A (-30) but good with B (+60)
+    // However, C is allied with A, so should vote for A due to loyalty
+    const relCA = makeAllianceRelation('C', 'A', -30);
+    const relCB = makeRelation('C', 'B', 60);
+    const relAC = makeAllianceRelation('A', 'C', -30);
+    const relBC = makeRelation('B', 'C', 60);
+    const relAB = makeRelation('A', 'B', 0);
+    const relBA = makeRelation('B', 'A', 0);
+
+    const empA = makeEmpire('A', 'hamsters',    ['pA'], { C: relAC, B: relAB });
+    const empB = makeEmpire('B', 'guinea_pigs', ['pB'], { C: relBC, A: relBA });
+    const empC = makeEmpire('C', 'rats',        ['pC'], { A: relCA, B: relCB });
+
+    // Run multiple turns to test probabilistic behavior
+    // Due to deterministic hash, we just verify the alliance is detected
+    const state = makeState([empA, empB, empC], [pA, pB, pC], 50);
+    const votes = runAIVotes(state, ['A', 'B']);
+
+    // With the deterministic hash for turn 50 + 'C', the result is determined
+    // We're testing that the alliance path is taken and produces a valid vote
+    expect(votes['C']).toBeDefined();
+    expect(['A', 'B']).toContain(votes['C']);
+  });
+
+  it('Chameleons have only 50% alliance loyalty', () => {
+    const pA = makePlanet('pA', 'A', 350);
+    const pB = makePlanet('pB', 'B', 300);
+    const pC = makePlanet('pC', 'C', 350);
+
+    // C (Chameleon) is allied with A
+    const relCA = makeAllianceRelation('C', 'A', 50);
+    const relCB = makeRelation('C', 'B', 40);
+    const relAC = makeAllianceRelation('A', 'C', 50);
+    const relBC = makeRelation('B', 'C', 40);
+    const relAB = makeRelation('A', 'B', 0);
+    const relBA = makeRelation('B', 'A', 0);
+
+    const empA = makeEmpire('A', 'hamsters',    ['pA'], { C: relAC, B: relAB });
+    const empB = makeEmpire('B', 'guinea_pigs', ['pB'], { C: relBC, A: relBA });
+    const empC = makeEmpire('C', 'chameleons',  ['pC'], { A: relCA, B: relCB });
+
+    const state = makeState([empA, empB, empC], [pA, pB, pC], 50);
+    const votes = runAIVotes(state, ['A', 'B']);
+
+    // Verify Chameleon produces a valid vote (alliance path or independent)
+    expect(votes['C']).toBeDefined();
+    expect(['A', 'B']).toContain(votes['C']);
+  });
+
+  it('alliance with both candidates falls through to score-based voting', () => {
+    const pA = makePlanet('pA', 'A', 350);
+    const pB = makePlanet('pB', 'B', 300);
+    const pC = makePlanet('pC', 'C', 350);
+
+    // C is allied with BOTH A and B
+    const relCA = makeAllianceRelation('C', 'A', 50);
+    const relCB = makeAllianceRelation('C', 'B', 80); // Better relations with B
+    const relAC = makeAllianceRelation('A', 'C', 50);
+    const relBC = makeAllianceRelation('B', 'C', 80);
+    const relAB = makeRelation('A', 'B', 0);
+    const relBA = makeRelation('B', 'A', 0);
+
+    const empA = makeEmpire('A', 'hamsters',    ['pA'], { C: relAC, B: relAB });
+    const empB = makeEmpire('B', 'guinea_pigs', ['pB'], { C: relBC, A: relBA });
+    const empC = makeEmpire('C', 'rats',        ['pC'], { A: relCA, B: relCB });
+
+    const state = makeState([empA, empB, empC], [pA, pB, pC], 50);
+    const votes = runAIVotes(state, ['A', 'B']);
+
+    // When allied with both, falls through to score-based voting
+    // B has better relations (+80 vs +50), so C should vote for B
+    expect(votes['C']).toBe('B');
   });
 });

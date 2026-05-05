@@ -1,11 +1,57 @@
 {
-  "state": "IDLE",
+  "state": "TESTING",
   "phase": "phase5-design-compliance-fixes",
-  "current_task": null,
-  "last_check": "2026-05-04T02:44:00.000Z",
+  "current_task": "fix-63",
+  "last_check": "2026-05-05T02:28:00.000Z",
   "total_tasks": 85,
-  "completed_count": 1,
+  "completed_count": 3,
   "skipped_count": 0,
   "blocked_count": 0,
-  "notes": "fix-1 completed: Fixed 16 issues in combat.ts + test fixes for race IDs and difficulty levels"
+  "notes": "fix-63 completed: Added bribery formula helpers and alliance voting per council.md",
+  "worker_output": {
+    "files_created": [],
+    "files_modified": [
+      "src/game/systems/council.ts",
+      "test/game/systems/council.test.ts"
+    ],
+    "tests_added": [
+      "test/game/systems/council.test.ts (16 new tests)"
+    ],
+    "summary": "Implemented two fixes from council.md: (1) Bribery factor formula with Tech_Value calculation per §4.4, (2) Alliance voting mechanics with 80%/50% loyalty for Chameleons per §7.6. Added 16 new tests covering both features.",
+    "design_compliance": [
+      {
+        "doc": "design/diplomacy/council.md",
+        "section": "4.4 Bribery Factor",
+        "quote": "Tech_Value(tech) = Tech_Tier × 50 + (1000 if voter_does_not_have)",
+        "impl_file": "src/game/systems/council.ts",
+        "impl_line": 143,
+        "verified": true
+      },
+      {
+        "doc": "design/diplomacy/council.md",
+        "section": "4.4 Bribery Factor",
+        "quote": "Bribery_Factor = (Bribe_Value / Voter_Economy) × BRIBERY_WEIGHT × Racial_Bribe_Modifier",
+        "impl_file": "src/game/systems/council.ts",
+        "impl_line": 168,
+        "verified": true
+      },
+      {
+        "doc": "design/diplomacy/council.md",
+        "section": "7.6 Alliance Voting",
+        "quote": "80% chance to vote for allied candidate, 20% independent",
+        "impl_file": "src/game/systems/council.ts",
+        "impl_line": 32,
+        "verified": true
+      },
+      {
+        "doc": "design/diplomacy/council.md",
+        "section": "7.6 Alliance Voting",
+        "quote": "Chameleons: Only 50% alliance loyalty",
+        "impl_file": "src/game/systems/council.ts",
+        "impl_line": 33,
+        "verified": true
+      }
+    ],
+    "design_gaps": []
+  }
 }

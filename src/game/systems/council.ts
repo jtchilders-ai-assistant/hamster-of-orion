@@ -28,6 +28,14 @@ export const DOMINANCE_COUNCIL_PENALTY = -20;
 export const DOMINANCE_THRESHOLD = 0.40;        // 40% of galactic population
 export const HERMIT_CRAB_ABSTAIN_CHANCE = 0.25;
 
+// Alliance voting constants (council.md §7.6)
+export const ALLIANCE_VOTE_LOYALTY = 0.80;      // 80% chance to vote for allied candidate
+export const CHAMELEON_ALLIANCE_LOYALTY = 0.50; // Chameleons only 50% alliance loyalty
+
+// Bribery tech value constants (council.md §4.4)
+export const TECH_VALUE_PER_TIER = 50;          // Tech_Tier × 50
+export const TECH_VALUE_NEW_BONUS = 1000;       // +1000 if voter doesn't have the tech
+
 /** Planet types that are NOT habitable (cannot be colonised, excluded from council formation). */
 const NON_HABITABLE_TYPES: ReadonlySet<PlanetType> = new Set<PlanetType>([
   'gas_giant',
@@ -115,6 +123,77 @@ function livingEmpireIds(state: GameState): EmpireId[] {
 function atWar(state: GameState, empireAId: EmpireId, empireBId: EmpireId): boolean {
   const rel = state.empires.byId[empireAId]?.relations[empireBId];
   return rel?.state === 'war';
+}
+
+/**
+ * Check if two empires have a military alliance treaty.
+ * Used for alliance voting in council (council.md §7.6).
+ */
+function hasAlliance(state: GameState, empireAId: EmpireId, empireBId: EmpireId): boolean {
+  const rel = state.empires.byId[empireAId]?.relations[empireBId];
+  if (!rel) return false;
+  return rel.treaties.some(t => t.type === 'military_alliance');
+}
+
+/**
+ * Get the alliance loyalty modifier for a race.
+ * Chameleons have only 50% loyalty; others have 80%.
+ * (council.md §7.6)
+ */
+function getAllianceLoyalty(raceId: string): number {
+  return raceId === 'chameleons' ? CHAMELEON_ALLIANCE_LOYALTY : ALLIANCE_VOTE_LOYALTY;
+}
+
+/**
+ * Calculate the value of a technology for bribery purposes.
+ *
+ * Formula (council.md §4.4):
+ *   Tech_Value(tech) = Tech_Tier × 50 + (1000 if voter_does_not_have)
+ *
+ * @param techTier - The tier/level of the technology (1-10)
+ * @param voterHasTech - Whether the voter already has this technology
+ * @returns The bribe value of the technology in BC
+ */
+export function calculateTechBribeValue(techTier: number, voterHasTech: boolean): number {
+  const tierValue = techTier * TECH_VALUE_PER_TIER;
+  const newBonus = voterHasTech ? 0 : TECH_VALUE_NEW_BONUS;
+  return tierValue + newBonus;
+}
+
+/**
+ * Calculate the total bribe value including BC and technologies.
+ *
+ * Formula (council.md §4.4):
+ *   Bribe_Value = BC_offered + sum(Tech_Value(each offered tech))
+ *
+ * @param bcAmount - Credits offered
+ * @param techValues - Array of tech values (already calculated via calculateTechBribeValue)
+ * @returns Total bribe value in BC
+ */
+export function calculateTotalBribeValue(bcAmount: number, techValues: number[]): number {
+  return bcAmount + techValues.reduce((sum, v) => sum + v, 0);
+}
+
+/**
+ * Calculate the bribery factor for a vote.
+ *
+ * Formula (council.md §4.4):
+ *   Bribery_Factor = (Bribe_Value / Voter_Economy) × BRIBERY_WEIGHT × Racial_Bribe_Modifier
+ *   Capped at MAX_BRIBERY_FACTOR (50)
+ *
+ * @param bribeValue - Total value of the bribe (BC + tech values)
+ * @param voterEconomy - Voter's annual BC income
+ * @param racialBribeModifier - Race-specific bribe susceptibility
+ * @returns Bribery factor score (capped at 50)
+ */
+export function calculateBriberyFactor(
+  bribeValue: number,
+  voterEconomy: number,
+  racialBribeModifier: number,
+): number {
+  if (voterEconomy <= 0) return 0;
+  const rawFactor = (bribeValue / voterEconomy) * BRIBERY_WEIGHT * racialBribeModifier;
+  return Math.min(rawFactor, MAX_BRIBERY_FACTOR);
 }
 
 // ── Public API ────────────────────────────────────────────────────────────────
@@ -305,6 +384,32 @@ export function runAIVotes(
       // Deterministic pseudo-random: hash turn + voterId.
       const hash = (state.turn * 2654435761 + voterId.split('').reduce((a, c) => a + c.charCodeAt(0), 0)) >>> 0;
       if ((hash % 100) / 100 < HERMIT_CRAB_ABSTAIN_CHANCE) continue; // abstain
+    }
+
+    // Alliance voting override (council.md §7.6):
+    // If voter is allied with a candidate, they have a chance to vote for the ally
+    // regardless of score. 80% for most races, 50% for Chameleons.
+    const alliedWithC1 = hasAlliance(state, voterId, c1);
+    const alliedWithC2 = hasAlliance(state, voterId, c2);
+
+    if (alliedWithC1 || alliedWithC2) {
+      const allianceLoyalty = getAllianceLoyalty(voterRaceId);
+      // Deterministic pseudo-random for alliance loyalty check
+      const allianceHash = (state.turn * 1664525 + voterId.split('').reduce((a, c) => a + c.charCodeAt(0) * 31, 0)) >>> 0;
+      const allianceRoll = (allianceHash % 100) / 100;
+
+      if (allianceRoll < allianceLoyalty) {
+        // Vote for allied candidate
+        if (alliedWithC1 && !alliedWithC2) {
+          votes[voterId] = c1;
+          continue;
+        } else if (alliedWithC2 && !alliedWithC1) {
+          votes[voterId] = c2;
+          continue;
+        }
+        // If allied with both, fall through to score-based voting
+      }
+      // 20% (or 50% for Chameleons) vote independently based on score
     }
 
     const score1 = calculateVoteScore(state, voterId, c1, voteShares);
