@@ -3,7 +3,7 @@
     "base_rp_per_scientist": 1.0,
     "miniaturization_rate": 0.05,
     "miniaturization_maximum": 0.50,
-    "miniaturization_minimum_scale": 0.50,
+    "miniaturization_minimum": 0.50,
     "tech_choices_base": 2,
     "tech_choices_rats": 3
   },
@@ -95,9 +95,9 @@
   },
 
   "special_rp_bonuses": {
-    "artifacts_world_multiplier": 1.25,
-    "orion_planet_multiplier": 4.00,
-    "research_treaty_share": 0.10
+    "artifacts_world": 1.25,
+    "orion_planet": 4.00,
+    "research_treaty": 0.10
   },
 
   "technology_fields": [

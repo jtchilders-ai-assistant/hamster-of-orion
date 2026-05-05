@@ -224,7 +224,7 @@ export const MINIATURIZATION_MAX = technologiesData.research_system.miniaturizat
 
 /** Minimum scale factor; component never shrinks below 50% of base. */
 export const MINIATURIZATION_MIN_SCALE =
-  technologiesData.research_system.miniaturization_minimum_scale;
+  technologiesData.research_system.miniaturization_minimum;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Core functions
@@ -302,10 +302,10 @@ export function calculatePlanetRP(planet: PlanetRPInput, raceId: RaceId): number
   } else {
     // Backwards-compat: use boolean flags when researchMultiplier not provided
     if (planet.hasArtifacts) {
-      planetRP *= technologiesData.special_rp_bonuses.artifacts_world_multiplier;
+      planetRP *= technologiesData.special_rp_bonuses.artifacts_world;
     }
     if (planet.isOrion) {
-      planetRP *= technologiesData.special_rp_bonuses.orion_planet_multiplier;
+      planetRP *= technologiesData.special_rp_bonuses.orion_planet;
     }
   }
 
