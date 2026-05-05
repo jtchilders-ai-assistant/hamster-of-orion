@@ -24,7 +24,7 @@
       "name": "Missile Base",
       "category": "defense",
       "techRequired": null,
-      "cost": 150,
+      "cost": 100,
       "maintenance": 0,
       "effects": {
         "planetaryDefense": true,
@@ -525,21 +525,16 @@
     },
 
     {
-      "id": "stellar_converter",
-      "name": "Stellar Converter",
-      "category": "terraforming",
-      "techRequired": "stellar_converter_tech",
-      "cost": 5000,
-      "maintenance": 50,
-      "effects": {
-        "allowsGasGiantTerraforming": true,
-        "convertsGasGiantToTerran": true,
-        "conversionTurns": 50,
-        "maxPerPlanet": 1,
-        "note": "Advanced planetary engineering facility that can convert a gas giant into a habitable terran world. The conversion process takes 50 turns and requires massive ongoing energy expenditure. Once complete, the planet becomes a normal terran world with base population capacity of 100."
-      },
-      "builtVia": "special_project",
-      "planetTypeRestriction": ["gas_giant"]
+      "id": "_removed_stellar_converter",
+      "_design_note": "REMOVED: Stellar Converter is a ship weapon that destroys planets (design/ships/weapons-complete.md), NOT a building. Gas giant terraforming is not part of MOO1-faithful design. See design/planets/special-planets.md for Stellar Converter weapon effect.",
+      "_removal_date": "2026-05-04",
+      "name": "[REMOVED] Stellar Converter",
+      "category": "_deprecated",
+      "techRequired": null,
+      "cost": 0,
+      "maintenance": 0,
+      "effects": {},
+      "builtVia": "_none"
     }
 
   ],

@@ -343,7 +343,7 @@ Fixed installations have different economics:
 
 | Installation | Construction | Maintenance |
 |--------------|--------------|-------------|
-| Missile Base | 150 BC | 2 BC/turn |
+| Missile Base | 100 BC | 2 BC/turn |
 | Starbase | 300 BC | 5 BC/turn |
 | Orbital Station | 800 BC | 15 BC/turn |
 | Star Fortress | 2,000 BC | 40 BC/turn |
@@ -418,7 +418,7 @@ Military vessels used to carry soldiers for planetary invasion. Have limited sel
   "maintenance_stacking": "multiplicative",
 
   "defensive_installations": [
-    { "type": "missile_base", "cost": 150, "maintenance": 2 },
+    { "type": "missile_base", "cost": 100, "maintenance": 2 },
     { "type": "fighter_base", "cost": 300, "maintenance": 5 },
     { "type": "orbital_station", "cost": 800, "maintenance": 15 },
     { "type": "star_fortress", "cost": 2000, "maintenance": 40 },

@@ -205,7 +205,12 @@ function makeMinimalState(
   };
 }
 
-/** Helper: planet with a missile base queued, partially paid */
+/**
+ * Helper: planet with a missile base queued, partially paid.
+ *
+ * Design Reference: design/economy/slider-mathematics.md
+ *   Missile Base Cost: Base 100 BC (reduced by Construction tech)
+ */
 function planetWithMissileBaseQueued(costRemaining: number): Planet {
   return makePlanet({
     buildQueue: [
@@ -213,7 +218,7 @@ function planetWithMissileBaseQueued(costRemaining: number): Planet {
         type: 'defense',
         targetId: 'missile_base',
         targetName: 'Missile Base',
-        costTotal: 150,
+        costTotal: 100, // design/economy/slider-mathematics.md: Base 100 BC
         costRemaining,
         turnsRemaining: 1,
       },
@@ -227,30 +232,30 @@ function planetWithMissileBaseQueued(costRemaining: number): Planet {
 
 describe('DEF production accumulates toward building queue', () => {
   it('reduces costRemaining by the DEF BC applied', () => {
-    const planet = planetWithMissileBaseQueued(150); // 150 cost, none paid
+    const planet = planetWithMissileBaseQueued(100); // 100 BC base cost per slider-mathematics.md
     const state = makeMinimalState([planet], [makeEmpire()]);
 
     const result = accumulateBuildingProgress(state, 'p1', 50);
     const updatedPlanet = result.state.planets.byId['p1'];
 
-    expect(updatedPlanet.buildQueue[0].costRemaining).toBe(100);
+    expect(updatedPlanet.buildQueue[0].costRemaining).toBe(50);
     expect(result.overflow).toBe(0);
   });
 
   it('accumulates across multiple turns (partial payments)', () => {
-    const planet = planetWithMissileBaseQueued(150);
+    const planet = planetWithMissileBaseQueued(100); // 100 BC base cost
     const empire = makeEmpire();
     let state = makeMinimalState([planet], [empire]);
 
-    // Turn 1: pay 60
-    let result = accumulateBuildingProgress(state, 'p1', 60);
+    // Turn 1: pay 40
+    let result = accumulateBuildingProgress(state, 'p1', 40);
     state = result.state;
-    expect(state.planets.byId['p1'].buildQueue[0].costRemaining).toBe(90);
+    expect(state.planets.byId['p1'].buildQueue[0].costRemaining).toBe(60);
 
-    // Turn 2: pay 60 more
-    result = accumulateBuildingProgress(state, 'p1', 60);
+    // Turn 2: pay 40 more
+    result = accumulateBuildingProgress(state, 'p1', 40);
     state = result.state;
-    expect(state.planets.byId['p1'].buildQueue[0].costRemaining).toBe(30);
+    expect(state.planets.byId['p1'].buildQueue[0].costRemaining).toBe(20);
   });
 
   it('does not go below zero costRemaining', () => {
@@ -293,11 +298,11 @@ describe('DEF production accumulates toward building queue', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('Building completes when cost accumulated', () => {
-  it('missile base is added when fully paid', () => {
-    const planet = planetWithMissileBaseQueued(150);
+  it('missile base is added when fully paid (design/economy/slider-mathematics.md: 100 BC)', () => {
+    const planet = planetWithMissileBaseQueued(100);
     const state = makeMinimalState([planet], [makeEmpire()]);
 
-    const result = accumulateBuildingProgress(state, 'p1', 150);
+    const result = accumulateBuildingProgress(state, 'p1', 100);
     const updatedPlanet = result.state.planets.byId['p1'];
 
     expect(updatedPlanet.missileBases).toBe(1);
@@ -314,7 +319,7 @@ describe('Building completes when cost accumulated', () => {
           type: 'defense',
           targetId: 'missile_base',
           targetName: 'Missile Base',
-          costTotal: 150,
+          costTotal: 100, // design/economy/slider-mathematics.md: Base 100 BC
           costRemaining: 0, // already fully paid
           turnsRemaining: 0,
         },
@@ -348,10 +353,10 @@ describe('Building completes when cost accumulated', () => {
   });
 
   it('build queue is cleared after building completes', () => {
-    const planet = planetWithMissileBaseQueued(150);
+    const planet = planetWithMissileBaseQueued(100);
     const state = makeMinimalState([planet], [makeEmpire()]);
 
-    const result = accumulateBuildingProgress(state, 'p1', 150);
+    const result = accumulateBuildingProgress(state, 'p1', 100);
     expect(result.state.planets.byId['p1'].buildQueue).toHaveLength(0);
   });
 
@@ -363,8 +368,8 @@ describe('Building completes when cost accumulated', () => {
           type: 'defense',
           targetId: 'missile_base',
           targetName: 'Missile Base',
-          costTotal: 150,
-          costRemaining: 150,
+          costTotal: 100, // design/economy/slider-mathematics.md: Base 100 BC
+          costRemaining: 100,
           turnsRemaining: 1,
         },
       ],
@@ -376,8 +381,8 @@ describe('Building completes when cost accumulated', () => {
           type: 'defense',
           targetId: 'missile_base',
           targetName: 'Missile Base',
-          costTotal: 150,
-          costRemaining: 150,
+          costTotal: 100, // design/economy/slider-mathematics.md: Base 100 BC
+          costRemaining: 100,
           turnsRemaining: 1,
         },
       ],
@@ -385,7 +390,7 @@ describe('Building completes when cost accumulated', () => {
     const empire = makeEmpire();
     const state = makeMinimalState([planet1, planet2], [empire]);
 
-    const result = processAllBuildingConstruction(state, { p1: 150, p2: 150 });
+    const result = processAllBuildingConstruction(state, { p1: 100, p2: 100 });
 
     expect(result.state.planets.byId['p1'].missileBases).toBe(1);
     expect(result.state.planets.byId['p2'].missileBases).toBe(1);
@@ -401,8 +406,8 @@ describe('Building completes when cost accumulated', () => {
           type: 'defense',
           targetId: 'missile_base',
           targetName: 'Missile Base',
-          costTotal: 150,
-          costRemaining: 50, // only 50 BC needed
+          costTotal: 100, // design/economy/slider-mathematics.md: Base 100 BC
+          costRemaining: 40, // only 40 BC needed
           turnsRemaining: 1,
         },
       ],
@@ -410,11 +415,11 @@ describe('Building completes when cost accumulated', () => {
     const empire = makeEmpire();
     const state = makeMinimalState([planet1], [empire]);
 
-    // Pay 100 BC when only 50 needed → 50 BC overflow
+    // Pay 100 BC when only 40 needed → 60 BC overflow
     const result = processAllBuildingConstruction(state, { p1: 100 });
 
     expect(result.state.planets.byId['p1'].missileBases).toBe(1);
-    expect(result.overflowByEmpire).toEqual({ empire1: 50 });
+    expect(result.overflowByEmpire).toEqual({ empire1: 60 });
   });
 });
 
@@ -541,7 +546,7 @@ describe('Building effects applied', () => {
           type: 'defense' as const,
           targetId: 'missile_base',
           targetName: 'Missile Base',
-          costTotal: 150,
+          costTotal: 100, // design/economy/slider-mathematics.md: Base 100 BC
           costRemaining: 0,
           turnsRemaining: 0,
         },

@@ -21,120 +21,36 @@ import {
   Empire,
   PlanetId,
   BuildingId,
-  PlanetType,
 } from '../state';
 import { cannotTerraform } from './raceAbilities';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Non-terraformable environments
+// Terraforming eligibility
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * Planet types that cannot be terraformed.
- * Gas giants and nebula have no solid surface; dead planets require
- * atmospheric terraforming to become habitable before standard terraforming.
- *
- * Note: Hermit Crabs have the `cannot_terraform` ability and are checked
- * separately via raceAbilities.cannotTerraform().
- */
-const NON_TERRAFORMABLE_TYPES = new Set<PlanetType>([
-  'gas_giant',
-]);
-
-/**
  * Check if a planet can be terraformed.
- * Returns false for gas giants (unless Stellar Converter is present) and for
- * races with `cannot_terraform` ability (Hermit Crabs).
+ *
+ * Design Reference: design/planets/buildings.md
+ *   - Terraforming is built via Ecology (ECO) slider after pollution cleared
+ *   - All standard planet types in MOO1 can be terraformed
+ *
+ * Design Note: In MOO1, Stellar Converter is a ship weapon that destroys
+ * planets (design/ships/weapons-complete.md, design/planets/special-planets.md),
+ * NOT a building. Gas giants are not part of the MOO1-faithful PlanetType.
+ *
+ * Hermit Crabs have the `cannot_terraform` ability and are checked via
+ * raceAbilities.cannotTerraform().
  */
-export function canTerraformPlanet(planet: Planet, raceId: string): boolean {
-  // Gas giants can only be terraformed with Stellar Converter
-  if (NON_TERRAFORMABLE_TYPES.has(planet.type)) {
-    // Check if planet has Stellar Converter building
-    if (planet.buildings.includes('stellar_converter')) {
-      return true;
-    }
-    return false;
-  }
-
+export function canTerraformPlanet(_planet: Planet, raceId: string): boolean {
   // Hermit Crabs (and any race with cannot_terraform ability) cannot terraform
   if (cannotTerraform(raceId)) {
     return false;
   }
 
+  // All MOO1 planet types in the PlanetType union are terraformable
+  // (gas giants are not part of MOO1-faithful design)
   return true;
-}
-
-/**
- * Check if a Stellar Converter can be built on a planet.
- * Can only be built on gas giants.
- */
-export function canBuildStellarConverter(planet: Planet): boolean {
-  return planet.type === 'gas_giant' && !planet.buildings.includes('stellar_converter');
-}
-
-/**
- * Process Stellar Converter progress for a planet.
- * After 50 turns, converts the gas giant to a terran world.
- */
-export interface StellarConverterProgress {
-  /** Planet has a stellar converter active. */
-  hasConverter: boolean;
-  /** Turn the converter was built (stored in planet metadata). */
-  startTurn: number | null;
-  /** Turns remaining until conversion complete. */
-  turnsRemaining: number;
-  /** Whether conversion is complete this turn. */
-  conversionComplete: boolean;
-}
-
-export function checkStellarConverterProgress(
-  planet: Planet,
-  currentTurn: number,
-): StellarConverterProgress {
-  if (!planet.buildings.includes('stellar_converter')) {
-    return {
-      hasConverter: false,
-      startTurn: null,
-      turnsRemaining: 0,
-      conversionComplete: false,
-    };
-  }
-
-  // Stellar Converter requires 50 turns to complete conversion
-  const CONVERSION_TURNS = 50;
-
-  // Find when the stellar converter was built by checking the building's index
-  // In a real implementation, this would be stored in planet metadata
-  // For now, assume it's tracked elsewhere or just started
-  const startTurn = (planet as unknown as { stellarConverterStartTurn?: number }).stellarConverterStartTurn ?? currentTurn;
-  const turnsElapsed = currentTurn - startTurn;
-  const turnsRemaining = Math.max(0, CONVERSION_TURNS - turnsElapsed);
-  const conversionComplete = turnsElapsed >= CONVERSION_TURNS && planet.type === 'gas_giant';
-
-  return {
-    hasConverter: true,
-    startTurn,
-    turnsRemaining,
-    conversionComplete,
-  };
-}
-
-/**
- * Convert a gas giant to a terran world after Stellar Converter completes.
- */
-export function convertGasGiantToTerran(planet: Planet): Planet {
-  if (planet.type !== 'gas_giant') {
-    return planet;
-  }
-
-  return {
-    ...planet,
-    type: 'terran',
-    maxPopulation: 100, // Base terran capacity
-    growthRate: 1.0,
-    // Remove the stellar converter building as it's consumed in the process
-    buildings: planet.buildings.filter(b => b !== 'stellar_converter'),
-  };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

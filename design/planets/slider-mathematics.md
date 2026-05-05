@@ -109,8 +109,8 @@ Defense_BC = Total_Production × (DEF% / 100)
 #### Missile Base Construction
 
 ```
-Missile_Base_Cost = 150 BC (base)
-Missile_Base_Cost = 150 × (1 + 0.1 × Tech_Level_Bonus) # Scales with tech
+Missile_Base_Cost = 100 BC (base) # Canonical: design/economy/slider-mathematics.md
+Missile_Base_Cost = 100 × (1 + 0.1 × Tech_Level_Bonus) # Scales with tech
 
 Bases_Built = floor((Defense_BC + Base_Progress) / Missile_Base_Cost)
 Base_Progress = (Defense_BC + Old_Progress) mod Missile_Base_Cost
@@ -407,7 +407,7 @@ Else:
     "output_type": "bc_to_defenses",
     "overflow_destination": "reserve",
     "priority_order": ["missile_bases", "planetary_shield", "shield_upgrade", "base_refit"],
-    "missile_base_cost": 150,
+    "missile_base_cost": 100,
     "max_bases_formula": "10 + (population / 10)",
     "max_bases_cap": 50
   },
