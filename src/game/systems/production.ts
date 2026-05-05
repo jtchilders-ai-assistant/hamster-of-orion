@@ -42,6 +42,15 @@ export const BASE_CLEANUP_COST_PER_POLLUTION = 0.5;
 /** Each BC spent on ECO growth bonus adds this much pop growth per turn. */
 export const GROWTH_BC_EFFICIENCY = 0.1;
 
+/** Base ship maintenance rate (2% of construction cost per turn). */
+export const SHIP_MAINTENANCE_RATE = 0.02;
+
+/** Minimum ship maintenance per ship (1 BC). */
+export const MINIMUM_SHIP_MAINTENANCE = 1;
+
+/** Emergency scrap rate during bankruptcy (10%). */
+export const EMERGENCY_SCRAP_RATE = 0.10;
+
 /** Mineral richness multipliers keyed by ResourceLevel. */
 export const MINERAL_RICHNESS_MODIFIERS: Record<ResourceLevel, number> = {
   ultra_poor: 0.33,
@@ -70,10 +79,18 @@ export interface ProductionContext {
   difficultyProductionModifier: number;
 
   /**
-   * Robotic Controls level (how many factories each colonist can operate).
+   * Base Robotic Controls level from technology (how many factories each colonist can operate).
    * Starting value = 2 (Robotic Controls II).
+   * Note: Mice (Meklars) receive +2 to this level via racialRCBonus.
    */
   roboticControlsLevel: number;
+
+  /**
+   * Racial bonus to Robotic Controls level.
+   * Mice (Meklars) = +2, all others = 0.
+   * Effective RC level = roboticControlsLevel + racialRCBonus.
+   */
+  racialRCBonus: number;
 
   /**
    * Planetology tech level (0–50).  Drives Base_Pop_Output scaling.
@@ -118,6 +135,18 @@ export interface ProductionContext {
    * Applied per factory on top of the base 1 BC/factory output.
    */
   factoryEfficiencyMultiplier: number;
+
+  /**
+   * Racial ship maintenance modifier (e.g. 0.80 for Mice, 0.75 for Ants).
+   * Applied to ship maintenance costs.
+   */
+  racialMaintenanceModifier: number;
+
+  /**
+   * Tech-based fleet logistics modifiers (multiplicative).
+   * Example: [0.90, 0.80, 0.70] for Fleet Logistics I, II, III.
+   */
+  fleetLogisticsModifiers: number[];
 }
 
 /**
@@ -129,6 +158,7 @@ export const DEFAULT_PRODUCTION_CONTEXT: ProductionContext = {
   racialResearchModifier:   1.0,
   difficultyProductionModifier: 1.0,
   roboticControlsLevel:     2,
+  racialRCBonus:            0,
   planetologyTL:            1,
   wasteRate:                1.0,
   cleanupModifier:          1.0,
@@ -136,6 +166,8 @@ export const DEFAULT_PRODUCTION_CONTEXT: ProductionContext = {
   maxTerraformTier:         null,
   terraformTierCost:        200,
   factoryEfficiencyMultiplier: 1.0,
+  racialMaintenanceModifier: 1.0,
+  fleetLogisticsModifiers:  [],
 };
 
 /**
@@ -181,11 +213,23 @@ export function getRichnessMultiplier(planet: Planet): number {
 }
 
 /**
+ * Get effective Robotic Controls level, including racial bonuses.
+ * Mice (Meklars) receive +2 to their effective RC level.
+ *
+ * @param ctx ProductionContext with base RC level and racial bonus.
+ * @returns Effective RC level (roboticControlsLevel + racialRCBonus).
+ */
+export function getEffectiveRCLevel(ctx: ProductionContext): number {
+  return ctx.roboticControlsLevel + ctx.racialRCBonus;
+}
+
+/**
  * Number of factories a planet can actually operate, given its population
- * and Robotic Controls level.
+ * and effective Robotic Controls level (including racial bonuses).
  */
 export function operatingFactories(planet: Planet, ctx: ProductionContext): number {
-  const maxOperable = planet.population * ctx.roboticControlsLevel;
+  const effectiveRC = getEffectiveRCLevel(ctx);
+  const maxOperable = planet.population * effectiveRC;
   return Math.min(planet.factories, maxOperable);
 }
 
@@ -244,16 +288,19 @@ export function calculateGrossProduction(
   const opFac = operatingFactories(planet, ctx);
   const idleFac = planet.factories - opFac;
 
-  // Factory output — races with factory efficiency bonuses (e.g., Mice = 1.5x)
-  // use factoryEfficiencyMultiplier directly. racialProductionModifier applies
-  // ONLY to population labor, not factory output, to avoid double-counting.
-  // See design/economy/factory-formulas.md §Mice worked example.
+  // Factory output formula per design/economy/factory-formulas.md §2:
+  //   Effective_Factory_Output = Operating_Factories × Base_Factory_Output × Racial_Production_Modifier
+  // The factoryEfficiencyMultiplier handles special abilities like Mice "Automated Production"
+  // which stacks with the base racial production modifier.
+  // Difficulty modifier is NOT applied here — it applies to NET production after cleanup.
   const factoryBC = opFac * BASE_FACTORY_OUTPUT * ctx.factoryEfficiencyMultiplier 
-    * ctx.difficultyProductionModifier;
+    * ctx.racialProductionModifier;
 
-  // Population labor output — apply difficulty modifier
+  // Population labor output — difficulty modifier is NOT applied here.
+  // Per design/economy/factory-formulas.md §Difficulty Modifiers:
+  //   "These modifiers apply to the final net production after cleanup costs."
   const popRate = basePopOutput(ctx.planetologyTL);
-  const popBC = activePop * popRate * ctx.racialProductionModifier * ctx.difficultyProductionModifier;
+  const popBC = activePop * popRate * ctx.racialProductionModifier;
 
   const grossBeforeRichness = factoryBC + popBC;
   const richness = getRichnessMultiplier(planet);
@@ -312,20 +359,20 @@ export interface NetProductionResult {
 /**
  * Compute net production for a planet.
  *
- * Net_Production = floor(Gross_Production − Cleanup_Cost)
- * Clamped to 0 (cleanup cost can never exceed gross production in outcome;
- * shortfall is tracked via ECO allocation, not deducted from net production
- * directly — cleanup is actually paid *from ECO_BC* per slider-mathematics.md).
+ * Net_Production = floor((Gross_Production − Cleanup_Cost) × Difficulty_Modifier)
+ *
+ * Per design/economy/factory-formulas.md §Difficulty Modifiers:
+ *   "These modifiers apply to the final net production after cleanup costs."
  *
  * Note on design reconciliation:
  *   factory-formulas.md shows cleanup deducted from gross to get net.
  *   slider-mathematics.md shows cleanup as first charge against ECO_BC.
  *   The authoritative model (slider-mathematics.md §5) is:
  *     1. Gross production is calculated.
- *     2. Cleanup_Cost is subtracted → Net_Production.
- *     3. Net_Production is split by SHIP/DEF/IND/ECO sliders.
- *     4. ECO allocation then handles growth/terraform *after* cleanup.
- *   We follow this: cleanup is deducted pre-split from gross, giving net.
+ *     2. Cleanup_Cost is subtracted → Net_Production (pre-difficulty).
+ *     3. Difficulty modifier is applied to net production.
+ *     4. Net_Production is split by SHIP/DEF/IND/ECO sliders.
+ *     5. ECO allocation then handles growth/terraform *after* cleanup.
  */
 export function calculateNetProduction(
   planet: Planet,
@@ -333,7 +380,10 @@ export function calculateNetProduction(
 ): NetProductionResult {
   const gross = calculateGrossProduction(planet, ctx);
   const pollution = calculatePollution(gross.operatingFactories, ctx);
-  const netContinuous = Math.max(0, gross.grossProduction - pollution.cleanupCost);
+  // Calculate net before difficulty modifier
+  const netBeforeDifficulty = Math.max(0, gross.grossProduction - pollution.cleanupCost);
+  // Apply difficulty modifier to NET production (after cleanup costs)
+  const netContinuous = netBeforeDifficulty * ctx.difficultyProductionModifier;
   const netProduction = Math.floor(netContinuous);
   return { gross, pollution, netProduction };
 }
@@ -554,7 +604,8 @@ export function buildFactories(
   prevBuildProgress: number,
 ): FactoryBuildResult {
   const totalBC = indBc + prevBuildProgress;
-  const maxFactories = planet.maxPopulation * ctx.roboticControlsLevel;
+  const effectiveRC = getEffectiveRCLevel(ctx);
+  const maxFactories = planet.maxPopulation * effectiveRC;
   const factoriesNeeded = Math.max(0, maxFactories - planet.factories);
 
   if (factoriesNeeded === 0) {
@@ -664,7 +715,7 @@ export interface SliderState {
  */
 export type RebalanceResult =
   | { ok: true; sliders: SliderState }
-  | { ok: false; error: 'NO_UNLOCKED_SLIDERS' | 'LOCKED_SUM_EXCEEDS_100' };
+  | { ok: false; error: 'NO_UNLOCKED_SLIDERS' | 'LOCKED_SUM_EXCEEDS_100' | 'CANNOT_LOCK_LAST_SLIDER' };
 
 /**
  * Rebalance sliders after one is changed.
@@ -702,6 +753,13 @@ export function rebalanceSliders(
 
   // Identify adjustable (unlocked, not the changed key)
   const adjustable = keys.filter(k => k !== changedKey && !draft[k].locked);
+
+  // Per slider-mathematics.md §7: "At least one slider must remain unlocked"
+  // Count total unlocked sliders (including the changed one if it's unlocked)
+  const totalUnlocked = keys.filter(k => !draft[k].locked).length;
+  if (totalUnlocked === 0) {
+    return { ok: false, error: 'NO_UNLOCKED_SLIDERS' };
+  }
 
   if (adjustable.length === 0) {
     return { ok: false, error: 'NO_UNLOCKED_SLIDERS' };
@@ -741,6 +799,202 @@ export function rebalanceSliders(
   );
 
   return { ok: true, sliders: draft };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Ship Maintenance
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Calculate maintenance cost for a single ship.
+ *
+ * Per design/economy/ship-costs.md §5:
+ *   Ship_Maintenance = Ship_Cost × 0.02
+ *   Minimum 1 BC per ship.
+ *
+ * Modifiers:
+ *   - Racial maintenance modifier (e.g., Mice = 0.80, Ants = 0.75)
+ *   - Fleet Logistics tech modifiers (multiplicative stack)
+ *
+ * @param shipCost The construction cost of the ship in BC.
+ * @param ctx      Production context with maintenance modifiers.
+ * @returns Maintenance cost per turn in BC (minimum 1).
+ */
+export function calculateShipMaintenance(
+  shipCost: number,
+  ctx: ProductionContext,
+): number {
+  // Base maintenance: 2% of construction cost
+  let maintenance = shipCost * SHIP_MAINTENANCE_RATE;
+
+  // Apply racial modifier
+  maintenance *= ctx.racialMaintenanceModifier;
+
+  // Apply tech modifiers (multiplicative stack)
+  for (const mod of ctx.fleetLogisticsModifiers) {
+    maintenance *= mod;
+  }
+
+  // Minimum 1 BC per ship
+  return Math.max(MINIMUM_SHIP_MAINTENANCE, Math.floor(maintenance));
+}
+
+/**
+ * Calculate total fleet maintenance for an empire.
+ *
+ * @param shipDesigns Map of ship design ID to design info (with cost and count).
+ * @param ctx         Production context with maintenance modifiers.
+ * @returns Total fleet maintenance per turn in BC.
+ */
+export function calculateFleetMaintenance(
+  shipDesigns: Array<{ cost: number; count: number }>,
+  ctx: ProductionContext,
+): number {
+  let totalMaintenance = 0;
+
+  for (const design of shipDesigns) {
+    const perShip = calculateShipMaintenance(design.cost, ctx);
+    totalMaintenance += perShip * design.count;
+  }
+
+  return totalMaintenance;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Bankruptcy Handling
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Ship info for bankruptcy scuttle decisions.
+ */
+export interface ScuttleCandidate {
+  shipId: string;
+  cost: number;
+}
+
+/**
+ * Result of bankruptcy handling.
+ */
+export interface BankruptcyResult {
+  /** Ships that were scuttled (ship IDs). */
+  scuttledShips: string[];
+  /** Total BC recovered from emergency scrapping. */
+  recoveredBC: number;
+  /** Final treasury balance (should be >= 0). */
+  finalTreasury: number;
+  /** Whether all ships were exhausted before treasury became positive. */
+  empireCollapsed: boolean;
+}
+
+/**
+ * Handle bankruptcy by scuttling ships at emergency scrap rate.
+ *
+ * Per design/economy/ship-costs.md §10:
+ *   When empire cannot pay maintenance:
+ *     - Scuttle ships at 10% emergency scrap rate until treasury positive
+ *     - Each scrapped ship adds Ship_Cost × 0.10 to treasury
+ *
+ * @param treasury       Current treasury balance (negative = bankruptcy).
+ * @param ships          Array of ships that can be scuttled, ordered by preference
+ *                       (oldest/weakest first per design doc).
+ * @returns Result with scuttled ships and final treasury.
+ */
+export function handleBankruptcy(
+  treasury: number,
+  ships: ScuttleCandidate[],
+): BankruptcyResult {
+  const scuttledShips: string[] = [];
+  let recoveredBC = 0;
+  let currentTreasury = treasury;
+
+  // If treasury is positive, no bankruptcy
+  if (currentTreasury >= 0) {
+    return {
+      scuttledShips: [],
+      recoveredBC: 0,
+      finalTreasury: currentTreasury,
+      empireCollapsed: false,
+    };
+  }
+
+  // Scuttle ships until treasury is positive or no ships remain
+  const remainingShips = [...ships];
+
+  while (currentTreasury < 0 && remainingShips.length > 0) {
+    const ship = remainingShips.shift()!;
+    const scrapValue = Math.floor(ship.cost * EMERGENCY_SCRAP_RATE);
+
+    scuttledShips.push(ship.shipId);
+    recoveredBC += scrapValue;
+    currentTreasury += scrapValue;
+  }
+
+  return {
+    scuttledShips,
+    recoveredBC,
+    finalTreasury: currentTreasury,
+    empireCollapsed: currentTreasury < 0, // No ships left but still negative
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Slider Lock Validation
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Validate that a slider lock operation is allowed.
+ *
+ * Per slider-mathematics.md §7:
+ *   "At least one slider must remain unlocked (otherwise re-balancing is impossible)"
+ *
+ * @param current   Current slider state.
+ * @param keyToLock The slider key the player wants to lock.
+ * @returns True if locking is allowed, false if it would lock the last slider.
+ */
+export function canLockSlider(
+  current: SliderState,
+  keyToLock: keyof SliderState,
+): boolean {
+  const keys: Array<keyof SliderState> = ['ship', 'defense', 'industry', 'ecology', 'research'];
+
+  // If this slider is already locked, no change
+  if (current[keyToLock].locked) {
+    return true;
+  }
+
+  // Count currently unlocked sliders
+  const unlockedCount = keys.filter(k => !current[k].locked).length;
+
+  // Must have at least 2 unlocked to allow locking one more
+  return unlockedCount >= 2;
+}
+
+/**
+ * Attempt to lock a slider. Returns error if it would leave no unlocked sliders.
+ *
+ * @param current   Current slider state.
+ * @param keyToLock The slider key to lock.
+ * @returns Updated slider state or error.
+ */
+export function lockSlider(
+  current: SliderState,
+  keyToLock: keyof SliderState,
+): RebalanceResult {
+  if (!canLockSlider(current, keyToLock)) {
+    return { ok: false, error: 'CANNOT_LOCK_LAST_SLIDER' };
+  }
+
+  const newState: SliderState = {
+    ship:     { ...current.ship },
+    defense:  { ...current.defense },
+    industry: { ...current.industry },
+    ecology:  { ...current.ecology },
+    research: { ...current.research },
+  };
+
+  newState[keyToLock].locked = true;
+
+  return { ok: true, sliders: newState };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
