@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 /**
  * TurnConfirmDialog unit tests
  * test/ui/components/TurnConfirmDialog.test.ts

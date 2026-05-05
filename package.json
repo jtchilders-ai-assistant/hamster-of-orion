@@ -15,9 +15,10 @@
     "check-design": "npx tsx scripts/check-design-compliance.ts"
   },
   "devDependencies": {
+    "@types/node": "^20.12.12",
+    "jsdom": "^29.1.1",
     "typescript": "^5.4.5",
     "vite": "^5.2.11",
-    "vitest": "^1.6.0",
-    "@types/node": "^20.12.12"
+    "vitest": "^1.6.0"
   }
 }

@@ -37,3 +37,12 @@ export class Store<T> {
     return () => this.listeners.delete(listener);
   }
 }
+
+/**
+ * Factory function to create a Store instance.
+ * Equivalent to `new Store(reducer, initialState)` — provided for
+ * convenience and to match the Redux-style createStore API.
+ */
+export function createStore<T>(reducer: Reducer<T>, initialState: T): Store<T> {
+  return new Store(reducer, initialState);
+}
