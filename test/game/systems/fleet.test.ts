@@ -830,3 +830,171 @@ describe('moveFleet with star gates (design/galaxy/travel.md §Star Gates)', () 
     expect(movedFleet.eta).toBe(50);
   });
 });
+
+// ── Fuel range tests ────────────────────────────────────────────────────────────
+
+import { getShipFuelRange, getFleetFuelRange } from '../../../src/game/systems/fleet';
+import type { ShipDesign } from '../../../src/game/state';
+
+/**
+ * Build a design with specified fuel component(s).
+ * category must be 'fuel' and the id must be in components.json.
+ */
+function makeDesignWithFuel(designId: string, fuelIds: string[]): ShipDesign {
+  return {
+    id: designId,
+    name: `Design ${designId}`,
+    class: 'small',
+    ownerId: 'player',
+    size: 50,
+    spaceUsed: 10,
+    spaceFree: 40,
+    components: fuelIds.map((fuelId) => ({
+      id: fuelId,
+      type: 'fuel' as const,
+      name: fuelId,
+      space: 3,
+      baseCost: 6,
+      count: 1,
+    })),
+    stats: {
+      cost: 100,
+      maintenance: 5,
+      hp: 10,
+      shieldHp: 0,
+      speed: 1,
+      range: 5,
+      weapons: [],
+      defense: { armor: 1, shields: 0, ecm: 0 },
+      special: [],
+    },
+    miniaturization: {},
+    isObsolete: false,
+    shipsBuilt: 0,
+  };
+}
+
+function buildFuelState(designs: ShipDesign[], shipDesignMap: Record<string, string>): GameState {
+  // shipDesignMap: { shipId: designId }
+  const shipsById: Record<string, ReturnType<typeof makeShip>> = {};
+  const fleetShipIds: string[] = [];
+
+  for (const [shipId, designId] of Object.entries(shipDesignMap)) {
+    shipsById[shipId] = makeShip(shipId, 'f1', designId);
+    fleetShipIds.push(shipId);
+  }
+
+  const fleet1 = makeFleet('f1', 's1', fleetShipIds);
+  const system1 = makeSystem('s1', 0, 0);
+
+  const designsById: Record<string, ShipDesign> = {};
+  for (const d of designs) {
+    designsById[d.id] = d;
+  }
+
+  return {
+    ...initialState,
+    fleets: {
+      allIds: ['f1'],
+      byId: { f1: fleet1 },
+    },
+    ships: {
+      allIds: fleetShipIds,
+      byId: shipsById,
+    },
+    shipDesigns: {
+      allIds: designs.map((d) => d.id),
+      byId: designsById,
+    },
+    galaxy: {
+      ...initialState.galaxy,
+      systems: {
+        allIds: ['s1'],
+        byId: { s1: system1 },
+      },
+    },
+  };
+}
+
+describe('getShipFuelRange (design/galaxy/travel.md §Fuel Range)', () => {
+  it('returns base range from fuel cell (standard = 4 parsecs)', () => {
+    const design = makeDesignWithFuel('d1', ['standard_fuel_cells']);
+    const ship = makeShip('s1', 'f1', 'd1');
+    const state = buildFuelState([design], { s1: 'd1' });
+    expect(getShipFuelRange(ship, state)).toBe(4);
+  });
+
+  it('returns base range from deuterium fuel cells (6 parsecs)', () => {
+    const design = makeDesignWithFuel('d1', ['deuterium_fuel_cells']);
+    const ship = makeShip('s1', 'f1', 'd1');
+    const state = buildFuelState([design], { s1: 'd1' });
+    expect(getShipFuelRange(ship, state)).toBe(6);
+  });
+
+  it('returns base + bonus for fuel cell + reserve tanks (+3)', () => {
+    // standard (4) + reserve_fuel_tanks (+3) = 7
+    const design = makeDesignWithFuel('d1', ['standard_fuel_cells', 'reserve_fuel_tanks']);
+    const ship = makeShip('s1', 'f1', 'd1');
+    const state = buildFuelState([design], { s1: 'd1' });
+    expect(getShipFuelRange(ship, state)).toBe(7);
+  });
+
+  it('returns base + bonus for fuel cell + extended tanks (+5)', () => {
+    // standard (4) + extended_reserve_tanks (+5) = 9
+    const design = makeDesignWithFuel('d1', ['standard_fuel_cells', 'extended_reserve_tanks']);
+    const ship = makeShip('s1', 'f1', 'd1');
+    const state = buildFuelState([design], { s1: 'd1' });
+    expect(getShipFuelRange(ship, state)).toBe(9);
+  });
+
+  it('defaults to 4 parsecs if no fuel component installed', () => {
+    // design with engine only (no fuel)
+    const design = makeDesignWithEngine('d1', 'retro_engines');
+    const ship = makeShip('s1', 'f1', 'd1');
+    const state = buildFuelState([design], { s1: 'd1' });
+    expect(getShipFuelRange(ship, state)).toBe(4);
+  });
+
+  it('returns Infinity for ship with thorium_cells (unlimited range)', () => {
+    const design = makeDesignWithFuel('d1', ['thorium_cells']);
+    const ship = makeShip('s1', 'f1', 'd1');
+    const state = buildFuelState([design], { s1: 'd1' });
+    expect(getShipFuelRange(ship, state)).toBe(Infinity);
+  });
+});
+
+describe('getFleetFuelRange (design/galaxy/travel.md §Fuel Range)', () => {
+  it('returns the minimum range ship in the fleet', () => {
+    const d1 = makeDesignWithFuel('d1', ['standard_fuel_cells']); // 4
+    const d2 = makeDesignWithFuel('d2', ['deuterium_fuel_cells']); // 6
+    const ship1 = makeShip('ship1', 'f1', 'd1');
+    const ship2 = makeShip('ship2', 'f1', 'd2');
+    const state = buildFuelState([d1, d2], { ship1: 'd1', ship2: 'd2' });
+    // Fleet range = min(4, 6) = 4
+    const fleet = state.fleets.byId['f1'];
+    expect(getFleetFuelRange(fleet, state)).toBe(4);
+  });
+
+  it('returns Infinity if all ships have unlimited range', () => {
+    const d1 = makeDesignWithFuel('d1', ['thorium_cells']);
+    const d2 = makeDesignWithFuel('d2', ['thorium_cells']);
+    const state = buildFuelState([d1, d2], { ship1: 'd1', ship2: 'd2' });
+    const fleet = state.fleets.byId['f1'];
+    expect(getFleetFuelRange(fleet, state)).toBe(Infinity);
+  });
+
+  it('returns base range if unlimited ship is mixed with limited ship', () => {
+    const d1 = makeDesignWithFuel('d1', ['thorium_cells']); // Infinity
+    const d2 = makeDesignWithFuel('d2', ['standard_fuel_cells']); // 4
+    const state = buildFuelState([d1, d2], { ship1: 'd1', ship2: 'd2' });
+    const fleet = state.fleets.byId['f1'];
+    // min(Infinity, 4) = 4
+    expect(getFleetFuelRange(fleet, state)).toBe(4);
+  });
+
+  it('returns 0 for empty fleet', () => {
+    const state = buildFuelState([], {});
+    const fleet = state.fleets.byId['f1'];
+    expect(getFleetFuelRange(fleet, state)).toBe(0);
+  });
+});

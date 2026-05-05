@@ -13,6 +13,7 @@
 import { FleetId, GameState } from '../../game/state';
 import { Store } from '../../game/store';
 import { findPath } from '../../game/utils/pathfinding';
+import { getFleetFuelRange } from '../../game/systems/fleet';
 import { clearCanvas, drawStarfield } from '../canvas/renderer';
 import {
   MapTransform,
@@ -333,11 +334,13 @@ export class StarMap {
         const { x: dx, y: dy } = galaxyToCanvas(dest.coordinates, transform);
 
         // Check if in range using pathfinding
+        // Per design/galaxy/travel.md: use actual fleet fuel range (fuel cells + bonus tanks)
+        const fleetRange = getFleetFuelRange(fleet, state);
         const pathResult = findPath(
           galaxy,
           fleet.systemId,
           deployment.destinationId,
-          50, // max range
+          isFinite(fleetRange) ? fleetRange : 9999, // Infinity = Thorium Cells (unlimited)
         );
         const inRange = pathResult !== null;
 

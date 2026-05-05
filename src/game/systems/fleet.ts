@@ -13,7 +13,7 @@
  */
 
 import { GameState, Fleet, Ship, FleetId, ShipId, SystemId, BuildingId } from '../state';
-import { ComponentData, EngineEffect } from '../types/shipComponents';
+import { ComponentData, EngineEffect, FuelEffect } from '../types/shipComponents';
 import componentData from '../../data/components.json';
 
 // ── Component lookup ───────────────────────────────────────────────────────────
@@ -68,6 +68,88 @@ export function getFleetWarpSpeed(fleet: Fleet, state: GameState): number {
     if (speed < minSpeed) minSpeed = speed;
   }
   return minSpeed === Infinity ? 0 : minSpeed;
+}
+
+// ── Fuel range calculation ────────────────────────────────────────────────────
+//
+// Per design/galaxy/travel.md §Fuel Range:
+//   - Fuel cells determine max distance from nearest friendly colony
+//   - Reserve Fuel Tanks: +3 parsecs bonus (design/galaxy/travel.md §Reserve Fuel Tanks)
+//   - Extended Fuel Tanks: +5 parsecs bonus (design/ships/components-complete.md)
+//   - Ship with Thorium Cells has unlimited range (range = null → Infinity)
+//
+// Per design/galaxy/travel.md §Extending Ship Range:
+//   - Reserve Fuel Tanks: +3 parsecs
+//   - Extended Fuel Tanks: +6 parsecs (replaces Reserve) [travel.md]
+//   NOTE: components-complete.md says +5; travel.md says +6. Using components-complete.md
+//   value of +5 as the more specific/detailed spec.
+
+/**
+ * Get the fuel range for a single ship based on its design.
+ *
+ * Per design/galaxy/travel.md:
+ *   - Base range comes from highest-range fuel cell component
+ *   - Bonus range from Reserve/Extended Fuel Tank components is additive
+ *   - Thorium Cells grant unlimited range (Infinity)
+ *
+ * @param ship  The ship to check.
+ * @param state Current game state.
+ * @returns Range in parsecs (Infinity if unlimited).
+ */
+export function getShipFuelRange(ship: Ship, state: GameState): number {
+  const design = state.shipDesigns.byId[ship.designId];
+  if (!design) return 4; // default minimum (hydrogen cells)
+
+  let baseRange = 0;
+  let bonusRange = 0;
+  let unlimited = false;
+
+  for (const component of design.components) {
+    const comp = componentsById[component.id];
+    if (!comp || comp.category !== 'fuel') continue;
+
+    const effect = comp.effect as FuelEffect;
+    if (effect.bonusRange !== undefined) {
+      // Supplemental tanks (Reserve / Extended) — check bonusRange FIRST
+      // since these may also have range: null in the JSON
+      bonusRange += effect.bonusRange;
+    } else if (effect.range === null) {
+      // Unlimited range (Thorium Cells) — no bonusRange field
+      unlimited = true;
+    } else if (effect.range !== undefined && effect.range > baseRange) {
+      // Primary fuel cell — take the best one
+      baseRange = effect.range;
+    }
+  }
+
+  if (unlimited) return Infinity;
+  // If no fuel cell found, default to starting range (hydrogen = 4)
+  if (baseRange === 0) baseRange = 4;
+  return baseRange + bonusRange;
+}
+
+/**
+ * Get the effective fuel range of a fleet (limited by its shortest-range ship).
+ *
+ * Per design/galaxy/travel.md:
+ *   - Fleet range is the minimum range ship in the fleet.
+ *   - Combined fleets cannot travel farther than their shortest-range ship allows.
+ *
+ * @param fleet The fleet.
+ * @param state Current game state.
+ * @returns Range in parsecs (Infinity if all ships have unlimited range).
+ */
+export function getFleetFuelRange(fleet: Fleet, state: GameState): number {
+  if (fleet.shipIds.length === 0) return 0;
+
+  let minRange = Infinity;
+  for (const shipId of fleet.shipIds) {
+    const ship = state.ships.byId[shipId];
+    if (!ship) continue;
+    const range = getShipFuelRange(ship, state);
+    if (range < minRange) minRange = range;
+  }
+  return minRange === Infinity ? Infinity : minRange;
 }
 
 // ── Star Gate support ───────────────────────────────────────────────────────────
