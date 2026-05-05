@@ -40,6 +40,11 @@ const defaultUI: UIState = {
     zoom: 1.0,
     target: null,
   },
+  galaxyMapToggles: {
+    showRangeCircles: false,
+    showTradeRoutes: false,
+    highlightEnemyFleets: false,
+  },
   modals: {
     shipDesigner: { open: false },
     diplomacy: { open: false },

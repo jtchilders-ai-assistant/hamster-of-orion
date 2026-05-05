@@ -415,6 +415,144 @@ export function rootReducer(state: GameState, action: Action): GameState {
     };
   }
 
+  // ── Galaxy Map Toggles (interaction-spec.md §2.2) ─────────────────────────
+  //
+  // Toggle display options for the galaxy map view.
+
+  if (action.type === 'TOGGLE_GRID') {
+    return {
+      ...state,
+      ui: {
+        ...state.ui,
+        settings: {
+          ...state.ui.settings,
+          showGrid: !state.ui.settings.showGrid,
+        },
+      },
+    };
+  }
+
+  if (action.type === 'TOGGLE_RANGE_CIRCLES') {
+    return {
+      ...state,
+      ui: {
+        ...state.ui,
+        galaxyMapToggles: {
+          ...state.ui.galaxyMapToggles,
+          showRangeCircles: !state.ui.galaxyMapToggles.showRangeCircles,
+        },
+      },
+    };
+  }
+
+  if (action.type === 'TOGGLE_TRADE_ROUTES') {
+    return {
+      ...state,
+      ui: {
+        ...state.ui,
+        galaxyMapToggles: {
+          ...state.ui.galaxyMapToggles,
+          showTradeRoutes: !state.ui.galaxyMapToggles.showTradeRoutes,
+        },
+      },
+    };
+  }
+
+  if (action.type === 'TOGGLE_HIGHLIGHT_ENEMIES') {
+    return {
+      ...state,
+      ui: {
+        ...state.ui,
+        galaxyMapToggles: {
+          ...state.ui.galaxyMapToggles,
+          highlightEnemyFleets: !state.ui.galaxyMapToggles.highlightEnemyFleets,
+        },
+      },
+    };
+  }
+
+  // ── Cycle Colony/Fleet Selection (interaction-spec.md §2.2) ───────────────
+  //
+  // SELECT_NEXT_COLONY / SELECT_PREV_COLONY: Cycle through player colonies.
+  // SELECT_NEXT_FLEET / SELECT_PREV_FLEET: Cycle through player fleets.
+
+  if (action.type === 'SELECT_NEXT_COLONY' || action.type === 'SELECT_PREV_COLONY') {
+    const playerEmpireId = state.empires.playerId;
+    const playerColonies = state.planets.allIds
+      .map((id) => state.planets.byId[id])
+      .filter((p) => p.ownerId === playerEmpireId)
+      .sort((a, b) => a.name.localeCompare(b.name));
+
+    if (playerColonies.length === 0) return state;
+
+    const currentSystem = state.ui.selectedSystem;
+    const currentColony = playerColonies.find((p) => p.systemId === currentSystem);
+    const currentIdx = currentColony ? playerColonies.indexOf(currentColony) : -1;
+
+    let nextIdx: number;
+    if (action.type === 'SELECT_NEXT_COLONY') {
+      nextIdx = currentIdx < 0 ? 0 : (currentIdx + 1) % playerColonies.length;
+    } else {
+      nextIdx = currentIdx < 0 ? playerColonies.length - 1 : (currentIdx - 1 + playerColonies.length) % playerColonies.length;
+    }
+
+    const nextColony = playerColonies[nextIdx];
+    return {
+      ...state,
+      ui: {
+        ...state.ui,
+        selectedSystem: nextColony.systemId,
+        selectedPlanet: nextColony.id,
+        selectedFleet: null,
+        fleetDeploymentMode: null,
+        camera: {
+          ...state.ui.camera,
+          target: nextColony.systemId,
+        },
+      },
+    };
+  }
+
+  if (action.type === 'SELECT_NEXT_FLEET' || action.type === 'SELECT_PREV_FLEET') {
+    const playerEmpireId = state.empires.playerId;
+    const playerFleets = state.fleets.allIds
+      .map((id) => state.fleets.byId[id])
+      .filter((f) => f.ownerId === playerEmpireId)
+      .sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+
+    if (playerFleets.length === 0) return state;
+
+    const currentFleetId = state.ui.selectedFleet;
+    const currentIdx = currentFleetId ? playerFleets.findIndex((f) => f.id === currentFleetId) : -1;
+
+    let nextIdx: number;
+    if (action.type === 'SELECT_NEXT_FLEET') {
+      nextIdx = currentIdx < 0 ? 0 : (currentIdx + 1) % playerFleets.length;
+    } else {
+      nextIdx = currentIdx < 0 ? playerFleets.length - 1 : (currentIdx - 1 + playerFleets.length) % playerFleets.length;
+    }
+
+    const nextFleet = playerFleets[nextIdx];
+    return {
+      ...state,
+      ui: {
+        ...state.ui,
+        selectedSystem: nextFleet.systemId,
+        selectedPlanet: null,
+        selectedFleet: nextFleet.id,
+        fleetDeploymentMode: nextFleet.destination ? null : {
+          fleetId: nextFleet.id,
+          ships: {},
+          destinationId: null,
+        },
+        camera: {
+          ...state.ui.camera,
+          target: nextFleet.systemId,
+        },
+      },
+    };
+  }
+
   // Unknown action — return unchanged state
   return state;
 }

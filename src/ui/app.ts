@@ -299,6 +299,41 @@ export class App {
           e.preventDefault();
           this.store.dispatch({ type: 'ZOOM_CAMERA', payload: { delta: 0 } } as Action);
           break;
+
+        // ─ Colony/Fleet cycling (interaction-spec.md §2.2) ─────────────────
+        case 'n':
+        case 'N':
+          e.preventDefault();
+          this.store.dispatch({ type: e.shiftKey ? 'SELECT_PREV_COLONY' : 'SELECT_NEXT_COLONY' } as Action);
+          break;
+        case 'f':
+          // Note: F key (lowercase only) cycles fleets; Shift+F cycles prev fleet.
+          // F1-F8 are handled above in section 7, so we only get here for lowercase 'f'.
+          e.preventDefault();
+          this.store.dispatch({ type: e.shiftKey ? 'SELECT_PREV_FLEET' : 'SELECT_NEXT_FLEET' } as Action);
+          break;
+
+        // ─ Display toggles (interaction-spec.md §2.2) ──────────────────────
+        case 'g':
+        case 'G':
+          e.preventDefault();
+          this.store.dispatch({ type: 'TOGGLE_GRID' } as Action);
+          break;
+        case 'r':
+        case 'R':
+          e.preventDefault();
+          this.store.dispatch({ type: 'TOGGLE_RANGE_CIRCLES' } as Action);
+          break;
+        case 't':
+        case 'T':
+          e.preventDefault();
+          this.store.dispatch({ type: 'TOGGLE_TRADE_ROUTES' } as Action);
+          break;
+        case 'e':
+        case 'E':
+          e.preventDefault();
+          this.store.dispatch({ type: 'TOGGLE_HIGHLIGHT_ENEMIES' } as Action);
+          break;
       }
     });
   }

@@ -993,6 +993,19 @@ export interface UIState {
     target: SystemId | null;
   };
 
+  /**
+   * Galaxy Map display toggles (per interaction-spec.md §2.2).
+   * These are session-transient UI state, not persistent settings.
+   */
+  galaxyMapToggles: {
+    /** Show range circles around selected fleet. Shortcut: R */
+    showRangeCircles: boolean;
+    /** Show trade route lines between colonies with trade agreements. Shortcut: T */
+    showTradeRoutes: boolean;
+    /** Highlight all enemy fleets with a visual indicator. Shortcut: E */
+    highlightEnemyFleets: boolean;
+  };
+
   modals: {
     shipDesigner: { open: boolean; designId?: ShipDesignId };
     diplomacy: { open: boolean; empireId?: EmpireId };
