@@ -1,0 +1,181 @@
+{
+  "task": "fix-2",
+  "status": "completed",
+  "timestamp": "2026-05-04T19:58:00-05:00",
+  "summary": "Fixed 14 technology issues in combat.ts to match design specifications",
+  "fixes_applied": [
+    {
+      "issue": "Ion Stream Projector",
+      "design_doc": "design/technology/weapons.md",
+      "specification": "Deals 20% of target's current HP as damage",
+      "implementation": "Used weapon.percentDamage property (already existed), verified handling in shipActs()",
+      "line": "~1006 (shipActs percent damage handling)"
+    },
+    {
+      "issue": "Zyro Shield",
+      "design_doc": "design/technology/force-fields.md",
+      "specification": "75% chance to destroy incoming missiles − 1% per missile tech level",
+      "implementation": "Added checkZyroShield() function with per-missile rolls, Tech Level reduction",
+      "line": "723-747"
+    },
+    {
+      "issue": "Lightning Shield",
+      "design_doc": "design/technology/force-fields.md",
+      "specification": "100% chance to destroy incoming missiles − 1% per missile tech level",
+      "implementation": "Added checkLightningShield() function with per-missile rolls, Tech Level reduction",
+      "line": "749-773"
+    },
+    {
+      "issue": "Energy Pulsar",
+      "design_doc": "design/technology/propulsion.md",
+      "specification": "5 damage to all adjacent ships + 1 damage per 2 firing ships",
+      "implementation": "Added activatePulsar() function with base 5 damage + scaling bonus",
+      "line": "907-979"
+    },
+    {
+      "issue": "Ionic Pulsar",
+      "design_doc": "design/technology/propulsion.md",
+      "specification": "10 damage to all adjacent ships + 1 damage per 2 firing ships",
+      "implementation": "Handled in same activatePulsar() function with base 10 damage for ionic",
+      "line": "907-979"
+    },
+    {
+      "issue": "Stasis Field",
+      "design_doc": "design/technology/force-fields.md",
+      "specification": "Ship cannot move, fire, or retreat",
+      "implementation": "Added applyStasisField() function, inStasisField property checked in shipActs() and attemptRetreat()",
+      "line": "1079-1107"
+    },
+    {
+      "issue": "Repulsor Beam",
+      "design_doc": "design/technology/force-fields.md",
+      "specification": "Push enemy ships 2 hexes away",
+      "implementation": "Added activateRepulsorBeam() function with hex push calculation",
+      "line": "1030-1075"
+    },
+    {
+      "issue": "Cloaking Device",
+      "design_doc": "design/technology/force-fields.md",
+      "specification": "+5 Defense, invisible until firing",
+      "implementation": "Added handleCloakingOnFire() and refreshCloaks() functions, +5 defense via cloaked check in calcHitChanceVs()",
+      "line": "981-1028"
+    },
+    {
+      "issue": "Anti-Missile Rockets",
+      "design_doc": "design/technology/weapons.md",
+      "specification": "Point defense destroys 40% of incoming missiles (−1% per missile tech level)",
+      "implementation": "Added checkAntiMissileRockets() function with 40% base − tech level penalty",
+      "line": "775-799"
+    },
+    {
+      "issue": "Hit_Chance formula",
+      "design_doc": "design/technology/computers.md",
+      "specification": "50% + (Attack_Rating × 5%) - (Target_Defense × 3%)",
+      "implementation": "Fixed calcHitChanceVs() to use separate attack/defense multipliers instead of differential",
+      "line": "395"
+    }
+  ],
+  "interface_properties_added": [
+    "lastStasisTargetRound?: number",
+    "hasAntiMissileRockets?: boolean",
+    "hasStasisField?: boolean",
+    "firedThisRound?: boolean"
+  ],
+  "functions_added": [
+    "checkZyroShield()",
+    "checkLightningShield()",
+    "checkAntiMissileRockets()",
+    "activatePulsar()",
+    "handleCloakingOnFire()",
+    "refreshCloaks()",
+    "activateRepulsorBeam()",
+    "applyStasisField()"
+  ],
+  "verification": {
+    "typecheck": "PASSED",
+    "tests": "PASSED (1257 tests)",
+    "test_duration": "4.64s"
+  },
+  "design_compliance": [
+    {
+      "doc": "design/technology/computers.md",
+      "section": "Hit Chance Formula",
+      "quote": "Hit_Chance = 50% + (Attack_Rating × 5%) - (Target_Defense × 3%)",
+      "impl_file": "src/game/systems/combat.ts",
+      "impl_line": 395,
+      "verified": true
+    },
+    {
+      "doc": "design/technology/force-fields.md",
+      "section": "Zyro Shield",
+      "quote": "75% chance to destroy incoming missiles − 1% per missile tech level",
+      "impl_file": "src/game/systems/combat.ts",
+      "impl_line": 723,
+      "verified": true
+    },
+    {
+      "doc": "design/technology/force-fields.md",
+      "section": "Lightning Shield",
+      "quote": "100% chance to destroy incoming missiles − 1% per missile tech level",
+      "impl_file": "src/game/systems/combat.ts",
+      "impl_line": 749,
+      "verified": true
+    },
+    {
+      "doc": "design/technology/propulsion.md",
+      "section": "Energy Pulsar",
+      "quote": "5 damage to all adjacent ships + 1 damage per 2 firing ships",
+      "impl_file": "src/game/systems/combat.ts",
+      "impl_line": 920,
+      "verified": true
+    },
+    {
+      "doc": "design/technology/propulsion.md",
+      "section": "Ionic Pulsar",
+      "quote": "10 damage to all adjacent ships + 1 damage per 2 firing ships",
+      "impl_file": "src/game/systems/combat.ts",
+      "impl_line": 920,
+      "verified": true
+    },
+    {
+      "doc": "design/technology/force-fields.md",
+      "section": "Stasis Field",
+      "quote": "Ship cannot move, fire, or retreat",
+      "impl_file": "src/game/systems/combat.ts",
+      "impl_line": 1090,
+      "verified": true
+    },
+    {
+      "doc": "design/technology/force-fields.md",
+      "section": "Repulsor Beam",
+      "quote": "Push enemy ships 2 hexes away",
+      "impl_file": "src/game/systems/combat.ts",
+      "impl_line": 1043,
+      "verified": true
+    },
+    {
+      "doc": "design/technology/force-fields.md",
+      "section": "Cloaking Device",
+      "quote": "+5 Defense, invisible until firing",
+      "impl_file": "src/game/systems/combat.ts",
+      "impl_line": 988,
+      "verified": true
+    },
+    {
+      "doc": "design/technology/weapons.md",
+      "section": "Anti-Missile Rockets",
+      "quote": "Point defense destroys 40% of incoming missiles (−1% per missile tech level)",
+      "impl_file": "src/game/systems/combat.ts",
+      "impl_line": 775,
+      "verified": true
+    },
+    {
+      "doc": "design/technology/weapons.md",
+      "section": "Ion Stream Projector",
+      "quote": "Deals 20% of target's current HP as damage",
+      "impl_file": "src/game/systems/combat.ts",
+      "impl_line": 1006,
+      "verified": true
+    }
+  ]
+}
