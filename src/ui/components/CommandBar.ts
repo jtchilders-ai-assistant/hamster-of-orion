@@ -6,10 +6,15 @@
  *   GAME | DESIGN | FLEET | MAP | RACES | PLANETS | TECH | REPORTS | COUNCIL | NEXT TURN
  *   ESC     F6       F3    ---    F5       F2       F4       F7         F8     [ENTER]
  *
- * Per design/ui-ux/navigation-flow.md:
- * - ESC is the sole trigger for Game Menu (F10 intentionally omitted)
- * - MAP opens a separate full-screen MAP view (not the Galaxy Map / F1)
- * - F1 navigates to Galaxy Map, but that's not a command bar button
+ * Design Compliance (navigation-flow.md, screen-inventory.md, interaction-spec.md):
+ * - ESC is the sole trigger for Game Menu (F10 intentionally omitted per §9)
+ * - MAP opens a separate full-screen MAP view (not the Galaxy Map / F1) per §4.5
+ * - F7 = Reports (Empire Statistics) per interaction-spec.md §2.1
+ * - F1 navigates to Galaxy Map (handled by keyboard bindings, not command bar)
+ *
+ * QoL Additions (not in original MOO1 but documented as acceptable enhancements):
+ * - Speed control buttons (slow/normal/fast) for combat and map animations
+ * - Toast notification system for user feedback (e.g., "Council not yet formed")
  *
  * Active screen button is highlighted. F-key labels shown below each button.
  * Hover tooltips provide button descriptions.
@@ -28,6 +33,21 @@ interface NavButton {
   tooltip: string;
 }
 
+/**
+ * Navigation buttons per MOO1 command bar layout.
+ *
+ * F-Key assignments per design/ui-ux/navigation-flow.md §9 and interaction-spec.md §2.1:
+ *   F1 = Galaxy Map (not in command bar, handled via keyboard)
+ *   F2 = Planets
+ *   F3 = Fleet
+ *   F4 = Tech
+ *   F5 = Races (Diplomacy)
+ *   F6 = Design
+ *   F7 = Reports (HoO enhancement, restored per screen-inventory.md §2.8)
+ *   F8 = Council (when active)
+ *   ESC = Game Menu (F10 intentionally NOT bound per navigation-flow.md §9)
+ *   MAP = No F-key (button-only, opens separate full-screen MAP view per §4.5)
+ */
 const NAV_BUTTONS: NavButton[] = [
   { label: 'GAME',    fkey: 'ESC', screen: 'menu',        tooltip: 'Game Menu — Save, Load, Options, Quit' },
   { label: 'DESIGN',  fkey: 'F6',  screen: 'ship_design', tooltip: 'Ship Design Lab — Create and modify ship blueprints' },
@@ -40,11 +60,17 @@ const NAV_BUTTONS: NavButton[] = [
   { label: 'COUNCIL', fkey: 'F8',  screen: 'council',     tooltip: 'Galactic High Council — Vote for Master of Orion' },
 ];
 
-/** Animation speed multipliers for combat and map animations */
+/**
+ * Animation speed multipliers for combat and map animations.
+ *
+ * QoL Enhancement (not in original MOO1):
+ * Speed controls are a modern convenience feature. They are not specified in
+ * the design documents but are reasonable UX additions per screen-inventory.md.
+ */
 const SPEED_MULTIPLIERS: Record<GameSpeed, number> = {
-  slow: 2.0,
-  normal: 1.0,
-  fast: 0.5,
+  slow: 2.0,    // 2x duration (slower animations)
+  normal: 1.0,  // Standard speed
+  fast: 0.5,    // 0.5x duration (faster animations)
 };
 
 export class CommandBar {
@@ -163,7 +189,13 @@ export class CommandBar {
     this.element.appendChild(nextTurnBtn);
   }
 
-  /** Show a brief toast message */
+  /**
+   * Show a brief toast message for user feedback.
+   *
+   * QoL Enhancement (not in original MOO1):
+   * Toast notifications are a modern UX pattern for non-blocking feedback.
+   * Not specified in design documents but reasonable addition per screen-inventory.md.
+   */
   private showToast(message: string): void {
     // Create or reuse toast element
     let toast = document.getElementById('cmd-toast');
