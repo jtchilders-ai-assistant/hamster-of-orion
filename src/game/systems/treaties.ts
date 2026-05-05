@@ -32,18 +32,31 @@ export const HAMSTER_RACE_ID = 'hamsters';
 /** Hamster trade income multiplier. */
 export const HAMSTER_TRADE_BONUS = 1.25;
 
-// ── Relation penalties on break ───────────────────────────────────────────────
+// ── Relation penalties on break (design/diplomacy/relationship-formulas.md §3.2) ──
 
-/** Relation penalty applied to all empires when a peace treaty is broken. */
+/**
+ * Treaty break penalties from design doc Section 3.2.
+ * Each treaty type has a penalty for the target and a separate penalty for all other races.
+ */
+export interface BreakPenalty {
+  target: number;  // Penalty applied to the target of the broken treaty
+  all: number;     // Penalty applied to all other races
+}
+
+export const BREAK_PENALTIES: Record<TreatyType, BreakPenalty> = {
+  // Peace break: -50 to all races (design §2.2 says "with all races")
+  peace:             { target: -50,  all: -50 },
+  trade:             { target: -25,  all: -10 },
+  research:          { target: -20,  all: -10 },
+  non_aggression:    { target: -30,  all: -15 },
+  defensive_pact:    { target: -40,  all: -20 },
+  military_alliance: { target: -100, all: -50 },
+};
+
+// Legacy exports for backward compatibility with tests
 export const BREAK_PEACE_PENALTY = -50;
-
-/** Relation penalty applied to all empires when a NAP is broken. */
 export const BREAK_NAP_PENALTY = -30;
-
-/** Relation penalty applied to all empires when a military alliance is broken. */
 export const BREAK_ALLIANCE_PENALTY = -100;
-
-/** Generic relation penalty for breaking any other treaty type. */
 export const BREAK_DEFAULT_PENALTY = -20;
 
 /** Severe penalty for breaking a defensive pact early (before duration expires). */
@@ -58,6 +71,32 @@ export const TREATY_MAINTENANCE_BONUSES: Partial<Record<TreatyType, number>> = {
   military_alliance: 15,  // -15% maintenance with ally
   defensive_pact: 10,     // -10% maintenance with defensive pact
 };
+
+/**
+ * Per-turn relationship maintenance bonuses from active treaties.
+ * design/diplomacy/relationship-formulas.md §3.1
+ *
+ * Formula: TreatyBonus_PerTurn = TreatyBaseBonus / 100
+ * These are fractionally accumulated each turn.
+ */
+export const TREATY_RELATION_MAINTENANCE: Partial<Record<TreatyType, number>> = {
+  trade:             0.20,  // +0.20/turn, +2.0/year
+  research:          0.15,  // +0.15/turn, +1.5/year
+  non_aggression:    0.10,  // +0.10/turn, +1.0/year
+  defensive_pact:    0.20,  // +0.20/turn, +2.0/year
+  military_alliance: 0.30,  // +0.30/turn, +3.0/year
+};
+
+/** Maximum treaty maintenance bonus per turn from all treaties combined. */
+export const TREATY_MAINTENANCE_CAP = 10;
+
+/**
+ * Treaty duration bonus formula: floor(TurnsActive / 25) × 5
+ * design/diplomacy/relationship-formulas.md §3.3
+ */
+export const TREATY_DURATION_BONUS_INTERVAL = 25;
+export const TREATY_DURATION_BONUS_INCREMENT = 5;
+export const TREATY_DURATION_BONUS_MAX = 20;
 
 // ── Default treaty terms by type ─────────────────────────────────────────────
 
@@ -203,14 +242,24 @@ function nudgeRelation(
 }
 
 /** Recompute the DiplomaticState label from a numeric value. */
+/**
+ * Recompute the DiplomaticState label from a numeric value.
+ *
+ * Per design/diplomacy/relationship-formulas.md §1:
+ *   War:        -100 to -50 (value ≤ -50)
+ *   Unfriendly: -49 to -1
+ *   Neutral:    0 to +49
+ *   Friendly:   +50 to +79
+ *   Allied:     +80 to +100
+ */
 function getDiplomaticStateFromValue(
   value: number,
 ): import('../state').DiplomaticState {
-  if (value < -50) return 'war';
-  if (value < 0)   return 'unfriendly';
-  if (value <= 49) return 'neutral';
-  if (value <= 79) return 'friendly';
-  return 'allied';
+  if (value <= -50) return 'war';      // -100 to -50
+  if (value < 0)    return 'unfriendly'; // -49 to -1
+  if (value < 50)   return 'neutral';    // 0 to 49
+  if (value < 80)   return 'friendly';   // 50 to 79
+  return 'allied';                       // 80 to 100
 }
 
 /**
@@ -463,8 +512,11 @@ export function rejectProposal(
 /**
  * Break/cancel an active treaty.
  *
- * Removes the treaty and applies a relation penalty to all empires in the game
- * (simulating the reputation damage from breaking a treaty).
+ * Removes the treaty and applies relation penalties per the design doc:
+ * - Target empire receives full penalty
+ * - All other empires receive reduced penalty
+ *
+ * design/diplomacy/relationship-formulas.md §3.2
  */
 export function breakTreaty(
   state: GameState,
@@ -485,34 +537,57 @@ export function breakTreaty(
     treaties: rel.treaties.filter(t => !(t.type === type && t.isActive)),
   }));
 
-  // Calculate penalty - defensive pacts have severe early-break penalty
-  let penalty = BREAK_PENALTY_FOR_TYPE[type];
+  // Get penalties from design doc - different for target vs all other races
+  const penalties = BREAK_PENALTIES[type];
+  let targetPenalty = penalties.target;
+  let allPenalty = penalties.all;
+
+  // Defensive pacts have severe early-break penalty
   if (type === 'defensive_pact') {
     const turnsActive = state.turn - treaty.signedTurn;
     if (turnsActive < DEFENSIVE_PACT_FIXED_DURATION) {
       // Early break: use severe penalty instead of normal penalty
-      penalty = BREAK_DEFENSIVE_PACT_EARLY_PENALTY;
+      targetPenalty = BREAK_DEFENSIVE_PACT_EARLY_PENALTY;
     }
   }
 
-  // Apply penalty to all empire pairs that include the breaker
-  for (const othEmpireId of next.empires.allIds) {
-    if (othEmpireId === breakerId) continue;
-    next = nudgeRelation(next, breakerId, othEmpireId, penalty);
-    next = nudgeRelation(next, othEmpireId, breakerId, penalty);
+  // Apply penalties: target gets targetPenalty, all others get allPenalty
+  for (const empireId of next.empires.allIds) {
+    if (empireId === breakerId) continue;
+
+    // Determine which penalty to apply
+    const penalty = (empireId === otherId) ? targetPenalty : allPenalty;
+
+    // Apply penalty bidirectionally (breaker's rep with this empire drops)
+    next = nudgeRelation(next, breakerId, empireId, penalty);
+    next = nudgeRelation(next, empireId, breakerId, penalty);
   }
 
   return next;
 }
 
 /**
+ * Calculate the treaty duration bonus for a treaty.
+ * Formula: floor(TurnsActive / 25) × 5, max +20
+ * design/diplomacy/relationship-formulas.md §3.3
+ */
+export function calculateTreatyDurationBonus(turnsActive: number): number {
+  const bonus = Math.floor(turnsActive / TREATY_DURATION_BONUS_INTERVAL) * TREATY_DURATION_BONUS_INCREMENT;
+  return Math.min(bonus, TREATY_DURATION_BONUS_MAX);
+}
+
+/**
  * Apply treaty effects for the current turn.
  *
  * For each active treaty between empires:
+ *  - Apply per-turn relation maintenance bonus (capped at +10 total)
+ *  - Apply treaty duration bonus for long-held treaties
  *  - Trade: Advance the ramp counter and credit both empires.
  *  - Research: Research bonus is handled by the research system; no-op here.
  *  - Timed treaties (NAP, research): Expire after their duration.
  *  - canBreak: Set to true once the minimum lock-in period has passed.
+ *
+ * design/diplomacy/relationship-formulas.md §3.1, §3.3
  */
 export function processTreatyEffects(state: GameState): GameState {
   let next = state;
@@ -538,6 +613,7 @@ export function processTreatyEffects(state: GameState): GameState {
       let updatedTreaties: Treaty[] = [];
       let creditDeltaA = 0;
       let creditDeltaB = 0;
+      let relationMaintenanceBonus = 0;  // Accumulated per-turn bonus for this pair
 
       for (const treaty of rel.treaties) {
         if (!treaty.isActive) {
@@ -562,6 +638,10 @@ export function processTreatyEffects(state: GameState): GameState {
           minDuration === undefined || turnsActive >= minDuration;
 
         let updatedTreaty: Treaty = { ...treaty, canBreak: canBreakNow };
+
+        // Accumulate per-turn maintenance bonus for this treaty type
+        const maintenanceRate = TREATY_RELATION_MAINTENANCE[treaty.type] ?? 0;
+        relationMaintenanceBonus += maintenanceRate;
 
         // Trade: advance ramp counter and compute income
         if (treaty.type === 'trade' && treaty.terms.tradeIncome !== undefined) {
@@ -589,6 +669,15 @@ export function processTreatyEffects(state: GameState): GameState {
         ...rel,
         treaties: updatedTreaties,
       }));
+
+      // Apply per-turn relation maintenance bonus (capped at TREATY_MAINTENANCE_CAP)
+      // This is fractionally accumulated - we floor to get integer relation change
+      const cappedBonus = Math.min(relationMaintenanceBonus, TREATY_MAINTENANCE_CAP);
+      if (cappedBonus >= 1) {
+        const intBonus = Math.floor(cappedBonus);
+        next = nudgeRelation(next, idA, idB, intBonus);
+        next = nudgeRelation(next, idB, idA, intBonus);
+      }
 
       // Credit empires if trade income accrued
       if (creditDeltaA !== 0 || creditDeltaB !== 0) {
@@ -638,14 +727,8 @@ const RELATION_BONUS_FOR_TYPE: Partial<Record<TreatyType, number>> = {
   // peace treaty: no relation bonus — it just ends the war state
 };
 
-const BREAK_PENALTY_FOR_TYPE: Record<TreatyType, number> = {
-  peace:             BREAK_PEACE_PENALTY,
-  non_aggression:    BREAK_NAP_PENALTY,
-  trade:             BREAK_DEFAULT_PENALTY,
-  research:          BREAK_DEFAULT_PENALTY,
-  military_alliance: BREAK_ALLIANCE_PENALTY,
-  defensive_pact:    BREAK_DEFAULT_PENALTY,
-};
+// Note: BREAK_PENALTY_FOR_TYPE is deprecated.
+// Use BREAK_PENALTIES which has separate target/all penalties per design doc §3.2.
 
 /**
  * Calculate the total maintenance bonus percentage for an empire based on active treaties.

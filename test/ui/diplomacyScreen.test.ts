@@ -97,15 +97,18 @@ function makeState(empires: Empire[]): GameState {
 // ── Tests: getDiplomaticState (relation label logic) ──────────────────────────
 
 describe('DiplomacyScreen – relation label logic', () => {
-  it('shows WAR for values strictly below -50', () => {
-    // STATE_WAR_THRESHOLD = -50; war if value < -50 (strict)
-    expect(getDiplomaticState(-51)).toBe('war');
+  it('shows WAR for values at or below -50 (per design doc §1)', () => {
+    // Per design/diplomacy/relationship-formulas.md §1:
+    // War: -100 to -50 (value ≤ -50)
     expect(getDiplomaticState(-100)).toBe('war');
+    expect(getDiplomaticState(-51)).toBe('war');
+    expect(getDiplomaticState(-50)).toBe('war');  // -50 IS war (inclusive)
   });
 
-  it('shows unfriendly for -50 through -1', () => {
-    expect(getDiplomaticState(-50)).toBe('unfriendly');  // -50 is NOT war (strict <)
+  it('shows unfriendly for -49 through -1', () => {
+    // Per design doc: Unfriendly: -49 to -1
     expect(getDiplomaticState(-49)).toBe('unfriendly');
+    expect(getDiplomaticState(-25)).toBe('unfriendly');
     expect(getDiplomaticState(-1)).toBe('unfriendly');
   });
 
@@ -113,18 +116,19 @@ describe('DiplomacyScreen – relation label logic', () => {
     expect(getDiplomaticState(0)).toBe('neutral');
   });
 
-  it('shows friendly above friendly threshold (50+)', () => {
-    // STATE_FRIENDLY_THRESHOLD = 49; friendly if value > 49 (i.e. >= 50)
+  it('shows friendly for values 50-79 (per design doc §1)', () => {
+    // Per design doc: Friendly: +50 to +79
     expect(getDiplomaticState(50)).toBe('friendly');
+    expect(getDiplomaticState(65)).toBe('friendly');
     expect(getDiplomaticState(79)).toBe('friendly');
-    expect(getDiplomaticState(STATE_FRIENDLY_THRESHOLD)).toBe('neutral');  // 49 is still neutral
+    expect(getDiplomaticState(49)).toBe('neutral');  // 49 is still neutral
   });
 
-  it('shows allied above allied threshold (80+)', () => {
-    // STATE_ALLIED_THRESHOLD = 79; allied if value > 79 (i.e. >= 80)
+  it('shows allied for values 80+ (per design doc §1)', () => {
+    // Per design doc: Allied: +80 to +100
     expect(getDiplomaticState(80)).toBe('allied');
     expect(getDiplomaticState(100)).toBe('allied');
-    expect(getDiplomaticState(STATE_ALLIED_THRESHOLD)).toBe('friendly');  // 79 is still friendly
+    expect(getDiplomaticState(79)).toBe('friendly');  // 79 is still friendly
   });
 });
 
@@ -254,12 +258,13 @@ describe('DiplomacyScreen – relation value range', () => {
     expect(RELATION_MAX).toBe(100);
   });
 
-  it('war threshold is at -50 (strict less-than)', () => {
+  it('war threshold is at -50 (inclusive per design doc)', () => {
     expect(STATE_WAR_THRESHOLD).toBe(-50);
-    // war if value < -50 (strict), so -50 itself is unfriendly
+    // Per design/diplomacy/relationship-formulas.md §1:
+    // War: -100 to -50 (value ≤ -50)
     expect(getDiplomaticState(-51)).toBe('war');
-    expect(getDiplomaticState(-50)).toBe('unfriendly');  // NOT war
-    expect(getDiplomaticState(-49)).not.toBe('war');
+    expect(getDiplomaticState(-50)).toBe('war');  // -50 IS war (inclusive)
+    expect(getDiplomaticState(-49)).toBe('unfriendly');  // -49 is unfriendly
   });
 });
 
