@@ -553,8 +553,8 @@ export interface AIStartingTechBonus {
   techCostMult: number;
   /** Multiplier on AI research speed. */
   researchSpeedMult: number;
-  /** Fields from which to select bonus techs (undefined = none). */
-  bonusTechFields?: BonusTechField[];
+  /** Fields from which to select bonus techs (empty array = none). */
+  bonusTechFields: BonusTechField[];
 }
 
 /**
@@ -567,18 +567,21 @@ export const AI_STARTING_TECH_BONUSES: Record<Exclude<DifficultyLevel, 'custom'>
     startingTier: 1,
     techCostMult: 1.50,
     researchSpeedMult: 0.67,
+    bonusTechFields: [],
   },
   easy: {
     bonusTechs: 0,
     startingTier: 1,
     techCostMult: 1.25,
     researchSpeedMult: 0.80,
+    bonusTechFields: [],
   },
   average: {
     bonusTechs: 0,
     startingTier: 1,
     techCostMult: 1.00,
     researchSpeedMult: 1.00,
+    bonusTechFields: [],
   },
   hard: {
     bonusTechs: 2,
