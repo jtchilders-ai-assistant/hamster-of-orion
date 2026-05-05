@@ -126,25 +126,30 @@ describe('getTerraformingBonus', () => {
 // ── getCloningBonus ───────────────────────────────────────────────────────────
 
 describe('getCloningBonus', () => {
+  // Design source: design/technology/planetology.md §Cloning Technology
+  // Cloning (TL 21): +2 pop/turn
+  // Advanced Cloning (TL 42): +5 pop/turn
+
   it('returns 0 with no cloning tech', () => {
     expect(getCloningBonus(0)).toBe(0);
+    expect(getCloningBonus(20)).toBe(0);
   });
 
-  it('returns 2 at tech level 11', () => {
-    expect(getCloningBonus(11)).toBe(2);
-  });
-
-  it('returns 2 for levels 11–21', () => {
-    expect(getCloningBonus(15)).toBe(2);
+  it('returns 2 at tech level 21 (Cloning)', () => {
     expect(getCloningBonus(21)).toBe(2);
   });
 
-  it('returns 5 at tech level 22', () => {
-    expect(getCloningBonus(22)).toBe(5);
+  it('returns 2 for levels 21–41', () => {
+    expect(getCloningBonus(25)).toBe(2);
+    expect(getCloningBonus(41)).toBe(2);
   });
 
-  it('returns 5 for level > 22', () => {
-    expect(getCloningBonus(40)).toBe(5);
+  it('returns 5 at tech level 42 (Advanced Cloning)', () => {
+    expect(getCloningBonus(42)).toBe(5);
+  });
+
+  it('returns 5 for level > 42', () => {
+    expect(getCloningBonus(50)).toBe(5);
   });
 });
 
@@ -301,7 +306,7 @@ describe('calculatePopulationGrowth', () => {
     });
     const ctx = makeCtx('rabbits', {
       terraforming_tech_level: 14,  // +40
-      cloning_tech_level: 22,       // +5/turn
+      cloning_tech_level: 42,       // +5/turn (Advanced Cloning per planetology.md)
     });
     const result = calculatePopulationGrowth(planet, ctx);
 
@@ -383,7 +388,7 @@ describe('calculatePopulationGrowth', () => {
       base_population: 100,
       fractional_population: 0,
     });
-    const ctx = makeCtx('hamsters', { cloning_tech_level: 22 });
+    const ctx = makeCtx('hamsters', { cloning_tech_level: 42 }); // Advanced Cloning per planetology.md
     const result = calculatePopulationGrowth(planet, ctx);
 
     // At max pop, early return sets cloningBonus=0 (not computed)

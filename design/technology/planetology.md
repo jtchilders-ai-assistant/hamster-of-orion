@@ -137,7 +137,7 @@ Converts hostile planets to habitable environments.
 | Tech Name | Tech Level | RP Cost | Category | Effect |
 |-----------|------------|---------|----------|--------|
 | Improved Terraforming +40 | 20 | 4,090 | terraforming | +40 max pop, 4 BC/million |
-| Cloning | 21 | 7,050 | cloning | Grow 1M pop per 10 BC |
+| Cloning | 21 | 7,050 | cloning | +2 pop/turn (flat bonus) |
 | Atmospheric Terraforming | 22 | 7,740 | atmosphere | Convert hostile→standard, 200 BC |
 
 ---
@@ -179,7 +179,7 @@ Converts hostile planets to habitable environments.
 
 | Tech Name | Tech Level | RP Cost | Category | Effect |
 |-----------|------------|---------|----------|--------|
-| Advanced Cloning | 42 | 28,220 | cloning | Grow 1M pop per 5 BC |
+| Advanced Cloning | 42 | 28,220 | cloning | +5 pop/turn (flat bonus) |
 | Improved Terraforming +100 | 44 | 40,000 | terraforming | +100 max pop, 2 BC/million |
 
 ---
@@ -501,8 +501,10 @@ Population_Lost = max(0, Population_Lost)
 
 ### Cloning Growth
 ```
-Population_Grown = BC_Invested / BC_Per_Million
+Total_Growth = Natural_Growth + Cloning_Bonus
 ```
+
+Where `Cloning_Bonus` is 0 (no tech), 2 (Cloning at TL 21), or 5 (Advanced Cloning at TL 42). This is a flat per-turn bonus, not BC-invested.
 
 ---
 
@@ -802,9 +804,9 @@ Max_Population = (Base_Size + Terraforming_Bonus + Soil_Enrichment_Bonus) × Env
             "research_cost": 7050,
             "category": "cloning",
             "effect": {
-              "bc_per_million": 10
+              "bonus_per_turn": 2
             },
-            "description": "Allows bio-engineered colonists to be grown at a rate of 1M per 10 BC."
+            "description": "Provides a flat +2 population growth per turn per planet, on top of natural growth."
           },
           {
             "id": "atmospheric_terraforming",
@@ -946,13 +948,13 @@ Max_Population = (Base_Size + Terraforming_Bonus + Soil_Enrichment_Bonus) × Env
           {
             "id": "advanced_cloning",
             "name": "Advanced Cloning",
-            "tech_level": 34,
+            "tech_level": 42,
             "research_cost": 28220,
             "category": "cloning",
             "effect": {
-              "bc_per_million": 5
+              "bonus_per_turn": 5
             },
-            "description": "Allows bio-engineered colonists to be grown at a rate of 1M per 5 BC. Twice as efficient as basic cloning."
+            "description": "Provides a flat +5 population growth per turn per planet, replacing basic Cloning."
           }
         ]
       },
@@ -1223,10 +1225,10 @@ See `../economy/factory-formulas.md` §8 for full pollution calculation.
 
 ### Cloning (2 technologies)
 
-| Technology | Tech Level | RP Cost | BC/Million |
-|------------|------------|---------|------------|
-| Cloning | 21 | 7,050 | 10 BC |
-| Advanced Cloning | 42 | 28,220 | 5 BC |
+| Technology | Tech Level | RP Cost | Flat Bonus/Turn |
+|------------|------------|---------|------------------|
+| Cloning | 21 | 7,050 | +2 pop/turn |
+| Advanced Cloning | 42 | 28,220 | +5 pop/turn |
 
 ### Atmospheric (1 technology)
 

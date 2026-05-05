@@ -194,9 +194,15 @@ export function getTerraformingBonus(techLevel: number): number {
 /**
  * Cloning tech bonus: flat population added per turn per planet.
  */
+/**
+ * Cloning tech bonus: flat population added per turn per planet.
+ * Design source: design/technology/planetology.md §Cloning Technology
+ * - Cloning (TL 21): +2 pop/turn
+ * - Advanced Cloning (TL 42): +5 pop/turn
+ */
 const CLONING_BONUS_TABLE: Array<{ minLevel: number; bonus: number }> = [
-  { minLevel: 22, bonus: 5 },
-  { minLevel: 11, bonus: 2 },
+  { minLevel: 42, bonus: 5 },
+  { minLevel: 21, bonus: 2 },
   { minLevel:  0, bonus: 0 },
 ];
 

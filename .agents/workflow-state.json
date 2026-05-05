@@ -1,57 +1,52 @@
 {
   "state": "TESTING",
-  "current_task": "fix-38",
+  "current_task": "fix-25",
   "phase": "phase5-design-compliance-fixes",
-  "last_completed": "fix-37",
-  "last_check": "2026-05-04T21:45:00Z",
+  "last_completed": "fix-38",
+  "last_check": "2026-05-04T21:52:00Z",
   "worker_output": {
     "files_created": [],
-    "files_modified": ["design/technology/research-formulas.md"],
+    "files_modified": [
+      "design/technology/planetology.md",
+      "src/game/constants.ts",
+      "src/game/systems/population.ts",
+      "test/game/systems/population.test.ts"
+    ],
     "tests_added": [],
-    "summary": "Expanded research-formulas.md with detailed formulas for Tech Stealing (espionage), Tech Trading (diplomacy), Reverse Engineering (captured ships), and Random Tech Choices (Rats Academic Network ability). All formulas now match and cross-reference the authoritative design docs in diplomacy/espionage.md and ships/combat-algorithm.md.",
+    "summary": "Fixed Cloning Technology inconsistencies in planetology.md. The design doc had conflicting information: the §Cloning Technology section correctly described flat +2/+5 pop/turn bonuses, but tier tables, JSON schema, and Formulas Summary section incorrectly showed BC-invested growth model. Now all sections consistently describe flat per-turn bonuses. Also updated code (constants.ts, population.ts) and tests to use correct tech levels (21/42) per the design doc tier tables.",
     "design_compliance": [
       {
-        "doc": "design/diplomacy/espionage.md",
-        "section": "§6.2 Tech Theft",
-        "quote": "TheftSuccess = 30 + SpyEffectiveness + TechValueModifier",
-        "impl_file": "design/technology/research-formulas.md",
-        "impl_line": 375,
+        "doc": "design/technology/planetology.md",
+        "section": "§Cloning Technology",
+        "quote": "Cloning provides a flat bonus to population growth per turn... +2 pop/turn (TL 21), +5 pop/turn (TL 42)",
+        "impl_file": "src/game/constants.ts",
+        "impl_line": 157,
         "verified": true
       },
       {
-        "doc": "design/diplomacy/espionage.md",
-        "section": "§6.2 Tech Value Modifier",
-        "quote": "Tier 1-3 techs: +10, Tier 4-6: +0, Tier 7-9: -5, Tier 10-12: -10, Tier 13+: -15",
-        "impl_file": "design/technology/research-formulas.md",
-        "impl_line": 380,
+        "doc": "design/technology/planetology.md",
+        "section": "§Cloning Technology",
+        "quote": "Total_Growth = Natural_Growth + Cloning_Bonus",
+        "impl_file": "src/game/systems/population.ts",
+        "impl_line": 207,
         "verified": true
       },
       {
-        "doc": "design/species/rats.md",
-        "section": "Academic Network",
-        "quote": "Always gets multiple tech choices per field (minimum 3)",
-        "impl_file": "design/technology/research-formulas.md",
-        "impl_line": 292,
-        "verified": true
-      },
-      {
-        "doc": "design/species/rats.md",
-        "section": "Quick Study",
-        "quote": "Can reverse-engineer captured tech immediately",
-        "impl_file": "design/technology/research-formulas.md",
-        "impl_line": 481,
-        "verified": true
-      },
-      {
-        "doc": "design/species/race-stats-complete.md",
-        "section": "Mice abilities",
-        "quote": "50% faster reverse engineering",
-        "impl_file": "design/technology/research-formulas.md",
-        "impl_line": 482,
+        "doc": "design/technology/planetology.md",
+        "section": "Tier 7 (Cloning) & Tier 11 (Advanced Cloning)",
+        "quote": "Tech levels 21 and 42 respectively",
+        "impl_file": "src/game/systems/population.ts",
+        "impl_line": 201,
         "verified": true
       }
     ],
-    "design_gaps": []
+    "design_gaps": [
+      {
+        "issue": "Bio weapon combat integration",
+        "status": "documented_but_not_implemented",
+        "notes": "Bio weapons (Death Spores, Doom Virus, Bio Terminator) have constants and population effects defined, but combat.ts does not integrate them. This is a separate implementation task, not a design doc fix."
+      }
+    ]
   },
-  "notes": "fix-38 complete. npm run check-design passes. TypeScript and test failures are pre-existing issues unrelated to this design doc fix."
+  "notes": "fix-25 complete. Cloning tech level and formula inconsistencies resolved. npm run typecheck, npm run test (1497 tests), and npm run check-design all pass."
 }

@@ -153,10 +153,11 @@ export const BASE_FOOD_PER_WORKER = 2.0;
 export const STARVATION_RATE = 0.5;
 
 // Cloning tech bonuses
+// Design source: design/technology/planetology.md §Cloning Technology
 export const CLONING: { tech_level: number; name: string; bonus_per_turn: number }[] = [
   { tech_level: 0, name: "None", bonus_per_turn: 0 },
-  { tech_level: 11, name: "Cloning", bonus_per_turn: 2 },
-  { tech_level: 22, name: "Advanced Cloning", bonus_per_turn: 5 },
+  { tech_level: 21, name: "Cloning", bonus_per_turn: 2 },
+  { tech_level: 42, name: "Advanced Cloning", bonus_per_turn: 5 },
 ];
 
 // Terraforming bonuses by tech level
@@ -803,3 +804,117 @@ export const BASE_SCANNER_RANGE_PARSECS = 2;
  * Formula: range = BASE_SCANNER_RANGE_PARSECS + (scannerTechLevel * SCANNER_RANGE_PER_TECH_LEVEL)
  */
 export const SCANNER_RANGE_PER_TECH_LEVEL = 2;
+
+// ================================================================
+// Population Dominance Coalition (design/diplomacy/relationship-formulas.md §7)
+// ================================================================
+
+/**
+ * Population fraction that triggers a warning to the dominant empire.
+ * Design source: design/diplomacy/relationship-formulas.md §7.1
+ */
+export const DOMINANCE_WARNING_THRESHOLD = 0.33;
+
+/**
+ * Population fraction that triggers the coalition penalty.
+ * Design source: design/diplomacy/relationship-formulas.md §7.1
+ */
+export const DOMINANCE_COALITION_THRESHOLD = 0.40;
+
+/**
+ * Per-turn relation penalty toward the dominant empire.
+ * Design source: design/diplomacy/relationship-formulas.md §7.3
+ */
+export const DOMINANCE_PENALTY_PER_TURN = 2;
+
+/**
+ * Floor for dominance penalty: stops pushing relations below -30.
+ * Design source: design/diplomacy/relationship-formulas.md §7.3
+ */
+export const DOMINANCE_PENALTY_MAX = -30;
+
+/**
+ * AI war tendency boost vs the dominant empire when coalition active.
+ * Design source: design/diplomacy/relationship-formulas.md §7.4
+ */
+export const COALITION_WAR_BOOST = 20;
+
+/**
+ * AI alliance acceptance boost among non-dominant races when coalition active.
+ * Design source: design/diplomacy/relationship-formulas.md §7.4
+ */
+export const COALITION_ALLIANCE_BOOST = 30;
+
+/**
+ * Hysteresis buffer: warning resets when empire shrinks below threshold - 3%.
+ * Design source: design/diplomacy/relationship-formulas.md §7.5
+ */
+export const DOMINANCE_WARNING_RESET_BUFFER = 0.03;
+
+// ================================================================
+// Reputation System (design/diplomacy/relationship-formulas.md §8)
+// ================================================================
+
+/**
+ * Maximum value for any reputation track.
+ * Design source: design/diplomacy/relationship-formulas.md §8.1
+ */
+export const REPUTATION_TRACK_MAX = 100;
+
+/**
+ * Minimum value for any reputation track.
+ * Design source: design/diplomacy/relationship-formulas.md §8.1
+ */
+export const REPUTATION_TRACK_MIN = -100;
+
+/**
+ * Reputation change events by category.
+ * Design source: design/diplomacy/relationship-formulas.md §8.2
+ */
+export const REPUTATION_EVENTS = {
+  // Honor track
+  KEEP_TREATY_25_TURNS: { track: 'honor' as const, change: 5 },
+  BREAK_ANY_TREATY: { track: 'honor' as const, change: -25 },
+  HONOR_DEFENSIVE_PACT: { track: 'honor' as const, change: 15 },
+  REFUSE_ALLY_WAR_HELP: { track: 'honor' as const, change: -20 },
+
+  // Peace track
+  PEACE_25_TURNS: { track: 'peace' as const, change: 5 },
+  DECLARE_WAR: { track: 'peace' as const, change: -15 },
+  ACCEPT_PEACE_AS_LOSER: { track: 'peace' as const, change: 5 },
+  REJECT_PEACE_WHILE_WINNING: { track: 'peace' as const, change: -10 },
+
+  // Fairness track
+  FAIR_TECH_TRADE: { track: 'fairness' as const, change: 5 },
+  DEMAND_EXCESSIVE_TRIBUTE: { track: 'fairness' as const, change: -10 },
+  BREAK_TRADE_FOR_ADVANTAGE: { track: 'fairness' as const, change: -15 },
+
+  // Mercy track
+  ACCEPT_SURRENDER: { track: 'mercy' as const, change: 10 },
+  RELEASE_CAPTURED_PLANET: { track: 'mercy' as const, change: 15 },
+  ORBITAL_BOMBARDMENT: { track: 'mercy' as const, change: -20 },
+  USE_BIO_WEAPONS: { track: 'mercy' as const, change: -50 },
+  EXTERMINATE_POPULATION: { track: 'mercy' as const, change: -75 },
+};
+
+// ================================================================
+// Treaty Breaker Status (design/diplomacy/relationship-formulas.md §3.2)
+// ================================================================
+
+/**
+ * Base duration of treaty breaker status in turns.
+ * Design source: design/diplomacy/relationship-formulas.md §3.2
+ */
+export const TREATY_BREAKER_DURATION = 50;
+
+/**
+ * Additional duration added per violation while status is active.
+ * Design source: design/diplomacy/relationship-formulas.md §3.2
+ */
+export const TREATY_BREAKER_STACK_DURATION = 25;
+
+/**
+ * Penalty to all new treaty negotiations while flagged as treaty breaker.
+ * Design source: design/diplomacy/relationship-formulas.md §3.2
+ */
+export const TREATY_BREAKER_NEGOTIATION_PENALTY = -20;
