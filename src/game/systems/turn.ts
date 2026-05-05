@@ -42,7 +42,6 @@ import {
   PopulationPlanetFields,
 } from './population';
 import {
-  DEFAULT_PRODUCTION_CONTEXT,
   ProductionContext,
   processPlanetProduction,
   calculateShipMaintenance,
@@ -77,8 +76,6 @@ import {
 import {
   RACIAL_PRODUCTION_MODIFIERS,
   ROBOTIC_CONTROLS,
-  WASTE_REDUCTION,
-  ECO_RESTORATION,
   INDUSTRIAL_TECH_FACTORY_COSTS,
   TERRAFORMING_BONUSES,
 } from '../constants';
