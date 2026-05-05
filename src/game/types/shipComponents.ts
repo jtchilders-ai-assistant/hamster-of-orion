@@ -128,6 +128,8 @@ export interface ComputerEffect {
 export interface SpecialEffect {
   /** Push distance in hexes (Repulsor Beam) */
   pushDistance?: number;
+  /** Pull distance in hexes (Tractor Beam) */
+  pullDistance?: number;
   /** Whether prevents enemy from retreating (Warp Dissipator) */
   preventsRetreat?: boolean;
   /** Number of turns target is disabled (Stasis Field) */
@@ -180,6 +182,12 @@ export interface SpecialEffect {
   factoryCost?: number;
   /** Ground combat bonus */
   groundCombatBonus?: number;
+  /** Whether ship is invisible until it fires (Cloaking Device) */
+  invisibleUntilFire?: boolean;
+  /** Detection range multiplier (Improved Cloaking: 0.5 = -50%) */
+  detectionRangeMultiplier?: number;
+  /** Whether ship remains invisible even while firing (Perfect Cloaking) */
+  alwaysInvisible?: boolean;
 }
 
 // ── Union effect type ─────────────────────────────────────────────────────────
