@@ -12,10 +12,11 @@
     "files_created": [],
     "files_modified": [
       "src/game/ai/diplomacyAI.ts",
+      "src/game/systems/treaties.ts",
       "test/game/ai/diplomacyAI.test.ts"
     ],
     "tests_added": [],
-    "summary": "Reviewed diplomacyAI.ts for design compliance. Found and fixed one issue: applyProposeTreaty was creating treaties directly with isActive=true, bypassing the proper propose/accept flow from treaties.ts. Now uses proposeTreaty() to create pending treaties, then acceptTreaty() for AI-to-AI treaties (auto-accept), while AI-to-player treaties remain pending for UI acceptance. Added test fixture fix for missing incomingProposals field. Verified existing honorable/peaceful trait handling correctly implements design doc rules for war declaration.",
+    "summary": "Reviewed diplomacyAI.ts for design compliance. Fixed three issues: (1) applyProposeTreaty was creating treaties directly with isActive=true, bypassing the proper propose/accept flow from treaties.ts — now uses proposeTreaty() + acceptTreaty() for AI-to-AI, pending for AI-to-player; (2) DiplomaticDecision.treatyType was missing, causing propose_treaty actions to always apply non_aggression instead of the intended treaty type (trade/research/etc.); (3) cloneRelation in treaties.ts crashed on missing incomingProposals — now defensive with nullish coalescing. Added test fixture fix for missing incomingProposals field. Verified existing honorable/peaceful trait handling correctly implements design doc rules for war declaration.",
     "design_compliance": [
       {
         "doc": "design/diplomacy/ai-personalities.md",

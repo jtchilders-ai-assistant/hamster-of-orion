@@ -1,3 +1,5 @@
-# Current Task: fix-20 — Tactical Combat UI Design Doc Fixes
+# Current Task: fix-79 — DiplomacyAI Fixes
 
-**ID**: fix-20 | **Severity**: medium | **Source**: design/ui-ux/tactical-combat-ui.md
+**ID**: fix-79 | **Severity**: medium | **Source**: src/game/ai/diplomacyAI.ts
+
+**Task**: Review src/game/ai/diplomacyAI.ts for design compliance. No design docs listed.
