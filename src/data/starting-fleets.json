@@ -1,11 +1,12 @@
 {
   "version": 1,
   "_note": "Starting ship designs and fleet compositions for each race. Ships use only starting technologies. Colony ships enable early expansion. All races begin with 1 colony ship + race-specific combat ships.",
+  "_shipSizesNote": "baseHp from combat-algorithm.md §13 Base_HP by Hull Size (MOO1). spaceUnits is legacy and unused.",
   "shipSizes": {
-    "small":  { "baseHp": 25,  "spaceUnits": 50  },
-    "medium": { "baseHp": 60,  "spaceUnits": 100 },
-    "large":  { "baseHp": 125, "spaceUnits": 200 },
-    "huge":   { "baseHp": 250, "spaceUnits": 500 }
+    "small":  { "baseHp": 3,   "spaceUnits": 50  },
+    "medium": { "baseHp": 18,  "spaceUnits": 100 },
+    "large":  { "baseHp": 100, "spaceUnits": 200 },
+    "huge":   { "baseHp": 600, "spaceUnits": 500 }
   },
   "races": [
     {

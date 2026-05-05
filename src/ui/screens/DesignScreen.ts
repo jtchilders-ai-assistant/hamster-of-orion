@@ -1066,7 +1066,7 @@ export class DesignScreen {
     if (available.length === 0) return 1;
     const best = available.reduce((a, b) => (b.techLevel > a.techLevel ? b : a));
     const eff = best.effect as Record<string, number | undefined>;
-    return Math.round((eff['hpMultiplier'] ?? 1) * HULL_SPECS[this.working.hullSize].space);
+    return Math.round((eff['hpMultiplier'] ?? 1) * HULL_SPECS[this.working.hullSize].baseHp);
   }
 
   private calcShieldHp(techs: string[]): number {

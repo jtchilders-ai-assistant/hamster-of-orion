@@ -326,11 +326,12 @@ export const SHIELD_DAMAGE_ABSORPTION_RATE = 1; // each point of shield class ab
 export const SHIELD_REGENERATION_BETWEEN_COMBATS = true;
 
 // Base HP by hull size
+// Design doc source: combat-algorithm.md §13 Base_HP by Hull Size (MOO1)
 export const HULL_BASE_HP = {
   small: 3,
   medium: 18,
-  large: 54,
-  huge: 120,
+  large: 100,
+  huge: 600,
 };
 
 // Armor multipliers by type

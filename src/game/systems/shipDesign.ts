@@ -19,17 +19,28 @@ import type { ShipClass, TechId } from '../state';
 
 // ── Hull definitions (from design/ships/ship-design.md) ───────────────────────
 
-/** Hull space and base cost for each ship class. */
+/**
+ * Hull space, base cost, HP, and crew for each ship class.
+ * 
+ * Design doc source:
+ *   - space/baseCost: design/ships/ship-classes.md
+ *   - baseHp: design/ships/combat-algorithm.md §13 Base_HP by Hull Size (MOO1)
+ *   - baseCrew: design/ships/combat-algorithm.md §11c Crew scaling by hull size
+ */
 export interface HullSpec {
   space: number;
   baseCost: number;
+  /** Base hit points before armor multiplier (MOO1 canonical) */
+  baseHp: number;
+  /** Base crew complement for combat crew tracking */
+  baseCrew: number;
 }
 
 export const HULL_SPECS: Record<ShipClass, HullSpec> = {
-  small:  { space:   25, baseCost:    6 },
-  medium: { space:   70, baseCost:   36 },
-  large:  { space:  280, baseCost:  200 },
-  huge:   { space: 1400, baseCost: 1200 },
+  small:  { space:   25, baseCost:    6, baseHp:   3, baseCrew:  20 },
+  medium: { space:   70, baseCost:   36, baseHp:  18, baseCrew:  60 },
+  large:  { space:  280, baseCost:  200, baseHp: 100, baseCrew: 200 },
+  huge:   { space: 1400, baseCost: 1200, baseHp: 600, baseCrew: 500 },
 };
 
 // ── Ship design type used by this system ─────────────────────────────────────
