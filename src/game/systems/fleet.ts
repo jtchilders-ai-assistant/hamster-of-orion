@@ -70,6 +70,82 @@ export function getFleetWarpSpeed(fleet: Fleet, state: GameState): number {
   return minSpeed === Infinity ? 0 : minSpeed;
 }
 
+// ── Star Gate support ───────────────────────────────────────────────────────────
+//
+// Per design/galaxy/travel.md §Star Gates:
+//   - Ships travel instantly between any two planets with Star Gates
+//   - Ignores fuel range for gate-to-gate travel
+//   - One gate per planet maximum
+//
+// Per design/planets/buildings.md §Star Gates:
+//   - Cost: 3000 BC, Tech Required: Intergalactic Star Gates (Propulsion)
+//   - Effect: Instant travel between gated planets
+
+/** Building ID for star gate (must match buildings.json). */
+const STAR_GATE_BUILDING_ID: BuildingId = 'star_gate' as BuildingId;
+
+/**
+ * Check if a star system has a planet with an operational star gate.
+ *
+ * Star gates are planetary buildings, so we check each planet in the system
+ * for a star gate in its buildings array.
+ *
+ * @param systemId The star system to check.
+ * @param empireId The empire that must own the star gate (must be allied/owned).
+ * @param state    Current game state.
+ * @returns True if the system has a planet with a star gate owned by the empire.
+ */
+export function systemHasStarGate(
+  systemId: SystemId,
+  empireId: string,
+  state: GameState,
+): boolean {
+  const system = state.galaxy.systems.byId[systemId];
+  if (!system) return false;
+
+  for (const planetId of system.planetIds) {
+    const planet = state.planets.byId[planetId];
+    if (!planet) continue;
+    // Planet must be owned by the fleet's empire
+    if (planet.ownerId !== empireId) continue;
+    // Check if star gate building is present
+    if (planet.buildings.includes(STAR_GATE_BUILDING_ID)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Check if a fleet can use star gate travel to a destination.
+ *
+ * Per design/galaxy/travel.md §Star Gates:
+ *   - Both origin and destination must have star gates
+ *   - Gates must be owned by the same empire
+ *   - Travel is instant (1 turn)
+ *   - Ignores fuel range
+ *
+ * @param fleet         The fleet attempting to travel.
+ * @param destinationId The target star system.
+ * @param state         Current game state.
+ * @returns True if star gate travel is possible.
+ */
+export function canUseStarGateTravel(
+  fleet: Fleet,
+  destinationId: SystemId,
+  state: GameState,
+): boolean {
+  // Origin system must have a star gate owned by the fleet's empire
+  if (!systemHasStarGate(fleet.systemId, fleet.ownerId, state)) {
+    return false;
+  }
+  // Destination system must have a star gate owned by the fleet's empire
+  if (!systemHasStarGate(destinationId, fleet.ownerId, state)) {
+    return false;
+  }
+  return true;
+}
+
 // ── Distance calculation ───────────────────────────────────────────────────────
 
 /**
@@ -91,13 +167,22 @@ export function distanceBetweenSystems(
 
 /**
  * Calculate ETA (turns) from a fleet's location to a destination.
- * ETA = ceil(distance / warpSpeed). Minimum 1 turn.
+ *
+ * Per design/galaxy/travel.md §Star Gates:
+ *   - If both origin and destination have star gates owned by the fleet's empire,
+ *     travel is instant (ETA = 1 turn).
+ *   - Otherwise, ETA = ceil(distance / warpSpeed). Minimum 1 turn.
  */
 export function calculateEta(
   fleet: Fleet,
   destinationId: SystemId,
   state: GameState,
 ): number {
+  // Star gate travel: instant (1 turn) if both ends have gates
+  if (canUseStarGateTravel(fleet, destinationId, state)) {
+    return 1;
+  }
+
   const warpSpeed = getFleetWarpSpeed(fleet, state);
   if (warpSpeed === 0) return Infinity;
 
