@@ -15,6 +15,9 @@ import {
   scorePlanetForColonization,
   isUnderThreat,
   shouldBuildMilitary,
+  calculateShipPower,
+  calculateFleetPower,
+  getEmpireFleetPower,
 } from '../../../src/game/ai/strategies';
 import {
   GameState,
@@ -379,6 +382,316 @@ function makeBaseState(turn = 1): GameState {
 }
 
 // ── Strategy helper tests ──────────────────────────────────────────────────────
+
+// ── Ship Power calculation tests (design/technical/ai-implementation.md §1.3) ──────
+
+function makeShipDesignForPower(
+  options: {
+    hullClass?: 'small' | 'medium' | 'large' | 'huge';
+    armorType?: string;
+    weaponsDamage?: string[];
+    shieldClass?: number;
+    speed?: number;
+  } = {},
+): ShipDesign {
+  const hullClass = options.hullClass ?? 'medium';
+  return {
+    id: 'test-design',
+    name: 'Test Ship',
+    class: hullClass,
+    ownerId: 'player',
+    size: 100,
+    spaceUsed: 80,
+    spaceFree: 20,
+    components: options.armorType
+      ? [{ id: options.armorType, type: 'armor' as const, name: `${options.armorType} Armor`, space: 10, baseCost: 50, count: 1 }]
+      : [],
+    stats: {
+      cost: 100,
+      maintenance: 2,
+      hp: 18,
+      shieldHp: options.shieldClass ? options.shieldClass * 10 : 0,
+      speed: options.speed ?? 4,
+      range: 5,
+      weapons: (options.weaponsDamage ?? []).map((dmg, i) => ({
+        name: `Weapon ${i}`,
+        damage: dmg,
+        range: 3,
+        type: 'beam' as const,
+      })),
+      defense: {
+        armor: 1,
+        shields: options.shieldClass ?? 0,
+        ecm: 0,
+      },
+      special: [],
+    },
+    miniaturization: {},
+    isObsolete: false,
+    shipsBuilt: 0,
+  };
+}
+
+describe('calculateShipPower (ai-implementation.md §1.3)', () => {
+  it('calculates power using hull HP, armor, weapons, shields, and speed', () => {
+    // Medium hull = 18 HP, Zortrium armor = 1.8×, Fusion Beam 20 dmg, Class V shields, Speed 4
+    // Ship_Power = floor((18 × 1.8 × 0.5) + (20 × 2.0) + (5 × 5) + (4 × 3))
+    //            = floor(16.2 + 40 + 25 + 12) = floor(93.2) = 93
+    const design = makeShipDesignForPower({
+      hullClass: 'medium',
+      armorType: 'zortrium',
+      weaponsDamage: ['20'],
+      shieldClass: 5,
+      speed: 4,
+    });
+    expect(calculateShipPower(design)).toBe(93);
+  });
+
+  it('handles damage ranges (e.g., 2-8) by using average', () => {
+    // Laser damage 2-8, average = 5
+    // Medium hull = 18, no armor (1.0), no shields, speed 1
+    // Ship_Power = floor((18 × 1.0 × 0.5) + (5 × 2.0) + (0 × 5) + (1 × 3))
+    //            = floor(9 + 10 + 0 + 3) = 22
+    const design = makeShipDesignForPower({
+      hullClass: 'medium',
+      weaponsDamage: ['2-8'],
+      shieldClass: 0,
+      speed: 1,
+    });
+    expect(calculateShipPower(design)).toBe(22);
+  });
+
+  it('uses different base HP for each hull size', () => {
+    // Small hull = 3 HP, Large = 100 HP, Huge = 600 HP
+    const small = calculateShipPower(makeShipDesignForPower({ hullClass: 'small', speed: 1 }));
+    const large = calculateShipPower(makeShipDesignForPower({ hullClass: 'large', speed: 1 }));
+    const huge = calculateShipPower(makeShipDesignForPower({ hullClass: 'huge', speed: 1 }));
+    
+    // Small: floor(3 × 0.5) + 3 = 4
+    // Large: floor(100 × 0.5) + 3 = 53
+    // Huge: floor(600 × 0.5) + 3 = 303
+    expect(small).toBe(4);
+    expect(large).toBe(53);
+    expect(huge).toBe(303);
+  });
+
+  it('sums damage from multiple weapons', () => {
+    // Two weapons: 10 + 20 = 30 total
+    // Medium hull = 18, no armor, no shields, speed 1
+    // Ship_Power = floor((18 × 0.5) + (30 × 2.0) + 0 + 3) = floor(9 + 60 + 3) = 72
+    const design = makeShipDesignForPower({
+      hullClass: 'medium',
+      weaponsDamage: ['10', '20'],
+      speed: 1,
+    });
+    expect(calculateShipPower(design)).toBe(72);
+  });
+
+  it('returns minimum power of 1 for unarmed scout', () => {
+    // Tiny ship with nothing
+    const design = makeShipDesignForPower({
+      hullClass: 'small',
+      weaponsDamage: [],
+      shieldClass: 0,
+      speed: 0,
+    });
+    // floor(3 × 0.5 + 0 + 0 + 0) = 1
+    expect(calculateShipPower(design)).toBeGreaterThanOrEqual(1);
+  });
+
+  it('handles missing weapons array gracefully', () => {
+    const design = makeShipDesignForPower({ hullClass: 'medium' });
+    // Remove weapons to simulate test fixture without weapons
+    (design.stats as { weapons?: unknown }).weapons = undefined;
+    // Should not throw, should return some positive value
+    expect(() => calculateShipPower(design)).not.toThrow();
+    expect(calculateShipPower(design)).toBeGreaterThanOrEqual(1);
+  });
+});
+
+describe('calculateFleetPower (ai-implementation.md §1.3)', () => {
+  it('sums power of all ships in fleet', () => {
+    const state = makeBaseState();
+    // Add ships and designs to state
+    const design = makeShipDesignForPower({
+      hullClass: 'medium',
+      weaponsDamage: ['10'],
+      speed: 2,
+    });
+    state.shipDesigns.byId['test-design'] = design;
+    state.shipDesigns.allIds = ['test-design'];
+
+    // Add two ships with this design
+    state.ships.byId['ship1'] = {
+      id: 'ship1',
+      name: 'Ship 1',
+      designId: 'test-design',
+      ownerId: 'ai1',
+      fleetId: 'fleet1',
+      hp: 18,
+      maxHp: 18,
+      shieldHp: 0,
+      maxShieldHp: 0,
+      experience: 'regular',
+      kills: 0,
+      combatPosition: null,
+      hasActed: false,
+      specialSystems: {},
+    };
+    state.ships.byId['ship2'] = { ...state.ships.byId['ship1'], id: 'ship2', name: 'Ship 2' };
+    state.ships.allIds = ['ship1', 'ship2'];
+
+    // Create fleet with both ships
+    const fleet: Fleet = {
+      id: 'fleet1',
+      name: 'Test Fleet',
+      ownerId: 'ai1',
+      shipIds: ['ship1', 'ship2'],
+      systemId: 'sys1',
+      troops: 0,
+      destination: null,
+      eta: 0,
+      route: [],
+      movementPoints: 4,
+      maxMovement: 4,
+      orders: { type: 'none' },
+      experience: 'regular',
+      isInCombat: false,
+      combatId: null,
+    };
+    state.fleets.byId['fleet1'] = fleet;
+    state.fleets.allIds = ['fleet1'];
+
+    // Each ship: floor(18 × 0.5 + 10 × 2 + 0 + 2 × 3) = floor(9 + 20 + 6) = 35
+    // Fleet power = 35 + 35 = 70
+    expect(calculateFleetPower(fleet, state)).toBe(70);
+  });
+
+  it('adjusts power based on ship HP ratio', () => {
+    const state = makeBaseState();
+    const design = makeShipDesignForPower({
+      hullClass: 'medium',
+      weaponsDamage: ['10'],
+      speed: 2,
+    });
+    state.shipDesigns.byId['test-design'] = design;
+
+    // One ship at full HP, one at 50%
+    state.ships.byId['ship1'] = {
+      id: 'ship1',
+      name: 'Ship 1',
+      designId: 'test-design',
+      ownerId: 'ai1',
+      fleetId: 'fleet1',
+      hp: 18,
+      maxHp: 18,
+      shieldHp: 0,
+      maxShieldHp: 0,
+      experience: 'regular',
+      kills: 0,
+      combatPosition: null,
+      hasActed: false,
+      specialSystems: {},
+    };
+    state.ships.byId['ship2'] = { ...state.ships.byId['ship1'], id: 'ship2', name: 'Ship 2', hp: 9 }; // 50% HP
+    state.ships.allIds = ['ship1', 'ship2'];
+
+    const fleet: Fleet = {
+      id: 'fleet1',
+      name: 'Test Fleet',
+      ownerId: 'ai1',
+      shipIds: ['ship1', 'ship2'],
+      systemId: 'sys1',
+      troops: 0,
+      destination: null,
+      eta: 0,
+      route: [],
+      movementPoints: 4,
+      maxMovement: 4,
+      orders: { type: 'none' },
+      experience: 'regular',
+      isInCombat: false,
+      combatId: null,
+    };
+    state.fleets.byId['fleet1'] = fleet;
+
+    // Ship 1: 35 × 1.0 = 35
+    // Ship 2: 35 × 0.5 = 17 (floor)
+    // Total = 52
+    expect(calculateFleetPower(fleet, state)).toBe(52);
+  });
+});
+
+describe('getEmpireFleetPower (ai-implementation.md §1.3)', () => {
+  it('sums power of all fleets belonging to empire', () => {
+    const state = makeBaseState();
+    const design = makeShipDesignForPower({
+      hullClass: 'medium',
+      weaponsDamage: ['10'],
+      speed: 2,
+    });
+    state.shipDesigns.byId['test-design'] = design;
+
+    // Add ships
+    state.ships.byId['ship1'] = {
+      id: 'ship1',
+      name: 'Ship 1',
+      designId: 'test-design',
+      ownerId: 'ai1',
+      fleetId: 'fleet1',
+      hp: 18,
+      maxHp: 18,
+      shieldHp: 0,
+      maxShieldHp: 0,
+      experience: 'regular',
+      kills: 0,
+      combatPosition: null,
+      hasActed: false,
+      specialSystems: {},
+    };
+    state.ships.byId['ship2'] = { ...state.ships.byId['ship1'], id: 'ship2', fleetId: 'fleet2' };
+    state.ships.allIds = ['ship1', 'ship2'];
+
+    // Two fleets, one ship each
+    const fleet1: Fleet = {
+      id: 'fleet1',
+      name: 'Fleet 1',
+      ownerId: 'ai1',
+      shipIds: ['ship1'],
+      systemId: 'sys1',
+      troops: 0,
+      destination: null,
+      eta: 0,
+      route: [],
+      movementPoints: 4,
+      maxMovement: 4,
+      orders: { type: 'none' },
+      experience: 'regular',
+      isInCombat: false,
+      combatId: null,
+    };
+    const fleet2: Fleet = { ...fleet1, id: 'fleet2', name: 'Fleet 2', shipIds: ['ship2'] };
+    state.fleets.byId = { fleet1, fleet2 };
+    state.fleets.allIds = ['fleet1', 'fleet2'];
+
+    // Update empire to have both fleets
+    state.empires.byId['ai1'].fleets = ['fleet1', 'fleet2'];
+
+    // Each ship = 35, total = 70
+    expect(getEmpireFleetPower('ai1', state)).toBe(70);
+  });
+
+  it('returns 0 for empire with no fleets', () => {
+    const state = makeBaseState();
+    state.empires.byId['ai1'].fleets = [];
+    expect(getEmpireFleetPower('ai1', state)).toBe(0);
+  });
+
+  it('returns 0 for unknown empire', () => {
+    const state = makeBaseState();
+    expect(getEmpireFleetPower('nonexistent', state)).toBe(0);
+  });
+});
 
 describe('getGamePhase', () => {
   it('returns early for turns 1-50', () => {

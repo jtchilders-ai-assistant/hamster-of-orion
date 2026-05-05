@@ -15,13 +15,16 @@ import {
   AIEmpire,
   Planet,
   Fleet,
+  ShipDesign,
   PlanetId,
   SystemId,
   FleetId,
   EmpireId,
   PlanetProduction,
   DiplomaticState,
+  ShipClass,
 } from '../state';
+import { HULL_BASE_HP, ARMOR_MULTIPLIERS } from '../constants';
 
 // ── Situation analysis ─────────────────────────────────────────────────────────
 
@@ -57,6 +60,9 @@ export function getWarEnemies(
 /**
  * Return whether the given empire is currently under threat — either at war
  * or a neighboring empire has a significantly larger fleet.
+ *
+ * Uses fleet power calculation per design/technical/ai-implementation.md §1.3
+ * instead of simple ship counts.
  */
 export function isUnderThreat(
   empireId: EmpireId,
@@ -66,8 +72,8 @@ export function isUnderThreat(
   const enemies = getWarEnemies(empireId, state);
   if (enemies.length > 0) return true;
 
-  // Check if any neighbor has a much larger fleet
-  const myFleetSize = getEmpireFleetSize(empireId, state);
+  // Check if any neighbor has a much larger fleet (using fleet power, not ship count)
+  const myFleetPower = getEmpireFleetPower(empireId, state);
   const empire = state.empires.byId[empireId];
   if (!empire) return false;
 
@@ -76,15 +82,123 @@ export function isUnderThreat(
     const rel = empire.relations[otherId] as { state: DiplomaticState } | undefined;
     if (!rel) continue;
     if (rel.state === 'war' || rel.state === 'unfriendly') {
-      const theirSize = getEmpireFleetSize(otherId, state);
-      if (theirSize > myFleetSize * fleetSizeThreshold) return true;
+      const theirPower = getEmpireFleetPower(otherId, state);
+      if (theirPower > myFleetPower * fleetSizeThreshold) return true;
     }
   }
   return false;
 }
 
 /**
+ * Calculate the power rating for a single ship based on its design.
+ *
+ * Formula (design/technical/ai-implementation.md §1.3):
+ *   Ship_Power = floor(
+ *     (Hull_HP × Armor_Multiplier × 0.5) +
+ *     (Total_Weapon_Damage × 2.0) +
+ *     (Shield_Class × 5) +
+ *     (Speed × 3)
+ *   )
+ */
+export function calculateShipPower(design: ShipDesign): number {
+  // Get base HP from hull size
+  const hullHP = HULL_BASE_HP[design.class as ShipClass] ?? HULL_BASE_HP.medium;
+
+  // Find armor multiplier from components
+  let armorMultiplier = 1.0;
+  for (const comp of design.components) {
+    if (comp.type === 'armor') {
+      // Normalize armor name to match constants (e.g., 'Zortrium Armor' → 'zortrium')
+      const armorName = comp.name.toLowerCase().replace(/\s*armor\s*/i, '').trim();
+      armorMultiplier = ARMOR_MULTIPLIERS[armorName] ?? ARMOR_MULTIPLIERS[comp.id] ?? 1.0;
+      break;
+    }
+  }
+
+  // Calculate total weapon damage
+  let totalWeaponDamage = 0;
+  const weapons = design.stats?.weapons ?? [];
+  for (const weapon of weapons) {
+    // Parse damage string (e.g., "2-8" or "10")
+    const damageStr = weapon.damage ?? '';
+    const damageMatch = damageStr.match(/(\d+)(?:-(\d+))?/);
+    if (damageMatch) {
+      const minDmg = parseInt(damageMatch[1], 10) || 0;
+      const maxDmg = parseInt(damageMatch[2], 10) || minDmg;
+      // Use average damage for power calculation
+      totalWeaponDamage += (minDmg + maxDmg) / 2;
+    }
+  }
+
+  // Get shield class from defense summary
+  const shieldClass = design.stats.defense.shields ?? 0;
+
+  // Get speed from stats
+  const speed = design.stats.speed ?? 1;
+
+  // Apply the formula from design doc
+  const power = Math.floor(
+    (hullHP * armorMultiplier * 0.5) +
+    (totalWeaponDamage * 2.0) +
+    (shieldClass * 5) +
+    (speed * 3)
+  );
+
+  return Math.max(1, power); // Minimum power of 1
+}
+
+/**
+ * Calculate the total fleet power for a single fleet.
+ *
+ * Formula (design/technical/ai-implementation.md §1.3):
+ *   Fleet_Power = Σ (Ship_Power × Ship_Count) for all ship designs
+ */
+export function calculateFleetPower(fleet: Fleet, state: GameState): number {
+  let totalPower = 0;
+
+  for (const shipId of fleet.shipIds) {
+    const ship = state.ships.byId[shipId];
+    if (!ship) continue;
+
+    const design = state.shipDesigns.byId[ship.designId];
+    if (!design) continue;
+
+    const shipPower = calculateShipPower(design);
+
+    // Adjust power based on ship's current HP vs max HP
+    const hpRatio = ship.maxHp > 0 ? ship.hp / ship.maxHp : 1;
+    totalPower += Math.floor(shipPower * hpRatio);
+  }
+
+  return totalPower;
+}
+
+/**
+ * Calculate total fleet power for an entire empire.
+ *
+ * This replaces the simple ship count with actual power calculation
+ * per design/technical/ai-implementation.md §1.3.
+ */
+export function getEmpireFleetPower(empireId: EmpireId, state: GameState): number {
+  const empire = state.empires.byId[empireId];
+  if (!empire) return 0;
+
+  let totalPower = 0;
+  for (const fleetId of empire.fleets) {
+    const fleet = state.fleets.byId[fleetId];
+    if (fleet) {
+      totalPower += calculateFleetPower(fleet, state);
+    }
+  }
+
+  return totalPower;
+}
+
+/**
  * Count total ships across all fleets for an empire.
+ *
+ * @deprecated Use getEmpireFleetPower() for threat assessment.
+ * This is kept for backwards compatibility and simple ship counting.
  */
 export function getEmpireFleetSize(empireId: EmpireId, state: GameState): number {
   const empire = state.empires.byId[empireId];
@@ -366,6 +480,9 @@ export function shouldBuildMilitary(
  * Return the enemy fleet IDs that the AI should attack this turn.
  * Condition: the AI fleet is at the same system as an enemy fleet AND the
  * AI fleet is large enough relative to the enemy (fleetSizeThreshold).
+ *
+ * Uses fleet power calculation per design/technical/ai-implementation.md §1.3
+ * instead of simple ship counts.
  */
 export function selectAttackTargets(
   empireId: EmpireId,
@@ -386,7 +503,8 @@ export function selectAttackTargets(
     if (!fleet || fleet.destination !== null) continue; // already moving
     if (fleetHasColonyShip(fleet, state)) continue; // don't send colony ships to fight
 
-    const myStrength = fleet.shipIds.length;
+    // Calculate our fleet's power using the Ship_Power formula
+    const myStrength = calculateFleetPower(fleet, state);
 
     for (const enemyId of enemies) {
       const enemyEmpire = state.empires.byId[enemyId];
@@ -397,7 +515,7 @@ export function selectAttackTargets(
         const planet = state.planets.byId[planetId];
         if (!planet) continue;
 
-        // Count enemy ships at that system
+        // Calculate total enemy fleet power at that system
         const enemySystem = state.galaxy.systems.byId[planet.systemId];
         if (!enemySystem) continue;
 
@@ -405,7 +523,7 @@ export function selectAttackTargets(
         for (const eFleetId of enemySystem.fleetIds) {
           const eFleet = state.fleets.byId[eFleetId];
           if (eFleet && eFleet.ownerId === enemyId) {
-            enemyStrength += eFleet.shipIds.length;
+            enemyStrength += calculateFleetPower(eFleet, state);
           }
         }
 
