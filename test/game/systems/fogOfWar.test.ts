@@ -228,14 +228,35 @@ function makeState(
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 describe('getSensorRange', () => {
-  it('returns 1 ly with scannerTechLevel 0', () => {
+  /**
+   * Design source: design/galaxy/exploration.md §Scanner Range
+   * Formula: range = 2 + (scannerTechLevel × 2) parsecs
+   *
+   * | scannerTechLevel | Technology             | Range     |
+   * |------------------|------------------------|-----------|
+   * | 0                | None (base)            | 2 parsecs |
+   * | 1                | Deep Space Scanner     | 4 parsecs |
+   * | 2                | Subspace Scanner       | 6 parsecs |
+   * | 3                | Deep Space Scanner II  | 8 parsecs |
+   */
+  it('returns 2 parsecs with scannerTechLevel 0 (base)', () => {
     const empire = makeEmpire('player', 0);
-    expect(getSensorRange(empire)).toBe(1);
+    expect(getSensorRange(empire)).toBe(2);
   });
 
-  it('returns 3 ly with scannerTechLevel 2', () => {
+  it('returns 4 parsecs with scannerTechLevel 1 (Deep Space Scanner)', () => {
+    const empire = makeEmpire('player', 1);
+    expect(getSensorRange(empire)).toBe(4);
+  });
+
+  it('returns 6 parsecs with scannerTechLevel 2 (Subspace Scanner)', () => {
     const empire = makeEmpire('player', 2);
-    expect(getSensorRange(empire)).toBe(3);
+    expect(getSensorRange(empire)).toBe(6);
+  });
+
+  it('returns 8 parsecs with scannerTechLevel 3 (Deep Space Scanner II)', () => {
+    const empire = makeEmpire('player', 3);
+    expect(getSensorRange(empire)).toBe(8);
   });
 });
 
@@ -315,7 +336,7 @@ describe('updateVisibility', () => {
       fleets: { allIds: ['f1'], byId: { f1: fleet1 } },
     };
 
-    // sensorRange = 1 + 2 = 3. Distance s1→s2 = 1, s1→s3 = 2. Both within range.
+    // sensorRange = 2 + (2 × 2) = 6 parsecs. Distance s1→s2 = 1, s1→s3 = 2. Both within range.
     const result = updateVisibility(stateWithFleets, 'player');
     const visible = result.empires.byId.player.visibleSystems;
     expect(visible).toContain('s2');
@@ -351,7 +372,7 @@ describe('processFogOfWar', () => {
     expect(result.empires.byId.player.exploredSystems).toContain('s1');
     expect(result.empires.byId.ai1.exploredSystems).toContain('s2');
 
-    // Both should have nearby systems visible (sensor range = 2)
+    // Both should have nearby systems visible (sensor range = 4 parsecs with scannerTechLevel 1)
     const playerVisible = result.empires.byId.player.visibleSystems;
     const aiVisible = result.empires.byId.ai1.visibleSystems;
     expect(playerVisible).toContain('s2');

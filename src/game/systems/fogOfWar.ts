@@ -4,26 +4,36 @@
  *
  * Handles exploration, sensor range, and visibility for each empire.
  *
- * Sensor range = 1 ly (base) + scannerTechLevel.
+ * Design source: design/galaxy/exploration.md §Scanner Range
+ * Scanner range = 2 parsecs (base) + scannerTechLevel × 2 parsecs.
  * Colonies always reveal their own system.
  * Fleets reveal systems within sensor range of their current position.
  */
 
 import { GameState, Empire, EmpireId, SystemId, Fleet } from '../state';
 import { distanceBetweenSystems } from './fleet';
-
-// ── Constants ────────────────────────────────────────────────────────────────
-
-const BASE_SENSOR_RANGE = 1; // light-years
+import {
+  BASE_SCANNER_RANGE_PARSECS,
+  SCANNER_RANGE_PER_TECH_LEVEL,
+} from '../constants';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 /**
- * Get the sensor range for an empire in light-years.
- * Base 1 ly + scannerTechLevel.
+ * Get the sensor range for an empire in parsecs.
+ *
+ * Design source: design/galaxy/exploration.md §Scanner Range
+ * | scannerTechLevel | Technology             | Range     |
+ * |------------------|------------------------|-----------|
+ * | 0                | None (base)            | 2 parsecs |
+ * | 1                | Deep Space Scanner     | 4 parsecs |
+ * | 2                | Subspace Scanner       | 6 parsecs |
+ * | 3                | Deep Space Scanner II  | 8 parsecs |
+ *
+ * Formula: range = 2 + (scannerTechLevel × 2) parsecs
  */
 export function getSensorRange(empire: Pick<Empire, 'scannerTechLevel'>): number {
-  return BASE_SENSOR_RANGE + empire.scannerTechLevel;
+  return BASE_SCANNER_RANGE_PARSECS + empire.scannerTechLevel * SCANNER_RANGE_PER_TECH_LEVEL;
 }
 
 /**

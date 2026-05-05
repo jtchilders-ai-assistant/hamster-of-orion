@@ -105,6 +105,22 @@ export type GalaxySize = 'small' | 'medium' | 'large' | 'huge';
 export type GalaxyShape = 'spiral' | 'elliptical' | 'irregular';
 export type StarType = 'yellow' | 'green' | 'red' | 'blue' | 'white' | 'purple';
 
+/**
+ * Planet environment types.
+ * Design source: design/planets/generation-tables.md §2.1 Environment Definitions
+ *
+ * Hostile environments (require colonization tech):
+ *   radiated, toxic, inferno, dead, tundra, barren
+ *
+ * Standard environments (colonizable from game start):
+ *   minimal, desert, steppe, arid, ocean, jungle, terran
+ *
+ * Legendary environment (terraformed only, never spawns naturally):
+ *   gaia
+ *
+ * Implementation extension (not in design):
+ *   gas_giant - uninhabitable planets; cannot be colonized
+ */
 export type PlanetType =
   | 'terran' | 'ocean' | 'jungle' | 'arid' | 'tundra'
   | 'toxic' | 'radiated' | 'barren' | 'dead' | 'gas_giant'
@@ -676,7 +692,21 @@ export interface Empire {
   fleets: FleetId[];
   shipDesigns: ShipDesignId[];
 
-  scannerTechLevel: number;  // 0 = basic, +1 per upgrade; used for sensor range
+  /**
+   * Scanner technology level. Determines sensor range from owned colonies.
+   * Design source: design/galaxy/exploration.md §Scanner Range
+   *
+   * | scannerTechLevel | Technology             | Range     |
+   * |------------------|------------------------|-----------|
+   * | 0                | None (base)            | 2 parsecs |
+   * | 1                | Deep Space Scanner     | 4 parsecs |
+   * | 2                | Subspace Scanner       | 6 parsecs |
+   * | 3                | Deep Space Scanner II  | 8 parsecs |
+   *
+   * Formula: range = 2 + (scannerTechLevel × 2) parsecs
+   * See also: src/game/constants.ts (BASE_SCANNER_RANGE_PARSECS, SCANNER_RANGE_PER_TECH_LEVEL)
+   */
+  scannerTechLevel: number;
   computerTechLevel: number; // 0 = basic, +1 per upgrade; used for espionage calculations
   securityLevel: number;     // 0-10; how much this empire spends on internal security
 

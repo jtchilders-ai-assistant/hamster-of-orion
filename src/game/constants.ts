@@ -682,3 +682,24 @@ export const SHIELD_CLASS_MAX = 15;
 
 // Ship build progress carryover
 export const BUILD_PROGRESS_CARRYOVER = 0;
+
+// ================================================================
+// Scanner Range (design/galaxy/exploration.md §Scanner Range)
+// ================================================================
+
+/**
+ * Base scanner range from owned colonies (parsecs).
+ * Design source: design/galaxy/exploration.md §Scanner Range
+ */
+export const BASE_SCANNER_RANGE_PARSECS = 2;
+
+/**
+ * Scanner range increase per tech level (parsecs).
+ * scannerTechLevel 0 = base (2 parsecs)
+ * scannerTechLevel 1 = Deep Space Scanner (4 parsecs)
+ * scannerTechLevel 2 = Subspace Scanner (6 parsecs)
+ * scannerTechLevel 3 = Deep Space Scanner II (8 parsecs)
+ *
+ * Formula: range = BASE_SCANNER_RANGE_PARSECS + (scannerTechLevel * SCANNER_RANGE_PER_TECH_LEVEL)
+ */
+export const SCANNER_RANGE_PER_TECH_LEVEL = 2;
