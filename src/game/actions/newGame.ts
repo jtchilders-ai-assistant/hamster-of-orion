@@ -16,6 +16,7 @@ import {
   isBloodEnemiesAll,
   getRandomLeaderName,
 } from '../systems/races';
+import { getStartingConditions } from '../systems/difficulty';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -78,6 +79,9 @@ function buildResearchState(raceId: string): ResearchState {
  * Build diplomatic relations for an empire.
  * Uses race-specific starting relationship calculations and handles special cases
  * like Ferrets' blood_enemies_all status.
+ *
+ * Design compliance: design/diplomacy/relationship-formulas.md Section 5.3
+ * Starting relations use Racial Attitude Matrix only - no player bonus modifier.
  */
 function buildRelations(
   empireA: EmpireId,
@@ -94,26 +98,23 @@ function buildRelations(
     const otherIsBloodEnemy = isBloodEnemiesAll(otherRaceId);
 
     // Calculate base relationship using both races' diplomacy bonuses
-    let baseRelationValue = startingRelationship(raceAId, otherRaceId);
-
-    // Apply player bonus: player starts with slightly better relations
-    if (isPlayer) {
-      baseRelationValue += 10;
-    }
+    // Per design doc: use Racial Attitude Matrix only, no player-specific bonus
+    const baseRelationValue = startingRelationship(raceAId, otherRaceId);
 
     // Determine if we start at war (Ferrets mechanic)
     const startsAtWar = isBloodEnemy || otherIsBloodEnemy;
     const relationState = startsAtWar ? 'war' : 'neutral';
 
     // Blood enemies start at very negative relations
+    let finalRelationValue = baseRelationValue;
     if (startsAtWar) {
-      baseRelationValue = Math.min(baseRelationValue, -40);
+      finalRelationValue = Math.min(baseRelationValue, -40);
     }
 
     relations[otherId] = {
       empireA,
       empireB: otherId,
-      value: Math.round(baseRelationValue),
+      value: Math.round(finalRelationValue),
       state: relationState,
       treaties: [],
       events: [],
@@ -222,6 +223,13 @@ function archetypeToDiplomaticGoal(archetype: string): AIEmpire['strategy']['dip
   return 'alliances';
 }
 
+/**
+ * Build player empire with difficulty-based starting conditions.
+ *
+ * Design compliance: design/game-mechanics/difficulty.md §Starting Conditions
+ * Player starting treasury (BC) varies by difficulty:
+ *   Simple: 100 BC, Easy: 50 BC, Average/Hard/Impossible: 0 BC
+ */
 function buildPlayerEmpire(
   empireId: EmpireId,
   options: NewGameOptions,
@@ -229,13 +237,14 @@ function buildPlayerEmpire(
 ): Empire {
   const relations = buildRelations(empireId, options.raceId, allEmpiresWithRaces, true);
   const research = buildResearchState(options.raceId);
+  const startingConditions = getStartingConditions(options.difficulty, true);
 
   return {
     id: empireId,
     raceId: options.raceId,
     name: options.emperorName,
     isPlayer: true,
-    credits: 250,
+    credits: startingConditions.reserveBC,
     creditPerTurn: 0,
     planets: [],
     fleets: [],
@@ -252,6 +261,12 @@ function buildPlayerEmpire(
   };
 }
 
+/**
+ * Build AI empire with Average-level starting conditions.
+ *
+ * Design compliance: design/game-mechanics/difficulty.md §Starting Conditions
+ * "AI empires always start with Average-level conditions (40 pop, 30 factories, 1 scout, 0 BC)"
+ */
 function buildAIEmpire(
   empireId: EmpireId,
   raceId: string,
@@ -267,13 +282,14 @@ function buildAIEmpire(
 
   const relations = buildRelations(empireId, raceId, allEmpiresWithRaces, false);
   const research = buildResearchState(raceId);
+  const startingConditions = getStartingConditions('average', false);
 
   const empire: Empire = {
     id: empireId,
     raceId: raceId,
     name: leaderName,
     isPlayer: false,
-    credits: 250,
+    credits: startingConditions.reserveBC,
     creditPerTurn: 0,
     planets: [],
     fleets: [],
@@ -467,6 +483,30 @@ export function newGameReducer(state: GameState, action: Action): GameState {
     };
   }
 
+  // Apply difficulty-based starting conditions to player homeworld
+  // Design compliance: design/game-mechanics/difficulty.md §Starting Conditions
+  // Player homeworld population/factories vary by difficulty:
+  //   Simple: 50 pop, 40 factories | Easy: 45 pop, 35 factories | Average+: 40 pop, 30 factories
+  const playerStartingConditions = getStartingConditions(difficulty, true);
+  let updatedPlanets = { ...planets };
+  if (playerHomeSystemId) {
+    const playerHomeSystem = updatedGalaxy.systems.byId[playerHomeSystemId];
+    if (playerHomeSystem && playerHomeSystem.planetIds.length > 0) {
+      const playerHomeworldId = playerHomeSystem.planetIds[0];
+      const playerHomeworld = planets[playerHomeworldId];
+      if (playerHomeworld) {
+        updatedPlanets = {
+          ...updatedPlanets,
+          [playerHomeworldId]: {
+            ...playerHomeworld,
+            population: playerStartingConditions.population,
+            factories: playerStartingConditions.factories,
+          },
+        };
+      }
+    }
+  }
+
   // Assemble fresh GameState
   const now = Date.now();
   const newState: GameState = {
@@ -490,7 +530,7 @@ export function newGameReducer(state: GameState, action: Action): GameState {
     galaxy: updatedGalaxy,
 
     planets: {
-      byId: planets,
+      byId: updatedPlanets,
       allIds: planetIds,
     },
 

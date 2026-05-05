@@ -435,3 +435,98 @@ export function getSpyCostMultiplier(difficulty: DifficultyLevel, isPlayer: bool
   if (!isPlayer) return 1.0; // AI always pays baseline
   return getDifficultyModifiers(difficulty).playerSpyCost;
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Starting Conditions
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Starting conditions for player homeworld based on difficulty.
+ * From design/game-mechanics/difficulty.md §Starting Conditions.
+ *
+ * | Difficulty | Population | Factories | Ships | Reserve BC |
+ * |------------|------------|-----------|-------|------------|
+ * | Simple     | 50         | 40        | 2 Scouts, 1 Fighter | 100 |
+ * | Easy       | 45         | 35        | 2 Scouts            | 50  |
+ * | Average    | 40         | 30        | 1 Scout             | 0   |
+ * | Hard       | 40         | 30        | 1 Scout             | 0   |
+ * | Impossible | 40         | 30        | 1 Scout             | 0   |
+ *
+ * Note: AI empires always start with Average-level conditions (40 pop, 30 factories, 1 scout, 0 BC).
+ */
+export interface StartingConditions {
+  /** Homeworld starting population. */
+  population: number;
+  /** Homeworld starting factories. */
+  factories: number;
+  /** Starting treasury (BC). */
+  reserveBC: number;
+  /** Number of scout ships. */
+  scouts: number;
+  /** Number of fighter ships. */
+  fighters: number;
+}
+
+/**
+ * Starting conditions table by difficulty level.
+ */
+export const STARTING_CONDITIONS: Record<Exclude<DifficultyLevel, 'custom'>, StartingConditions> = {
+  simple: {
+    population: 50,
+    factories: 40,
+    reserveBC: 100,
+    scouts: 2,
+    fighters: 1,
+  },
+  easy: {
+    population: 45,
+    factories: 35,
+    reserveBC: 50,
+    scouts: 2,
+    fighters: 0,
+  },
+  average: {
+    population: 40,
+    factories: 30,
+    reserveBC: 0,
+    scouts: 1,
+    fighters: 0,
+  },
+  hard: {
+    population: 40,
+    factories: 30,
+    reserveBC: 0,
+    scouts: 1,
+    fighters: 0,
+  },
+  impossible: {
+    population: 40,
+    factories: 30,
+    reserveBC: 0,
+    scouts: 1,
+    fighters: 0,
+  },
+};
+
+/**
+ * AI empires always use Average-level starting conditions.
+ */
+export const AI_STARTING_CONDITIONS: StartingConditions = STARTING_CONDITIONS.average;
+
+/**
+ * Get starting conditions for an empire based on difficulty.
+ * @param difficulty Game difficulty level.
+ * @param isPlayer   True if this is the player empire.
+ * @returns Starting conditions for homeworld and treasury.
+ */
+export function getStartingConditions(difficulty: DifficultyLevel, isPlayer: boolean): StartingConditions {
+  if (!isPlayer) {
+    // AI empires always start with Average-level conditions
+    return AI_STARTING_CONDITIONS;
+  }
+  if (difficulty === 'custom' || !(difficulty in STARTING_CONDITIONS)) {
+    // Custom difficulty or unknown difficulty defaults to Average starting conditions
+    return STARTING_CONDITIONS.average;
+  }
+  return STARTING_CONDITIONS[difficulty];
+}
