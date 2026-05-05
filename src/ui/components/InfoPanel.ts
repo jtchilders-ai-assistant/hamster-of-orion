@@ -174,10 +174,12 @@ export class InfoPanel {
     const maxFactories = planet.maxFactories;
     const atMaxFactories = planet.factories >= maxFactories;
     const atMaxPop = planet.population >= planet.maxPopulation;
-    const shieldClass = planet.planetaryShield > 0 ? `Class ${this.toRoman(planet.planetaryShield)}` : 'None';
     const wastePercent = Math.round(planet.waste * 100);
 
     const currentBuild = planet.buildQueue[0];
+
+    // Production slider percentages
+    const sliders = planet.production;
 
     return `
       <div class="info-header">
@@ -186,36 +188,89 @@ export class InfoPanel {
       </div>
       <div class="info-body">
         <div class="info-row"><span>${this.starTypeLabel(system.starType)}</span></div>
-        <div class="info-row"><span>${this.capitalize(planet.type)}</span></div>
-        <div class="info-row">Size: <span>${planet.maxPopulation}</span></div>
-        <div class="info-divider"></div>
-        <div class="info-status">YOUR COLONY</div>
+        <div class="info-row"><span>${this.capitalize(planet.type)} ${planet.maxPopulation} max pop</span></div>
         <div class="info-divider"></div>
         <div class="info-stat">
-          <span class="stat-label">Pop</span>
-          <span class="stat-value">${Math.round(planet.population)} / ${planet.maxPopulation}${atMaxPop ? ' (MAX)' : ''}</span>
+          <span class="stat-label">Population</span>
+          <span class="stat-value">${Math.round(planet.population)}${atMaxPop ? ' (MAX)' : ''}</span>
         </div>
         <div class="info-stat">
           <span class="stat-label">Factories</span>
-          <span class="stat-value">${planet.factories}${atMaxFactories ? ' (MAX)' : ` / ${maxFactories}`}</span>
+          <span class="stat-value">${planet.factories}${atMaxFactories ? ' (MAX)' : ''}</span>
         </div>
         <div class="info-stat">
           <span class="stat-label">Bases</span>
           <span class="stat-value">${planet.missileBases}</span>
         </div>
         <div class="info-stat">
-          <span class="stat-label">Shield</span>
-          <span class="stat-value">${shieldClass}</span>
-        </div>
-        <div class="info-stat">
           <span class="stat-label">Waste</span>
-          <span class="stat-value">${wastePercent}%</span>
+          <span class="stat-value">${wastePercent}</span>
         </div>
         <div class="info-divider"></div>
-        ${currentBuild ? this.renderProduction(currentBuild) : '<div class="info-note">Nothing producing</div>'}
+        <div class="info-status">PRODUCTION</div>
         <div class="info-divider"></div>
+        <div class="info-slider">
+          <span class="slider-label">SHIP</span>
+          <span class="slider-bar">${this.renderSliderBar(sliders.ship)}</span>
+          <span class="slider-pct">${Math.round(sliders.ship)}%</span>
+        </div>
+        <div class="info-slider">
+          <span class="slider-label">DEF</span>
+          <span class="slider-bar">${this.renderSliderBar(sliders.defense)}</span>
+          <span class="slider-pct">${Math.round(sliders.defense)}%</span>
+        </div>
+        <div class="info-slider">
+          <span class="slider-label">IND</span>
+          <span class="slider-bar">${this.renderSliderBar(sliders.industry)}</span>
+          <span class="slider-pct">${Math.round(sliders.industry)}%</span>
+        </div>
+        <div class="info-slider">
+          <span class="slider-label">ECO</span>
+          <span class="slider-bar">${this.renderSliderBar(sliders.ecology)}</span>
+          <span class="slider-pct">${Math.round(sliders.ecology)}%</span>
+        </div>
+        <div class="info-slider">
+          <span class="slider-label">TECH</span>
+          <span class="slider-bar">${this.renderSliderBar(sliders.research)}</span>
+          <span class="slider-pct">${Math.round(sliders.research)}%</span>
+        </div>
+        <div class="info-divider"></div>
+        ${currentBuild ? this.renderProductionItem(currentBuild) : ''}
         <button class="btn-manage-colony" data-planet-id="${planet.id}">MANAGE COLONY</button>
       </div>
+    `;
+  }
+
+  /**
+   * Render a slider bar with 8 segments.
+   * Per design/ui-ux/main-screens.md §Info Panel State: Colony Selected.
+   */
+  private renderSliderBar(percent: number): string {
+    const totalSegments = 8;
+    const filledSegments = Math.round((percent / 100) * totalSegments);
+    const filled = '■'.repeat(filledSegments);
+    const empty = '□'.repeat(totalSegments - filledSegments);
+    return filled + empty;
+  }
+
+  /**
+   * Render current build item with progress bar.
+   * Per design/ui-ux/main-screens.md §Info Panel State: Colony Selected.
+   */
+  private renderProductionItem(build: { targetName: string; turnsRemaining: number; costTotal: number; costRemaining: number }): string {
+    const progress = build.costTotal > 0
+      ? Math.max(0, Math.min(1, 1 - build.costRemaining / build.costTotal))
+      : 0;
+    const barFilled = Math.round(progress * 10);
+    const barEmpty = 10 - barFilled;
+    const progressBar = '█'.repeat(barFilled) + '░'.repeat(barEmpty);
+
+    return `
+      <div class="info-build">
+        <div class="info-build-label">Building: ${build.targetName}</div>
+        <div class="info-build-bar">${progressBar} ${build.turnsRemaining} turns</div>
+      </div>
+      <div class="info-divider"></div>
     `;
   }
 
@@ -237,23 +292,6 @@ export class InfoPanel {
           <span class="stat-value">~${Math.round(planet.population)}M</span>
         </div>
       </div>
-    `;
-  }
-
-  private renderProduction(build: { targetName: string; turnsRemaining: number; costTotal: number; costRemaining: number }): string {
-    const progress = build.costTotal > 0
-      ? Math.max(0, Math.min(1, 1 - build.costRemaining / build.costTotal))
-      : 0;
-    const barFilled = Math.round(progress * 14);
-    const barEmpty = 14 - barFilled;
-    const progressBar = '█'.repeat(barFilled) + '░'.repeat(barEmpty);
-
-    return `
-      <div class="info-status">PRODUCING</div>
-      <div class="info-divider"></div>
-      <div class="info-row producing-item">${build.targetName}</div>
-      <div class="info-progress-bar" aria-label="Production progress ${Math.round(progress * 100)}%">${progressBar}</div>
-      <div class="info-row">Turns left: <span>${build.turnsRemaining}</span></div>
     `;
   }
 
@@ -648,20 +686,5 @@ export class InfoPanel {
   private capitalize(str: string): string {
     if (!str) return '';
     return str.charAt(0).toUpperCase() + str.slice(1).replace(/_/g, ' ');
-  }
-
-  private toRoman(n: number): string {
-    const numerals: Array<[number, string]> = [
-      [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I'],
-    ];
-    let result = '';
-    let remaining = n;
-    for (const [val, sym] of numerals) {
-      while (remaining >= val) {
-        result += sym;
-        remaining -= val;
-      }
-    }
-    return result || String(n);
   }
 }

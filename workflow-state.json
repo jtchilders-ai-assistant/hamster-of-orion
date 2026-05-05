@@ -1,44 +1,54 @@
 {
-  "state": "COMPLETED",
+  "state": "TESTING",
   "phase": "phase5-design-compliance-fixes",
-  "current_task": "fix-70",
-  "last_check": "2026-05-05T03:04:00.000Z",
+  "current_task": "fix-68",
+  "last_check": "2026-05-05T03:11:00.000Z",
   "total_tasks": 85,
-  "completed_count": 8,
+  "completed_count": 10,
   "skipped_count": 0,
   "blocked_count": 0,
-  "notes": "fix-70 completed: Weapons design doc fixes - aligned weapons-complete.md with weapons.md, fixed missile speeds in components.json",
+  "notes": "fix-68 completed: Special Systems Design Doc Fixes - Lightning Shield, Stasis Field, Automated Repair",
   "worker_output": {
     "files_created": [],
     "files_modified": [
-      "design/ships/weapons-complete.md",
-      "src/data/components.json"
+      "src/game/types/shipComponents.ts",
+      "src/data/components.json",
+      "src/game/systems/combat.ts",
+      "test/data/components.test.ts"
     ],
     "tests_added": [],
-    "summary": "Fixed discrepancies between weapons.md (tech tree) and weapons-complete.md (detailed stats). Updated ground weapon tech levels, ground combat bonuses, and missile speeds in both design docs and implementation.",
+    "summary": "Fixed special systems to match design/ships/special-systems.md: (1) Lightning Shield changed from L46 missile destroyer to L25 damage reflector (50% reflection), (2) Stasis Field duration changed from 1 to 2 turns, (3) Automated Repair Unit now uses 10-15% HP range instead of flat 15%.",
     "design_compliance": [
       {
-        "doc": "design/technology/weapons.md",
-        "section": "Ground Combat Weapons (6 total)",
-        "quote": "Hand Lasers (Tech Level 2, +5), Gatling Laser Rifle (Tech Level 12, +10), Fusion Rifle (Tech Level 24, +20), Hand Phasors (Tech Level 31, +25), Plasma Rifle (Tech Level 42, +30), Mauler Pistol (Tech Level 50, +35)",
-        "impl_file": "design/ships/weapons-complete.md",
-        "impl_line": "Ground Combat Weapons table",
+        "doc": "design/ships/special-systems.md",
+        "section": "Lightning Shield",
+        "quote": "Tech Level (Design): 25, Effect (Design): Reflects 50% of incoming damage back to attacker",
+        "impl_file": "src/data/components.json",
+        "impl_line": "lightning_shield entry (techLevel: 25, damageReflection: 0.5)",
         "verified": true
       },
       {
-        "doc": "design/technology/weapons.md",
-        "section": "Tier 2 - Hyper-V Rockets",
-        "quote": "6 damage, speed 3.5, +1 attack rating",
-        "impl_file": "src/data/components.json",
-        "impl_line": "hyper_v_rocket missileSpeed: 3.5",
+        "doc": "design/ships/special-systems.md",
+        "section": "Lightning Shield Design Note",
+        "quote": "Intentional departure from MOO1: repositioned to L25 with damage reflection mechanic",
+        "impl_file": "src/game/systems/combat.ts",
+        "impl_line": "calculateDamageReflection() function",
         "verified": true
       },
       {
-        "doc": "design/technology/weapons.md",
-        "section": "Tier 6 - Stinger Missiles",
-        "quote": "15 damage, speed 4.5, +3 attack rating",
+        "doc": "design/ships/special-systems.md",
+        "section": "Stasis Field",
+        "quote": "Effect: Disable enemy weapons 2 turns",
         "impl_file": "src/data/components.json",
-        "impl_line": "stinger_missile missileSpeed: 4.5",
+        "impl_line": "stasis_field entry (disableDurationTurns: 2)",
+        "verified": true
+      },
+      {
+        "doc": "design/ships/special-systems.md",
+        "section": "Automated Repair",
+        "quote": "Effect: Regenerate 10-15% HP per turn",
+        "impl_file": "src/data/components.json",
+        "impl_line": "automated_repair_unit entry (repairPerTurn: 0.10, repairPerTurnMax: 0.15)",
         "verified": true
       }
     ],
