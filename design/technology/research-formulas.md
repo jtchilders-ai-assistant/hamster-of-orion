@@ -363,18 +363,48 @@ Else if current_building == Autolab AND tech_level >= 40:
 
 ### 15. Tech Stealing (Espionage)
 
-When stealing technology:
+Tech stealing is a spy mission type detailed fully in `diplomacy/espionage.md` §6.2. This section provides a summary and cross-reference.
 
+**Mission Parameters:**
+- **Cost:** 100 BC per attempt
+- **Duration:** 3 turns
+- **Frequency:** Once per turn per target empire
+- **Risk:** Medium (detection leads to diplomatic penalties)
+
+**Tech Theft Success Formula:**
 ```
-Steal_Success_Chance = Base_Chance × Spy_Skill × Racial_Modifier × Tech_Difficulty
+Theft_Success = 30 + Spy_Effectiveness + Tech_Value_Modifier
 
-Tech_Difficulty = 1.0 - (Target_Tech_Tier × 0.03)
+Spy_Effectiveness = (30 + RacialBonus + SpyRollBonus + TechBonus - SecurityPenalty) × Racial_Aggression_Multiplier
+
+Tech_Value_Modifier:
+  - Tier 1-3 techs:  +10  (easier to steal basic tech)
+  - Tier 4-6 techs:   +0
+  - Tier 7-9 techs:   -5
+  - Tier 10-12 techs: -10
+  - Tier 13+ techs:   -15 (hardest to steal advanced tech)
 ```
 
-Stolen techs:
-- Instantly complete
-- Do not count toward miniaturization
-- May be techs not in your tree
+**Tech Selection:**
+- Target tech is selected randomly from defender's researched techs that attacker lacks
+- Selection is weighted by tech research cost (prefers higher-value techs)
+- **Chameleons Special:** Can target a specific tech category, doubling chance of desired tech
+
+**Stolen Tech Properties:**
+- Instantly added to attacker's completed techs
+- **Does NOT count toward miniaturization** — tier advancement requires actual research
+- May include techs not in attacker's normal tech tree (unique acquisition path)
+- Triggers diplomatic penalty if caught (see `espionage.md` §7)
+
+**Racial Modifiers:**
+| Race | Theft Modifier | Notes |
+|------|----------------|-------|
+| Chameleons | +60% | Masters of infiltration, +30 flat roll bonus |
+| Ferrets | +10% | Aggressive operatives |
+| Ants | N/A | Cannot conduct espionage |
+| Others | +0% | Baseline |
+
+**Cross-Reference:** Full spy mission mechanics, detection formulas, and diplomatic consequences are defined in `diplomacy/espionage.md`.
 
 ### 16. Tech Trading
 
