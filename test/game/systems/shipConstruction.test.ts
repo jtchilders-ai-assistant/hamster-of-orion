@@ -559,9 +559,9 @@ describe('processAllShipConstruction', () => {
     const state = makeMinimalState([planet1, planet2], [design], [empire]);
     const shipBcByPlanet = { p1: 100, p2: 100 };
 
-    const nextState = processAllShipConstruction(state, shipBcByPlanet);
+    const result = processAllShipConstruction(state, shipBcByPlanet);
 
-    expect(nextState.ships.allIds).toHaveLength(2);
+    expect(result.state.ships.allIds).toHaveLength(2);
   });
 
   it('skips uncolonized planets', () => {
@@ -577,10 +577,10 @@ describe('processAllShipConstruction', () => {
     const empire = makeEmpire('empire1');
 
     const state = makeMinimalState([colonized, uncolonized], [design], [empire]);
-    const nextState = processAllShipConstruction(state, { p1: 100, p2: 100 });
+    const result = processAllShipConstruction(state, { p1: 100, p2: 100 });
 
     // Only p1 should have produced a ship
-    expect(nextState.ships.allIds).toHaveLength(1);
+    expect(result.state.ships.allIds).toHaveLength(1);
   });
 
   it('skips planets with zero BC and zero progress', () => {
@@ -589,8 +589,8 @@ describe('processAllShipConstruction', () => {
     const empire = makeEmpire('empire1');
     const state = makeMinimalState([planet], [design], [empire]);
 
-    const nextState = processAllShipConstruction(state, {}); // no allocation
-    expect(nextState.ships.allIds).toHaveLength(0);
+    const result = processAllShipConstruction(state, {}); // no allocation
+    expect(result.state.ships.allIds).toHaveLength(0);
   });
 });
 

@@ -80,6 +80,13 @@ export interface WeaponInstance {
  * A ship as it exists inside a combat session.
  *
  * Values derived from ShipDesign + components + racial bonuses at combat start.
+ * 
+ * Special system component effects that must be mapped by the caller:
+ * - `zyro_shield` → hasZyroShield: true
+ * - `lightning_shield` → hasDamageReflection: true, damageReflectionPercent: effect.damageReflection
+ * - `stasis_field` → hasStasisField: true, stasisFieldDurationTurns: effect.disableDurationTurns
+ * - `cloaking_device` → hasCloakingDevice: true
+ * - `black_hole_generator` → hasBlackHoleGenerator: true, etc.
  */
 export interface CombatShip {
   id: string;
@@ -173,10 +180,15 @@ export interface CombatShip {
    */
   hasZyroShield?: boolean;
   /**
-   * Lightning Shield: 100% base chance to destroy incoming missiles − 1% per missile tech level.
-   * Per design/technology/force-fields.md: Lightning Shield.
+   * Lightning Shield: Reflects 50% of incoming damage back to attacker.
+   * Per design/ships/special-systems.md: Intentional departure from MOO1.
+   * (MOO1's missile destroyer behavior is covered by Zyro Shield.)
    */
-  hasLightningShield?: boolean;
+  hasDamageReflection?: boolean;
+  /**
+   * Percentage of damage to reflect (e.g., 0.5 = 50%).
+   */
+  damageReflectionPercent?: number;
   /**
    * Stasis Field: Target ship cannot move, fire, or retreat.
    * Per design/technology/force-fields.md: Stasis Field.
@@ -200,6 +212,11 @@ export interface CombatShip {
    * Per design/technology/force-fields.md.
    */
   hasStasisField?: boolean;
+  /**
+   * Stasis Field duration in turns (from component data).
+   * Per design/ships/special-systems.md: 2 turns.
+   */
+  stasisFieldDurationTurns?: number;
   /**
    * Track whether ship fired this round (for cloaking re-cloak logic).
    */
@@ -226,6 +243,34 @@ export interface MissileInFlight {
   side: CombatSide;
 }
 
+/**
+ * Missile base participant in orbital combat.
+ *
+ * Per design/ships/combat-mechanics.md §Missile Bases:
+ *   - Each base fires 3 missile volleys per combat round
+ *   - Bases use best available tech (auto-upgrade)
+ *   - Cannot retreat
+ *   - Continue firing even if all ships retreat
+ */
+export interface MissileBaseParticipant {
+  /** Unique identifier for this base group */
+  id: string;
+  /** Always 'defender' - missile bases defend planets */
+  side: 'defender';
+  /** Number of active missile bases */
+  count: number;
+  /** Volleys fired per round (default 3) */
+  volleysPerRound?: number;
+  /** Attack rating from Battle Computer */
+  attackRating: number;
+  /** ECM rating from Jammer */
+  ecmRating: number;
+  /** Shield class from Deflector Shield */
+  shieldClass: number;
+  /** Missile weapon type */
+  weapon: WeaponInstance;
+}
+
 export interface CombatState {
   attackerShips: CombatShip[];
   defenderShips: CombatShip[];
@@ -236,6 +281,12 @@ export interface CombatState {
   difficulty?: DifficultyLevel;
   /** Missiles and torpedoes currently in flight */
   missilesInFlight: MissileInFlight[];
+  /**
+   * Missile bases defending this planet (optional).
+   * Per design/ships/combat-mechanics.md: Bases cannot retreat and continue
+   * firing even if all ships retreat.
+   */
+  missileBases?: MissileBaseParticipant;
 }
 
 /** Summary returned after combat ends. */
@@ -270,6 +321,12 @@ export interface FleetForCombat {
  *
  * Ships are copied shallowly so callers can keep original state untouched.
  * `retreated` is forced to false for all ships.
+ *
+ * **Shield Regeneration** (per design/ships/combat-mechanics.md §Shields):
+ * Shields regenerate 100% between battles. In our per-hit absorption model,
+ * shields are always at full effectiveness (shieldClass absorbs up to N damage
+ * per hit every round). This means ships entering combat always have "full"
+ * shields regardless of previous battle damage.
  */
 export function initiateCombat(
   attackerFleet: FleetForCombat,
@@ -293,6 +350,29 @@ export function initiateCombat(
     status: 'ongoing',
     missilesInFlight: [],
   };
+}
+
+/**
+ * Create a CombatState that includes planetary missile bases.
+ *
+ * Per design/ships/combat-mechanics.md §Missile Bases:
+ *   - Bases fire 3 volleys per combat round
+ *   - Bases cannot retreat
+ *   - Bases continue firing even if all ships retreat
+ *   - Bases auto-upgrade to use best available tech
+ *
+ * @param attackerFleet  Attacking ships
+ * @param defenderFleet  Defending ships (can be empty if only bases defend)
+ * @param missileBases   Missile base configuration for the defending planet
+ */
+export function initiateCombatWithBases(
+  attackerFleet: FleetForCombat,
+  defenderFleet: FleetForCombat,
+  missileBases: MissileBaseParticipant,
+): CombatState {
+  const state = initiateCombat(attackerFleet, defenderFleet);
+  state.missileBases = missileBases;
+  return state;
 }
 
 // ── Hit-chance formula (MOO1 differential) ────────────────────────────────────
@@ -770,30 +850,30 @@ function checkZyroShield(
 }
 
 /**
- * Check if Lightning Shield destroys an incoming missile.
- * Per design/technology/force-fields.md: 100% chance − 1% per missile tech level.
- * Roll made per missile, not per salvo.
+ * Calculate reflected damage from Lightning Shield.
+ * Per design/ships/special-systems.md: Reflects 50% of incoming damage back to attacker.
+ * This is an intentional departure from MOO1's missile destroyer behavior.
  */
-function checkLightningShield(
+export function calculateDamageReflection(
   target: CombatShip,
-  missileTechLevel: number,
+  damage: number,
+  attacker: CombatShip | undefined,
   log: CombatLogEntry[],
   round: number,
-): boolean {
-  if (!target.hasLightningShield) return false;
+): number {
+  if (!target.hasDamageReflection || !attacker || damage <= 0) return 0;
   
-  // 100% base chance − 1% per missile tech level
-  const destroyChance = Math.max(0, 100 - missileTechLevel);
-  const d100 = roll(1, 100);
+  const reflectPercent = target.damageReflectionPercent ?? 0.5; // Default 50%
+  const reflectedDamage = Math.floor(damage * reflectPercent);
   
-  if (d100 <= destroyChance) {
+  if (reflectedDamage > 0) {
     log.push({
       round,
-      message: `[R${round}] ${target.designId} Lightning Shield DESTROYS incoming missile (roll ${d100} ≤ ${destroyChance}%)`,
+      message: `[R${round}] ${target.designId} Lightning Shield REFLECTS ${reflectedDamage} damage back to ${attacker.designId}!`,
     });
-    return true;
   }
-  return false;
+  
+  return reflectedDamage;
 }
 
 /**
@@ -854,12 +934,12 @@ function calculateInterceptionChance(
  * Attempt to intercept incoming missiles during the missile phase.
  * 
  * Per design docs, missiles can be destroyed by (in order of priority):
- * 1. Lightning Shield (100% − 1% per missile tech level) - per missile roll
- * 2. Zyro Shield (75% − 1% per missile tech level) - per missile roll
- * 3. Anti-Missile Rockets (40% − 1% per missile tech level) - per missile roll
- * 4. Beam weapon point defense (10% per beam attack) - fleet-wide roll
+ * 1. Zyro Shield (75% − 1% per missile tech level) - per missile roll
+ * 2. Anti-Missile Rockets (40% − 1% per missile tech level) - per missile roll
+ * 3. Beam weapon point defense (10% per beam attack) - fleet-wide roll
  * 
- * Note: Torpedoes are NOT affected by Zyro/Lightning shields but ARE subject to point defense.
+ * Note: Lightning Shield is now damage reflection (not missile interception) per design/ships/special-systems.md
+ * Note: Torpedoes are NOT affected by Zyro shield but ARE subject to point defense.
  */
 function attemptMissileInterception(
   missile: MissileInFlight,
@@ -871,14 +951,9 @@ function attemptMissileInterception(
   const missileTechLevel = missile.techLevel ?? 1;
   const isTorpedo = missile.weapon.category === 'torpedo';
   
-  // Per design: Torpedoes are NOT affected by Zyro/Lightning shields
+  // Per design: Torpedoes are NOT affected by Zyro shield missile interception
   if (!isTorpedo) {
-    // Check Lightning Shield first (highest chance)
-    if (checkLightningShield(target, missileTechLevel, log, round)) {
-      return true;
-    }
-    
-    // Check Zyro Shield
+    // Check Zyro Shield (missile interception)
     if (checkZyroShield(target, missileTechLevel, log, round)) {
       return true;
     }
@@ -1105,14 +1180,15 @@ export function applyStasisField(
     return false;
   }
   
-  // Apply stasis
+  // Apply stasis - duration comes from component data, default 2 per design/ships/special-systems.md
+  const duration = attacker.stasisFieldDurationTurns ?? 2;
   target.inStasisField = true;
-  target.stasisFieldEndsRound = state.round + 1;
+  target.stasisFieldEndsRound = state.round + duration;
   target.lastStasisTargetRound = state.round;
   
   state.log.push({
     round: state.round,
-    message: `[R${state.round}] ${attacker.designId} fires Stasis Field at ${target.designId} — FROZEN for 1 round!`,
+    message: `[R${state.round}] ${attacker.designId} fires Stasis Field at ${target.designId} — FROZEN for ${duration} round${duration !== 1 ? 's' : ''}!`,
   });
   
   return true;
@@ -1286,6 +1362,21 @@ function shipActs(
         // Apply weapon special effects (crew kills, chain lightning, etc.)
         applyWeaponEffects(target, weapon, damage, combat, log);
         
+        // Lightning Shield damage reflection (per design/ships/special-systems.md)
+        const reflectedDamage = calculateDamageReflection(target, damage, ship, log, round);
+        if (reflectedDamage > 0 && ship.hp > 0) {
+          // Create a dummy weapon for reflected damage (no special effects)
+          const reflectWeapon: WeaponInstance = {
+            id: 'lightning_shield_reflect',
+            name: 'Lightning Shield',
+            category: 'special',
+            damageMin: reflectedDamage,
+            damageMax: reflectedDamage,
+            attacksPerRound: 1,
+          };
+          applyDamage(ship, reflectedDamage, reflectWeapon);
+        }
+        
         // Mark High Energy Focus as used after first hit
         if (ship.hasHighEnergyFocus && !ship.highEnergyFocusUsed) {
           ship.highEnergyFocusUsed = true;
@@ -1317,7 +1408,12 @@ function shipActs(
 
 function checkVictory(state: CombatState): CombatStatus {
   const attackersAlive = state.attackerShips.some((s) => s.hp > 0 && !s.retreated);
-  const defendersAlive = state.defenderShips.some((s) => s.hp > 0 && !s.retreated);
+  const defenderShipsAlive = state.defenderShips.some((s) => s.hp > 0 && !s.retreated);
+  
+  // Missile bases count as active defenders
+  // Per design: "Bases continue firing even if all ships retreat"
+  const hasActiveMissileBases = state.missileBases && state.missileBases.count > 0;
+  const defendersAlive = defenderShipsAlive || hasActiveMissileBases;
 
   if (!attackersAlive && !defendersAlive) return 'draw';
   if (!defendersAlive) return 'attacker_wins';

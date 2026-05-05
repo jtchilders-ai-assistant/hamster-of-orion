@@ -126,6 +126,8 @@ export interface ComputerEffect {
 }
 
 export interface SpecialEffect {
+  /** Damage reflection percentage (e.g., 0.5 = reflect 50% of incoming damage back to attacker) */
+  damageReflection?: number;
   /** Push distance in hexes (Repulsor Beam) */
   pushDistance?: number;
   /** Pull distance in hexes (Tractor Beam) */
@@ -172,8 +174,10 @@ export interface SpecialEffect {
   maintenance?: number;
   /** Whether this component enables colonization of habitable planets (consumed on use) */
   canColonize?: boolean;
-  /** HP regenerated per turn (%) */
+  /** HP regenerated per turn (%), minimum value when range is specified */
   repairPerTurn?: number;
+  /** Maximum HP regenerated per turn (%), when a range is specified */
+  repairPerTurnMax?: number;
   /** Hull space bonus multiplier (e.g. 0.2 = +20%) */
   hullSpaceBonus?: number;
   /** Pollution reduction factor (e.g. 0.8 = 80% of normal waste) */

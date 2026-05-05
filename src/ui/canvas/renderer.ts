@@ -4,10 +4,12 @@
  */
 
 /**
- * Clear a canvas to its background color.
+ * Clear a canvas to the Deep Space Blue background.
+ * Color from design/ui-ux/UI_OVERVIEW.md §Color Palette:
+ *   Deep Space Blue: #0a1628 (backgrounds)
  */
 export function clearCanvas(ctx: CanvasRenderingContext2D): void {
-  ctx.fillStyle = '#000010';
+  ctx.fillStyle = '#0a1628';
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 }
 

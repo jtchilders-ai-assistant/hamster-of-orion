@@ -337,11 +337,11 @@ describe('components.json — specials', () => {
     expect(req).toContain('huge');
   });
 
-  it('stasis field disables for 1 turn and prevents retreat', () => {
+  it('stasis field disables for 2 turns and prevents retreat (design/ships/special-systems.md)', () => {
     const stasis = specials.find((s) => s.id === 'stasis_field');
     expect(stasis).toBeDefined();
     const e = stasis!.effect as Record<string, unknown>;
-    expect(e['disableDurationTurns']).toBe(1);
+    expect(e['disableDurationTurns']).toBe(2);
     expect(e['preventsRetreat']).toBe(true);
   });
 
@@ -351,10 +351,19 @@ describe('components.json — specials', () => {
     expect((zyro!.effect as Record<string, unknown>)['missileDestroyChanceBase']).toBe(0.75);
   });
 
-  it('lightning shield has 100% base missile destroy chance', () => {
+  it('lightning shield reflects 50% damage at tech level 25 (design/ships/special-systems.md)', () => {
     const lightning = specials.find((s) => s.id === 'lightning_shield');
     expect(lightning).toBeDefined();
-    expect((lightning!.effect as Record<string, unknown>)['missileDestroyChanceBase']).toBe(1.0);
+    expect(lightning!.techLevel).toBe(25);
+    expect((lightning!.effect as Record<string, unknown>)['damageReflection']).toBe(0.5);
+  });
+
+  it('automated repair unit regenerates 10-15% HP per turn (design/ships/special-systems.md)', () => {
+    const repair = specials.find((s) => s.id === 'automated_repair_unit');
+    expect(repair).toBeDefined();
+    const e = repair!.effect as Record<string, unknown>;
+    expect(e['repairPerTurn']).toBe(0.10);
+    expect(e['repairPerTurnMax']).toBe(0.15);
   });
 
   it('displacement device has 33% hit avoid chance', () => {
