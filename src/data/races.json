@@ -102,8 +102,8 @@
       "description": "Hive-minded collectives with perfect industrial efficiency. The individual is nothing; the Collective is all.",
       "homeworld": {
         "name": "Formicae",
-        "type": "arid",
-        "climate": "dry",
+        "type": "terran",
+        "climate": "temperate",
         "size": "large",
         "special": "mineral_rich"
       },
@@ -516,8 +516,8 @@
       "description": "Crystalline-shelled beings immune to environmental hazards. Patient, enduring, and utterly self-sufficient.",
       "homeworld": {
         "name": "Crystalia",
-        "type": "radiated",
-        "climate": "hostile",
+        "type": "terran",
+        "climate": "temperate",
         "size": "large",
         "special": "mineral_ultra_rich"
       },
@@ -938,7 +938,7 @@
       },
       "bonuses": {
         "production": -10,
-        "research": 20,
+        "research": 0,
         "food": 0,
         "growth": -10,
         "groundCombat": 0,
