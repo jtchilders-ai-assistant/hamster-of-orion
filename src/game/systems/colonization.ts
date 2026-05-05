@@ -425,7 +425,7 @@ export function colonize(
 
   // ── 7. Assemble next state ─────────────────────────────────────────────────
 
-  return {
+  let nextState: GameState = {
     ...state,
 
     planets: {
@@ -465,4 +465,164 @@ export function colonize(
       },
     },
   };
+
+  // ── 8. Grant Artifacts tech bonus if applicable ───────────────────────────
+  //
+  // Per design/galaxy/exploration.md §Artifacts Worlds:
+  //   "One-time tech unlock upon colonization — fires exactly once per planet."
+  //
+  // This is applied AFTER the colony is established so the planet already
+  // has an owner (the colonizing empire).
+
+  if (updatedPlanet.hasArtifacts && !updatedPlanet.artifactsTechClaimed) {
+    const result = grantArtifactsTechBonus(nextState, planetId, fleet.ownerId);
+    nextState = result.state;
+    // The granted tech (if any) can be accessed via colonizeWithDetails()
+  }
+
+  return nextState;
+}
+
+/**
+ * Result of colonization including any Artifacts tech bonus.
+ */
+export interface ColonizeResult {
+  state: GameState;
+  /** Tech ID granted from Artifacts world, or null if none. */
+  grantedTechId: TechId | null;
+}
+
+/**
+ * Colonize with detailed results, including any Artifacts tech bonus.
+ *
+ * Use this when you need to know what tech was granted from an Artifacts world.
+ * For most cases, the simpler `colonize()` function is sufficient.
+ */
+export function colonizeWithDetails(
+  fleetId: FleetId,
+  planetId: PlanetId,
+  state: GameState,
+  rng: () => number = Math.random,
+): ColonizeResult {
+  const fleet = state.fleets.byId[fleetId];
+  if (!fleet) throw new Error(`Fleet not found: ${fleetId}`);
+
+  const planet = state.planets.byId[planetId];
+  if (!planet) throw new Error(`Planet not found: ${planetId}`);
+
+  if (!canColonize(fleet, planet, state)) {
+    throw new Error(
+      `Colonization preconditions not met for fleet ${fleetId} at planet ${planetId}`,
+    );
+  }
+
+  // Check if we'll be granting an Artifacts tech bonus
+  const willGrantArtifactsBonus = planet.hasArtifacts && !planet.artifactsTechClaimed;
+
+  // Run the colonization logic (duplicated from colonize() for immutability)
+  const colonyShipId = findColonyShipInFleet(fleet, state)!;
+  const remainingShipIds = fleet.shipIds.filter((id) => id !== colonyShipId);
+  const fleetBecomesEmpty = remainingShipIds.length === 0;
+
+  const colonizedPlanet: Planet = {
+    ...planet,
+    ownerId: fleet.ownerId,
+    isColonized: true,
+    population: COLONY_STARTING_POPULATION,
+    factories: COLONY_STARTING_FACTORIES,
+    waste: COLONY_STARTING_POLLUTION,
+    morale: COLONY_STARTING_MORALE,
+    production: { ...COLONY_STARTING_PRODUCTION },
+  };
+
+  const newShipsById = { ...state.ships.byId };
+  delete newShipsById[colonyShipId];
+  const newShipsAllIds = state.ships.allIds.filter((id) => id !== colonyShipId);
+
+  let newFleetsById = { ...state.fleets.byId };
+  let newFleetsAllIds = [...state.fleets.allIds];
+
+  if (fleetBecomesEmpty) {
+    delete newFleetsById[fleetId];
+    newFleetsAllIds = newFleetsAllIds.filter((id) => id !== fleetId);
+  } else {
+    newFleetsById = {
+      ...newFleetsById,
+      [fleetId]: { ...fleet, shipIds: remainingShipIds },
+    };
+  }
+
+  const empire = state.empires.byId[fleet.ownerId];
+  const detailEmpirePlanets = empire
+    ? [...empire.planets, planetId]
+    : [planetId];
+
+  const detailEmpireFleets =
+    empire && fleetBecomesEmpty
+      ? empire.fleets.filter((id) => id !== fleetId)
+      : empire?.fleets ?? [];
+
+  const detailEmpire = empire
+    ? {
+        ...empire,
+        planets: detailEmpirePlanets,
+        fleets: detailEmpireFleets,
+      }
+    : empire;
+
+  const detailSystem = state.galaxy.systems.byId[fleet.systemId];
+  const detailSystemFleetIds =
+    detailSystem && fleetBecomesEmpty
+      ? detailSystem.fleetIds.filter((id) => id !== fleetId)
+      : detailSystem?.fleetIds ?? [];
+
+  const detailUpdatedSystem = detailSystem
+    ? { ...detailSystem, fleetIds: detailSystemFleetIds }
+    : detailSystem;
+
+  let detailNextState: GameState = {
+    ...state,
+    planets: {
+      ...state.planets,
+      byId: {
+        ...state.planets.byId,
+        [planetId]: colonizedPlanet,
+      },
+    },
+    ships: {
+      byId: newShipsById,
+      allIds: newShipsAllIds,
+    },
+    fleets: {
+      byId: newFleetsById,
+      allIds: newFleetsAllIds,
+    },
+    empires: {
+      ...state.empires,
+      byId: {
+        ...state.empires.byId,
+        ...(detailEmpire ? { [fleet.ownerId]: detailEmpire } : {}),
+      },
+    },
+    galaxy: {
+      ...state.galaxy,
+      systems: {
+        ...state.galaxy.systems,
+        byId: {
+          ...state.galaxy.systems.byId,
+          ...(detailUpdatedSystem ? { [fleet.systemId]: detailUpdatedSystem } : {}),
+        },
+      },
+    },
+  };
+
+  // Grant Artifacts tech bonus if applicable
+  let grantedTechId: TechId | null = null;
+  if (willGrantArtifactsBonus) {
+    const result = grantArtifactsTechBonus(detailNextState, planetId, fleet.ownerId, rng);
+    detailNextState = result.state;
+    grantedTechId = result.grantedTechId;
+  }
+
+  return { state: detailNextState, grantedTechId };
 }

@@ -2,12 +2,12 @@
   "state": "COMPLETED",
   "phase": "phase5-design-compliance-fixes",
   "current_task": "fix-35",
-  "last_check": "2026-05-05T02:41:00.000Z",
+  "last_check": "2026-05-05T02:48:00.000Z",
   "total_tasks": 85,
-  "completed_count": 5,
+  "completed_count": 6,
   "skipped_count": 0,
   "blocked_count": 0,
-  "notes": "fix-35 completed: Implemented turn structure design doc fixes - maintenance calculation, bankruptcy with penalties, fleet interception, quick combat setting",
+  "notes": "fix-35 completed: Implemented turn structure design doc fixes - maintenance calculation, bankruptcy with penalties, fleet interception, quick combat setting. Also fixed espionage test bug and added Planet.artifactsTechClaimed type.",
   "worker_output": {
     "files_created": [
       "test/game/systems/turn-fix35.test.ts"
@@ -23,12 +23,13 @@
       "test/game/systems/treaties.test.ts",
       "test/game/systems/shipConstruction.test.ts",
       "test/game/systems/council.test.ts",
-      "test/ui/screens/DiplomacyScreen.test.ts"
+      "test/ui/screens/DiplomacyScreen.test.ts",
+      "test/game/systems/espionage.test.ts"
     ],
     "tests_added": [
       "test/game/systems/turn-fix35.test.ts (6 tests for maintenance, bankruptcy, interception, quickCombat)"
     ],
-    "summary": "Implemented 4 fixes from design/game-mechanics/turn-structure.md: (1) Ship/building/spy maintenance calculation integrated into Phase 1, (2) Bankruptcy handling with ship scuttling, morale penalties, and diplomatic reputation damage, (3) Fleet interception during movement phase for fast fleets catching slow ones, (4) Added quickCombat setting to GameSettings for auto-resolve battles",
+    "summary": "Implemented 4 fixes from design/game-mechanics/turn-structure.md: (1) Ship/building/spy maintenance calculation integrated into Phase 1, (2) Bankruptcy handling with ship scuttling, morale penalties, and diplomatic reputation damage, (3) Fleet interception during movement phase for fast fleets catching slow ones, (4) Added quickCombat setting to GameSettings for auto-resolve battles. Also fixed pre-existing espionage test bug ('infiltration' → 'assassination') and added Planet.artifactsTechClaimed type for artifacts world bonus.",
     "design_compliance": [
       {
         "doc": "design/game-mechanics/turn-structure.md",
