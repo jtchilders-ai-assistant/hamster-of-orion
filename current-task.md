@@ -1,42 +1,55 @@
-# Current Task: fix-52 — Trade Design Doc Fixes (COMPLETED)
+# Current Task: fix-53 — Population Growth Design Doc Fixes (COMPLETED)
 
-**ID**: fix-52 | **Severity**: medium | **Source**: design/diplomacy/trade.md
+**ID**: fix-53 | **Severity**: medium | **Source**: design/economy/population-growth.md
 
 ## Summary
 
-Implemented trade disruption mechanics from design/diplomacy/trade.md:
+Implemented missing population mechanics from design/economy/population-growth.md:
 
-1. **Pirates & Space Monsters affecting trade routes with 20-50% income reduction**
-   - Added `hasActivePiracyEvent()` to check for active piracy events
-   - Added `calculatePiracyTradeMultiplier()` returning 0.50-0.80 based on severity
-   - Added `hasSpaceMonsterDisruption()` to check for monsters in empire systems
-   - Added `calculateMonsterTradeMultiplier()` returning 0.0 when monsters block routes
-   - Added `calculateTradeDisruptionMultiplier()` combining both effects
+1. **Population Transport System**
+   - Added `COLONY_TRANSPORT_COST = 50` BC to build
+   - Added `COLONY_TRANSPORT_MAINTENANCE = 1` BC/turn maintenance
+   - Added `POPULATION_TRANSPORT` constant object re-exporting these values
+   - `POPULATION_TRANSPORT_CAPACITY = 1` million pop per transport (already existed)
 
-2. **Trade Sanctions as Council action**
-   - Added `TradeSanction` interface to state.ts
-   - Added `sanctions: TradeSanction[]` to HighCouncil interface
-   - Added `isUnderSanctions()`, `getSanction()` for checking sanction status
-   - Added `calculateSanctionTradeMultiplier()` returning 0.50 for sanctioned empires
-   - Added `wouldViolateSanctions()` to check if trading would violate sanctions
-   - Added `imposeSanctions()`, `liftSanctions()` for Council actions
-   - Added `applySanctionViolationPenalty()` applying -30 relations to all races
+2. **Bio Weapon Max Population Reduction**
+   - Added `BIO_WEAPONS` constant with full stats for all bio weapons:
+     - Death Spores: TL 10, 1M/round kill rate, -10% max pop, 150 space, 100 BC
+     - Doom Virus: TL 25, 2M/round kill rate, -25% max pop, 200 space, 200 BC
+     - Bio Terminator: TL 33, 3M/round kill rate, -50% max pop, 250 space, 300 BC
+   - Added `BioWeaponType` type for bio weapon IDs
+   - Added `getBioWeaponMaxPopReduction()` helper function
+   - Added `BIO_WEAPON_DIPLOMACY_PENALTY = -100`
 
-3. **Full integration**
-   - Added `computeTradeIncomeWithDisruption()` combining all effects with base trade income
+3. **Bio Weapon Damage Processing**
+   - Added `BioWeaponPlanetFields` interface for tracking damage per planet
+   - Added `processBioWeaponDamage()` function implementing full damage calculation:
+     - Population killed = kill rate × weapon count × combat rounds - antidote reduction
+     - Max pop reduction is cumulative across attacks
+     - Capped at 90% max reduction (minimum 10% of original capacity)
+     - Leaves at least 1 survivor
+   - Added `clearBioWeaponDamage()` for re-terraforming
+   - Added `getEffectiveMaxPopulation()` accounting for bio weapon damage
 
 ## Files Modified
 
-- `src/game/state.ts` - Added TradeSanction interface, updated HighCouncil
-- `src/game/constants.ts` - Added piracy, monster, and sanction constants
-- `src/game/systems/treaties.ts` - Added trade disruption and sanctions functions
-- `test/game/systems/tradeDisruption.test.ts` - 38 comprehensive tests
+- `src/game/constants.ts` - Added transport cost/maintenance, bio weapon constants
+- `src/game/systems/population.ts` - Added bio weapon processing functions
+- `src/game/systems/turn.ts` - Fixed unused import and constant (pre-existing issue)
+- `test/game/systems/population.test.ts` - Added 22 new tests for bio weapons and transports
 
 ## Test Results
 
-All 38 tests pass:
-- Piracy Trade Disruption (design/diplomacy/trade.md §Pirates)
-- Space Monster Trade Disruption (design/diplomacy/trade.md §Space Monsters)
-- Combined Trade Disruption
-- Trade Sanctions (design/diplomacy/trade.md §Trade Sanctions)
-- computeTradeIncomeWithDisruption
+All 77 population tests pass including 22 new tests:
+- processBioWeaponDamage (14 tests)
+- clearBioWeaponDamage (2 tests)
+- getEffectiveMaxPopulation (3 tests)
+- POPULATION_TRANSPORT constant (3 tests)
+- BIO_WEAPONS constants (3 tests)
+
+## Design Doc References
+
+- design/economy/population-growth.md §7 Population Transport
+- design/economy/population-growth.md §Edge Cases - Biological Weapon Damage
+- design/technology/planetology.md §Biological Weapons
+- design/economy/ship-costs.md §16 Transport Costs
