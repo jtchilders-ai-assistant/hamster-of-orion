@@ -23,7 +23,7 @@ import {
   STATE_ALLIED_THRESHOLD,
   getRelationValue,
 } from '../systems/diplomacy';
-import { getEmpireFleetSize } from './strategies';
+import { getEmpireFleetPower } from './strategies';
 import { getPersonalityProfile } from './ai-personalities';
 
 // ── Public types ───────────────────────────────────────────────────────────────
@@ -74,16 +74,19 @@ function hasTreatyOfType(
 }
 
 /**
- * Return the strength ratio: myFleet / theirFleet.
- * Returns Infinity when the opponent has 0 ships.
+ * Return the strength ratio: myFleetPower / theirFleetPower.
+ * Returns Infinity when the opponent has 0 fleet power.
+ *
+ * Uses fleet power calculation per design/technical/ai-implementation.md §1.3
+ * instead of simple ship counts.
  */
 function fleetStrengthRatio(
   state: GameState,
   empireId: EmpireId,
   targetId: EmpireId,
 ): number {
-  const mine = getEmpireFleetSize(empireId, state);
-  const theirs = getEmpireFleetSize(targetId, state);
+  const mine = getEmpireFleetPower(empireId, state);
+  const theirs = getEmpireFleetPower(targetId, state);
   if (theirs === 0) return mine === 0 ? 1 : Infinity;
   return mine / theirs;
 }

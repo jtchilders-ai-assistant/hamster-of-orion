@@ -1,57 +1,57 @@
 {
-  "state": "TESTING",
+  "state": "COMPLETED",
   "phase": "phase5-design-compliance-fixes",
-  "current_task": "fix-63",
-  "last_check": "2026-05-05T02:28:00.000Z",
+  "current_task": "fix-77",
+  "last_check": "2026-05-05T02:32:00.000Z",
   "total_tasks": 85,
-  "completed_count": 3,
+  "completed_count": 4,
   "skipped_count": 0,
   "blocked_count": 0,
-  "notes": "fix-63 completed: Added bribery formula helpers and alliance voting per council.md",
+  "notes": "fix-77 completed: Verified Ship_Power formula implementation and updated diplomacyAI.ts to use fleet power",
   "worker_output": {
-    "files_created": [],
+    "files_created": [
+      "test/game/ai/strategies-power.test.ts"
+    ],
     "files_modified": [
-      "src/game/systems/council.ts",
-      "test/game/systems/council.test.ts"
+      "src/game/ai/diplomacyAI.ts"
     ],
     "tests_added": [
-      "test/game/systems/council.test.ts (16 new tests)"
+      "test/game/ai/strategies-power.test.ts (13 tests for calculateShipPower, calculateFleetPower, getEmpireFleetPower)"
     ],
-    "summary": "Implemented two fixes from council.md: (1) Bribery factor formula with Tech_Value calculation per §4.4, (2) Alliance voting mechanics with 80%/50% loyalty for Chameleons per §7.6. Added 16 new tests covering both features.",
+    "summary": "fix-77: The Ship_Power formula from design/technical/ai-implementation.md §1.3 was already implemented in strategies.ts. Updated diplomacyAI.ts to use getEmpireFleetPower() instead of getEmpireFleetSize() for proper military strength comparison. Added 13 comprehensive tests verifying the formula: HP component (Hull_HP × Armor_Multiplier × 0.5), weapon damage (Total × 2.0), shields (Shield_Class × 5), and speed (Speed × 3). Tests verify damage string parsing, armor multiplier lookup, HP-ratio adjustment for damaged ships, and the worked example from the design doc.",
     "design_compliance": [
       {
-        "doc": "design/diplomacy/council.md",
-        "section": "4.4 Bribery Factor",
-        "quote": "Tech_Value(tech) = Tech_Tier × 50 + (1000 if voter_does_not_have)",
-        "impl_file": "src/game/systems/council.ts",
-        "impl_line": 143,
+        "doc": "design/technical/ai-implementation.md",
+        "section": "1.3 Military Threat Component - Ship_Power formula",
+        "quote": "Ship_Power = floor((Hull_HP × Armor_Multiplier × 0.5) + (Total_Weapon_Damage × 2.0) + (Shield_Class × 5) + (Speed × 3))",
+        "impl_file": "src/game/ai/strategies.ts",
+        "impl_line": 104,
         "verified": true
       },
       {
-        "doc": "design/diplomacy/council.md",
-        "section": "4.4 Bribery Factor",
-        "quote": "Bribery_Factor = (Bribe_Value / Voter_Economy) × BRIBERY_WEIGHT × Racial_Bribe_Modifier",
-        "impl_file": "src/game/systems/council.ts",
-        "impl_line": 168,
+        "doc": "design/technical/ai-implementation.md",
+        "section": "1.3 Military Threat Component - Fleet_Power",
+        "quote": "Fleet_Power = Σ (Ship_Power × Ship_Count) for all ship designs",
+        "impl_file": "src/game/ai/strategies.ts",
+        "impl_line": 155,
         "verified": true
       },
       {
-        "doc": "design/diplomacy/council.md",
-        "section": "7.6 Alliance Voting",
-        "quote": "80% chance to vote for allied candidate, 20% independent",
-        "impl_file": "src/game/systems/council.ts",
-        "impl_line": 32,
-        "verified": true
-      },
-      {
-        "doc": "design/diplomacy/council.md",
-        "section": "7.6 Alliance Voting",
-        "quote": "Chameleons: Only 50% alliance loyalty",
-        "impl_file": "src/game/systems/council.ts",
-        "impl_line": 33,
+        "doc": "design/technical/ai-implementation.md",
+        "section": "1.3 Military Threat Component - Military_Threat",
+        "quote": "Military_Threat = floor(min(100, (Enemy_Fleet_Power / Our_Fleet_Power) × 50))",
+        "impl_file": "src/game/ai/diplomacyAI.ts",
+        "impl_line": 88,
         "verified": true
       }
     ],
-    "design_gaps": []
+    "design_gaps": [
+      {
+        "doc": "design/technical/ai-implementation.md",
+        "section": "1.3 Armor Multipliers",
+        "issue": "Design doc lists Duralloy (1.5), Andrium (2.5), Tritanium (3.0), Adamantium (3.5), Neutronium (4.0) but constants.ts has different armor types (monomolecular, composite, ferrocarbide). The Zortrium value also differs (2.0 in doc vs 1.8 in constants). This may be intentional game balance or needs review.",
+        "severity": "low"
+      }
+    ]
   }
 }
