@@ -4,7 +4,12 @@
  *
  * Renders the MOO1-style command bar:
  *   GAME | DESIGN | FLEET | MAP | RACES | PLANETS | TECH | REPORTS | COUNCIL | NEXT TURN
- *   F10     F6       F3    F1     F5       F2       F4       F7         F8     [ENTER]
+ *   ESC     F6       F3    ---    F5       F2       F4       F7         F8     [ENTER]
+ *
+ * Per design/ui-ux/navigation-flow.md:
+ * - ESC is the sole trigger for Game Menu (F10 intentionally omitted)
+ * - MAP opens a separate full-screen MAP view (not the Galaxy Map / F1)
+ * - F1 navigates to Galaxy Map, but that's not a command bar button
  *
  * Active screen button is highlighted. F-key labels shown below each button.
  * Hover tooltips provide button descriptions.
@@ -23,10 +28,10 @@ interface NavButton {
 }
 
 const NAV_BUTTONS: NavButton[] = [
-  { label: 'GAME',    fkey: 'F10', screen: 'menu',        tooltip: 'Game Menu — Save, Load, Options, Quit' },
+  { label: 'GAME',    fkey: 'ESC', screen: 'menu',        tooltip: 'Game Menu — Save, Load, Options, Quit' },
   { label: 'DESIGN',  fkey: 'F6',  screen: 'ship_design', tooltip: 'Ship Design Lab — Create and modify ship blueprints' },
   { label: 'FLEET',   fkey: 'F3',  screen: 'fleet',       tooltip: 'Fleet Management — View and command your fleets' },
-  { label: 'MAP',     fkey: 'F1',  screen: 'galaxy',      tooltip: 'Galaxy Map — Explore the cosmos and manage expansion' },
+  { label: 'MAP',     fkey: '',    screen: 'map',         tooltip: 'Full Galaxy Map — Zoomed-out view with filters (Colonies, Environment, Minerals)' },
   { label: 'RACES',   fkey: 'F5',  screen: 'diplomacy',   tooltip: 'Diplomacy — Manage relations with other empires' },
   { label: 'PLANETS', fkey: 'F2',  screen: 'planet_list', tooltip: 'Colony Management — Oversee all your planets' },
   { label: 'TECH',    fkey: 'F4',  screen: 'research',    tooltip: 'Research — Direct your scientific efforts' },

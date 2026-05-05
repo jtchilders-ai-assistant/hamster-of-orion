@@ -25,6 +25,7 @@ import { SaveLoadScreen } from './screens/SaveLoadScreen';
 import { GroundCombatScreen } from './screens/GroundCombatScreen';
 import { ReportsScreen } from './screens/ReportsScreen';
 import { HallOfFameScreen } from './screens/HallOfFameScreen';
+import { MapScreen } from './screens/MapScreen';
 
 // ── F-key → Screen mapping ────────────────────────────────────────────────────
 // Canonical source: design/ui-ux/interaction-spec.md §2.1 (Global Shortcuts)
@@ -136,6 +137,7 @@ export class App {
     const designEl     = this.makeScreenContainer(root, 'design-screen');
     const newGameEl    = this.makeScreenContainer(root, 'new-game-screen');
     const galaxyEl     = this.makeScreenContainer(root, 'galaxy-screen');
+    const mapEl        = this.makeScreenContainer(root, 'map-screen');
     const combatEl          = this.makeScreenContainer(root, 'combat-screen');
     const groundCombatEl   = this.makeScreenContainer(root, 'ground-combat-screen');
     const councilEl        = this.makeScreenContainer(root, 'council-screen');
@@ -154,6 +156,7 @@ export class App {
       screenInstances.push(
         ['new_game',         new NewGameScreen(newGameEl, store)],
         ['galaxy',           new GalaxyScreen(galaxyEl, store)],
+        ['map',              new MapScreen(mapEl, store)],
         ['planet',           new PlanetScreen(planetEl, store)],
         ['planet_list',      new ColoniesScreen(coloniesEl, store)],
         ['fleet',            new FleetsScreen(fleetsEl, store)],

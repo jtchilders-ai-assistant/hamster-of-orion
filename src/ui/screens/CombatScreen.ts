@@ -440,6 +440,9 @@ export class CombatScreen {
   // Ships that are marked DONE this round (cannot act again until next round)
   private doneShipIds: Set<string> = new Set();
 
+  // Track remaining movement points for each ship this round (shipId → MP remaining)
+  private movementPointsRemaining: Map<string, number> = new Map();
+
   constructor(container: HTMLElement, store: Store<GameState>) {
     this.container = container;
     this.store = store;
@@ -761,10 +764,12 @@ export class CombatScreen {
     this.targetableShipIds.clear();
     this.waitingShipIds.clear();
     this.doneShipIds.clear();
+    this.movementPointsRemaining.clear();
     this.damageNumbers = [];
     this.explosionParticles = [];
     this.combatState = initiateCombat(this.attackerFleet, this.defenderFleet);
     this.rebuildPositions();
+    this.resetMovementPoints();
     this.hideResultOverlay();
   }
 
@@ -804,6 +809,28 @@ export class CombatScreen {
     // suppress unused variable warnings
     void attackerLiving;
     void defenderLiving;
+  }
+
+  /**
+   * Reset movement points for all ships at the start of each round.
+   * Each ship gets MP = combat_speed per design/ships/combat-algorithm.md §6-7.
+   */
+  private resetMovementPoints(): void {
+    if (!this.combatState) return;
+    const allShips = [...this.combatState.attackerShips, ...this.combatState.defenderShips];
+    for (const ship of allShips) {
+      if (ship.hp > 0 && !ship.retreated) {
+        this.movementPointsRemaining.set(ship.id, ship.speed);
+      }
+    }
+  }
+
+  /**
+   * Get remaining movement points for a ship.
+   * Returns 0 if ship is dead, retreated, or not found.
+   */
+  private getMovementPoints(shipId: string): number {
+    return this.movementPointsRemaining.get(shipId) ?? 0;
   }
 
   // ── Effect animation loop ─────────────────────────────────────────────────────
@@ -915,9 +942,10 @@ export class CombatScreen {
   private stepRound(): void {
     if (!this.combatState || this.combatState.status !== 'ongoing') return;
     this.clearInteractionMode();
-    // Clear WAIT/DONE state at the start of each new round
+    // Clear WAIT/DONE state at the start of each new round and reset movement points
     this.waitingShipIds.clear();
     this.doneShipIds.clear();
+    this.resetMovementPoints();
     processRound(this.combatState);
 
     // Check for newly destroyed ships and spawn explosions
@@ -1221,8 +1249,9 @@ export class CombatScreen {
     const origin = this.positions.get(ship.id);
     if (!origin) { this.clearInteractionMode(); return; }
 
-    // Reachable hexes by BFS within combat_speed steps
-    this.moveableHexes = getReachableHexes(origin, ship.speed, occupied);
+    // Reachable hexes by BFS within remaining movement points (not full speed)
+    const remainingMP = this.getMovementPoints(ship.id);
+    this.moveableHexes = getReachableHexes(origin, remainingMP, occupied);
 
     // Targetable enemies: all living enemies on the grid
     const enemies = ship.side === 'attacker'
@@ -1366,14 +1395,19 @@ export class CombatScreen {
 
     const dist = hexDistance(oldPos, { col, row });
 
+    // Decrement movement points by distance moved
+    const currentMP = this.getMovementPoints(shipId);
+    const newMP = Math.max(0, currentMP - dist);
+    this.movementPointsRemaining.set(shipId, newMP);
+
     this.positions.set(shipId, { col, row });
 
     this.combatState.log.push({
       round: this.combatState.round,
-      message: `[M] ${ship.designId} moves ${dist} hex${dist !== 1 ? 'es' : ''} to (${col},${row})`,
+      message: `[M] ${ship.designId} moves ${dist} hex${dist !== 1 ? 'es' : ''} to (${col},${row}) [MP: ${newMP}/${ship.speed}]`,
     });
 
-    // Recompute movement range from new position
+    // Recompute movement range from new position (using remaining MP)
     this.activateShipInteraction(ship);
 
     this.renderAll();
@@ -1526,10 +1560,19 @@ export class CombatScreen {
     this.initiativeEl.innerHTML = '';
 
     // Sort by speed descending — initiative order per §4-5
+    // Ships using WAIT move to end of initiative order (per design doc)
     const allShips = [
       ...this.combatState.attackerShips,
       ...this.combatState.defenderShips,
-    ].sort((a, b) => b.speed - a.speed);
+    ].sort((a, b) => {
+      const aWaiting = this.waitingShipIds.has(a.id);
+      const bWaiting = this.waitingShipIds.has(b.id);
+      // Waiting ships go to end
+      if (aWaiting && !bWaiting) return 1;
+      if (!aWaiting && bWaiting) return -1;
+      // Otherwise sort by speed descending
+      return b.speed - a.speed;
+    });
 
     const label = document.createElement('span');
     label.style.cssText = 'font-size:10px; color:#607080; white-space:nowrap; margin-right:4px;';
@@ -1541,29 +1584,42 @@ export class CombatScreen {
       const isSelected = ship.id === this.selectedShipId;
       const isDead = ship.hp <= 0;
       const isRetreated = ship.retreated;
+      const isWaiting = this.waitingShipIds.has(ship.id);
+      const isDone = this.doneShipIds.has(ship.id);
       const color = sideColor(ship.side);
       const hpRatio = ship.maxHp > 0 ? ship.hp / ship.maxHp : 0;
+
+      // Determine border color based on state
+      let borderColor = isSelected ? '#fff' : color;
+      if (isWaiting) borderColor = '#8888ff';
+      if (isDone) borderColor = '#88cc88';
 
       card.style.cssText = `
         display: flex;
         flex-direction: column;
         align-items: center;
         padding: 4px 8px;
-        border: 1px solid ${isSelected ? '#fff' : color};
-        background: ${isSelected ? '#1a2a3a' : '#050f1e'};
+        border: 1px solid ${borderColor};
+        background: ${isSelected ? '#1a2a3a' : isDone ? '#1a2a1a' : isWaiting ? '#1a1a2a' : '#050f1e'};
         min-width: 80px;
         cursor: pointer;
-        opacity: ${isDead || isRetreated ? '0.35' : '1'};
+        opacity: ${isDead || isRetreated ? '0.35' : isDone ? '0.6' : '1'};
         text-decoration: ${isDead ? 'line-through' : 'none'};
         flex-shrink: 0;
         transition: background 0.1s;
       `;
 
+      // Build status indicator string
+      const statusParts: string[] = [];
+      if (isRetreated) statusParts.push('FLED');
+      if (isWaiting) statusParts.push('[WAIT]');
+      if (isDone) statusParts.push('✓ done');
+      const statusStr = statusParts.length > 0 ? ` · ${statusParts.join(' ')}` : '';
+
       card.innerHTML = `
         <span style="font-size:10px; color:${color}; font-weight:bold; white-space:nowrap;">${ship.designId}</span>
         <span style="font-size:9px; color:#607080; white-space:nowrap;">
-          ${ship.side === 'attacker' ? 'ALLY' : 'ENEMY'} · Spd ${ship.speed}
-          ${isRetreated ? ' · FLED' : ''}
+          ${ship.side === 'attacker' ? 'ALLY' : 'ENEMY'} · Spd ${ship.speed}${statusStr}
         </span>
         <div style="width:60px; height:5px; background:#1a1a1a; border-radius:2px; margin-top:3px; overflow:hidden;">
           <div style="width:${Math.round(hpRatio * 100)}%; height:100%; background:${hpColor(hpRatio)};"></div>
@@ -1712,12 +1768,41 @@ export class CombatScreen {
       ctx.fillStyle = hpColor(hpRatio);
       ctx.fillRect(barX, barY, barW * hpRatio, barH);
 
-      // Speed label
-      ctx.fillStyle = '#607080';
+      // Movement Points (MP) display per design doc
+      // Format: "MP: n/max" with status indicators
+      const mp = this.getMovementPoints(ship.id);
+      const maxMp = this.getMaxMovementPoints(ship.id);
+      const isWaiting = this.waitingShipIds.has(ship.id);
+      const isDone = this.doneShipIds.has(ship.id);
+
+      // Build MP label with status indicator per design:
+      // - "MP: 0/4 ✓ done" when ship has exhausted its moves or is marked done
+      // - "MP: 4/4 ◄►" when a ship is selected and waiting for movement input
+      // - "[WAIT]" when ship used WAIT
+      let mpLabel: string;
+      let mpColor: string;
+      if (isDone) {
+        mpLabel = `MP: ${mp}/${maxMp} ✓`;
+        mpColor = '#88cc88';
+      } else if (isWaiting) {
+        mpLabel = `[WAIT]`;
+        mpColor = '#8888ff';
+      } else if (mp === 0 && maxMp > 0) {
+        mpLabel = `MP: 0/${maxMp} ✓`;
+        mpColor = '#88cc88';
+      } else if (isSelected) {
+        mpLabel = `MP: ${mp}/${maxMp} ◄►`;
+        mpColor = '#00aaff';
+      } else {
+        mpLabel = `MP: ${mp}/${maxMp}`;
+        mpColor = '#607080';
+      }
+
+      ctx.fillStyle = mpColor;
       ctx.font = `${Math.round(HEX_SIZE * 0.28)}px monospace`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'top';
-      ctx.fillText(`Spd ${ship.speed}`, x, barY + barH + 1);
+      ctx.fillText(mpLabel, x, barY + barH + 1);
 
       // Shield indicator
       if (ship.shieldClass > 0) {

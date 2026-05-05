@@ -85,6 +85,7 @@ export type ScreenType =
   | 'menu'
   | 'new_game'
   | 'galaxy'
+  | 'map'           // Full-screen MAP view (separate from Galaxy Map)
   | 'planet'
   | 'planet_list'
   | 'fleet'

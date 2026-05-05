@@ -1,6 +1,3 @@
-# Current Task: fix-13 — Research Issues
+# Current Task: fix-4 — Production Quality Fixes
 
-**ID**: fix-13 | **Severity**: high | **Source**: src/game/systems/research.ts | **Issues**: 4
-
-## Design Docs (MUST READ)
-- `design/technology/research-formulas.md`
+**ID**: fix-4 | **Severity**: medium | **Source**: src/game/systems/production.ts
