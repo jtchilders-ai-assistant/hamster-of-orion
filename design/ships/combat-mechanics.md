@@ -138,10 +138,23 @@ See `components-complete.md` for shield absorption values.
 5. Ship destroyed when hull reaches 0
 
 ### Shields
-- Absorb damage before armor
-- Regenerate 100% between battles
-- Don't regenerate during battle (unless special tech)
-- Different shield classes have different HP
+
+**Shield Regeneration Between Battles:**
+- Shields regenerate 100% between battles
+- At the start of each new combat, all ships have full shield effectiveness
+- This applies whether the previous battle was won, lost, or the ship retreated
+- Ships that retreat with damaged shields will have full shields in the next battle
+
+**In-Battle Behavior:**
+- Shields absorb damage before armor
+- Don't regenerate during battle (unless special tech: Advanced Damage Control)
+- Different shield classes have different HP/absorption values
+
+**Implementation Note (Per-Hit Absorption Model):**
+- MOO1-style shields use per-hit absorption rather than a depleting pool
+- Each hit is absorbed up to the ship's Shield Class value
+- Example: Shield Class V absorbs up to 5 damage per hit
+- See `combat-algorithm.md` Section 11-12 for detailed shield mechanics
 
 ### Armor
 - Second layer of defense
@@ -342,6 +355,19 @@ Where component costs are based on the best available technology at time of cons
 - Bases are destroyed when planet is captured
 - Bases continue firing even if all ships retreat
 - Multiple bases fire independently (no coordination bonus)
+
+### Implementation Reference
+
+**Combat Integration** (see `src/game/systems/combat.ts`):
+- Use `initiateCombatWithBases()` to include missile bases in orbital combat
+- `MissileBaseParticipant` interface defines base combat statistics
+- Bases fire after all ships have acted each round via `missileBasesAct()`
+- `checkVictory()` considers active missile bases as defenders
+
+**Victory Conditions**:
+- Combat is ongoing while missile bases remain (even if all ships destroyed/retreated)
+- Attackers must destroy all bases to claim victory
+- Bases are removed when planet is captured (not destroyed via combat HP)
 
 ---
 

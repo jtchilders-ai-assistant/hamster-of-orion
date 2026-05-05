@@ -592,6 +592,58 @@ describe('processAllShipConstruction', () => {
     const result = processAllShipConstruction(state, {}); // no allocation
     expect(result.state.ships.allIds).toHaveLength(0);
   });
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // Empire Reserve overflow tests (per slider-mathematics.md §8)
+  // ───────────────────────────────────────────────────────────────────────────
+
+  it('returns overflow when queue is empty (no currentDesignId)', () => {
+    const planet = makePlanet({ currentDesignId: null, shipyardProgress: 0 });
+    const empire = makeEmpire('empire1');
+    const state = makeMinimalState([planet], [], [empire]);
+
+    const result = processAllShipConstruction(state, { p1: 50 });
+
+    expect(result.overflowByEmpire['empire1']).toBe(50);
+    expect(result.state.planets.byId['p1'].shipyardProgress).toBe(0);
+  });
+
+  it('also overflows existing shipyardProgress when queue is cleared', () => {
+    // Planet has progress from a design that was deleted
+    const planet = makePlanet({ currentDesignId: null, shipyardProgress: 30 });
+    const empire = makeEmpire('empire1');
+    const state = makeMinimalState([planet], [], [empire]);
+
+    const result = processAllShipConstruction(state, { p1: 50 });
+
+    // Both the new BC (50) and existing progress (30) should overflow
+    expect(result.overflowByEmpire['empire1']).toBe(80);
+    expect(result.state.planets.byId['p1'].shipyardProgress).toBe(0);
+  });
+
+  it('accumulates overflow across multiple planets for same empire', () => {
+    const planet1 = makePlanet({ id: 'p1', currentDesignId: null, shipyardProgress: 0 });
+    const planet2 = makePlanet({ id: 'p2', systemId: 's2', currentDesignId: null, shipyardProgress: 0 });
+    const empire = makeEmpire('empire1');
+    const state = makeMinimalState([planet1, planet2], [], [empire]);
+
+    const result = processAllShipConstruction(state, { p1: 30, p2: 20 });
+
+    expect(result.overflowByEmpire['empire1']).toBe(50);
+  });
+
+  it('does not overflow when actively building ships', () => {
+    const planet = makePlanet({ shipyardProgress: 0 });
+    const design = makeDesign('design1', 100, 50);
+    const empire = makeEmpire('empire1');
+    const state = makeMinimalState([planet], [design], [empire]);
+
+    const result = processAllShipConstruction(state, { p1: 50 });
+
+    // BC goes to shipyard progress, not overflow
+    expect(result.overflowByEmpire['empire1']).toBeUndefined();
+    expect(result.state.planets.byId['p1'].shipyardProgress).toBe(50);
+  });
 });
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -242,11 +242,12 @@ export class InfoPanel {
   }
 
   /**
-   * Render a slider bar with 8 segments.
-   * Per design/ui-ux/main-screens.md §Info Panel State: Colony Selected.
+   * Render a slider bar with 16 segments.
+   * Per design/ui-ux/main-screens.md §Single Planet Management:
+   *   SHIP  ■■■■□□□□□□□□□□□□  38%   Scout (2 turns)
    */
   private renderSliderBar(percent: number): string {
-    const totalSegments = 8;
+    const totalSegments = 16;
     const filledSegments = Math.round((percent / 100) * totalSegments);
     const filled = '■'.repeat(filledSegments);
     const empty = '□'.repeat(totalSegments - filledSegments);

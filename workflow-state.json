@@ -1,31 +1,11 @@
 {
   "state": "COMPLETED",
   "phase": "phase5-design-compliance-fixes",
-  "current_task": "fix-72",
-  "last_check": "2026-05-05T03:12:30.000Z",
+  "current_task": "fix-61",
+  "last_check": "2025-05-05T03:15:00.000Z",
   "total_tasks": 85,
-  "completed_count": 11,
+  "completed_count": 9,
   "skipped_count": 0,
   "blocked_count": 0,
-  "notes": "fix-72 completed: Canvas renderer background color updated to match UI_OVERVIEW.md design spec",
-  "worker_output": {
-    "files_created": [],
-    "files_modified": [
-      "src/ui/canvas/renderer.ts",
-      "test/game/systems/shipConstruction.test.ts"
-    ],
-    "tests_added": [],
-    "summary": "Fixed canvas clearCanvas() background color from #000010 to #0a1628 (Deep Space Blue) per design/ui-ux/UI_OVERVIEW.md §Color Palette. Also fixed processAllShipConstruction tests to use new AllShipConstructionResult return type.",
-    "design_compliance": [
-      {
-        "doc": "design/ui-ux/UI_OVERVIEW.md",
-        "section": "Color Palette",
-        "quote": "Deep Space Blue: #0a1628 (backgrounds)",
-        "impl_file": "src/ui/canvas/renderer.ts",
-        "impl_line": 12,
-        "verified": true
-      }
-    ],
-    "design_gaps": []
-  }
+  "notes": "fix-61 completed: Combat mechanics design doc fixes - shield regeneration documentation and missile base combat participation"
 }

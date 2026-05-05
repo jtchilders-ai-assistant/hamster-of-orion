@@ -1,3 +1,3 @@
-# Current Task: fix-71 — InfoPanel Fixes
+# Current Task: fix-75 — State Transitions Design Doc Fixes
 
-**ID**: fix-71 | **Severity**: low | **Source**: src/ui/components/InfoPanel.ts
+**ID**: fix-75 | **Severity**: low | **Source**: design/ui-ux/state-transitions.md

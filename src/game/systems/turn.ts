@@ -60,7 +60,7 @@ import {
 import { processFleetMovement, getFleetWarpSpeed, distanceBetweenSystems } from './fleet';
 import { canColonize, colonize } from './colonization';
 import { processAllAITurns } from '../ai/AIEmpire';
-import { processAllShipConstruction } from './shipConstruction';
+import { processAllShipConstruction, AllShipConstructionResult } from './shipConstruction';
 import { checkVictoryConditions, VictoryResult } from './victoryConditions';
 import { resolveEspionageMissions } from './espionageResolution';
 import {
@@ -763,7 +763,31 @@ function processPhaseProduction(
   }
 
   // Process ship construction
-  next = processAllShipConstruction(next, shipBcMap);
+  // Per design/economy/slider-mathematics.md §8: SHIP overflow goes to Empire Reserve
+  const shipResult: AllShipConstructionResult = processAllShipConstruction(next, shipBcMap);
+  next = shipResult.state;
+
+  // Add SHIP overflow to each empire's credits (Empire Reserve)
+  for (const [empireId, overflow] of Object.entries(shipResult.overflowByEmpire)) {
+    if (overflow <= 0) continue;
+    const empire = next.empires.byId[empireId];
+    if (!empire || empire.isDefeated) continue;
+
+    const updatedEmpire: Empire = {
+      ...empire,
+      credits: empire.credits + overflow,
+    };
+    next = {
+      ...next,
+      empires: {
+        ...next.empires,
+        byId: {
+          ...next.empires.byId,
+          [empireId]: updatedEmpire,
+        },
+      },
+    };
+  }
 
   // Check for new ships built (compare with pre-state)
   const beforeShipIds = new Set(state.ships.allIds);

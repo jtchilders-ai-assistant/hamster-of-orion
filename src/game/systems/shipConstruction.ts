@@ -132,12 +132,15 @@ export function processPlanetShipConstruction(
   state: GameState,
   turn: number,
 ): ShipConstructionResult {
-  // Nothing to do if no design selected
+  // Per slider-mathematics.md §SHIP: "If queue is empty, overflow goes to Empire Reserve"
+  // When no design is selected, all SHIP BC overflows to reserve.
   if (planet.currentDesignId === null) {
+    // Any existing shipyardProgress should also overflow (e.g., design was cleared)
+    const totalOverflow = shipBc + planet.shipyardProgress;
     return {
-      updatedPlanet: planet,
+      updatedPlanet: { ...planet, shipyardProgress: 0 },
       spawnedShipIds: [],
-      overflow: 0,
+      overflow: totalOverflow,
     };
   }
 
@@ -340,19 +343,37 @@ export function applyShipConstruction(
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
+ * Result of processing all ship construction for a turn.
+ * Per design/economy/slider-mathematics.md §8: Reserve / Overflow Mechanics.
+ */
+export interface AllShipConstructionResult {
+  /** Updated game state with ships spawned and shipyardProgress updated. */
+  state: GameState;
+  /** BC overflow by empire ID to add to Empire Reserve. */
+  overflowByEmpire: Record<EmpireId, number>;
+}
+
+/**
  * Process ship construction for all colonized planets in one turn.
  *
  * Intended to be called from `processTurn()` after SHIP BC is allocated
  * via `allocateSliders()`.
  *
+ * Per design/economy/slider-mathematics.md §8:
+ *   - SHIP BC accumulates toward the current design.
+ *   - When a ship completes, overflow carries to the next ship.
+ *   - When the queue is empty (no currentDesignId), overflow goes to Empire Reserve.
+ *
  * @param state    Current game state.
  * @param shipBcByPlanet   Map of planetId → SHIP BC allocated this turn.
+ * @returns Updated state and overflow BC by empire for reserve contribution.
  */
 export function processAllShipConstruction(
   state: GameState,
   shipBcByPlanet: Record<string, number>,
-): GameState {
+): AllShipConstructionResult {
   let nextState = state;
+  const overflowByEmpire: Record<EmpireId, number> = {};
 
   for (const planetId of nextState.planets.allIds) {
     const planet = nextState.planets.byId[planetId];
@@ -368,8 +389,14 @@ export function processAllShipConstruction(
       nextState.turn,
     );
 
+    // Track overflow for this empire's reserve
+    if (result.overflow > 0) {
+      const empireId = planet.ownerId;
+      overflowByEmpire[empireId] = (overflowByEmpire[empireId] ?? 0) + result.overflow;
+    }
+
     nextState = applyShipConstruction(nextState, planet, result);
   }
 
-  return nextState;
+  return { state: nextState, overflowByEmpire };
 }

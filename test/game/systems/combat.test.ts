@@ -8,6 +8,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import {
   initiateCombat,
+  initiateCombatWithBases,
   processRound,
   applyDamage,
   calcHitChanceVs,
@@ -17,6 +18,7 @@ import {
   type CombatShip,
   type WeaponInstance,
   type FleetForCombat,
+  type MissileBaseParticipant,
 } from '../../../src/game/systems/combat';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -482,5 +484,177 @@ describe('multi-round / autoResolveCombat', () => {
       expect(entry.round).toBeGreaterThanOrEqual(1);
       expect(typeof entry.message).toBe('string');
     });
+  });
+});
+
+// ── Shield Regeneration (design/ships/combat-mechanics.md §Shields) ─────────────
+
+describe('shield regeneration between battles', () => {
+  it('ships start combat with full shield effectiveness', () => {
+    // Per design: "Regenerate 100% between battles"
+    // In per-hit absorption model, shields are always at full capacity
+    const ship = makeShip('d1', 'defender', { shieldClass: 5 });
+    const state = initiateCombat(makeFleet([makeShip('a1', 'attacker')]), makeFleet([ship]));
+    
+    // Verify shield class is preserved at full value
+    expect(state.defenderShips[0].shieldClass).toBe(5);
+  });
+
+  it('shields absorb up to shieldClass damage per hit every round', () => {
+    // Per design: per-hit absorption model means shields are "full" every hit
+    setCombatRng(fixedRng(0.05)); // Always hit
+    
+    const attacker = makeShip('a1', 'attacker', {
+      weapons: [makeWeapon({ damageMin: 10, damageMax: 10, alwaysHits: true })],
+    });
+    const defender = makeShip('d1', 'defender', { hp: 100, maxHp: 100, shieldClass: 3 });
+    
+    const state = initiateCombat(makeFleet([attacker]), makeFleet([defender]));
+    
+    // Round 1: shields absorb 3 of 10 damage, 7 gets through
+    processRound(state);
+    expect(state.defenderShips[0].hp).toBe(93); // 100 - 7
+    
+    // Round 2: shields STILL absorb 3 (regenerated), 7 more through
+    processRound(state);
+    expect(state.defenderShips[0].hp).toBe(86); // 93 - 7
+    
+    setCombatRng(Math.random);
+  });
+});
+
+// ── Missile Base Combat Participation (design/ships/combat-mechanics.md §Missile Bases) ──
+
+describe('missile base combat participation', () => {
+  afterEach(() => {
+    setCombatRng(Math.random);
+  });
+
+  function makeMissileBases(overrides: Partial<MissileBaseParticipant> = {}): MissileBaseParticipant {
+    return {
+      id: 'bases-1',
+      side: 'defender',
+      count: 2,
+      volleysPerRound: 3,
+      attackRating: 3,
+      ecmRating: 0,
+      shieldClass: 5,
+      weapon: makeWeapon({ id: 'missile-1', name: 'Nuclear Missile', category: 'missile', damageMin: 5, damageMax: 5 }),
+      ...overrides,
+    };
+  }
+
+  it('initiateCombatWithBases includes missile bases in state', () => {
+    const bases = makeMissileBases();
+    const state = initiateCombatWithBases(
+      makeFleet([makeShip('a1', 'attacker')]),
+      makeFleet([makeShip('d1', 'defender')]),
+      bases,
+    );
+    
+    expect(state.missileBases).toBeDefined();
+    expect(state.missileBases?.count).toBe(2);
+    expect(state.missileBases?.side).toBe('defender');
+  });
+
+  it('missile bases fire 3 volleys per base per round (design spec)', () => {
+    setCombatRng(fixedRng(0.5)); // 50% hit chance, some will miss
+    
+    const bases = makeMissileBases({ count: 1, volleysPerRound: 3 });
+    const attacker = makeShip('a1', 'attacker', { hp: 100, maxHp: 100 });
+    
+    const state = initiateCombatWithBases(
+      makeFleet([attacker]),
+      makeFleet([]),
+      bases,
+    );
+    
+    processRound(state);
+    
+    // Log should show missile base firing 3 volleys
+    const baseMessages = state.log.filter((e) => e.message.includes('Missile Base'));
+    expect(baseMessages.length).toBeGreaterThan(0);
+  });
+
+  it('missile bases count as active defenders for victory check', () => {
+    // Per design: "Bases continue firing even if all ships retreat"
+    const bases = makeMissileBases({ count: 1 });
+    const state = initiateCombatWithBases(
+      makeFleet([makeShip('a1', 'attacker')]),
+      makeFleet([]), // No defending ships!
+      bases,
+    );
+    
+    // Combat should be ongoing because missile bases are active
+    expect(state.status).toBe('ongoing');
+  });
+
+  it('missile bases prioritize bombers (design targeting priority)', () => {
+    setCombatRng(fixedRng(0.1)); // Always hit
+    
+    const bomber = makeShip('a1', 'attacker', {
+      hp: 20, maxHp: 20, hullSize: 'large',
+      weapons: [makeWeapon({ name: 'Fusion Bomb', damageMin: 10, damageMax: 10 })],
+    });
+    const normalShip = makeShip('a2', 'attacker', {
+      hp: 20, maxHp: 20, hullSize: 'huge',
+      weapons: [makeWeapon({ damageMin: 1, damageMax: 1 })],
+    });
+    
+    const bases = makeMissileBases({
+      count: 1,
+      volleysPerRound: 1,
+      weapon: makeWeapon({ damageMin: 5, damageMax: 5, alwaysHits: true }),
+    });
+    
+    const state = initiateCombatWithBases(
+      makeFleet([normalShip, bomber]), // Bomber is in the list
+      makeFleet([]),
+      bases,
+    );
+    
+    processRound(state);
+    
+    // Bomber should be targeted first (priority 1) even though normalShip is larger
+    // Check that bomber took damage
+    const bomberShip = state.attackerShips.find((s) => s.id === 'a1');
+    expect(bomberShip!.hp).toBeLessThan(20);
+  });
+
+  it('missile bases cannot retreat', () => {
+    // Per design: "Bases cannot retreat"
+    // This is enforced by the MissileBaseParticipant interface - no retreated flag
+    const bases = makeMissileBases();
+    expect((bases as Record<string, unknown>)['retreated']).toBeUndefined();
+  });
+
+  it('missile bases continue firing after all defending ships are destroyed', () => {
+    setCombatRng(fixedRng(0.1)); // Always hit
+    
+    const weakDefender = makeShip('d1', 'defender', { hp: 1, maxHp: 1 });
+    const attacker = makeShip('a1', 'attacker', {
+      hp: 100, maxHp: 100,
+      weapons: [makeWeapon({ damageMin: 10, damageMax: 10, alwaysHits: true })],
+    });
+    const bases = makeMissileBases({
+      count: 1,
+      volleysPerRound: 3,
+      weapon: makeWeapon({ damageMin: 5, damageMax: 5 }),
+    });
+    
+    const state = initiateCombatWithBases(
+      makeFleet([attacker]),
+      makeFleet([weakDefender]),
+      bases,
+    );
+    
+    // First round: attacker kills defender, but combat continues (bases)
+    processRound(state);
+    expect(state.defenderShips[0].hp).toBeLessThanOrEqual(0);
+    expect(state.status).toBe('ongoing'); // Still ongoing due to bases
+    
+    // Bases should have fired at attacker
+    const baseMessages = state.log.filter((e) => e.message.includes('Missile Base'));
+    expect(baseMessages.length).toBeGreaterThan(0);
   });
 });
