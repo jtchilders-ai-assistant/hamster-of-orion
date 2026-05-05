@@ -239,10 +239,16 @@ describe('Criterion 1: Empire list — all known empires visible via relations',
 // ═══════════════════════════════════════════════════════════════════════════
 
 describe('Criterion 2: Relation bar — color coding via getDiplomaticState', () => {
+  // From design/diplomacy/relationship-formulas.md §1:
+  //   -100 to -50 → War (Hostile) — note: -50 IS included in war range
+  //   -49 to -1  → Unfriendly (Cold)
+  //   0 to +49   → Neutral (Cautious)
+  //   +50 to +79 → Friendly (Warm)
+  //   +80 to +100 → Allied (United)
   const CASES: Array<[number, string]> = [
     [-100, 'war'],
     [-51, 'war'],
-    [-50, 'unfriendly'], // boundary: getDiplomaticState uses strict < -50 for 'war'
+    [-50, 'war'],        // boundary: -50 IS war per design doc (≤ -50)
     [-49, 'unfriendly'],
     [-1, 'unfriendly'],
     [0, 'neutral'],

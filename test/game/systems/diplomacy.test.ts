@@ -191,14 +191,15 @@ describe('initializeRelations', () => {
 
 // ── Tests: getDiplomaticState ─────────────────────────────────────────────────
 
-describe('getDiplomaticState', () => {
-  it('returns "war" for values below -50', () => {
+describe('getDiplomaticState (design/diplomacy/relationship-formulas.md §1)', () => {
+  it('returns "war" for values at or below -50', () => {
     expect(getDiplomaticState(-100)).toBe('war');
     expect(getDiplomaticState(-51)).toBe('war');
+    expect(getDiplomaticState(-50)).toBe('war'); // -50 is included in war range
   });
 
-  it('returns "unfriendly" for values from -50 to -1', () => {
-    expect(getDiplomaticState(-50)).toBe('unfriendly');
+  it('returns "unfriendly" for values from -49 to -1', () => {
+    expect(getDiplomaticState(-49)).toBe('unfriendly');
     expect(getDiplomaticState(-25)).toBe('unfriendly');
     expect(getDiplomaticState(-1)).toBe('unfriendly');
   });
@@ -424,7 +425,7 @@ describe('processRelations', () => {
     expect(getRelationValue(result, 'a', 'b')).toBeLessThan(-90);
   });
 
-  it('updates the diplomatic state label to "war" when value drops below -50', () => {
+  it('updates the diplomatic state label to "war" when value drops to -50 or below', () => {
     const base = initializeRelations(makeState(['a', 'b']));
     const withRelation: GameState = {
       ...base,

@@ -2,10 +2,12 @@
  * Diplomatic relations system — pure TypeScript, NO DOM.
  *
  * Handles relationship values between empires on a -100 (war) to +100 (allied)
- * scale, with per-empire modifier stacking and per-turn decay toward neutral.
+ * scale, with per-empire modifier stacking and per-turn decay toward racial baseline.
  *
  * Also implements war weariness: prolonged war causes morale degradation and
- * production penalties. Each turn at war reduces morale by 1, capped at -20.
+ * production penalties. War weariness is calculated as:
+ *   BaseDuration + CasualtyFactor + EconomicStrain
+ * with racial multipliers applied.
  *
  * All formulas follow design/diplomacy/relationship-formulas.md.
  */
@@ -16,37 +18,107 @@ import {
   Empire,
   EmpireId,
   GameState,
+  RaceId,
   RelationModifier,
+  TreatyType,
 } from '../state';
+// Note: Race data is used via RACIAL_* constants defined above
 
-// ── War Weariness Constants ───────────────────────────────────────────────────
-
-/** Morale penalty per turn at war. */
-export const WAR_WEARINESS_MORALE_PER_TURN = 1;
-
-/** Maximum war weariness morale penalty. */
-export const WAR_WEARINESS_MAX_PENALTY = 20;
-
-/** Production penalty percentage per 5 morale points lost to war weariness. */
-export const WAR_WEARINESS_PRODUCTION_PENALTY_PER_5_MORALE = 2;
-
-// ── Constants ─────────────────────────────────────────────────────────────────
+// ── Constants (design/diplomacy/relationship-formulas.md §10) ────────────────
 
 export const RELATION_MIN = -100;
 export const RELATION_MAX = 100;
 export const RELATION_NEUTRAL = 0;
 
-/** Base decay rate per turn (2 % of the gap to neutral). */
+/** Base decay rate per turn (2% of the gap to baseline). */
 export const DECAY_RATE = 0.02;
 
-/** Threshold below which the relation is "war". */
+/**
+ * Diplomatic state thresholds (design/diplomacy/relationship-formulas.md §1):
+ *   War:        -100 to -50 (≤ -50)
+ *   Unfriendly: -49 to -1
+ *   Neutral:    0 to +49
+ *   Friendly:   +50 to +79
+ *   Allied:     +80 to +100
+ */
 export const STATE_WAR_THRESHOLD = -50;
-/** Threshold at or below which the relation is "unfriendly" (range: -50 to -1). */
-export const STATE_UNFRIENDLY_THRESHOLD = 0;
-/** Threshold above which the relation is "friendly". */
-export const STATE_FRIENDLY_THRESHOLD = 49;
-/** Threshold above which the relation is "allied". */
-export const STATE_ALLIED_THRESHOLD = 79;
+export const STATE_UNFRIENDLY_THRESHOLD = -1;
+export const STATE_FRIENDLY_THRESHOLD = 50;
+export const STATE_ALLIED_THRESHOLD = 80;
+
+/** Turns per duration bonus for treaty maintenance. */
+export const TREATY_DURATION_BONUS_INTERVAL = 25;
+export const TREATY_DURATION_BONUS_MAX = 20;
+
+/** Maximum per-turn bonus from treaty maintenance. */
+export const TREATY_MAINTENANCE_CAP = 10;
+
+/** War weariness interval (turns per base weariness point). */
+export const WAR_WEARINESS_INTERVAL = 10;
+
+/** Border friction penalty per contested system. */
+export const BORDER_FRICTION_PER_SYSTEM = -5;
+export const BORDER_FRICTION_MAX = -25;
+
+/** Hamster racial diplomacy constants (§5.2, §10). */
+export const HAMSTER_DIPLOMACY_BASE = 1.30;
+export const HAMSTER_POSITIVE_MULTIPLIER = 2.0;
+export const HAMSTER_POSITIVE_COMBINED = 2.60; // 1.30 × 2.0
+export const HAMSTER_TRADE_BONUS = 1.25;
+export const HAMSTER_TREATY_BONUS = 5;
+
+/** Treaty maintenance bonuses per turn (§3.1). */
+export const TREATY_MAINTENANCE_BONUSES: Record<TreatyType, number> = {
+  trade: 0.20,
+  research: 0.15,
+  non_aggression: 0.10,
+  defensive_pact: 0.20,
+  military_alliance: 0.30,
+  peace: 0,
+};
+
+/**
+ * Racial war weariness multipliers (design/diplomacy/relationship-formulas.md §4.2).
+ */
+export const RACIAL_WAR_WEARINESS_MULTIPLIERS: Record<RaceId, number> = {
+  guinea_pigs: 0.5,
+  hermit_crabs: 0.6,
+  ferrets: 0.7,
+  budgies: 0.75,
+  ants: 0.8,
+  chameleons: 0.9,
+  hamsters: 1.0,
+  mice: 1.0,
+  rats: 1.2,
+  rabbits: 1.5,
+};
+
+/**
+ * Racial diplomacy modifiers (design/diplomacy/relationship-formulas.md §5.1).
+ * Value is the multiplier (e.g. 1.30 means +30%).
+ */
+export const RACIAL_DIPLOMACY_MODIFIERS: Record<RaceId, number> = {
+  hamsters: 1.30,
+  chameleons: 1.20,
+  rabbits: 1.05,
+  mice: 1.0,
+  rats: 1.0,
+  ants: 1.0,
+  hermit_crabs: 1.0,
+  budgies: 0.95,
+  ferrets: 0.90,
+  guinea_pigs: 0.80,
+};
+
+/**
+ * Ship weight values for war weariness casualty calculation (§4.1).
+ */
+export const SHIP_WEIGHT: Record<string, number> = {
+  small: 0.1,
+  medium: 0.5,
+  large: 2.0,
+  huge: 6.0,
+};
 
 // ── Helper ────────────────────────────────────────────────────────────────────
 
@@ -122,12 +194,19 @@ export function initializeRelations(state: GameState): GameState {
 
 /**
  * Compute the diplomatic state label from a raw relation value.
+ *
+ * Thresholds per design/diplomacy/relationship-formulas.md §1:
+ *   War:        -100 to -50 (value ≤ -50)
+ *   Unfriendly: -49 to -1   (-50 < value < 0)
+ *   Neutral:    0 to +49    (0 ≤ value < 50)
+ *   Friendly:   +50 to +79  (50 ≤ value < 80)
+ *   Allied:     +80 to +100 (value ≥ 80)
  */
 export function getDiplomaticState(value: number): DiplomaticState {
-  if (value < STATE_WAR_THRESHOLD) return 'war';
-  if (value < STATE_UNFRIENDLY_THRESHOLD) return 'unfriendly';
-  if (value <= STATE_FRIENDLY_THRESHOLD) return 'neutral';
-  if (value <= STATE_ALLIED_THRESHOLD) return 'friendly';
+  if (value <= STATE_WAR_THRESHOLD) return 'war';
+  if (value <= STATE_UNFRIENDLY_THRESHOLD) return 'unfriendly';
+  if (value < STATE_FRIENDLY_THRESHOLD) return 'neutral';
+  if (value < STATE_ALLIED_THRESHOLD) return 'friendly';
   return 'allied';
 }
 
@@ -165,13 +244,93 @@ export function applyRelationModifier(
 }
 
 /**
- * Process per-turn modifier application and natural decay.
+ * Get the racial baseline relationship between two races.
+ * Per design/diplomacy/relationship-formulas.md §5.3, this is based on
+ * the racial attitude matrix.
+ */
+export function getRacialBaseline(
+  raceAId: RaceId,
+  raceBId: RaceId,
+): number {
+  let baseline = 0;
+
+  // Hamsters: +10 toward everyone (Universal Diplomat)
+  if (raceAId === 'hamsters') {
+    baseline += 10;
+  }
+  if (raceBId === 'hamsters') {
+    baseline += 10;
+  }
+
+  // Chameleons: -10 outgoing (no one trusts them) + -10 incoming (universal unease)
+  if (raceAId === 'chameleons') {
+    baseline -= 10; // outgoing distrust
+  }
+  if (raceBId === 'chameleons') {
+    baseline -= 10; // incoming distrust
+  }
+
+  // Specific racial attitudes
+  if (raceAId === 'guinea_pigs' && raceBId === 'hamsters') baseline -= 30;
+  if (raceAId === 'guinea_pigs' && raceBId === 'chameleons') baseline -= 20;
+  if (raceAId === 'ferrets' && raceBId === 'rabbits') baseline -= 25;
+  if (raceAId === 'ferrets' && raceBId === 'chameleons') baseline -= 15;
+  if (raceAId === 'budgies' && raceBId === 'guinea_pigs') baseline += 10;
+  if (raceAId === 'budgies' && raceBId === 'ferrets') baseline += 10;
+  if (raceAId === 'rats' && raceBId === 'mice') baseline += 15;
+  if (raceAId === 'mice' && raceBId === 'rats') baseline += 15;
+
+  return baseline;
+}
+
+/**
+ * Calculate the treaty maintenance bonus per turn for a relation.
+ * Per design/diplomacy/relationship-formulas.md §3.1.
+ */
+export function calculateTreatyMaintenanceBonus(
+  relation: DiplomaticRelations,
+): number {
+  let totalBonus = 0;
+  for (const treaty of relation.treaties) {
+    const bonus = TREATY_MAINTENANCE_BONUSES[treaty.type] ?? 0;
+    totalBonus += bonus;
+  }
+  // Cap at TREATY_MAINTENANCE_CAP per turn
+  return Math.min(totalBonus, TREATY_MAINTENANCE_CAP);
+}
+
+/**
+ * Apply racial diplomacy modifier to a relationship change.
+ * Per design/diplomacy/relationship-formulas.md §2.1:
+ *   RelationChange = floor(BaseChange × RacialMod × ReputationMod × DifficultyMod)
  *
- * For each relation:
- *   1. Sum and apply all active modifiers (including expiration).
- *   2. Decay the resulting value toward neutral (0) by DECAY_RATE.
- *   3. Clamp to [-100, +100].
- *   4. Re-compute the state label.
+ * For Hamsters with positive actions, applies the Universal Diplomat 2× bonus.
+ */
+export function applyRacialDiplomacyModifier(
+  baseChange: number,
+  initiatorRaceId: RaceId,
+  isPositiveAction: boolean = baseChange > 0,
+): number {
+  let racialMod = RACIAL_DIPLOMACY_MODIFIERS[initiatorRaceId] ?? 1.0;
+
+  // Hamsters get 2× multiplier on positive actions (Universal Diplomat)
+  if (initiatorRaceId === 'hamsters' && isPositiveAction) {
+    racialMod = HAMSTER_POSITIVE_COMBINED; // 1.30 × 2.0 = 2.60
+  }
+
+  return Math.floor(baseChange * racialMod);
+}
+
+/**
+ * Process per-turn modifier application, treaty bonuses, and natural decay.
+ *
+ * Per design/diplomacy/relationship-formulas.md §12:
+ *   1. Apply action-based changes (modifiers) from this turn
+ *   2. Apply treaty maintenance bonuses
+ *   3. Apply natural decay toward racial baseline
+ *   4. Apply border friction (TODO: requires contested systems data)
+ *   5. Clamp to [-100, +100]
+ *   6. Re-compute the state label
  */
 export function processRelations(state: GameState): GameState {
   const empiresCopy: Record<EmpireId, Empire> = {};
@@ -180,14 +339,17 @@ export function processRelations(state: GameState): GameState {
     const empire = state.empires.byId[empireId];
     const oldRelations = empire.relations;
     const newRelations: Record<EmpireId, DiplomaticRelations> = {};
+    const empireRaceId = empire.raceId;
 
     for (const targetId of Object.keys(oldRelations)) {
       if (targetId === empireId) continue;
 
       const relation = oldRelations[targetId];
+      const targetEmpire = state.empires.byId[targetId];
+      const targetRaceId = targetEmpire?.raceId ?? 'hamsters';
       const turn = state.turn;
 
-      // 1. Sum modifiers, drop expired ones
+      // Step 1: Sum modifiers, drop expired ones
       let modifierSum = 0;
       const activeModifiers: RelationModifier[] = [];
       for (const mod of relation.modifiers) {
@@ -200,13 +362,27 @@ export function processRelations(state: GameState): GameState {
 
       let newValue = clamp(relation.value + modifierSum);
 
-      // 2. Decay toward neutral (0)
-      const decayAmount = Math.floor(
-        (newValue - RELATION_NEUTRAL) * DECAY_RATE,
-      );
+      // Step 2: Apply treaty maintenance bonuses (fractional accumulation)
+      const treatyBonus = calculateTreatyMaintenanceBonus(relation);
+      // Accumulate fractional bonus in the relation (simplified: apply floor per turn)
+      if (treatyBonus > 0) {
+        // For simplicity, accumulate and apply when >= 1
+        const accumulatedBonus = (relation.treatyBonusAccumulator ?? 0) + treatyBonus;
+        if (accumulatedBonus >= 1) {
+          newValue = clamp(newValue + Math.floor(accumulatedBonus));
+        }
+        // Store remainder for next turn (will be in updated relation)
+      }
+
+      // Step 3: Decay toward racial baseline (not neutral 0)
+      const baseline = getRacialBaseline(empireRaceId, targetRaceId);
+      const decayAmount = Math.floor((newValue - baseline) * DECAY_RATE);
       newValue = clamp(newValue - decayAmount);
 
-      // 3. & 4. Re-compute state
+      // Step 4: Border friction (TODO: requires contested systems tracking)
+      // This will be implemented when the territory system is in place
+
+      // Step 5 & 6: Re-compute state
       const newState = getDiplomaticState(newValue);
 
       newRelations[targetId] = {
@@ -215,6 +391,8 @@ export function processRelations(state: GameState): GameState {
         state: newState,
         modifiers: activeModifiers,
         lastContact: turn,
+        treatyBonusAccumulator:
+          treatyBonus > 0 ? ((relation.treatyBonusAccumulator ?? 0) + treatyBonus) % 1 : 0,
       };
     }
 
@@ -246,11 +424,63 @@ export function getRelationValue(
   return relation.value;
 }
 
-// ── War Weariness ─────────────────────────────────────────────────────────────
+// ── War Weariness (design/diplomacy/relationship-formulas.md §4) ──────────────
 
 /**
- * Calculate the war weariness penalty for an empire based on active wars.
- * Returns the total morale penalty from all active wars.
+ * War weariness data tracked per empire for accurate calculation.
+ * This interface represents the inputs needed for the full formula.
+ */
+export interface WarWearinessInputs {
+  turnsAtWar: number;
+  shipsLost: { small: number; medium: number; large: number; huge: number };
+  populationLost: number;
+  warMaintenanceCost: number;
+  totalIncome: number;
+}
+
+/**
+ * Calculate war weariness for a single conflict.
+ * Per design/diplomacy/relationship-formulas.md §4.1:
+ *   WarWeariness = BaseDuration + CasualtyFactor + EconomicStrain
+ *
+ * Where:
+ *   BaseDuration = floor(TurnsAtWar / 10)
+ *   CasualtyFactor = floor(ShipsLost × ShipWeight + PopulationLost × 0.01)
+ *   EconomicStrain = floor((WarMaintenanceCost / TotalIncome) × 20)
+ */
+export function calculateWarWearinessForConflict(
+  inputs: WarWearinessInputs,
+  raceId: RaceId,
+): number {
+  const { turnsAtWar, shipsLost, populationLost, warMaintenanceCost, totalIncome } = inputs;
+
+  // BaseDuration = floor(TurnsAtWar / 10)
+  const baseDuration = Math.floor(turnsAtWar / WAR_WEARINESS_INTERVAL);
+
+  // CasualtyFactor = floor(ShipsLost × ShipWeight + PopulationLost × 0.01)
+  const shipCasualties =
+    shipsLost.small * SHIP_WEIGHT.small +
+    shipsLost.medium * SHIP_WEIGHT.medium +
+    shipsLost.large * SHIP_WEIGHT.large +
+    shipsLost.huge * SHIP_WEIGHT.huge;
+  const casualtyFactor = Math.floor(shipCasualties + populationLost * 0.01);
+
+  // EconomicStrain = floor((WarMaintenanceCost / TotalIncome) × 20)
+  const economicStrain =
+    totalIncome > 0 ? Math.floor((warMaintenanceCost / totalIncome) * 20) : 0;
+
+  // Total weariness before racial modifier
+  const rawWeariness = baseDuration + casualtyFactor + economicStrain;
+
+  // Apply racial multiplier (§4.2)
+  const racialMultiplier = RACIAL_WAR_WEARINESS_MULTIPLIERS[raceId] ?? 1.0;
+  return Math.floor(rawWeariness * racialMultiplier);
+}
+
+/**
+ * Calculate the total war weariness for an empire across all active wars.
+ * Simplified version that uses turn-based duration when detailed casualty
+ * data is not available.
  */
 export function calculateWarWeariness(
   state: GameState,
@@ -260,6 +490,7 @@ export function calculateWarWeariness(
   if (!empire) return 0;
 
   let totalWeariness = 0;
+  const raceId = empire.raceId;
 
   for (const otherId of Object.keys(empire.relations)) {
     if (otherId === empireId) continue;
@@ -270,27 +501,42 @@ export function calculateWarWeariness(
     // Check if at war (state is 'war' and warStartTurn is set)
     if (rel.state === 'war' && rel.warStartTurn !== null) {
       const turnsAtWar = state.turn - rel.warStartTurn;
-      // 1 morale penalty per turn at war, capped at 20 per war
-      const weariness = Math.min(turnsAtWar * WAR_WEARINESS_MORALE_PER_TURN, WAR_WEARINESS_MAX_PENALTY);
+
+      // Simplified calculation when detailed casualty data unavailable:
+      // Use BaseDuration with racial multiplier
+      const baseDuration = Math.floor(turnsAtWar / WAR_WEARINESS_INTERVAL);
+      const racialMultiplier = RACIAL_WAR_WEARINESS_MULTIPLIERS[raceId] ?? 1.0;
+      const weariness = Math.floor(baseDuration * racialMultiplier);
+
       totalWeariness += weariness;
     }
   }
 
-  // Global cap at 20 total (sum of all wars)
-  return Math.min(totalWeariness, WAR_WEARINESS_MAX_PENALTY);
+  return totalWeariness;
 }
 
 /**
  * Calculate the production penalty percentage from war weariness.
- * Returns a percentage reduction (e.g., 8 means -8% production).
+ * Per design/diplomacy/relationship-formulas.md §4.1 War Weariness Scale:
+ *   0-10:   0% (Fresh)
+ *   11-25:  -5% (Tired)
+ *   26-50:  -10% (Weary)
+ *   51-75:  -15% (Exhausted)
+ *   76-100: -20% (Critical)
+ *   100+:   -25% (Desperate)
  */
 export function calculateWarWearinessProductionPenalty(
   state: GameState,
   empireId: EmpireId,
 ): number {
   const weariness = calculateWarWeariness(state, empireId);
-  // 2% production penalty per 5 morale points lost
-  return Math.floor(weariness / 5) * WAR_WEARINESS_PRODUCTION_PENALTY_PER_5_MORALE;
+
+  if (weariness <= 10) return 0;        // Fresh
+  if (weariness <= 25) return 5;        // Tired
+  if (weariness <= 50) return 10;       // Weary
+  if (weariness <= 75) return 15;       // Exhausted
+  if (weariness <= 100) return 20;      // Critical
+  return 25;                             // Desperate
 }
 
 /**

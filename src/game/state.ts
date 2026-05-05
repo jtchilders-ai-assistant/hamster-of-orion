@@ -639,7 +639,8 @@ export interface DiplomaticRelations {
   modifiers: RelationModifier[];
   /** Incoming treaty proposals from other empires (for the player to accept/reject). */
   incomingProposals: Array<{ type: TreatyType; fromEmpireId: EmpireId; proposedTurn: number }>;
-
+  /** Accumulated fractional treaty bonus (0-1) carried over between turns. */
+  treatyBonusAccumulator?: number;
 }
 
 export interface CouncilVote {
