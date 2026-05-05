@@ -25,17 +25,34 @@ Population is the fundamental resource. More population = more factory operators
 ## Population and Production
 
 **Operating Factories**: Population operates factories at a ratio determined by Robotic Controls technology:
-- Base: 2 factories per population
-- With tech upgrades: Up to 7 factories per population
+- Base: 2 factories per population (Robotic Controls II, starting tech)
+- With tech upgrades: Up to 7 factories per population (Robotic Controls VII)
+- **Mice (Meklars) Special**: +2 effective RC level (start with 4 factories/pop)
 
-**Direct Production**: Each population unit also contributes 0.5 BC of base production (representing manual labor).
+See `../economy/factory-formulas.md` §1 for the complete Robotic Controls table.
 
-**Formula**:
+**Direct Production**: Each population unit contributes labor output that scales with Planetology technology:
+
 ```
-Total_Production = (Operating_Factories × 1 BC) + (Population × 0.5 BC)
-Total_Production *= Mineral_Richness_Modifier
-Total_Production *= Racial_Production_Modifier
+Base_Pop_Output = 0.5 + (Planetology_TL / 50 × 1.5)
+  # At TL 0:  0.50 BC/pop (game start)
+  # At TL 25: 1.25 BC/pop
+  # At TL 50: 2.00 BC/pop (maximum)
 ```
+
+This represents improvements in agricultural efficiency and industrial tools from environmental research.
+
+**Formula** (see `../economy/factory-formulas.md` §3 for complete details):
+```
+Factory_Production = Operating_Factories × 1.0 × Racial_Production_Modifier × Factory_Efficiency_Modifier
+Population_Production = Active_Population × Base_Pop_Output × Racial_Production_Modifier
+Total_Production = (Factory_Production + Population_Production) × Mineral_Richness_Modifier
+```
+
+**Notes:**
+- `Active_Population` = Population not diverted to TECH slider (scientists don't contribute labor)
+- `Factory_Efficiency_Modifier` = 1.0 for most races; Mice have 1.5× from "Automated Production" ability
+- Mineral richness ranges from 0.33× (Ultra Poor) to 3.0× (Ultra Rich)
 
 ---
 
