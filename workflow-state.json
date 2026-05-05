@@ -1,60 +1,71 @@
 {
-  "state": "TESTING",
+  "state": "COMPLETED",
   "phase": "phase5-design-compliance-fixes",
-  "current_task": "fix-82",
-  "last_check": "2026-05-05T03:33:00.000Z",
+  "current_task": "fix-57",
+  "last_check": "2026-05-05T03:40:00.000Z",
   "total_tasks": 85,
-  "completed_count": 14,
+  "completed_count": 15,
   "skipped_count": 0,
   "blocked_count": 0,
-  "notes": "fix-82 completed: Implemented Star Gate travel mechanics per design/galaxy/travel.md and design/planets/buildings.md in fleet.ts",
+  "notes": "fix-57 completed: Star Gate travel + fuel range integration per design/galaxy/travel.md. Star gates use ETA=1 instant travel. getFleetFuelRange() uses actual fuel cells + bonus tanks instead of hardcoded 50 in StarMap.",
   "worker_output": {
     "files_created": [],
     "files_modified": [
       "src/game/systems/fleet.ts",
+      "src/ui/components/StarMap.ts",
       "test/game/systems/fleet.test.ts"
     ],
     "tests_added": [
-      "systemHasStarGate returns false if system has no planets",
-      "systemHasStarGate returns false if planet has no star gate",
-      "systemHasStarGate returns true if planet has star gate owned by empire",
-      "systemHasStarGate returns false if star gate planet owned by different empire",
-      "systemHasStarGate returns false for uncolonized planet with star gate",
-      "canUseStarGateTravel returns true when both systems have star gates",
-      "canUseStarGateTravel returns false when origin has no star gate",
-      "canUseStarGateTravel returns false when destination has no star gate",
-      "canUseStarGateTravel returns false when neither system has star gate",
-      "canUseStarGateTravel returns false when destination gate owned by different empire",
-      "calculateEta returns ETA=1 for star gate travel regardless of distance",
-      "moveFleet sets ETA=1 when using star gate travel"
+      "systemHasStarGate: returns false if system has no planets",
+      "systemHasStarGate: returns false if planet has no star gate",
+      "systemHasStarGate: returns true if planet has star gate owned by empire",
+      "systemHasStarGate: returns false if star gate planet owned by different empire",
+      "systemHasStarGate: returns false for uncolonized planet with star gate",
+      "canUseStarGateTravel: returns true when both systems have star gates",
+      "canUseStarGateTravel: returns false when origin has no star gate",
+      "canUseStarGateTravel: returns false when destination has no star gate",
+      "canUseStarGateTravel: returns false when destination gate owned by different empire",
+      "calculateEta: returns ETA=1 for star gate travel regardless of distance",
+      "calculateEta: returns normal ETA when star gates not available",
+      "moveFleet: sets ETA=1 when using star gate travel",
+      "getShipFuelRange: returns base range from fuel cell (standard = 4 parsecs)",
+      "getShipFuelRange: returns base + bonus for fuel cell + reserve tanks (+3)",
+      "getShipFuelRange: returns base + bonus for fuel cell + extended tanks (+5)",
+      "getShipFuelRange: returns Infinity for ship with thorium_cells",
+      "getFleetFuelRange: returns the minimum range ship in the fleet",
+      "getFleetFuelRange: returns Infinity if all ships have unlimited range"
     ],
-    "summary": "Implemented Star Gate instant travel mechanics in fleet.ts. Added systemHasStarGate() to check if a system has a planet with a star gate building owned by a given empire. Added canUseStarGateTravel() to verify both origin and destination have gates. Modified calculateEta() to return ETA=1 for star gate travel (instant). Added 12 unit tests verifying star gate behavior per design docs.",
+    "summary": "Implemented Star Gate travel and fuel range per design/galaxy/travel.md. Added systemHasStarGate(), canUseStarGateTravel(), getShipFuelRange(), getFleetFuelRange() to fleet.ts. calculateEta() now returns 1 turn for star gate travel. StarMap.ts uses actual fleet fuel range instead of hardcoded 50 for pathfinding. Note: extended_reserve_tanks uses bonusRange=5 per components-complete.md (travel.md says +6 - design gap documented).",
     "design_compliance": [
       {
         "doc": "design/galaxy/travel.md",
         "section": "§Star Gates",
-        "quote": "Ships travel instantly between any two planets with Star Gates",
+        "quote": "Ships travel instantly between any gated planets. Ignores fuel range for gate-to-gate travel.",
         "impl_file": "src/game/systems/fleet.ts",
-        "impl_line": 175,
+        "impl_line": "canUseStarGateTravel(), calculateEta()",
         "verified": true
       },
       {
         "doc": "design/galaxy/travel.md",
-        "section": "§Star Gates",
-        "quote": "Ignores fuel range for gate-to-gate travel",
+        "section": "§Reserve Fuel Tanks",
+        "quote": "Reserve Fuel Tanks: +3 parsecs to ship range",
         "impl_file": "src/game/systems/fleet.ts",
-        "impl_line": 126,
+        "impl_line": "getShipFuelRange()",
         "verified": true
       },
       {
-        "doc": "design/planets/buildings.md",
-        "section": "§Star Gates",
-        "quote": "Ships can travel instantly between any two planets with Star Gates",
-        "impl_file": "src/game/systems/fleet.ts",
-        "impl_line": 175,
+        "doc": "design/ships/components-complete.md",
+        "section": "§Reserve Fuel Tank table",
+        "quote": "Extended Reserve Tank | 15 | +5 range",
+        "impl_file": "src/data/components.json",
+        "impl_line": "extended_reserve_tanks bonusRange: 5",
         "verified": true
       }
     ],
-    "design_gaps": []
+    "design_gaps": [
+      {
+        "gap": "Extended Fuel Tank range bonus conflict: design/galaxy/travel.md says +6 parsecs, design/ships/components-complete.md says +5 range. Implementation uses +5 (components-complete.md as more specific spec). Needs human review to resolve canonical value."
+      }
+    ]
   }
 }
