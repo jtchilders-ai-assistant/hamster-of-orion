@@ -1,3 +1,3 @@
-# Current Task: fix-72 — Renderer Fixes
+# Current Task: fix-71 — InfoPanel Fixes
 
-**ID**: fix-72 | **Severity**: low | **Source**: src/ui/canvas/renderer.ts
+**ID**: fix-71 | **Severity**: low | **Source**: src/ui/components/InfoPanel.ts

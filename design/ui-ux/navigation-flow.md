@@ -600,6 +600,7 @@ F-keys are available from **all main screens** (F1–F7). Pressing any F-key fro
 | `F4` | Technology Screen |
 | `F5` | Races Screen (Diplomacy) |
 | `F6` | Ship Design |
+| `F7` | Reports (Empire Statistics) |
 | `F8` | High Council (only when Council is in session; otherwise no-op) |
 
 ### Galaxy Map Letter Shortcuts

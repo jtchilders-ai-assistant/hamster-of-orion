@@ -1262,6 +1262,124 @@ function activateBlackHoleGenerator(
   return destroyed;
 }
 
+// ── Missile Base Combat Participation ────────────────────────────────────────
+
+/**
+ * Select target for missile bases using design-specified priority.
+ *
+ * Per design/ships/combat-mechanics.md §Missile Bases - Targeting Priority:
+ *   1. Bombers (ships with bombs equipped)
+ *   2. Troop transports
+ *   3. Largest enemy ships
+ *   4. Closest enemy ships (default: use first available)
+ *
+ * @param enemies  Attacking ships to target
+ * @returns  The highest-priority target, or undefined if none available
+ */
+function selectMissileBaseTarget(enemies: CombatShip[]): CombatShip | undefined {
+  const living = enemies.filter((s) => s.hp > 0 && !s.retreated && !s.displaced);
+  if (living.length === 0) return undefined;
+
+  // Priority 1: Bombers (look for bomb-equipped ships)
+  const bombers = living.filter((s) =>
+    s.weapons.some((w) => w.name.toLowerCase().includes('bomb'))
+  );
+  if (bombers.length > 0) {
+    return bombers.reduce((best, s) => (s.hp > best.hp ? s : best), bombers[0]);
+  }
+
+  // Priority 2: Troop transports (not currently modeled in CombatShip)
+  // Skip for now - would check for troop capacity
+
+  // Priority 3: Largest enemy ships
+  const sizeOrder: Record<HullSize, number> = { small: 1, medium: 2, large: 3, huge: 4 };
+  living.sort((a, b) => sizeOrder[b.hullSize] - sizeOrder[a.hullSize]);
+
+  // Return largest ship
+  return living[0];
+}
+
+/**
+ * Fire missile base volleys at attacking ships.
+ *
+ * Per design/ships/combat-mechanics.md §Missile Bases:
+ *   - Each base fires 3 missile volleys per combat round
+ *   - Missiles use standard hit formula with base's Battle Computer
+ *   - Enemy point defense can intercept missiles
+ *   - Missiles that hit deal standard missile damage
+ *   - Bases cannot retreat
+ *   - Bases continue firing even if all ships retreat
+ *
+ * @param bases    Missile base participant (contains count, weapon, attackRating)
+ * @param enemies  Attacking ships to target
+ * @param state    Combat state for logging and missile tracking
+ */
+function missileBasesAct(
+  bases: MissileBaseParticipant,
+  enemies: CombatShip[],
+  state: CombatState,
+): void {
+  if (bases.count <= 0) return;
+
+  const target = selectMissileBaseTarget(enemies);
+  if (!target) return;
+
+  // Each base fires volleysPerRound volleys (default 3)
+  const volleysPerBase = bases.volleysPerRound ?? 3;
+  const totalVolleys = bases.count * volleysPerBase;
+
+  state.log.push({
+    round: state.round,
+    message: `[R${state.round}] ${bases.count} Missile Base(s) fire ${totalVolleys} volleys at ${target.designId}`,
+  });
+
+  // Fire each volley
+  for (let i = 0; i < totalVolleys; i++) {
+    // Re-select target if current target is destroyed
+    const currentTarget = target.hp > 0 ? target : selectMissileBaseTarget(enemies);
+    if (!currentTarget) break;
+
+    // Calculate hit chance for missile base
+    // Per design: uses standard missile formula with base's Battle Computer
+    // Missile hit: 80 - (ECM_rating × 5) - (maneuver_rating × 2)
+    let hitChance = 80;
+    if (currentTarget.ecmRating) {
+      hitChance -= currentTarget.ecmRating * 5;
+    }
+    hitChance -= currentTarget.defenseRating * 2;
+    // Add base's attack rating bonus
+    hitChance += bases.attackRating * 5;
+    hitChance = Math.min(95, Math.max(10, hitChance));
+
+    const d100 = roll(1, 100);
+    if (d100 <= hitChance) {
+      // Check Displacement Device
+      if (checkDisplacementDevice(currentTarget, state.log, state.round)) {
+        continue;
+      }
+
+      // Roll damage
+      const damage = bases.weapon.damageMin === bases.weapon.damageMax
+        ? bases.weapon.damageMin
+        : roll(bases.weapon.damageMin, bases.weapon.damageMax);
+
+      applyDamage(currentTarget, damage, bases.weapon);
+      state.log.push({
+        round: state.round,
+        message: `[R${state.round}] Missile Base HIT ${currentTarget.designId} for ${damage} dmg → ${currentTarget.hp}/${currentTarget.maxHp} HP`,
+      });
+
+      // Apply weapon effects (crew kills, overflow, etc.)
+      applyWeaponEffects(currentTarget, bases.weapon, damage, state, state.log);
+    } else {
+      state.log.push({
+        round: state.round,
+        message: `[R${state.round}] Missile Base MISS ${currentTarget.designId} (roll ${d100} > ${hitChance}%)`,
+      });
+    }
+  }
+}
+
 // ── Ship action (fire all weapons at target) ──────────────────────────────────
 
 function shipActs(
@@ -1584,6 +1702,15 @@ export function processRound(state: CombatState): CombatState {
       ship.side === 'attacker' ? state.defenderShips : state.attackerShips;
 
     shipActs(ship, enemies, state.round, state.log, state);
+  }
+
+  // Missile bases fire after all ships have acted
+  // Per design/ships/combat-mechanics.md §Missile Bases:
+  //   - Bases fire 3 volleys per combat round
+  //   - Bases continue firing even if all ships retreat
+  //   - Cannot retreat
+  if (state.missileBases && state.missileBases.count > 0) {
+    missileBasesAct(state.missileBases, state.attackerShips, state);
   }
 
   // Process missiles in flight (interception happens here)

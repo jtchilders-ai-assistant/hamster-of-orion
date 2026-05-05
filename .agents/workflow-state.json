@@ -1,43 +1,44 @@
 {
   "state": "COMPLETED",
   "phase": "phase5-design-compliance-fixes",
-  "current_task": "fix-60",
-  "last_check": "2026-05-05T02:58:00.000Z",
+  "current_task": "fix-73",
+  "last_check": "2026-05-05T03:14:00.000Z",
   "total_tasks": 85,
-  "completed_count": 8,
+  "completed_count": 9,
   "skipped_count": 0,
   "blocked_count": 0,
-  "notes": "fix-60 completed: Production design doc fixes - ECO priority order corrected to match slider-mathematics.md and implementation, ship display format fixed",
+  "notes": "fix-73 completed: Navigation flow design doc fixes - added F7 Reports to F-key table, restored Reports Screen section in screen-inventory.md",
   "worker_output": {
     "files_created": [],
     "files_modified": [
-      "design/planets/production.md"
+      "design/ui-ux/navigation-flow.md",
+      "design/ui-ux/screen-inventory.md"
     ],
     "tests_added": [],
-    "summary": "Fixed design/planets/production.md to match authoritative slider-mathematics.md and actual code: (1) ECO priority order corrected from 'cleanup→terraform→growth' to 'cleanup→growth→terraform', (2) Ship display format fixed from '(Ship Name) & Turns' to '{Ship Name} {Turns}' to match example and implementation",
+    "summary": "Fixed design doc inconsistencies: (1) Added missing F7 Reports entry to navigation-flow.md Section 9 F-key table, (2) Restored Reports Screen section in screen-inventory.md (was incorrectly marked REMOVED but ReportsScreen.ts exists and is wired). Code already correctly routes MAP to separate 'map' screen (was fixed in commit b149fe3).",
     "design_compliance": [
       {
-        "doc": "design/economy/slider-mathematics.md",
-        "section": "§ECO Spending Priority",
-        "quote": "1. Pollution Cleanup, 2. Population Growth Bonus, 3. Terraforming",
-        "impl_file": "design/planets/production.md",
-        "impl_line": "§4. Ecology - Strategy",
+        "doc": "design/ui-ux/interaction-spec.md",
+        "section": "§2.1 Global Shortcuts",
+        "quote": "F7 | Reports | Switch to statistics/reports",
+        "impl_file": "design/ui-ux/navigation-flow.md",
+        "impl_line": "§9 F-Key Navigation table",
         "verified": true
       },
       {
-        "doc": "src/game/systems/production.ts",
-        "section": "processEcoPhases()",
-        "quote": "Phase 1: Pollution cleanup, Phase 2: Population growth bonus, Phase 3: Terraforming",
-        "impl_file": "design/planets/production.md",
-        "impl_line": "§4. Ecology - Strategy",
+        "doc": "design/ui-ux/interaction-spec.md",
+        "section": "§2.1 Global Shortcuts",
+        "quote": "F7 = Reports",
+        "impl_file": "src/ui/app.ts",
+        "impl_line": "F_KEY_MAP: F7: 'reports'",
         "verified": true
       },
       {
-        "doc": "src/ui/screens/ColoniesScreen.ts",
-        "section": "getBuildingDescription()",
-        "quote": "return `${design.name} ${turnsRemaining}`",
-        "impl_file": "design/planets/production.md",
-        "impl_line": "§1. Ship Construction - Display Text",
+        "doc": "design/ui-ux/navigation-flow.md",
+        "section": "§4.5 MAP Screen",
+        "quote": "The MAP button opens a **separate full-screen MAP view**",
+        "impl_file": "src/ui/screens/MapScreen.ts",
+        "impl_line": "MapScreen class with mode filters",
         "verified": true
       }
     ],

@@ -415,29 +415,25 @@ Each field researches exactly one tech at a time. See `wireframes/research-tree.
 
 ---
 
-### 2.8 ~~Reports Screen~~ (REMOVED)
+### 2.8 Reports Screen (F7)
 
-> **REMOVED (2026-04-12):** F7 Reports was not in MOO1 and was never properly defined. 
-> The command bar follows MOO1: GAME/DESIGN/FLEET/MAP/RACES/PLANETS/TECH.
-> F7 = Tech Screen.
+> **RESTORED (2026-05-04):** Reports Screen is implemented as a HoO enhancement. While MOO1 didn't have a
+> dedicated reports screen, HoO adds F7 Reports as a hub for empire statistics and analysis.
+> Per `interaction-spec.md §2.1`: F7 = Reports.
 
-<!--
 | Aspect | MOO1 | HoO Status | Notes |
 |--------|------|------------|-------|
-| Empire Summary | ✓ | ✅ Documented | |
-| Economic Stats | ✓ | ✅ Documented | |
-| Military Stats | ✓ | ✅ Documented | |
-| Research Stats | ✓ | ✅ Documented | |
-| Population Graphs | ✓ | ✅ Documented | |
-| Production Graphs | ✓ | ✅ Documented | |
-| Fleet Strength Graphs | ✓ | ✅ Documented | |
-| Tech Level Comparison | ✓ | ✅ Documented | |
-| Empire Rankings | ✓ | ✅ Documented | |
-| Victory Progress | N/A in MOO1 | ✅ Added | HoO enhancement |
-| Score Display | ✓ | ✅ Documented | |
--->
+| Empire Dashboard | N/A | ✅ Implemented | Overview of empire status |
+| Charts & Statistics | N/A | ✅ Implemented | Trends and graphs |
+| Technology Reports | N/A | ✅ Implemented | Tech analysis |
+| Score Breakdown | N/A | ✅ Implemented | Empire rankings |
+| Combat History | N/A | ✅ Implemented | Battle log |
+| Diplomatic Matrix | N/A | ✅ Implemented | Relations grid |
+| Hall of Fame | N/A | ✅ Implemented | Records and achievements |
 
-**Status:** REMOVED — Not in MOO1. Info integrated into other screens.
+**HoO Location:** `src/ui/screens/ReportsScreen.ts`
+
+**Status:** ✅ Implemented — HoO enhancement (not in MOO1).
 
 ---
 
