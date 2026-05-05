@@ -1,11 +1,30 @@
 {
   "state": "COMPLETED",
   "phase": "phase5-design-compliance-fixes",
-  "current_task": "fix-61",
-  "last_check": "2025-05-05T03:15:00.000Z",
+  "current_task": "fix-76",
+  "last_check": "2026-05-05T03:15:00.000Z",
   "total_tasks": 85,
-  "completed_count": 9,
+  "completed_count": 12,
   "skipped_count": 0,
   "blocked_count": 0,
-  "notes": "fix-61 completed: Combat mechanics design doc fixes - shield regeneration documentation and missile base combat participation"
+  "notes": "fix-76 completed: Updated ground-combat-ui.md transport ship capacity table to match ship-costs.md §16B authoritative values",
+  "worker_output": {
+    "files_created": [],
+    "files_modified": [
+      "design/ui-ux/ground-combat-ui.md"
+    ],
+    "tests_added": [],
+    "summary": "Fixed transport ship capacity display in ground-combat-ui.md §6 to match authoritative source ship-costs.md §16B. Old values (Small: 1, Large: 4) replaced with correct Military Transport values (Light: 5, Heavy: 10, Assault: 20). Also clarified distinction between Military Transports (troops) and Colony Transports (population), and updated Fleet Deployment wireframe example to show realistic troop counts.",
+    "design_compliance": [
+      {
+        "doc": "design/economy/ship-costs.md",
+        "section": "§16B Military (Troop) Transports",
+        "quote": "Light Transport: 5 troops, Heavy Transport: 10 troops, Assault Transport: 20 troops",
+        "impl_file": "design/ui-ux/ground-combat-ui.md",
+        "impl_line": "§6 Troop Sources and Transport Ships",
+        "verified": true
+      }
+    ],
+    "design_gaps": []
+  }
 }

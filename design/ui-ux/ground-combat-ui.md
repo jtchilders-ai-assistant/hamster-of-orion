@@ -250,13 +250,17 @@ After a successful COLONIZE, the captured planet transitions immediately into yo
 ## 6. Troop Sources and Transport Ships
 
 ### How Troops Get There
-Troops are carried in **Transport Ships** (a dedicated ship class built at colonies):
+Troops are carried in **Military Transport Ships** (built at colonies). These are distinct from Colony Transports used for population transfer.
 
-| Ship Type | Troop Capacity | Notes |
-|-----------|---------------|-------|
-| Transport (Small) | 1 troop | Basic; cheap |
-| Transport (Large) | 4 troops | Efficient; MOO1 standard |
-| Colony Ship (modified) | 1 troop | Not efficient; avoid |
+See `design/economy/ship-costs.md` §16B for authoritative costs and capacities:
+
+| Transport Type | Cost | Maintenance | Troop Capacity |
+|----------------|------|-------------|----------------|
+| Light Transport | 50 BC | 1 BC/turn | 5 troops |
+| Heavy Transport | 100 BC | 2 BC/turn | 10 troops |
+| Assault Transport | 200 BC | 4 BC/turn | 20 troops |
+
+**Note:** Colony Ships (population transports) are civilian vessels and cannot carry military troops.
 
 ### Transport Ships in Fleet Deployment
 When deploying a fleet that includes transports, the Fleet Deployment panel shows:
@@ -267,17 +271,18 @@ When deploying a fleet that includes transports, the Fleet Deployment panel show
 │                               │
 │  ┌───────┐  ┌───────┐        │
 │  │WARSHIP│  │TRANSP.│        │
-│  │    3  │  │    2  │  12 🪖  │
+│  │    3  │  │    2  │  15 🪖  │
 │  └───────┘  └───────┘        │
 │  (select all for deployment)  │
 │                               │
-│  Troops aboard: 8 total       │
+│  Troops aboard: 15 total      │
+│  (1× Heavy: 10, 1× Light: 5)  │
 │                               │
 │  [CANCEL]       [ACCEPT]      │
 └───────────────────────────────┘
 ```
 
-The `🪖 12` badge shows total troops available in the transport ships in this fleet.
+The `🪖 15` badge shows total troops available in the transport ships in this fleet.
 
 ---
 
