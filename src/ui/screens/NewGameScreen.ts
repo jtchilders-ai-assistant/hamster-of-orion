@@ -60,6 +60,7 @@ export class NewGameScreen {
   private wizard: WizardState;
 
   constructor(container: HTMLElement, store: Store<GameState>) {
+    console.log('[NewGameScreen] Constructor called');
     this.container = container;
     this.container.id = 'new-game-screen';
     this.container.className = 'screen new-game-screen';
@@ -81,14 +82,23 @@ export class NewGameScreen {
     };
 
     this.container.style.display = 'none';
+    console.log('[NewGameScreen] Container display set to none, initial DOM: tag=', container?.tagName, 'id=', container?.id);
   }
 
   // ── Screen interface ────────────────────────────────────────────────────────
 
   show(): void {
+    console.log('[NewGameScreen.show] Setting display to flex, current display:', this.container.style.display);
     this.container.style.display = 'flex';
+    console.log('[NewGameScreen.show] After setting flex, actual display:', this.container.style.display);
     this.wizard.step = 1;
     this.renderCurrentStep();
+    console.log('[NewGameScreen.show] After render, container innerHTML length:', this.container.innerHTML.length);
+    // Log computed styles
+    if (typeof window !== 'undefined') {
+      const computed = window.getComputedStyle(this.container);
+      console.log('[NewGameScreen.show] Computed: display=', computed.display, 'visibility=', computed.visibility, 'opacity=', computed.opacity);
+    }
   }
 
   hide(): void {

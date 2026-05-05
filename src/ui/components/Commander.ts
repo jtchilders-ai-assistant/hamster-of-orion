@@ -29,11 +29,13 @@ export class Commander {
   private readonly _app: App;
 
   constructor(container: HTMLElement, store: Store<GameState>) {
+    console.log('[Commander] Creating, container:', container?.id || container?.tagName, 'children:', container?.children.length);
     this._container = container;
     this.store = store;
     // Initialize the App (screen router, command bar, keyboard nav, turn processing)
     this._app = new App(store);
     console.log('[Commander] App instantiated, container:', container?.id || container?.tagName);
+    console.log('[Commander] Store currentScreen after App construction:', store.getState().currentScreen);
     // Note: Keyboard handling is now fully in App — no duplicate listeners here
   }
 

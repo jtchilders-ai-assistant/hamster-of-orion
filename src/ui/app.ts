@@ -75,13 +75,18 @@ export class App {
   private victoryActive: boolean = false;
 
   constructor(store: Store<GameState>) {
+    console.log('[App] Constructor called');
     this.store = store;
     this.currentScreen = store.getState().currentScreen;
+    console.log('[App] Store currentScreen:', this.currentScreen);
 
     const root = this.ensureRoot();
+    console.log('[App] Root element:', root?.id ?? 'null', 'children:', root?.children.length);
 
     // Build screen containers and instances
     this.screens = this.buildScreens(root, store);
+    console.log('[App] Screens map built with', this.screens.size, 'screens');
+    console.log('[App] Screen types:', Array.from(this.screens.keys()).join(', '));
 
     // Persistent command bar — rendered outside any screen container
     const cmdContainer = this.ensureCommandBarContainer(root);
@@ -97,8 +102,19 @@ export class App {
     store.subscribe((state) => this.onStateChange(state));
 
     // Show and render initial screen
-    this.screens.get(this.currentScreen)?.show();
+    console.log('[App] About to show screen:', this.currentScreen);
+    const screenToShow = this.screens.get(this.currentScreen);
+    console.log('[App] Screen instance found:', !!screenToShow);
+    screenToShow?.show();
+    console.log('[App] After show(), screen container display:', (screenToShow as any)?.container?.style?.display);
+    console.log('[App] DOM children after show():', root?.children.length);
+    Array.from(root?.children || []).forEach((child, i) => {
+      const style = (child as HTMLElement).style;
+      const cs = window.getComputedStyle(child as HTMLElement);
+      console.log(`[App]   child[${i}]: id="${child.id}", class="${child.className}", inlineDisplay=${style.display || '(none)'}, computedDisplay=${cs.display}, computedOpacity=${cs.opacity}`);
+    });
     this.onStateChange(store.getState());
+    console.log('[App] Constructor complete, currentScreen:', this.currentScreen);
   }
 
   // ── Private helpers ─────────────────────────────────────────────────────────
@@ -123,10 +139,13 @@ export class App {
   private makeScreenContainer(root: HTMLElement, id: string): HTMLElement {
     let el = root.querySelector<HTMLElement>(`#${id}`);
     if (!el) {
+      console.log('[App.makeScreenContainer] Creating new div for:', id);
       el = document.createElement('div');
       el.id = id;
       el.className = 'screen';
       root.appendChild(el);
+    } else {
+      console.log('[App.makeScreenContainer] Found existing div for:', id, 'className=', el.className);
     }
     return el;
   }
@@ -350,6 +369,7 @@ export class App {
   private onStateChange(state: GameState): void {
     const prevScreen = this.currentScreen;
     const prevTurnSummary = this.turnSummaryActive;
+    console.log('[App.onStateChange] prevScreen:', prevScreen, '-> newState:', state.currentScreen, 'isGameOver:', state.isGameOver, 'turnSummaryActive:', prevTurnSummary);
 
     // Victory screen — shown when game is over
     if (state.isGameOver && state.victoryResult) {
@@ -400,16 +420,30 @@ export class App {
 
     // Normal screen transition
     if (state.currentScreen !== this.currentScreen) {
+      console.log('[App.onStateChange] Screen transition:', this.currentScreen, '->', state.currentScreen);
       this.screens.get(this.currentScreen)?.hide();
       this.currentScreen = state.currentScreen;
-      this.screens.get(this.currentScreen)?.show();
+      const newScreen = this.screens.get(this.currentScreen);
+      console.log('[App.onStateChange] Showing new screen:', this.currentScreen, 'found:', !!newScreen);
+      newScreen?.show();
     }
 
     // Render active screen
-    this.screens.get(this.currentScreen)?.render(state);
+    const activeScreen = this.screens.get(this.currentScreen);
+    console.log('[App.onStateChange] Rendering active screen:', this.currentScreen);
+    activeScreen?.render(state);
 
     // Always render command bar (it's persistent)
     this.commandBar.render(state);
+
+    // Log final DOM state for debugging
+    const root = this.ensureRoot();
+    console.log('[App.onStateChange] Final DOM state - #app children:', root?.children.length);
+    Array.from(root?.children || []).forEach((child, i) => {
+      const el = child as HTMLElement;
+      const cs = window?.getComputedStyle ? window.getComputedStyle(el) : null;
+      console.log(`[App.onStateChange]   child[${i}]: id="${el.id}", class="${el.className}", display="${cs ? cs.display : '?'}", visibility="${cs ? cs.visibility : '?'}"`);
+    });
   }
 
   // ── End Turn with Confirmation ──────────────────────────────────────────

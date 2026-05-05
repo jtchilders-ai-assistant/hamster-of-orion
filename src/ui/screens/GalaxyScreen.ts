@@ -51,13 +51,21 @@ export class GalaxyScreen {
   }
 
   show(): void {
+    console.log('[GalaxyScreen.show] Before: display=', this.container.style.display, 'class=', this.container.className);
     this.container.style.display = '';
     this.container.classList.add('active');
+    console.log('[GalaxyScreen.show] After: display=', this.container.style.display, 'class=', this.container.className);
+    if (typeof window !== 'undefined') {
+      const cs = window.getComputedStyle(this.container);
+      console.log('[GalaxyScreen.show] Computed: display=', cs.display, 'visibility=', cs.visibility);
+    }
   }
 
   hide(): void {
+    console.log('[GalaxyScreen.hide] Before: display=', this.container.style.display, 'class=', this.container.className);
     this.container.style.display = 'none';
     this.container.classList.remove('active');
+    console.log('[GalaxyScreen.hide] After: display=', this.container.style.display, 'class=', this.container.className);
   }
 
   // ── Private ────────────────────────────────────────────────────────────────
