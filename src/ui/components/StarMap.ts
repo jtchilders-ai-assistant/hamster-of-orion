@@ -44,7 +44,7 @@ const FLEET_HIT_RADIUS = 16;
 
 export class StarMap {
   private readonly canvas: HTMLCanvasElement;
-  private readonly ctx: CanvasRenderingContext2D;
+  private ctx!: CanvasRenderingContext2D; // assigned in constructor or retry
   private readonly store: Store<GameState>;
 
   // Map from empire ID → display color (computed on first render)
@@ -54,21 +54,31 @@ export class StarMap {
     this.canvas = canvas;
     this.store = store;
 
+    // Get context — canvas must be in DOM with non-zero size for context to be valid
     const ctx = canvas.getContext('2d');
     if (!ctx) {
-      // Some browsers return null when canvas is not yet in the DOM or has 0×0 size.
-      // Create a tiny offscreen canvas as a safe fallback so construction doesn't throw.
-      const offscreen = document.createElement('canvas');
-      offscreen.width = 1;
-      offscreen.height = 1;
-      this.ctx = offscreen.getContext('2d')!;
+      // Canvas not in DOM yet or has 0×0 size — defer context acquisition
+      // We'll retry after the canvas is attached to the DOM and sized
+      this.retryContext();
     } else {
       this.ctx = ctx;
+      this.bindEvents();
+      this.resize();
+      window.addEventListener('resize', () => this.resize());
     }
+  }
 
-    this.bindEvents();
-    this.resize();
-    window.addEventListener('resize', () => this.resize());
+  // ── Retry context acquisition if canvas wasn't ready ───────────────────────
+  private retryContext(): void {
+    setTimeout(() => {
+      const ctx = this.canvas.getContext('2d');
+      if (ctx) {
+        this.ctx = ctx;
+        this.bindEvents();
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+      }
+    }, 100);
   }
 
   // ── Private ──────────────────────────────────────────────────────────────────
