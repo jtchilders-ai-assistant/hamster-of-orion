@@ -90,7 +90,8 @@ export class NewGameScreen {
   show(): void {
     console.log('[NewGameScreen.show] Setting display to flex, current display:', this.container.style.display);
     this.container.style.display = 'flex';
-    console.log('[NewGameScreen.show] After setting flex, actual display:', this.container.style.display);
+    this.container.classList.add('active');
+    console.log('[NewGameScreen.show] After setting flex and adding active, class=', this.container.className);
     this.wizard.step = 1;
     this.renderCurrentStep();
     console.log('[NewGameScreen.show] After render, container innerHTML length:', this.container.innerHTML.length);
