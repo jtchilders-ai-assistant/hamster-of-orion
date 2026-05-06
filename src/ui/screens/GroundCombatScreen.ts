@@ -86,6 +86,8 @@ export class GroundCombatScreen {
     this.container = container;
     this.store = store;
     this.buildLayout();
+    // Ensure container starts hidden — buildLayout sets display: flex
+    this.container.style.display = 'none';
   }
 
   // ═══════════════════════════════════════════════════════════════════════════

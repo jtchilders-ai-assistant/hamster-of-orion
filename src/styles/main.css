@@ -1352,7 +1352,7 @@ html, body {
 /* ── New Game / Wizard Screen ── */
 
 .new-game-screen {
-  display: flex;
+  /* display: flex inherited from .screen.active */
   align-items: center;
   justify-content: center;
   background: radial-gradient(ellipse at center, #0a1a2e 0%, #000a1a 100%);
@@ -1560,7 +1560,7 @@ html, body {
    ════════════════════════════════════════════════════════════════════════════ */
 
 .diplomatic-matrix-screen {
-  display: flex;
+  /* display: flex inherited from .screen.active */
   flex-direction: column;
   height: 100%;
   overflow: hidden;
@@ -1751,7 +1751,7 @@ html, body {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .reports-screen {
-  display: flex;
+  /* display: flex inherited from .screen.active */
   flex-direction: column;
   height: 100%;
   overflow: hidden;

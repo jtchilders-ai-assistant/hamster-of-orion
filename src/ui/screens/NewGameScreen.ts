@@ -95,10 +95,15 @@ export class NewGameScreen {
     this.wizard.step = 1;
     this.renderCurrentStep();
     console.log('[NewGameScreen.show] After render, container innerHTML length:', this.container.innerHTML.length);
-    // Log computed styles
+    // Log computed styles (immediate - opacity 0 is expected before animation completes)
     if (typeof window !== 'undefined') {
       const computed = window.getComputedStyle(this.container);
-      console.log('[NewGameScreen.show] Computed: display=', computed.display, 'visibility=', computed.visibility, 'opacity=', computed.opacity);
+      console.log('[NewGameScreen.show] Computed immediately: display=', computed.display, 'visibility=', computed.visibility, 'opacity=', computed.opacity);
+      // Check opacity again after animation should complete (250ms)
+      setTimeout(() => {
+        const postAnim = window.getComputedStyle(this.container);
+        console.log('[NewGameScreen.show] Computed after animation: opacity=', postAnim.opacity);
+      }, 250);
     }
   }
 
