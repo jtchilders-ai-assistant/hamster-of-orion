@@ -44,42 +44,60 @@ const FLEET_HIT_RADIUS = 16;
 
 export class StarMap {
   private readonly canvas: HTMLCanvasElement;
-  private ctx!: CanvasRenderingContext2D; // assigned in constructor or retry
+  private ctx!: CanvasRenderingContext2D;
   private readonly store: Store<GameState>;
 
   // Map from empire ID → display color (computed on first render)
   private empireColorMap: Map<string, string> = new Map();
 
+  // ResizeObserver to handle canvas being created while hidden (0×0)
+  private resizeObserver: ResizeObserver | null = null;
+  private lastKnownWidth = 0;
+  private lastKnownHeight = 0;
+
   constructor(canvas: HTMLCanvasElement, store: Store<GameState>) {
     this.canvas = canvas;
     this.store = store;
 
-    // Get context — canvas must be in DOM with non-zero size for context to be valid
+    // Use ResizeObserver to detect when canvas becomes visible/sized
+    // This handles the case where the canvas is created while hidden (0×0)
+    this.resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const { width, height } = entry.contentRect;
+        if (width > 0 && height > 0) {
+          // Set context and dimensions now that canvas is visible
+          if (!this.ctx || this.lastKnownWidth !== width || this.lastKnownHeight !== height) {
+            const ctx = this.canvas.getContext('2d');
+            if (ctx) {
+              this.ctx = ctx;
+              this.lastKnownWidth = width;
+              this.lastKnownHeight = height;
+              this.bindEvents();
+              this.resize();
+              // Immediately render with correct dimensions
+              const state = this.store.getState();
+              this.render(state);
+            }
+          }
+        }
+      }
+    });
+    this.resizeObserver.observe(this.canvas);
+
+    // If canvas already has a valid context and non-zero size, init immediately
     const ctx = canvas.getContext('2d');
-    if (!ctx) {
-      // Canvas not in DOM yet or has 0×0 size — defer context acquisition
-      // We'll retry after the canvas is attached to the DOM and sized
-      this.retryContext();
-    } else {
+    const rect = canvas.getBoundingClientRect();
+    if (ctx && rect.width > 0 && rect.height > 0) {
       this.ctx = ctx;
+      this.lastKnownWidth = rect.width;
+      this.lastKnownHeight = rect.height;
       this.bindEvents();
       this.resize();
       window.addEventListener('resize', () => this.resize());
     }
   }
 
-  // ── Retry context acquisition if canvas wasn't ready ───────────────────────
-  private retryContext(): void {
-    setTimeout(() => {
-      const ctx = this.canvas.getContext('2d');
-      if (ctx) {
-        this.ctx = ctx;
-        this.bindEvents();
-        this.resize();
-        window.addEventListener('resize', () => this.resize());
-      }
-    }, 100);
-  }
+  // ── Private ──────────────────────────────────────────────────────────────────
 
   // ── Private ──────────────────────────────────────────────────────────────────
 
