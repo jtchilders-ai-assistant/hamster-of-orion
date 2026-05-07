@@ -281,17 +281,16 @@ describe('calculateShipPower (design/technical/ai-implementation.md §1.3)', () 
     });
 
     const power = calculateShipPower(design);
-    // HP: 18 × 1.8 × 0.5 = 16.2 (zortrium = 1.8× per constants.ts)
-    // Total: floor(16.2) = 16
-    expect(power).toBe(16);
+    // HP: 18 × 2.0 × 0.5 = 18 (zortrium = 2.0× per ai-implementation.md §1.3)
+    // Total: floor(18) = 18
+    expect(power).toBe(18);
   });
 
-  it('matches worked example from design doc (adjusted for constants)', () => {
-    // From design doc:
-    // Large ship with Fusion Beams (20 dmg), Class V shields, Zortrium armor (2.0× in doc)
-    // Note: Our constants say zortrium = 1.8, so we test with that
-    // Ship_Power = floor((100 × 1.8 × 0.5) + (20 × 2.0) + (5 × 5) + (4 × 3))
-    //            = floor(90 + 40 + 25 + 12) = 167
+  it('matches worked example from design doc', () => {
+    // From design/technical/ai-implementation.md §1.3 worked example:
+    // Large ship with Fusion Beams (20 dmg), Class V shields, Zortrium armor (2.0×)
+    // Ship_Power = floor((100 × 2.0 × 0.5) + (20 × 2.0) + (5 × 5) + (4 × 3))
+    //            = floor(100 + 40 + 25 + 12) = 177
 
     const design = makeDesign('worked-example', {
       class: 'large', // 100 HP per HULL_BASE_HP
@@ -309,7 +308,7 @@ describe('calculateShipPower (design/technical/ai-implementation.md §1.3)', () 
           { name: 'Fusion Beam', damage: '20', range: 3, type: 'beam' },
         ],
         defense: {
-          armor: ARMOR_MULTIPLIERS['zortrium'], // 1.8 per constants
+          armor: ARMOR_MULTIPLIERS['zortrium'], // 2.0 per ai-implementation.md
           shields: 5,
           ecm: 0,
         },
@@ -318,12 +317,12 @@ describe('calculateShipPower (design/technical/ai-implementation.md §1.3)', () 
     });
 
     const power = calculateShipPower(design);
-    // HP: 100 × 1.8 × 0.5 = 90
+    // HP: 100 × 2.0 × 0.5 = 100
     // Weapons: 20 × 2.0 = 40
     // Shields: 5 × 5 = 25
     // Speed: 4 × 3 = 12
-    // Total: floor(90 + 40 + 25 + 12) = 167
-    expect(power).toBe(167);
+    // Total: floor(100 + 40 + 25 + 12) = 177
+    expect(power).toBe(177);
   });
 });
 

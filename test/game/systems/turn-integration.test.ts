@@ -211,7 +211,7 @@ function makeMinimalState(
     version: '0.1.0',
     seed: 'test-seed',
     turn,
-    year: 2500 + turn,
+    year: 2623 + turn, // Per design/game-mechanics/turn-structure.md
     difficulty: 'normal',
     isPaused: false,
     gameSpeed: 'normal',
@@ -315,7 +315,7 @@ describe('processTurn — time advancement', () => {
     const state = makeMinimalState(10);
     const next = processTurn(state);
     expect(next.turn).toBe(11);
-    expect(next.year).toBe(2511);
+    expect(next.year).toBe(2634); // 2623 + 11
   });
 
   it('does not mutate the input state', () => {
@@ -692,11 +692,11 @@ describe('processTurn — research wiring', () => {
 });
 
 describe('processTurn — turn counter and year', () => {
-  it('always satisfies year === 2500 + turn after processTurn', () => {
+  it('always satisfies year === 2623 + turn after processTurn (per design doc)', () => {
     let state = makeMinimalState(0);
     for (let i = 0; i < 5; i++) {
       state = processTurn(state);
-      expect(state.year).toBe(2500 + state.turn);
+      expect(state.year).toBe(2623 + state.turn);
     }
   });
 });

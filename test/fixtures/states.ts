@@ -50,7 +50,7 @@ export const earlyGameState: GameState = {
   ...initialState,
   seed: 'early-game-fixture',
   turn: 1,
-  year: 2501,
+  year: 2624, // 2623 + 1 per design/game-mechanics/turn-structure.md
   currentScreen: 'galaxy',
   empires: {
     byId: {

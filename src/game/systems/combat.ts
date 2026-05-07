@@ -33,7 +33,7 @@ function roll(min: number, max: number): number {
 
 // ── Domain types ──────────────────────────────────────────────────────────────
 
-export type WeaponCategory = 'beam' | 'missile' | 'torpedo' | 'special';
+export type WeaponCategory = 'beam' | 'missile' | 'torpedo' | 'scatter' | 'special';
 export type HullSize = 'small' | 'medium' | 'large' | 'huge';
 export type ExperienceLevel = 'rookie' | 'regular' | 'veteran' | 'elite';
 export type CombatSide = 'attacker' | 'defender';
@@ -74,6 +74,18 @@ export interface WeaponInstance {
   noRangePenalty?: boolean;
   /** Ignores shields (e.g., Death Ray) — bypasses shield absorption entirely */
   ignoresShields?: boolean;
+  /**
+   * MIRV warhead count for Scatter Pack weapons.
+   * When > 0, one launch deploys this many independent warheads at the target.
+   * Per design/technology/weapons.md: Scatter Pack V = 5×6dmg, VII = 7×10dmg, X = 10×15dmg.
+   */
+  mirvCount?: number;
+  /**
+   * Per-warhead damage for Scatter Pack (MIRV) weapons.
+   * Each spawned warhead deals this fixed amount of damage.
+   * If not set, warheads inherit the parent missile's rolled damage.
+   */
+  damagePerMirv?: number;
 }
 
 /**
@@ -180,14 +192,18 @@ export interface CombatShip {
    */
   hasZyroShield?: boolean;
   /**
-   * Lightning Shield: Reflects 50% of incoming damage back to attacker.
-   * Per design/ships/special-systems.md: Intentional departure from MOO1.
-   * (MOO1's missile destroyer behavior is covered by Zyro Shield.)
+   * Lightning Shield: 100% base chance to destroy incoming missiles − 1% per missile tech level.
+   * Per design/technology/force-fields.md Tier 11: upgraded missile interceptor (above Zyro Shield).
+   * Does NOT affect torpedoes or beam weapons.
+   */
+  hasLightningShield?: boolean;
+  /**
+   * @deprecated Legacy damage-reflection design. Use hasLightningShield instead.
+   * The authoritative spec (force-fields.md) specifies Lightning Shield as a missile interceptor.
+   * Retained for backwards compatibility with any existing save data / tests.
    */
   hasDamageReflection?: boolean;
-  /**
-   * Percentage of damage to reflect (e.g., 0.5 = 50%).
-   */
+  /** @deprecated see hasDamageReflection */
   damageReflectionPercent?: number;
   /**
    * Stasis Field: Target ship cannot move, fire, or retreat.
@@ -221,6 +237,16 @@ export interface CombatShip {
    * Track whether ship fired this round (for cloaking re-cloak logic).
    */
   firedThisRound?: boolean;
+  /**
+   * Armor value: flat damage reduction applied per hit AFTER shield absorption.
+   * Maps from armor hpMultiplier: armorValue = max(0, floor(hpMultiplier - 1)).
+   * Examples: Titanium(1.0x)=0, Duralloy(1.5x)=0, Zortrium(2.0x)=1,
+   *           Andrium(2.5x)=1, Tritanium(3.0x)=2, Adamantium(3.5x)=2, Neutronium(4.0x)=3.
+   * Per design/ships/combat-algorithm.md §11: Shields → Armor/Hull sequence.
+   * Note: The HP multiplier effect is applied at ship creation (maxHp reflects armor class).
+   * armorValue is the per-hit flat reduction bonus for harder armor classes.
+   */
+  armorValue?: number;
 }
 
 export interface CombatLogEntry {
@@ -241,6 +267,13 @@ export interface MissileInFlight {
   remainingFuel: number;
   /** Side that fired this missile */
   side: CombatSide;
+  /**
+   * For Scatter Pack (MIRV) warheads: number of warheads this missile will deploy.
+   * 0 for standard missiles. When > 0, launchMissile() spawns mirvCount warheads
+   * and sets this missile's damage = 0 (carrier is inert after deploying warheads).
+   * Per design/technology/weapons.md: Scatter Pack V=5, VII=7, X=10.
+   */
+  mirvCount: number;
 }
 
 /**
@@ -532,13 +565,19 @@ export function calcHitChanceVs(
 // ── Damage application ────────────────────────────────────────────────────────
 
 /**
- * Apply `damage` points to `target`, shields-first.
+ * Apply `damage` points to `target` using the Shields → Armor → Hull sequence.
  *
- * Shield absorption per hit = min(effectiveShieldClass, damage).
- * `armorPiercing` halves effective shield class (floor) before absorbing.
- * `doubleShieldDamage` causes shields to take 2× damage.
+ * Per design/ships/combat-algorithm.md §11:
+ *   1. Shield absorption: min(effectiveShieldClass, remaining).
+ *      - `armorPiercing` halves effectiveShieldClass (floor) before absorbing.
+ *      - Ships with no shields or ignoresShields weapons skip this step.
+ *   2. Armor layer reduction: flat reduction = min(target.armorValue, remaining).
+ *      - Applied AFTER shields, regardless of whether shields absorbed anything.
+ *      - `ignoresShields` weapons still face armor reduction (armor is not a shield).
+ *   3. Hull damage: remaining is subtracted from target.hp.
  *
- * Mutates target.hp in place; returns actual hull damage taken.
+ * Mutates target.hp in place; returns the amount of damage absorbed by shields
+ * (informational — does not include armor reduction).
  */
 export function applyDamage(
   target: CombatShip,
@@ -561,9 +600,16 @@ export function applyDamage(
 
     const absorbed = Math.min(effectiveShieldClass, remaining);
     remaining -= absorbed;
-    
-    // Double shield damage weapons (e.g., Plasma Cannon) - tracked for shield pool if implemented
-    // For now, this is informational as we use per-hit absorption model
+  }
+
+  // ── Armor Layer ────────────────────────────────────────────────────────────
+  // Applied AFTER shields, regardless of whether the ship has shields.
+  // armorValue is a flat per-hit reduction derived from armor tech tier.
+  // ignoresShields weapons (Death Ray) still face armor reduction.
+  // Per design/ships/combat-algorithm.md §11: Shields → Armor → Hull sequence.
+  if (target.armorValue && target.armorValue > 0 && remaining > 0) {
+    const armorReduction = Math.min(remaining, target.armorValue);
+    remaining -= armorReduction;
   }
 
   // ── Hull ───────────────────────────────────────────────────────────────────
@@ -850,9 +896,38 @@ function checkZyroShield(
 }
 
 /**
- * Calculate reflected damage from Lightning Shield.
- * Per design/ships/special-systems.md: Reflects 50% of incoming damage back to attacker.
- * This is an intentional departure from MOO1's missile destroyer behavior.
+ * Check if Lightning Shield destroys an incoming missile.
+ * Per design/technology/force-fields.md Tier 11: 100% base chance − 1% per missile tech level.
+ * This is the upgraded missile interceptor, superior to Zyro Shield (75% base).
+ * Roll made per missile; does NOT apply to torpedoes (same exception as Zyro Shield).
+ */
+function checkLightningShield(
+  target: CombatShip,
+  missileTechLevel: number,
+  log: CombatLogEntry[],
+  round: number,
+): boolean {
+  if (!target.hasLightningShield) return false;
+
+  // 100% base chance − 1% per missile tech level (clamped to 0–99)
+  const destroyChance = Math.max(0, Math.min(99, 100 - missileTechLevel));
+  const d100 = roll(1, 100);
+
+  if (d100 <= destroyChance) {
+    log.push({
+      round,
+      message: `[R${round}] ${target.designId} Lightning Shield DESTROYS incoming missile (roll ${d100} ≤ ${destroyChance}%)`,
+    });
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Calculate reflected damage from Lightning Shield (legacy behaviour).
+ * @deprecated The authoritative spec (design/technology/force-fields.md) defines Lightning Shield
+ * as a missile interceptor (see checkLightningShield). This function remains for any callers that
+ * still use the old hasDamageReflection flag until they are migrated.
  */
 export function calculateDamageReflection(
   target: CombatShip,
@@ -862,17 +937,17 @@ export function calculateDamageReflection(
   round: number,
 ): number {
   if (!target.hasDamageReflection || !attacker || damage <= 0) return 0;
-  
+
   const reflectPercent = target.damageReflectionPercent ?? 0.5; // Default 50%
   const reflectedDamage = Math.floor(damage * reflectPercent);
-  
+
   if (reflectedDamage > 0) {
     log.push({
       round,
       message: `[R${round}] ${target.designId} Lightning Shield REFLECTS ${reflectedDamage} damage back to ${attacker.designId}!`,
     });
   }
-  
+
   return reflectedDamage;
 }
 
@@ -934,12 +1009,13 @@ function calculateInterceptionChance(
  * Attempt to intercept incoming missiles during the missile phase.
  * 
  * Per design docs, missiles can be destroyed by (in order of priority):
- * 1. Zyro Shield (75% − 1% per missile tech level) - per missile roll
- * 2. Anti-Missile Rockets (40% − 1% per missile tech level) - per missile roll
- * 3. Beam weapon point defense (10% per beam attack) - fleet-wide roll
- * 
- * Note: Lightning Shield is now damage reflection (not missile interception) per design/ships/special-systems.md
- * Note: Torpedoes are NOT affected by Zyro shield but ARE subject to point defense.
+ * 1. Lightning Shield (100% − 1% per missile tech level) - per missile roll on target ship
+ * 2. Zyro Shield (75% − 1% per missile tech level) - per missile roll on target ship
+ * 3. Anti-Missile Rockets (40% − 1% per missile tech level) - per missile roll on target ship
+ * 4. Beam weapon point defense (10% per beam attack) - fleet-wide roll
+ *
+ * Note: Torpedoes are NOT affected by Zyro Shield or Lightning Shield, per design/technology/force-fields.md.
+ * Note: Anti-Missile Rockets and beam point defense DO apply to torpedoes.
  */
 function attemptMissileInterception(
   missile: MissileInFlight,
@@ -951,9 +1027,13 @@ function attemptMissileInterception(
   const missileTechLevel = missile.techLevel ?? 1;
   const isTorpedo = missile.weapon.category === 'torpedo';
   
-  // Per design: Torpedoes are NOT affected by Zyro shield missile interception
+  // Per design: Torpedoes are NOT affected by Lightning Shield or Zyro Shield interception
   if (!isTorpedo) {
-    // Check Zyro Shield (missile interception)
+    // Check Lightning Shield first (100% base − 1%/tech, superior to Zyro Shield)
+    if (checkLightningShield(target, missileTechLevel, log, round)) {
+      return true;
+    }
+    // Check Zyro Shield (75% base − 1%/tech)
     if (checkZyroShield(target, missileTechLevel, log, round)) {
       return true;
     }
@@ -1767,8 +1847,17 @@ export function activateDisplacementDevice(ship: CombatShip, state: CombatState)
 let missileIdCounter = 0;
 
 /**
- * Launch a missile or torpedo at a target.
- * Missiles travel and can be intercepted; they don't hit immediately.
+ * Launch a missile, torpedo, or scatter pack (MIRV) at a target.
+ *
+ * Missiles and torpedoes travel in flight and can be intercepted.
+ * Scatter packs (category 'scatter') immediately deploy their warheads:
+ *   each warhead is inserted as an independent MissileInFlight; the carrier
+ *   missile is marked damage=0 and mirvCount=0 so it has no further effect.
+ *
+ * Per design/technology/weapons.md:
+ *   - Scatter Pack V:   5 warheads × 6 dmg, interceptable
+ *   - Scatter Pack VII: 7 warheads × 10 dmg, interceptable
+ *   - Scatter Pack X:  10 warheads × 15 dmg, interceptable
  */
 export function launchMissile(
   attacker: CombatShip,
@@ -1776,30 +1865,78 @@ export function launchMissile(
   target: CombatShip,
   state: CombatState,
 ): boolean {
-  if (weapon.category !== 'missile' && weapon.category !== 'torpedo') {
+  const isScatterPack = weapon.category === 'scatter';
+  if (
+    weapon.category !== 'missile' &&
+    weapon.category !== 'torpedo' &&
+    !isScatterPack
+  ) {
     return false;
   }
-  
+
+  const mirvCount = weapon.mirvCount ?? 0;
+
+  // Build the carrier missile.
+  // For scatter packs the carrier itself is inert (damage=0); warheads carry the damage.
+  // For regular missiles/torpedoes mirvCount is 0.
+  const carrierDamage = isScatterPack ? 0 : (
+    weapon.damageMin === weapon.damageMax
+      ? weapon.damageMin
+      : roll(weapon.damageMin, weapon.damageMax)
+  );
+
   const missile: MissileInFlight = {
     id: `missile_${++missileIdCounter}`,
     sourceShipId: attacker.id,
     targetShipId: target.id,
     weapon,
-    damage: weapon.damageMin === weapon.damageMax 
-      ? weapon.damageMin 
-      : roll(weapon.damageMin, weapon.damageMax),
-    techLevel: 1, // Would be derived from weapon tech level
-    remainingFuel: 2, // MOO1: missiles self-destruct after 2 turns
+    damage: carrierDamage,
+    techLevel: 1, // Derived from weapon tech level when available
+    remainingFuel: 2, // MOO1: missiles self-destruct after 2 turns in flight
     side: attacker.side,
+    mirvCount,
   };
-  
+
   state.missilesInFlight.push(missile);
-  
+
   state.log.push({
     round: state.round,
     message: `[R${state.round}] ${attacker.designId} launches ${weapon.name} at ${target.designId}`,
   });
-  
+
+  // ── MIRV / Scatter Pack warhead deployment ─────────────────────────────────
+  // When mirvCount > 0, spawn independent warhead copies in missilesInFlight.
+  // Each warhead is a terminal missile: mirvCount=0, damage=damagePerMirv.
+  // The carrier (already pushed) has damage=0 and will be skipped by processMissilePhase.
+  if (mirvCount > 0) {
+    const warheadDamage = weapon.damagePerMirv ?? (
+      // Fallback: divide parent's rolled damage evenly across warheads
+      Math.ceil((
+        weapon.damageMin === weapon.damageMax
+          ? weapon.damageMin
+          : roll(weapon.damageMin, weapon.damageMax)
+      ) / mirvCount)
+    );
+
+    for (let i = 0; i < mirvCount; i++) {
+      const warhead: MissileInFlight = {
+        ...missile,
+        id: `missile_${++missileIdCounter}_w${i}`,
+        damage: warheadDamage,
+        mirvCount: 0, // Terminal warhead — does not spawn further warheads
+      };
+      state.missilesInFlight.push(warhead);
+    }
+
+    // Mark carrier as inert (already done for scatter packs; set for regular MIRV missiles too)
+    missile.damage = 0;
+
+    state.log.push({
+      round: state.round,
+      message: `[R${state.round}] ${weapon.name} deploys ${mirvCount} warheads (×${warheadDamage} dmg each) at ${target.designId}`,
+    });
+  }
+
   return true;
 }
 

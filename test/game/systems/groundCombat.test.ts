@@ -21,7 +21,7 @@ function makeMinimalState(): GameState {
     version: '0.1.0',
     seed: 'test',
     turn: 1,
-    year: 2501,
+    year: 2624, // 2623 + 1 per design doc
     difficulty: 'normal',
     isPaused: false,
     gameSpeed: 'normal',

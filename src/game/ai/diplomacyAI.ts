@@ -29,6 +29,12 @@ import { getPersonalityProfile } from './ai-personalities';
 
 // ── Public types ───────────────────────────────────────────────────────────────
 
+/**
+ * Output from the Stance_Score calculation (§5.3).
+ * Stance drives which diplomatic actions the AI considers.
+ */
+export type DiplomaticStance = 'hostile' | 'unfriendly' | 'neutral' | 'cooperative' | 'allied';
+
 export interface DiplomaticDecision {
   action: 'propose_treaty' | 'break_treaty' | 'declare_war' | 'maintain_relations' | 'trade_deal';
   targetId: EmpireId;
@@ -92,6 +98,182 @@ function fleetStrengthRatio(
   const theirs = getEmpireFleetPower(targetId, state);
   if (theirs === 0) return mine === 0 ? 1 : Infinity;
   return mine / theirs;
+}
+
+// ── Stance_Score formula (§5.3–§5.9) ─────────────────────────────────────────────────────────────────
+
+/** Personality stance modifiers (design/technical/ai-implementation.md §5.8) */
+const PERSONALITY_STANCE_MODIFIERS: Record<string, {
+  baseFriendliness: number;
+  warReluctance: number;
+  treatyBonus: number;
+}> = {
+  hamsters:     { baseFriendliness: 20,  warReluctance: 30,  treatyBonus: 15 },
+  guinea_pigs:  { baseFriendliness: -20, warReluctance: -30, treatyBonus: -10 },
+  chameleons:   { baseFriendliness: 0,   warReluctance: 10,  treatyBonus: 0 },
+  budgies:      { baseFriendliness: 0,   warReluctance: 0,   treatyBonus: 5 },
+  ferrets:      { baseFriendliness: -10, warReluctance: -15, treatyBonus: -5 },
+  rats:         { baseFriendliness: 15,  warReluctance: 25,  treatyBonus: 20 },
+  rabbits:      { baseFriendliness: 25,  warReluctance: 40,  treatyBonus: 10 },
+  mice:         { baseFriendliness: 10,  warReluctance: 15,  treatyBonus: 15 },
+  ants:         { baseFriendliness: -5,  warReluctance: 10,  treatyBonus: 0 },
+  hermit_crabs: { baseFriendliness: 0,   warReluctance: 30,  treatyBonus: -5 },
+};
+
+/** Trust modifiers per race (design/technical/ai-implementation.md §5.7) */
+const TRUST_MODIFIERS: Record<string, number> = {
+  hamsters:    1.3,
+  rabbits:     1.2,
+  rats:        1.1,
+  ferrets:     0.9,
+  chameleons:  0.7,
+  guinea_pigs: 0.8,
+};
+
+/**
+ * Calculate the Stance_Score between two empires using the full 6-component
+ * weighted formula from design/technical/ai-implementation.md §5.3:
+ *
+ *   Stance_Score = floor(
+ *     Base_Relationship +    §5.4: current diplomatic value
+ *     Power_Assessment +     §5.5: relative power ratio
+ *     Strategic_Value +      §5.6: strategic factors
+ *     Trust_Factor +         §5.7: historical trust
+ *     Personality_Modifier + §5.8: race-based friendliness
+ *     History_Modifier       §5.9: decayed historical events
+ *   )
+ *
+ * Score-to-Stance mapping:
+ *   < -60      → hostile
+ *   -60 to -20 → unfriendly
+ *   -19 to +30 → neutral
+ *   +31 to +60 → cooperative
+ *   > +60      → allied
+ */
+export function calculateStanceScore(
+  state: GameState,
+  empireId: EmpireId,
+  targetId: EmpireId,
+): { score: number; stance: DiplomaticStance } {
+  const empire = state.empires.byId[empireId];
+  const target = state.empires.byId[targetId];
+  if (!empire || !target) return { score: 0, stance: 'neutral' };
+
+  const relation = getRelation(state, empireId, targetId);
+  const aiEmpire: AIEmpire | undefined = state.aiEmpires[empireId];
+  const raceId = empire.raceId ?? 'hamsters';
+  const profile = getPersonalityProfile(raceId);
+
+  // §5.4 Base_Relationship
+  const baseRelationship = relation?.value ?? 0;
+
+  // §5.5 Power_Assessment
+  // Total_Power = Fleet_Power + (Production × 5) + (Tech_Level × 10)
+  const myFleetPower    = getEmpireFleetPower(empireId, state);
+  const theirFleetPower = getEmpireFleetPower(targetId, state);
+  const myProd          = empire.planets.length * 20;
+  const theirProd       = target.planets.length * 20;
+  const myTech          = empire.research?.completedTechs?.length ?? 0;
+  const theirTech       = target.research?.completedTechs?.length ?? 0;
+
+  const myTotalPower    = myFleetPower    + (myProd    * 5) + (myTech    * 10);
+  const theirTotalPower = theirFleetPower + (theirProd * 5) + (theirTech * 10);
+  const powerRatio      = theirTotalPower === 0 ? 2.0 : myTotalPower / theirTotalPower;
+
+  const aggression   = aiEmpire?.personality.aggression ?? profile.aggression;
+  const isAggressive = aggression > 60;
+
+  let powerAssessment: number;
+  if      (powerRatio < 0.5)  powerAssessment = isAggressive ? -30 : 30;
+  else if (powerRatio < 0.8)  powerAssessment = isAggressive ? -15 : 15;
+  else if (powerRatio <= 1.2) powerAssessment = 0;
+  else if (powerRatio <= 2.0) powerAssessment = isAggressive ? 15 : -15;
+  else                        powerAssessment = isAggressive ? 30 : -30;
+
+  // §5.6 Strategic_Value
+  let strategicValue = 0;
+  if (theirTech > myTech + 2)                        strategicValue += 25; // tech trading beneficial
+  if (target.planets.length > empire.planets.length) strategicValue += 20; // trade profitable
+
+  // -20 if target is allied with our enemy
+  const ourEnemyIds = Object.entries(empire.relations)
+    .filter(([, r]) => r.state === 'war').map(([id]) => id);
+  for (const enemyId of ourEnemyIds) {
+    const theirRel = target.relations[enemyId];
+    if (theirRel && ['allied', 'cooperative'].includes(theirRel.state)) {
+      strategicValue -= 20;
+      break;
+    }
+  }
+
+  // -30 if they block our expansion (adjacent to our home system)
+  const ourHomeSys = empire.planets[0]
+    ? state.galaxy.systems.byId[state.planets.byId[empire.planets[0]]?.systemId ?? ''] ?? null
+    : null;
+  if (ourHomeSys) {
+    for (const pid of target.planets) {
+      const theirSys = state.galaxy.systems.byId[state.planets.byId[pid]?.systemId ?? ''];
+      if (!theirSys) continue;
+      const dx = ourHomeSys.coordinates.x - theirSys.coordinates.x;
+      const dy = ourHomeSys.coordinates.y - theirSys.coordinates.y;
+      if (Math.sqrt(dx * dx + dy * dy) < 5) { strategicValue -= 30; break; }
+    }
+  }
+
+  // §5.7 Trust_Factor = floor(Trust_Base × Trust_Modifier)
+  let trustBase = 0;
+  if (relation) {
+    const broken      = relation.events?.filter(e => e.type === 'treaty_broken').length ?? 0;
+    const attacked    = relation.events?.some(e => e.type === 'unprovoked_attack') ?? false;
+    const honored     = relation.events?.some(e => e.type === 'honored_pact') ?? false;
+    const neverBroken = broken === 0 && relation.treaties.length > 0;
+    if (attacked)         trustBase = -50;
+    else if (broken > 0)  trustBase = -30;
+    else if (neverBroken) trustBase = 40;
+    else if (honored)     trustBase = 20;
+  }
+  const trustMod     = TRUST_MODIFIERS[raceId] ?? 1.0;
+  const chameleonPen = raceId === 'chameleons' ? -80 : 0;
+  const trustFactor  = Math.floor(trustBase * trustMod) + chameleonPen;
+
+  // §5.8 Personality_Modifier
+  const personalityModifier = PERSONALITY_STANCE_MODIFIERS[raceId]?.baseFriendliness ?? 0;
+
+  // §5.9 History_Modifier = Σ(event_value × 0.98^turns_since_event)
+  let historyModifier = 0;
+  if (relation?.events) {
+    for (const event of relation.events) {
+      const turnsSince  = Math.max(0, state.turn - (event.turn ?? state.turn));
+      const decayFactor = Math.pow(0.98, turnsSince);
+      let eventValue = 0;
+      switch (event.type) {
+        case 'war_declared':         eventValue = -30; break;
+        case 'attacked_ally':        eventValue = -20; break;
+        case 'helped_in_war':        eventValue =  25; break;
+        case 'long_standing_trade':  eventValue =  15; break;
+        case 'tech_shared':          eventValue =  10; break;
+        case 'treaty_broken':        eventValue = -40; break;
+        default:                     eventValue =   0; break;
+      }
+      historyModifier += Math.floor(eventValue * decayFactor);
+    }
+  }
+
+  // §5.3 Stance_Score
+  const score = Math.floor(
+    baseRelationship + powerAssessment + strategicValue +
+    trustFactor + personalityModifier + historyModifier,
+  );
+
+  // Score-to-Stance mapping
+  let stance: DiplomaticStance;
+  if      (score < -60) stance = 'hostile';
+  else if (score < -20) stance = 'unfriendly';
+  else if (score <= 30) stance = 'neutral';
+  else if (score <= 60) stance = 'cooperative';
+  else                  stance = 'allied';
+
+  return { score, stance };
 }
 
 // ── Core decision functions ────────────────────────────────────────────────────
@@ -334,34 +516,54 @@ export function evaluateDiplomaticOptions(
     const target = state.empires.byId[targetId];
     if (!target || target.isDefeated) continue;
 
-    // War declaration (highest potential disruption — check first)
-    const warDecision = aiDecideDeclareWar(state, empireId, targetId);
-    if (warDecision) decisions.push(warDecision);
+    // §5.3 Compute the weighted Stance_Score to gate and prioritize decisions.
+    const { score: stanceScore, stance } = calculateStanceScore(state, empireId, targetId);
 
-    // Treaty break (must happen before proposing replacement)
-    const breakDecision = aiDecideBreakTreaty(state, empireId, targetId);
-    if (breakDecision) decisions.push(breakDecision);
+    // War declaration (highest potential disruption — only viable when stance is hostile/unfriendly)
+    if (stance === 'hostile' || stance === 'unfriendly') {
+      const warDecision = aiDecideDeclareWar(state, empireId, targetId);
+      if (warDecision) {
+        // Boost priority for hostile stance; reduce for unfriendly
+        const stanceBoost = stance === 'hostile' ? 2 : 0;
+        decisions.push({ ...warDecision, priority: Math.min(10, warDecision.priority + stanceBoost) });
+      }
+    }
 
-    // Treaty proposal
-    const treatyDecision = aiDecideTreaty(state, empireId, targetId);
-    if (treatyDecision) decisions.push(treatyDecision);
+    // Treaty break (viable when stance has deteriorated to unfriendly or worse)
+    if (stance === 'hostile' || stance === 'unfriendly') {
+      const breakDecision = aiDecideBreakTreaty(state, empireId, targetId);
+      if (breakDecision) decisions.push(breakDecision);
+    }
 
-    // Trade deal (high-diplomacy empires seek trade when relations meet threshold)
-    // Per design/diplomacy/relationship-formulas.md §5.4, trade requires +10 relations
-    const TRADE_MIN_RELATION = 10;
+    // Treaty proposal (viable when stance is neutral or better)
+    if (stance !== 'hostile') {
+      const treatyDecision = aiDecideTreaty(state, empireId, targetId);
+      if (treatyDecision) {
+        // Cooperative/allied stance boosts treaty priority
+        const stanceBoost = (stance === 'cooperative' || stance === 'allied') ? 1 : 0;
+        decisions.push({ ...treatyDecision, priority: Math.min(10, treatyDecision.priority + stanceBoost) });
+      }
+    }
+
+    // Trade deal (high-diplomacy empires seek trade when stance is neutral+)
+    // Per design/diplomacy/relationship-formulas.md §5.4, trade requires +10 relations.
+    // Stance score provides a more nuanced gate than raw relation value.
+    const TRADE_MIN_STANCE = -19; // neutral or better
     const dipScore = aiState.personality.diplomacy;
     const relValue = getRelationValue(state, empireId, targetId);
 
     if (
       dipScore >= 40 &&
-      relValue >= TRADE_MIN_RELATION &&
+      stanceScore >= TRADE_MIN_STANCE &&
+      relValue >= 10 &&
       !hasTreatyOfType(state, empireId, targetId, 'trade')
     ) {
+      const tradeBoost = stanceScore > 30 ? 2 : 0; // extra push for cooperative/allied
       decisions.push({
         action: 'trade_deal',
         targetId,
-        reasoning: `Relations (${relValue}) and high diplomacy (${dipScore}) favor trade deal`,
-        priority: Math.min(10, 3 + Math.round(dipScore / 20)),
+        reasoning: `Stance score ${stanceScore} (${stance}) and diplomacy ${dipScore} favor trade`,
+        priority: Math.min(10, 3 + Math.round(dipScore / 20) + tradeBoost),
       });
     }
   }

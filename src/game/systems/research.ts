@@ -223,6 +223,8 @@ interface TechEntry {
   cost: number;
   unlocks?: string[];
   description?: string;
+  /** ID of another tech that must be completed before this one can be researched. */
+  prerequisite?: string;
 }
 
 /**
@@ -242,6 +244,26 @@ const TECH_COST_MAP: ReadonlyMap<string, number> = new Map(
 const TECH_TIER_MAP: ReadonlyMap<string, number> = new Map(
   (techTreeData.technologies as TechEntry[]).map(
     (tech) => [tech.id, tech.tier] as [string, number],
+  ),
+);
+
+/**
+ * Tech prerequisite lookup by tech ID.
+ * Maps a tech ID to the ID of the tech that must be completed first.
+ * Techs without prerequisites are absent from this map.
+ */
+const TECH_PREREQ_MAP: ReadonlyMap<string, string> = new Map(
+  (techTreeData.technologies as TechEntry[])
+    .filter((tech) => tech.prerequisite !== undefined)
+    .map((tech) => [tech.id, tech.prerequisite as string]),
+);
+
+/**
+ * Full tech entry lookup by tech ID (all fields).
+ */
+const TECH_ENTRY_MAP: ReadonlyMap<string, TechEntry> = new Map(
+  (techTreeData.technologies as TechEntry[]).map(
+    (tech) => [tech.id, tech],
   ),
 );
 
@@ -389,6 +411,86 @@ export function getTechBaseCostById(techId: string): number | undefined {
  */
 export function getTechTierById(techId: string): number | undefined {
   return TECH_TIER_MAP.get(techId);
+}
+
+/**
+ * Returns the prerequisite tech ID for a given tech, or undefined if none.
+ *
+ * Some techs form chains (e.g. Battle Computer I → II → III …) and require
+ * the predecessor to be completed before they can be researched.
+ *
+ * @param techId The tech ID to look up.
+ * @returns The ID of the required prerequisite tech, or undefined.
+ */
+export function getTechPrerequisite(techId: string): string | undefined {
+  return TECH_PREREQ_MAP.get(techId);
+}
+
+/**
+ * Returns whether an empire can begin researching a given tech.
+ *
+ * A tech is researchable when:
+ *   1. It has not already been completed.
+ *   2. Its prerequisite (if any) has been completed.
+ *
+ * This enforces tech-chain ordering (e.g. Robotic Controls I must be done
+ * before Robotic Controls II becomes available).
+ *
+ * @param techId         The tech to check.
+ * @param completedTechs Set (or array) of tech IDs the empire has completed.
+ * @returns true if the tech can be selected as a research target.
+ */
+export function isTechResearchable(
+  techId: string,
+  completedTechs: ReadonlyArray<string> | ReadonlySet<string>,
+): boolean {
+  const completed =
+    completedTechs instanceof Set
+      ? completedTechs
+      : new Set(completedTechs);
+
+  // Already done — not researchable (would be a no-op).
+  if (completed.has(techId)) return false;
+
+  // Check prerequisite chain.
+  const prereq = TECH_PREREQ_MAP.get(techId);
+  if (prereq !== undefined && !completed.has(prereq)) return false;
+
+  return true;
+}
+
+/**
+ * Returns all techs in a given field that are currently researchable.
+ *
+ * A tech is researchable if:
+ *   - It has not been completed.
+ *   - Its prerequisite (if any) has been completed.
+ *
+ * This is the source-of-truth list for what the UI should offer and what
+ * AI research selection should consider.
+ *
+ * @param jsonField      The tech field name as used in tech-tree.json
+ *                       (e.g. 'weapons', 'computers', 'force_fields').
+ * @param completedTechs The empire's completed tech IDs.
+ * @returns Array of researchable TechEntry objects in the field.
+ */
+export function getResearchableForField(
+  jsonField: string,
+  completedTechs: ReadonlyArray<string>,
+): TechEntry[] {
+  const completed = new Set(completedTechs);
+  return (techTreeData.technologies as TechEntry[]).filter(
+    (tech) => tech.field === jsonField && isTechResearchable(tech.id, completed),
+  );
+}
+
+/**
+ * Returns the full TechEntry for a given tech ID, or undefined if not found.
+ *
+ * @param techId The tech ID to look up.
+ */
+export function getTechEntryById(techId: string): TechEntry | undefined {
+  return TECH_ENTRY_MAP.get(techId);
 }
 
 /**
@@ -712,13 +814,30 @@ export function createEvenAllocation(): ResearchAllocation {
  *
  * Returns a new EmpireFieldResearch with the target updated.
  * Does not clear existing progress (pending RP is applied to new target).
+ *
+ * Enforces prerequisite chain: if the tech has a prerequisite that has not
+ * been completed, the call is rejected and the current state is returned
+ * unchanged. Pass `completedTechs` (from the empire's flat completed list)
+ * for validation. Omitting it disables the check (backwards-compat).
+ *
+ * @throws {Error} if `completedTechs` is provided and the prerequisite is unmet.
  */
 export function setResearchTarget(
   fields: EmpireFieldResearch,
   field: ResearchField,
   techId: string,
   techTier: number,
+  completedTechs?: ReadonlyArray<string>,
 ): EmpireFieldResearch {
+  if (completedTechs !== undefined) {
+    const prereq = getTechPrerequisite(techId);
+    if (prereq !== undefined && !completedTechs.includes(prereq)) {
+      throw new Error(
+        `Cannot research "${techId}": prerequisite "${prereq}" has not been completed.`,
+      );
+    }
+  }
+
   return {
     ...fields,
     [field]: {

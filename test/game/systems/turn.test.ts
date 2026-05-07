@@ -93,8 +93,8 @@ function makeMinimalState(turn = 0, planets: Planet[] = [], empires: Empire[] = 
     version: '0.1.0',
     seed: 'test-seed',
     turn,
-    year: 2500 + turn,
-    difficulty: 'normal',
+    year: 2623 + turn, // Per design/game-mechanics/turn-structure.md
+    difficulty: 'average',
     isPaused: false,
     gameSpeed: 'normal',
     currentScreen: 'galaxy',
@@ -201,16 +201,16 @@ describe('processTurn', () => {
     expect(next.turn).toBe(43);
   });
 
-  it('updates year to 2500 + turn', () => {
+  it('updates year to 2623 + turn (per design/game-mechanics/turn-structure.md)', () => {
     const state = makeMinimalState(0);
     const next = processTurn(state);
-    expect(next.year).toBe(2501);
+    expect(next.year).toBe(2624); // Starting year 2623 + turn 1
   });
 
-  it('year formula: year === 2500 + turn after processing', () => {
+  it('year formula: year === 2623 + turn after processing (design doc lore: 123 years post-Awakening)', () => {
     const state = makeMinimalState(99);
     const next = processTurn(state);
-    expect(next.year).toBe(2500 + next.turn);
+    expect(next.year).toBe(2623 + next.turn);
   });
 
   it('multiple consecutive turns increment correctly', () => {
@@ -218,7 +218,7 @@ describe('processTurn', () => {
     for (let i = 1; i <= 10; i++) {
       state = processTurn(state);
       expect(state.turn).toBe(i);
-      expect(state.year).toBe(2500 + i);
+      expect(state.year).toBe(2623 + i); // Starting year 2623 per design doc
     }
   });
 
@@ -327,7 +327,7 @@ describe('turnReducer', () => {
     state = turnReducer(state, nextTurn());
     state = turnReducer(state, nextTurn());
     expect(state.turn).toBe(3);
-    expect(state.year).toBe(2503);
+    expect(state.year).toBe(2626); // 2623 + 3
   });
 });
 
@@ -339,7 +339,7 @@ describe('Store + rootReducer integration', () => {
     const store = new Store(rootReducer, state);
     store.dispatch(nextTurn());
     expect(store.getState().turn).toBe(1);
-    expect(store.getState().year).toBe(2501);
+    expect(store.getState().year).toBe(2624); // 2623 + 1
   });
 
   it('dispatching nextTurn multiple times works correctly', () => {
@@ -349,7 +349,7 @@ describe('Store + rootReducer integration', () => {
       store.dispatch(nextTurn());
     }
     expect(store.getState().turn).toBe(5);
-    expect(store.getState().year).toBe(2505);
+    expect(store.getState().year).toBe(2628); // 2623 + 5
   });
 
   it('subscriber is notified after each dispatch', () => {

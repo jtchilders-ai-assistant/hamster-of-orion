@@ -17,7 +17,7 @@
  *   src/game/systems/research.ts        — ResearchField, ALL_RESEARCH_FIELDS
  */
 
-import { GameState, EmpireId, TechField, TechId } from '../state';
+import { GameState, EmpireId, TechField, TechId, StrategyGoal } from '../state';
 import { ALL_RESEARCH_FIELDS, ResearchField } from '../systems/research';
 import techTreeData from '../../data/tech-tree.json';
 
@@ -286,6 +286,21 @@ export function selectResearchPriorities(
   return decisions;
 }
 
+// ── Strategic Alignment bonuses (design/technical/ai-implementation.md §3.4) ──────────
+
+/**
+ * Bonuses to a tech field score based on the AI's current strategic goal.
+ * Source: design/technical/ai-implementation.md §3.4
+ */
+const STRATEGY_FIELD_BONUSES: Record<string, Partial<Record<ResearchField, number>>> = {
+  military_supremacy: { weapons: 40, force_fields: 30, computers: 20 },
+  tech_advantage:     { weapons: 10, propulsion: 10, construction: 10, computers: 30, force_fields: 10, planetology: 10 },
+  expansion:          { propulsion: 40, planetology: 30, construction: 20 },
+  diplomatic_victory: { computers: 20, planetology: 15 },
+  orion_rush:         { weapons: 50, force_fields: 40, propulsion: 30 },
+  defensive:          { force_fields: 40, construction: 30, weapons: 20 },
+};
+
 // ── aiChooseTech ─────────────────────────────────────────────────────────────
 
 /**
@@ -301,15 +316,38 @@ export function aiChooseTech(
 ): TechId | null {
   if (availableTechs.length === 0) return null;
 
-  // Get the race ID for racial preference lookup
   const aiEmpire = state.aiEmpires[empireId];
-  const raceId = aiEmpire?.raceId ?? 'hamsters';
+  const empire   = state.empires.byId[empireId];
+  const raceId   = aiEmpire?.raceId ?? 'hamsters';
+
+  // Derive empire research output for Cost_Efficiency calculation (§3.6).
+  // Try multiple field names to be compatible with different state versions.
+  const researchOutput = Math.max(1,
+    (empire as { researchOutput?: number } | undefined)?.researchOutput ??
+    empire?.research?.researchPerTurn ??
+    100,
+  );
+
+  // Get active strategy from AIEmpire strategy.primary (default 'tech_advantage')
+  const strategy: StrategyGoal = aiEmpire?.strategy?.primary ?? 'tech_advantage';
+
+  // Derive active war status for urgency modifier
+  const isAtWar = empire
+    ? Object.values(empire.relations).some(r => r.state === 'war')
+    : false;
 
   let bestId: TechId | null = null;
   let bestScore = -Infinity;
 
   for (const techId of availableTechs) {
-    const score = evaluateTechValue(raceId, techId, availableTechs);
+    const score = evaluateTechValue(
+      raceId,
+      techId,
+      availableTechs,
+      strategy,
+      researchOutput,
+      isAtWar,
+    );
     if (score > bestScore) {
       bestScore = score;
       bestId = techId;
@@ -322,46 +360,133 @@ export function aiChooseTech(
 // ── evaluateTechValue ────────────────────────────────────────────────────────
 
 /**
- * Score a single tech 0–100+ for a specific empire.
+ * Score a single tech using the full Research_Score formula from
+ * design/technical/ai-implementation.md §3.2:
  *
- * Factors:
- *   - Racial research preference (design/technical/ai-implementation.md §3.5)
- *   - Tier value (higher tier → higher score, tempered by affordability)
- *   - Uniqueness: being the only option in a field boosts the score
+ *   Research_Score = floor(
+ *     Base_Tech_Value +      §3.3: Tech_Tier × 10
+ *     Strategic_Alignment +  §3.4: field bonus based on current strategy
+ *     Racial_Preference +    §3.5: floor(20 × (Weight − 1.0) × 10)
+ *     Cost_Efficiency +      §3.6: floor(50 − turns_to_research × 2), −50 if >20 turns
+ *     Synergy_Bonus +        §3.7: unlocks techs (+15 each, max +45), ship class (+20)
+ *     Urgency_Modifier       §3.8: war counters, colonisation blockers, etc.
+ *   )
+ *
+ * The randomness factor (±5 per §6.1) is NOT applied here — callers may add it.
  */
 export function evaluateTechValue(
   raceId: string,
   techId: string,
   availableTechs: string[],
+  strategy: string = 'tech_advantage',
+  empireResearchOutput: number = 100,
+  isAtWar: boolean = false,
 ): number {
   const entry = TECH_INDEX.get(techId);
   if (!entry) return 0;
 
-  // Base score from tier (higher tier techs are generally more impactful)
-  // Formula from design doc §3.3: Base_Tech_Value = Tech_Tier × 10
+  // §3.3 Base_Tech_Value = Tech_Tier × 10
   let score = entry.tier * 10;
 
-  // Field value from the tech's field category
   const rf = techFieldToResearchField(entry.field);
-  if (rf !== null) {
-    score += FIELD_BASE_VALUE[rf];
 
-    // Add racial preference score (design/technical/ai-implementation.md §3.5)
-    // Formula: Racial_Preference = floor(20 × (Racial_Weight - 1.0) × 10)
+  // §3.4 Strategic_Alignment — bonus based on current strategic goal and tech field
+  if (rf !== null) {
+    const stratBonuses = STRATEGY_FIELD_BONUSES[strategy];
+    const stratBonus = stratBonuses?.[rf] ?? 0;
+    score += stratBonus;
+  }
+
+  // §3.5 Racial_Preference
+  // Formula: floor(20 × (Racial_Weight − 1.0) × 10)
+  if (rf !== null) {
     const racialPref = calculateRacialPreference(raceId, rf);
     score += racialPref;
   }
 
-  // Uniqueness bonus: fewer alternatives in the same field = higher urgency
-  const sameField = availableTechs.filter(id => {
+  // §3.6 Cost_Efficiency
+  // turns_to_research = tech.cost / empire.research_output
+  // If >20 turns: -50.  Otherwise: floor(50 − turns × 2)
+  const turnsToResearch = entry.cost / Math.max(1, empireResearchOutput);
+  let costEfficiency: number;
+  if (turnsToResearch > 20) {
+    costEfficiency = -50;
+  } else {
+    costEfficiency = Math.floor(50 - turnsToResearch * 2);
+  }
+  score += costEfficiency;
+
+  // §3.7 Synergy_Bonus
+  // +15 for each tech this unlocks (up to +45)
+  // +20 if this unlocks a new ship class
+  // +25 if this unlocks terraforming
+  let synergyBonus = 0;
+
+  // Count how many available techs are in the same field (proxy for unlocking chains)
+  const sameFieldTechs = availableTechs.filter(id => {
+    const t = TECH_INDEX.get(id);
+    return t !== undefined && t.field === entry.field && t.tier > entry.tier;
+  });
+  // Each tech this tier unlocks in the progression chain gives +15, up to +45
+  const unlocksCount = Math.min(3, sameFieldTechs.length);
+  synergyBonus += unlocksCount * 15;
+
+  // Ship class unlock bonus (construction tech at specific tiers unlock hulls)
+  const SHIP_CLASS_TIERS: Record<string, number[]> = {
+    construction: [5, 15, 25, 40], // approximate tiers that unlock new hull sizes
+  };
+  if (rf !== null && SHIP_CLASS_TIERS[rf]?.includes(entry.tier)) {
+    synergyBonus += 20;
+  }
+
+  // Terraforming unlock bonus (planetology/biotechnology)
+  const TERRAFORM_FIELDS: ResearchField[] = ['planetology'];
+  if (rf !== null && TERRAFORM_FIELDS.includes(rf) && entry.tier >= 5) {
+    synergyBonus += 25;
+  }
+
+  score += Math.min(synergyBonus, 45 + 20 + 25); // theoretical max per §3.7
+
+  // §3.8 Urgency_Modifier
+  let urgencyModifier = 0;
+
+  // +30 if this tech field counters the enemy's dominant strategy (at war, weapons/force_fields)
+  if (isAtWar && rf !== null && (rf === 'weapons' || rf === 'force_fields')) {
+    urgencyModifier += 30;
+  }
+
+  // +25 if tech enables colonization of blocked planet types (planetology enables hostile worlds)
+  if (rf === 'planetology' && entry.tier >= 3) {
+    urgencyModifier += 25;
+  }
+
+  // +20 if tech would make ships significantly stronger (weapons tier 10+)
+  if (rf === 'weapons' && entry.tier >= 10) {
+    urgencyModifier += 20;
+  }
+
+  // +15 urgency when this is the only available tech in its field
+  // (design §3.8: scarcity drives priority; maps to "enables new diplomatic options" urgency factor)
+  const sameFieldAny = availableTechs.filter(id => {
     const t = TECH_INDEX.get(id);
     return t !== undefined && t.field === entry.field;
   });
-  if (sameField.length === 1) {
-    score += 15; // only option in that field
+  if (sameFieldAny.length === 1) {
+    urgencyModifier += 15;
   }
 
-  return Math.max(0, score);
+  // -20 if a significantly higher-tier tech in the same field is nearly available (obsolescence)
+  const hasHigherTierNearby = sameFieldTechs.some(id => {
+    const t = TECH_INDEX.get(id);
+    return t !== undefined && t.tier >= entry.tier + 10;
+  });
+  if (hasHigherTierNearby) {
+    urgencyModifier -= 20;
+  }
+
+  score += urgencyModifier;
+
+  return Math.max(0, Math.floor(score));
 }
 
 // ── processAIResearch ────────────────────────────────────────────────────────
@@ -466,19 +591,6 @@ function aiWeightForField(
     case 'planetology':  return weights.biotechPriority;
   }
 }
-
-/**
- * Base field value scores — reflects general strategic importance.
- * Weapons and propulsion are universally high-impact in MOO1-style games.
- */
-const FIELD_BASE_VALUE: Record<ResearchField, number> = {
-  weapons:      20,
-  propulsion:   18,
-  computers:    15,
-  force_fields: 15,
-  construction: 12,
-  planetology:  12,
-};
 
 // Re-export ResearchField so consumers don't need to import from research.ts
 export type { ResearchField };

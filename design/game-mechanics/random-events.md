@@ -224,7 +224,7 @@ A massive single-celled organism that drifts through space, consuming everything
 5. Moves to next nearest colony after destroying target
 
 **Reward on Defeat**:
-- Regeneration technology research bonus (+50% to Planetology for 10 turns)
+- Regeneration technology research bonus (+50% to Biotechnology for 10 turns)
 - 200-500 BC salvage
 
 ### Crystal Horror (Space Crystal equivalent)
@@ -343,7 +343,7 @@ The Guardian is NOT a random event - it is a fixed encounter guarding the Orion 
       "specials": ["regeneration"],
       "immune_to": [],
       "reward_research_bonus": {
-        "field": "planetology",
+        "field": "biotechnology",
         "percent": 50,
         "duration_turns": 10
       },
@@ -382,7 +382,7 @@ The Guardian is NOT a random event - it is a fixed encounter guarding the Orion 
     "void_wyrm": {
       "id": "void_wyrm",
       "name": "Void Wyrm",
-      "moo1_equivalent": "Space Dragon",
+      "moo1_equivalent": null,
       "description": "An ancient predator that guards a treasure hoard of Ancient One technology.",
       "hit_points": 750,
       "attack_level": 8,

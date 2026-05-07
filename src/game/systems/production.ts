@@ -42,14 +42,23 @@ export const BASE_CLEANUP_COST_PER_POLLUTION = 0.5;
 /** Each BC spent on ECO growth bonus adds this much pop growth per turn. */
 export const GROWTH_BC_EFFICIENCY = 0.1;
 
-/** Base ship maintenance rate (2% of construction cost per turn). */
-export const SHIP_MAINTENANCE_RATE = 0.02;
+// Ship economics constants imported from constants.ts
+import {
+  SHIP_MAINTENANCE_RATE,
+  MINIMUM_SHIP_MAINTENANCE,
+  SCRAP_RATE_EMERGENCY,
+  SCRAP_RATE_BASE,
+  SCRAP_RATE_SHIPYARD,
+  SCRAP_RATE_DAMAGED,
+  SCRAP_RATE_ENEMY_TERRITORY,
+  REFIT_RATE,
+} from '../constants';
 
-/** Minimum ship maintenance per ship (1 BC). */
-export const MINIMUM_SHIP_MAINTENANCE = 1;
+// Re-export for backwards compatibility
+export { SHIP_MAINTENANCE_RATE, MINIMUM_SHIP_MAINTENANCE };
 
-/** Emergency scrap rate during bankruptcy (10%). */
-export const EMERGENCY_SCRAP_RATE = 0.10;
+/** @deprecated Use SCRAP_RATE_EMERGENCY from constants.ts */
+export const EMERGENCY_SCRAP_RATE = SCRAP_RATE_EMERGENCY;
 
 /** Mineral richness multipliers keyed by ResourceLevel. */
 export const MINERAL_RICHNESS_MODIFIERS: Record<ResourceLevel, number> = {
@@ -935,6 +944,156 @@ export function handleBankruptcy(
     finalTreasury: currentTreasury,
     empireCollapsed: currentTreasury < 0, // No ships left but still negative
   };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Ship Scrap Value
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Location type for scrap rate calculation.
+ */
+export type ScrapLocation = 'friendly' | 'shipyard' | 'enemy_territory';
+
+/**
+ * Calculate scrap value for a ship.
+ *
+ * Per design/economy/ship-costs.md §9:
+ *   - At friendly planet: 25%
+ *   - At shipyard world: 35%
+ *   - Damaged ship (< 50% HP): 15%
+ *   - In enemy territory: 10%
+ *   - Self-destruct in combat: 0%
+ *
+ * @param shipCost    Construction cost of the ship in BC.
+ * @param location    Where the ship is being scrapped.
+ * @param isDamaged   True if ship is below 50% HP.
+ * @returns Scrap value in BC.
+ */
+export function calculateScrapValue(
+  shipCost: number,
+  location: ScrapLocation,
+  isDamaged: boolean = false,
+): number {
+  let scrapRate: number;
+
+  // Damaged ship overrides location-based rate
+  if (isDamaged) {
+    scrapRate = SCRAP_RATE_DAMAGED;
+  } else {
+    switch (location) {
+      case 'shipyard':
+        scrapRate = SCRAP_RATE_SHIPYARD;
+        break;
+      case 'enemy_territory':
+        scrapRate = SCRAP_RATE_ENEMY_TERRITORY;
+        break;
+      case 'friendly':
+      default:
+        scrapRate = SCRAP_RATE_BASE;
+        break;
+    }
+  }
+
+  return Math.floor(shipCost * scrapRate);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Ship Refitting
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Result of a refit cost calculation.
+ */
+export interface RefitResult {
+  /** Whether refit is valid (same hull class). */
+  valid: boolean;
+  /** Error message if invalid. */
+  error?: string;
+  /** Cost to refit in BC (0 if downgrading). */
+  refitCost: number;
+}
+
+/**
+ * Calculate refit cost for upgrading a ship to a new design.
+ *
+ * Per design/economy/ship-costs.md §11:
+ *   Refit_Cost = (New_Design_Cost - Old_Design_Value) × 0.50
+ *   Minimum: 0 BC (if new design is cheaper, no refund)
+ *
+ * Restrictions:
+ *   - Ships must be at a planet with shipyard
+ *   - Cannot change hull size (e.g., Small → Large impossible)
+ *
+ * @param oldDesignCost  Construction cost of the current design.
+ * @param newDesignCost  Construction cost of the new design.
+ * @param oldHullClass   Hull class of current design (small/medium/large/huge).
+ * @param newHullClass   Hull class of new design.
+ * @param hasNoRefitCosts If true (e.g., Mice race ability), refit is free.
+ * @returns Refit calculation result.
+ */
+export function calculateRefitCost(
+  oldDesignCost: number,
+  newDesignCost: number,
+  oldHullClass: string,
+  newHullClass: string,
+  hasNoRefitCosts: boolean = false,
+): RefitResult {
+  // Cannot change hull class
+  if (oldHullClass !== newHullClass) {
+    return {
+      valid: false,
+      error: `Cannot refit from ${oldHullClass} to ${newHullClass} hull`,
+      refitCost: 0,
+    };
+  }
+
+  // Mice (no_refit_costs ability) can refit for free
+  if (hasNoRefitCosts) {
+    return {
+      valid: true,
+      refitCost: 0,
+    };
+  }
+
+  const costDifference = newDesignCost - oldDesignCost;
+
+  // Downgrade: no cost, but no refund either
+  if (costDifference <= 0) {
+    return {
+      valid: true,
+      refitCost: 0,
+    };
+  }
+
+  // Upgrade: pay 50% of the difference
+  const refitCost = Math.floor(costDifference * REFIT_RATE);
+
+  return {
+    valid: true,
+    refitCost,
+  };
+}
+
+/**
+ * Calculate refit time based on cost and planet production.
+ *
+ * Per design/economy/ship-costs.md §12:
+ *   Refit_Time = ceil(Refit_Cost / Planet_Production_Per_Turn)
+ *   Minimum: 1 turn for any refit.
+ *
+ * @param refitCost             BC required for the refit.
+ * @param planetProductionPerTurn Net production per turn at the planet.
+ * @returns Number of turns to complete refit.
+ */
+export function calculateRefitTime(
+  refitCost: number,
+  planetProductionPerTurn: number,
+): number {
+  if (refitCost <= 0) return 1; // No-cost refits still take 1 turn
+  if (planetProductionPerTurn <= 0) return Infinity; // No production = infinite time
+
+  return Math.max(1, Math.ceil(refitCost / planetProductionPerTurn));
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -15,16 +15,17 @@ describe('Turn Actions', () => {
   });
 
   it('increments turn and year on NEXT_TURN', () => {
+    // Start with turn 10 (year should be 2623 + 10 = 2633 per design doc)
     const state: GameState = {
       ...initialState,
       turn: 10,
-      year: 2510,
+      year: 2633, // 2623 + 10 per design/game-mechanics/turn-structure.md
     };
 
     const newState = turnReducer(state, nextTurn());
     
     expect(newState.turn).toBe(11);
-    expect(newState.year).toBe(2511);
+    expect(newState.year).toBe(2634); // 2623 + 11
     expect(newState.lastPlayed).toBeGreaterThan(state.lastPlayed);
   });
 

@@ -261,7 +261,7 @@ function makeMinimalState(
     version: '0.1.0',
     seed: 'test-seed',
     turn,
-    year: 2500 + turn,
+    year: 2623 + turn, // Per design/game-mechanics/turn-structure.md
     difficulty: 'average',
     isPaused: false,
     gameSpeed: 'normal',

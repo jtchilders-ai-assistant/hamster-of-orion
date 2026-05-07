@@ -1,5 +1,5 @@
-# Current Task: fix-79 — DiplomacyAI Fixes
+# Current Task: fix-47 — Fleet AI Design Doc Fixes
 
-**ID**: fix-79 | **Severity**: medium | **Source**: src/game/ai/diplomacyAI.ts
+**ID**: fix-47 | **Source files**: src/game/ai/fleetAI.ts
 
-**Task**: Review src/game/ai/diplomacyAI.ts for design compliance. No design docs listed.
+Review fleet AI system for design doc compliance. Fix mismatches between fleet AI behavior and design documents covering fleet deployment, colonization, and combat strategies.

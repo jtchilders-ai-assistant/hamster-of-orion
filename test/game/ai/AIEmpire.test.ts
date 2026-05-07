@@ -434,9 +434,10 @@ function makeShipDesignForPower(
 
 describe('calculateShipPower (ai-implementation.md §1.3)', () => {
   it('calculates power using hull HP, armor, weapons, shields, and speed', () => {
-    // Medium hull = 18 HP, Zortrium armor = 1.8×, Fusion Beam 20 dmg, Class V shields, Speed 4
-    // Ship_Power = floor((18 × 1.8 × 0.5) + (20 × 2.0) + (5 × 5) + (4 × 3))
-    //            = floor(16.2 + 40 + 25 + 12) = floor(93.2) = 93
+    // Medium hull = 18 HP, Zortrium armor = 2.0× (per ai-implementation.md §1.3)
+    // Fusion Beam 20 dmg, Class V shields, Speed 4
+    // Ship_Power = floor((18 × 2.0 × 0.5) + (20 × 2.0) + (5 × 5) + (4 × 3))
+    //            = floor(18 + 40 + 25 + 12) = floor(95) = 95
     const design = makeShipDesignForPower({
       hullClass: 'medium',
       armorType: 'zortrium',
@@ -444,7 +445,7 @@ describe('calculateShipPower (ai-implementation.md §1.3)', () => {
       shieldClass: 5,
       speed: 4,
     });
-    expect(calculateShipPower(design)).toBe(93);
+    expect(calculateShipPower(design)).toBe(95);
   });
 
   it('handles damage ranges (e.g., 2-8) by using average', () => {

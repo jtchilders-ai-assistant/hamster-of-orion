@@ -19,7 +19,7 @@
         "growth": 0,
         "groundCombat": -10,
         "shipCombat": 0,
-        "espionage": -20,
+        "espionage": 0,
         "diplomacy": 30
       },
       "researchFieldBonuses": {
@@ -528,7 +528,7 @@
         "growth": -50,
         "groundCombat": 25,
         "shipCombat": 0,
-        "espionage": -30,
+        "espionage": -15,
         "diplomacy": 0
       },
       "researchFieldBonuses": {
@@ -663,7 +663,7 @@
         "growth": 10,
         "groundCombat": 50,
         "shipCombat": 10,
-        "espionage": -20,
+        "espionage": -10,
         "diplomacy": -20
       },
       "researchFieldBonuses": {
@@ -848,7 +848,7 @@
         "growth": 0,
         "groundCombat": -20,
         "shipCombat": 50,
-        "espionage": -10,
+        "espionage": 0,
         "diplomacy": 0
       },
       "researchFieldBonuses": {

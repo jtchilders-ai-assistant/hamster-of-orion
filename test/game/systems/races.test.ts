@@ -383,9 +383,10 @@ describe('applyEspionageBonus', () => {
     expect(applyEspionageBonus(base, 'chameleons', 'hamsters')).toBeCloseTo(expected);
   });
 
-  it('Hamsters: -20% espionage reduces success rate', () => {
+  it('Hamsters: 0% espionage bonus (baseline race per §2.1)', () => {
+    // Per design/diplomacy/espionage.md §2.1, Hamsters have 0% espionage bonus
     const result = applyEspionageBonus(0.30, 'hamsters', 'rats');
-    expect(result).toBeCloseTo(0.30 * 0.80);
+    expect(result).toBeCloseTo(0.30);
   });
 
   it('Neutral race (0% bonus) returns base chance', () => {

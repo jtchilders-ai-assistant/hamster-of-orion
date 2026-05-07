@@ -394,14 +394,17 @@ export const HULL_BASE_HP = {
 };
 
 // Armor multipliers by type
-// Design doc source: combat-algorithm.md §3.1
+// Design doc source: ai-implementation.md §1.3 (for AI fleet power)
+// Also used in combat calculations
 export const ARMOR_MULTIPLIERS: Record<string, number> = {
   none: 1.0,
   titanium: 1.0,
-  monomolecular: 1.15,
-  composite: 1.3,
-  ferrocarbide: 1.5,
-  zortrium: 1.8,
+  duralloy: 1.5,
+  zortrium: 2.0,
+  andrium: 2.5,
+  tritanium: 3.0,
+  adamantium: 3.5,
+  neutronium: 4.0,
 };
 
 // Engine combat speed (1-8) and maneuver rating (1-6, +1 per mark)
@@ -783,6 +786,187 @@ export const SHIELD_CLASS_MAX = 15;
 
 // Ship build progress carryover
 export const BUILD_PROGRESS_CARRYOVER = 0;
+
+// ================================================================
+// Ship Economics (design/economy/ship-costs.md)
+// ================================================================
+
+// ── Ship Maintenance ──────────────────────────────────────────────────────────
+// Design source: design/economy/ship-costs.md §5-7
+
+/**
+ * Base maintenance rate for ships (2% of construction cost per turn).
+ * Formula: Ship_Maintenance = Ship_Cost × SHIP_MAINTENANCE_RATE
+ */
+export const SHIP_MAINTENANCE_RATE = 0.02;
+
+/**
+ * Minimum maintenance cost per ship (1 BC).
+ * No ship is free to maintain.
+ */
+export const MINIMUM_SHIP_MAINTENANCE = 1;
+
+/**
+ * Racial maintenance modifiers.
+ * Design source: design/economy/ship-costs.md §7 Racial Modifiers
+ */
+export const RACIAL_MAINTENANCE_MODIFIERS: Record<string, number> = {
+  ants: 0.75,        // 25% less - Hive efficiency
+  mice: 0.80,        // 20% less - Automated systems
+  hermit_crabs: 0.90, // 10% less - Durable ships
+  hamsters: 1.00,    // baseline
+  guinea_pigs: 1.00, // baseline
+  rats: 1.00,        // baseline
+  rabbits: 1.00,     // baseline
+  chameleons: 1.00,  // baseline
+  budgies: 1.10,     // 10% more - High-performance ships
+  ferrets: 1.15,     // 15% more - Weapon-heavy designs
+};
+
+/**
+ * Fleet Logistics tech modifiers for maintenance (multiplicative).
+ * Design source: design/economy/ship-costs.md §7 Technology Modifiers
+ * Note: These are SEPARATE from Automated Repair Unit / Advanced Damage Control
+ * which are in-combat HP regeneration systems.
+ */
+export const FLEET_LOGISTICS_TECH: {
+  tech_level: number;
+  name: string;
+  modifier: number;
+}[] = [
+  { tech_level: 14, name: "Fleet Logistics I", modifier: 0.90 },   // -10%
+  { tech_level: 30, name: "Fleet Logistics II", modifier: 0.80 },  // -20%
+  { tech_level: 44, name: "Fleet Logistics III", modifier: 0.70 }, // -30%
+];
+
+// ── Ship Scrapping ────────────────────────────────────────────────────────────
+// Design source: design/economy/ship-costs.md §9-10
+
+/**
+ * Base scrap rate when scrapping ships at a friendly planet.
+ * Scrap_Value = Ship_Cost × SCRAP_RATE_BASE
+ */
+export const SCRAP_RATE_BASE = 0.25;
+
+/**
+ * Scrap rate when scrapping at a shipyard world (35%).
+ */
+export const SCRAP_RATE_SHIPYARD = 0.35;
+
+/**
+ * Scrap rate for damaged ships (< 50% HP) (15%).
+ */
+export const SCRAP_RATE_DAMAGED = 0.15;
+
+/**
+ * Scrap rate when scrapping in enemy territory (10%).
+ */
+export const SCRAP_RATE_ENEMY_TERRITORY = 0.10;
+
+/**
+ * Emergency scrap rate during bankruptcy (10%).
+ * Used when empire cannot pay maintenance.
+ */
+export const SCRAP_RATE_EMERGENCY = 0.10;
+
+/**
+ * Self-destruct in combat returns nothing.
+ */
+export const SCRAP_RATE_SELF_DESTRUCT = 0.00;
+
+// ── Ship Refitting ────────────────────────────────────────────────────────────
+// Design source: design/economy/ship-costs.md §11-12
+
+/**
+ * Refit cost rate (50% of the cost difference between designs).
+ * Formula: Refit_Cost = (New_Design_Cost - Old_Design_Value) × REFIT_RATE
+ * Minimum refit cost is 0 (no refund if new design is cheaper).
+ */
+export const REFIT_RATE = 0.50;
+
+// ── Miniaturization ───────────────────────────────────────────────────────────
+// Design source: design/economy/ship-costs.md §3
+
+/**
+ * Miniaturization cost reduction per tier difference.
+ * Formula: Reduction = (Current_Tier - Component_Tier) × MINIATURIZATION_PER_TIER
+ */
+export const MINIATURIZATION_PER_TIER = 0.05;
+
+/**
+ * Maximum miniaturization reduction (50% - minimum 50% of base cost).
+ */
+export const MINIATURIZATION_MAX_REDUCTION = 0.50;
+
+// ── Hull Costs ────────────────────────────────────────────────────────────────
+// Design source: design/economy/ship-costs.md §1 Hull Base Costs
+
+export const HULL_COSTS: {
+  class: string;
+  base_space: number;
+  hull_cost: number;
+}[] = [
+  { class: "small", base_space: 25, hull_cost: 6 },
+  { class: "medium", base_space: 70, hull_cost: 36 },
+  { class: "large", base_space: 280, hull_cost: 200 },
+  { class: "huge", base_space: 1400, hull_cost: 1200 },
+];
+
+// ── Defensive Installations ───────────────────────────────────────────────────
+// Design source: design/economy/ship-costs.md §15
+// Note: Defensive installations have lower maintenance than equivalent ships.
+
+export const DEFENSIVE_INSTALLATIONS: {
+  type: string;
+  cost: number;
+  maintenance: number;
+}[] = [
+  { type: "missile_base", cost: 100, maintenance: 2 },
+  { type: "fighter_base", cost: 300, maintenance: 5 },
+  { type: "orbital_station", cost: 800, maintenance: 15 },
+  { type: "star_fortress", cost: 2000, maintenance: 40 },
+  { type: "battlestation", cost: 5000, maintenance: 100 },
+];
+
+// ── Troop Transports ──────────────────────────────────────────────────────────
+// Design source: design/economy/ship-costs.md §16
+// Military vessels for planetary invasion (separate from colony transports).
+
+export const TROOP_TRANSPORTS: {
+  type: string;
+  cost: number;
+  maintenance: number;
+  capacity_troops: number;
+}[] = [
+  { type: "light_transport", cost: 50, maintenance: 1, capacity_troops: 5 },
+  { type: "heavy_transport", cost: 100, maintenance: 2, capacity_troops: 10 },
+  { type: "assault_transport", cost: 200, maintenance: 4, capacity_troops: 20 },
+];
+
+// ── Fleet Budget Guidelines ───────────────────────────────────────────────────
+// Design source: design/economy/ship-costs.md §13-14
+
+/**
+ * Maximum recommended fleet-to-income ratio.
+ * Fleet maintenance should not exceed this fraction of net income.
+ */
+export const FLEET_BUDGET_MAX_RATIO = 0.40;
+
+/**
+ * Safety margin for fleet planning (50% of income).
+ */
+export const FLEET_BUDGET_SAFETY_MARGIN = 0.50;
+
+/**
+ * Fleet budget thresholds for UI warnings.
+ */
+export const FLEET_BUDGET_THRESHOLDS = {
+  underbuilt: 0.20,  // < 20% = can afford more ships
+  healthy_max: 0.40, // 20-40% = balanced
+  strained: 0.60,    // 40-60% = risk of bankruptcy
+  critical: 0.80,    // 60-80% = one bad turn = scrapping
+  // > 80% = unsustainable (will collapse)
+};
 
 // ================================================================
 // Scanner Range (design/galaxy/exploration.md §Scanner Range)

@@ -221,6 +221,12 @@ export interface SpyMission {
   reward?: { type: string; value: number };
   /** Turns to skip before this spy can act again (§1.3 All Spies Fail). */
   skipTurns?: number;
+  /**
+   * For frame_race missions: the empire being framed (blamed for the espionage).
+   * The target thinks this empire conducted the spy operation.
+   * Design source: design/diplomacy/espionage.md §6.6
+   */
+  framedEmpireId?: EmpireId;
 }
 
 export type TreatyType = 'peace' | 'non_aggression' | 'trade' | 'research' | 'military_alliance' | 'defensive_pact';
@@ -800,6 +806,14 @@ export interface Empire {
 
   isDefeated: boolean;
   defeatedTurn: number | null;
+
+  /**
+   * Active espionage modifiers applied to this empire by other empires.
+   * Stored here and consumed during production/research/morale phases.
+   * Cleaned up each turn via cleanupExpiredModifiers().
+   * Design source: design/diplomacy/espionage.md §6 (mission effects)
+   */
+  espionageModifiers?: import('./systems/espionageResolution').EspionageModifier[];
 }
 
 // ── AI Empire ───────────────────────────────────────────────────────────────

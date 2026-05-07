@@ -96,11 +96,11 @@ describe('newGameReducer', () => {
     expect(state.galaxy.size).toBe(baseOptions.galaxySize);
   });
 
-  it('starts at turn 1 year 2501', () => {
+  it('starts at turn 1 year 2624 (per design/game-mechanics/turn-structure.md)', () => {
     const action = startGame(baseOptions);
     const state: GameState = newGameReducer(initialState, action);
     expect(state.turn).toBe(1);
-    expect(state.year).toBe(2501);
+    expect(state.year).toBe(2624); // 2623 + 1
   });
 
   it('planets are populated', () => {

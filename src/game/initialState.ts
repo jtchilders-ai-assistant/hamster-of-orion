@@ -64,7 +64,7 @@ export const initialState: GameState = {
   version: '0.1.0',
   seed: 'default',
   turn: 1,
-  year: 2501,
+  year: 2624, // 2623 + 1 per design/game-mechanics/turn-structure.md
   difficulty: 'average',
   isPaused: false,
   gameSpeed: 'normal',

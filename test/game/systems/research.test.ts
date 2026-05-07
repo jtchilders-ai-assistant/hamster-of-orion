@@ -28,6 +28,9 @@ import {
   ALL_RESEARCH_FIELDS,
   BASE_RP_PER_SCIENTIST,
   MINIATURIZATION_RATE,
+  getTechPrerequisite,
+  isTechResearchable,
+  getResearchableForField,
   MINIATURIZATION_MAX,
   type PlanetRPInput,
   type ResearchAllocation,
@@ -1001,7 +1004,119 @@ describe('edge cases', () => {
     }
   });
 
-  it('multiple fields complete in the same turn', () => {
+  // ─── Tech Prerequisite Enforcement (ORION-FIX-012) ─────────────────────────
+
+describe('Tech prerequisite enforcement', () => {
+  // battle_computer_2_tech requires battle_computer_1_tech (from tech-tree.json)
+  const PREREQ_TECH = 'battle_computer_1_tech';
+  const CHAIN_TECH  = 'battle_computer_2_tech';
+  const FREE_TECH   = 'laser_tech'; // tier 1, no prerequisite
+
+  describe('getTechPrerequisite', () => {
+    it('returns undefined for techs with no prerequisite', () => {
+      expect(getTechPrerequisite(FREE_TECH)).toBeUndefined();
+    });
+
+    it('returns the prereq ID for chained techs', () => {
+      expect(getTechPrerequisite(CHAIN_TECH)).toBe(PREREQ_TECH);
+    });
+
+    it('returns undefined for an unknown tech ID', () => {
+      expect(getTechPrerequisite('nonexistent_tech')).toBeUndefined();
+    });
+  });
+
+  describe('isTechResearchable', () => {
+    it('allows a tech with no prerequisite when not completed', () => {
+      expect(isTechResearchable(FREE_TECH, [])).toBe(true);
+    });
+
+    it('blocks a tech that is already completed', () => {
+      expect(isTechResearchable(FREE_TECH, [FREE_TECH])).toBe(false);
+    });
+
+    it('blocks a chained tech when its prerequisite is not completed', () => {
+      expect(isTechResearchable(CHAIN_TECH, [])).toBe(false);
+    });
+
+    it('blocks a chained tech when completed list omits the prereq', () => {
+      // some other completed tech shouldn't unlock it
+      expect(isTechResearchable(CHAIN_TECH, [FREE_TECH])).toBe(false);
+    });
+
+    it('allows a chained tech when its prerequisite is completed', () => {
+      expect(isTechResearchable(CHAIN_TECH, [PREREQ_TECH])).toBe(true);
+    });
+
+    it('blocks a chained tech that is itself already completed', () => {
+      expect(isTechResearchable(CHAIN_TECH, [PREREQ_TECH, CHAIN_TECH])).toBe(false);
+    });
+
+    it('accepts a ReadonlySet as completedTechs', () => {
+      const done = new Set([PREREQ_TECH]);
+      expect(isTechResearchable(CHAIN_TECH, done)).toBe(true);
+    });
+  });
+
+  describe('getResearchableForField', () => {
+    it('returns techs with met prerequisites', () => {
+      const researchable = getResearchableForField('computers', [PREREQ_TECH]);
+      const ids = researchable.map((t) => t.id);
+      // CHAIN_TECH is now unlocked because PREREQ_TECH is done
+      expect(ids).toContain(CHAIN_TECH);
+    });
+
+    it('excludes techs whose prerequisite is unmet', () => {
+      const researchable = getResearchableForField('computers', []);
+      const ids = researchable.map((t) => t.id);
+      expect(ids).not.toContain(CHAIN_TECH);
+    });
+
+    it('excludes techs that are already completed', () => {
+      const researchable = getResearchableForField('computers', [PREREQ_TECH, CHAIN_TECH]);
+      const ids = researchable.map((t) => t.id);
+      expect(ids).not.toContain(CHAIN_TECH);
+      expect(ids).not.toContain(PREREQ_TECH);
+    });
+  });
+
+  describe('setResearchTarget with prerequisite validation', () => {
+    it('allows selecting a tech with no prerequisite', () => {
+      const fields = createDefaultFieldResearch();
+      const updated = setResearchTarget(fields, 'weapons', FREE_TECH, 1, []);
+      expect(updated.weapons.currentTechId).toBe(FREE_TECH);
+    });
+
+    it('allows selecting a chained tech when prereq is done', () => {
+      const fields = createDefaultFieldResearch();
+      const updated = setResearchTarget(fields, 'computers', CHAIN_TECH, 2, [PREREQ_TECH]);
+      expect(updated.computers.currentTechId).toBe(CHAIN_TECH);
+    });
+
+    it('throws when selecting a chained tech whose prereq is missing', () => {
+      const fields = createDefaultFieldResearch();
+      expect(() =>
+        setResearchTarget(fields, 'computers', CHAIN_TECH, 2, []),
+      ).toThrow(/prerequisite/);
+    });
+
+    it('throws mentioning the prereq ID in the error message', () => {
+      const fields = createDefaultFieldResearch();
+      expect(() =>
+        setResearchTarget(fields, 'computers', CHAIN_TECH, 2, []),
+      ).toThrow(PREREQ_TECH);
+    });
+
+    it('skips validation when completedTechs is omitted (backwards-compat)', () => {
+      // Omitting completedTechs bypasses the check — should not throw.
+      const fields = createDefaultFieldResearch();
+      const updated = setResearchTarget(fields, 'computers', CHAIN_TECH, 2);
+      expect(updated.computers.currentTechId).toBe(CHAIN_TECH);
+    });
+  });
+});
+
+it('multiple fields complete in the same turn', () => {
     // Set up all 6 fields close to completion, add enough RP to complete several
     let fields = createDefaultFieldResearch();
     for (const field of ALL_RESEARCH_FIELDS) {

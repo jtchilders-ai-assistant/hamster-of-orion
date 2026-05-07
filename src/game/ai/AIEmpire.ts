@@ -34,7 +34,6 @@ import { moveFleet } from '../systems/fleet';
 
 import {
   getGamePhase,
-  isUnderThreat,
   computeProductionSliders,
   shouldBuildMilitary,
   selectAttackTargets,
@@ -42,6 +41,7 @@ import {
   getIdleColonyFleets,
   fleetHasColonyShip,
 } from './strategies';
+import { isUnderSignificantThreat } from './threatAssessment';
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
@@ -124,7 +124,10 @@ export function processAITurn(state: GameState, empireId: EmpireId): GameState {
   if (!empire || empire.isDefeated || empire.planets.length === 0) return state;
 
   const phase = getGamePhase(state.turn);
-  const threatened = isUnderThreat(empireId, state, aiEmpire.weights.fleetSizeThreshold);
+  // Use the 5-component weighted Threat_Score formula (design/technical/ai-implementation.md §1.2)
+  // instead of the old binary heuristic (isUnderThreat).
+  // Threshold 60 = 'moderate' or higher — matches §1.9 Threat Classification.
+  const threatened = isUnderSignificantThreat(empireId, state, 60);
 
   let nextState = state;
 
@@ -171,7 +174,7 @@ export function processAITurn(state: GameState, empireId: EmpireId): GameState {
 
   // ── Step 3: Queue military ships when needed ───────────────────────────────
 
-  if (shouldBuildMilitary(empireId, nextState, aiEmpire, phase)) {
+  if (shouldBuildMilitary(empireId, nextState, aiEmpire, phase, threatened)) {
     const militaryDesign = findMilitaryShipDesign(empireId, nextState);
     if (militaryDesign !== null) {
       const planetsById3 = { ...nextState.planets.byId };

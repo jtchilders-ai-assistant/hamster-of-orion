@@ -73,16 +73,16 @@ const TECH_THEFT_TIER_MODIFIERS: Array<{ maxTier: number; modifier: number }> = 
  * Ants are excluded by canConductEspionage=false, so their multiplier is never used.
  */
 const RACIAL_AGGRESSION_MULTIPLIER: Record<string, number> = {
-  chameleons:  1.60,
-  ferrets:     1.10,
-  rats:        1.00,
-  hamsters:    1.00,
-  mice:        1.00,
-  budgies:     1.00,
-  rabbits:     1.00,
-  guinea_pigs: 1.00,
-  hermit_crabs: 1.00,
-  ants:        1.00,  // never applied (blocked by flag)
+  chameleons:   1.60,
+  ferrets:      1.10,
+  rats:         1.00,
+  hamsters:     1.00,
+  mice:         1.00,
+  budgies:      1.00,
+  rabbits:      0.95,  // §2.1: Too nervous for spy work
+  guinea_pigs:  0.90,  // §2.1: Too direct, despise subterfuge
+  hermit_crabs: 0.85,  // §2.1: Slow, obvious, patient not sneaky
+  ants:         1.00,  // never applied (blocked by flag)
 };
 
 /**

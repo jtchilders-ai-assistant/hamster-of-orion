@@ -162,11 +162,11 @@ describe('calculateMissionProbability', () => {
 
     const prob = calculateMissionProbability(sender, target, 'reconnaissance');
 
-    // Base for intelligence_gathering = 80
-    // Hamsters espionage bonus = -20 (from races.json)
-    // SpyEffectiveness = (30 + (-20) + 0 + 0 - 0) × 1.00 = 10
-    // SuccessChance = 80 + 10 = 90, clamped to 0.90
-    expect(prob).toBeCloseTo(0.90, 2);
+    // Base for reconnaissance = 80
+    // Hamsters espionage bonus = 0 (per design/diplomacy/espionage.md §2.1)
+    // SpyEffectiveness = (30 + 0 + 0 + 0 - 0) × 1.00 = 30
+    // SuccessChance = 80 + 30 = 110, clamped to 95 (MAX_SUCCESS)
+    expect(prob).toBeCloseTo(0.95, 2);
   });
 
   it('Chameleons have high success vs Hamsters (racial bonus)', () => {
@@ -189,10 +189,11 @@ describe('calculateMissionProbability', () => {
     const prob = calculateMissionProbability(sender, target, 'sabotage_factories');
 
     // Tech bonus = (15 - 10) × 2 = 10
-    // SpyEffectiveness = (30 + (-20) + 0 + 10 - 0) × 1.00 = 20
+    // Hamsters espionage bonus = 0 (per design/diplomacy/espionage.md §2.1)
+    // SpyEffectiveness = (30 + 0 + 0 + 10 - 0) × 1.00 = 40
     // Base sabotage = 40
-    // SuccessChance = 40 + 20 = 60
-    expect(prob).toBeCloseTo(0.60, 2);
+    // SuccessChance = 40 + 40 = 80
+    expect(prob).toBeCloseTo(0.80, 2);
   });
 
   it('high security reduces success', () => {
@@ -202,9 +203,10 @@ describe('calculateMissionProbability', () => {
     const prob = calculateMissionProbability(sender, target, 'assassination');
 
     // Security penalty = 5 × 10 = 50
-    // SpyEffectiveness = (30 + (-20) + 0 + 0 - 50) × 1.00 = -40
+    // Hamsters espionage bonus = 0 (per design/diplomacy/espionage.md §2.1)
+    // SpyEffectiveness = (30 + 0 + 0 + 0 - 50) × 1.00 = -20
     // Base assassination = 10
-    // SuccessChance = 10 + (-40) = -30 → clamped to 5 (minimum)
+    // SuccessChance = 10 + (-20) = -10 → clamped to 5 (minimum)
     expect(prob).toBeCloseTo(0.05, 2);
   });
 

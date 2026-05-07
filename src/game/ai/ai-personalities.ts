@@ -204,6 +204,8 @@ export const CHAMELEON_PROFILE: AIPersonalityProfile = {
 /**
  * Rabbits (MOO1: Sakkra) — +100% Population Growth
  * Fearful prey who focus on population.
+ * Note: Appease to survive, but Hamsters are the canonical "best starting
+ * relations" race (design/diplomacy/ai-personalities.md).
  */
 export const RABBIT_PROFILE: AIPersonalityProfile = {
   type: 'defensive',
@@ -211,7 +213,7 @@ export const RABBIT_PROFILE: AIPersonalityProfile = {
   expansionism: 45,
   diplomacy: 40,
   research: 30,
-  baseFriendliness: 25,
+  baseFriendliness: 18,
   warReluctance: 40,
   treatyBonus: 10,
   backstabTendency: 0,

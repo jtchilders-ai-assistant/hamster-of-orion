@@ -63,6 +63,8 @@ import { processAllAITurns } from '../ai/AIEmpire';
 import { processAllShipConstruction, AllShipConstructionResult } from './shipConstruction';
 import { checkVictoryConditions, VictoryResult } from './victoryConditions';
 import { resolveEspionageMissions } from './espionageResolution';
+import { processTreatyEffects } from './treaties';
+import { processRelations } from './diplomacy';
 import {
   processRandomEvents,
   processActiveEvents,
@@ -80,6 +82,16 @@ import {
   TERRAFORMING_BONUSES,
 } from '../constants';
 import { RaceId } from '../state';
+
+// ── Bankruptcy Constants (design/game-mechanics/turn-structure.md) ────────────
+// ── Year Tracking (design/game-mechanics/turn-structure.md §Turn Counter) ─────
+
+/**
+ * Starting year in galactic time.
+ * Design doc: "Starting: Year 2623 (lore: 123 years post-Awakening)"
+ * Each turn advances by 1 year.
+ */
+const STARTING_YEAR = 2623;
 
 // ── Bankruptcy Constants (design/game-mechanics/turn-structure.md) ────────────
 
@@ -1036,7 +1048,15 @@ function processPhaseDiplomacy(
   espionageMissionsResolved = espionageResult.results.length;
   events.push(...espionageResult.events);
 
-  // TODO: Implement treaty decay, AI diplomatic proposals, trade route updates
+  // Apply per-turn treaty upkeep: trade income ramp, maintenance relation bonuses,
+  // treaty duration bonuses, and treaty expiry.
+  // design/diplomacy/relationship-formulas.md §3.1, §3.3
+  next = processTreatyEffects(next);
+
+  // Apply natural relation decay toward racial baselines, expire timed modifiers,
+  // and recompute diplomatic state labels.
+  // design/diplomacy/relationship-formulas.md §6
+  next = processRelations(next);
 
   const successfulMissions = espionageResult.results.filter((r) => r.success).length;
   const detectedMissions = espionageResult.results.filter((r) => r.detected).length;
@@ -1677,7 +1697,7 @@ export function processTurn(state: GameState): GameState {
 
   // ── Step 1: advance time ─────────────────────────────────────────────────
   const newTurn = state.turn + 1;
-  const newYear = 2500 + newTurn;
+  const newYear = STARTING_YEAR + newTurn;
 
   let current: GameState = {
     ...state,
@@ -1726,7 +1746,7 @@ export function processTurn(state: GameState): GameState {
 export function processTurnWithResult(state: GameState): TurnResult {
   const preTurnState = state;
   const newTurn = state.turn + 1;
-  const newYear = 2500 + newTurn;
+  const newYear = STARTING_YEAR + newTurn;
 
   let current: GameState = {
     ...state,

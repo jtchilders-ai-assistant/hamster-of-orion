@@ -21,6 +21,9 @@ import {
   createDefaultFieldResearch,
   createEvenAllocation,
   getTechCost as systemGetTechCost,
+  isTechResearchable,
+  getTechPrerequisite,
+  getTechEntryById,
 } from '../../game/systems/research';
 import techTreeRaw from '../../data/tech-tree.json';
 
@@ -34,6 +37,8 @@ interface TechEntry {
   cost: number;
   unlocks: string[];
   description: string;
+  /** ID of another tech that must be completed before this one can be researched. */
+  prerequisite?: string;
 }
 
 interface TechTreeData {
@@ -523,14 +528,23 @@ export class ResearchScreen {
     isCurrent: boolean,
     state: GameState,
   ): HTMLElement {
-    const isSelectable = !isCompleted && !isCurrent;
+    // Prerequisite check: tech is only selectable when its prereq is done.
+    const empire = this.getPlayerEmpire(state);
+    const completedSet = new Set(empire?.research.completedTechs ?? []);
+    const prereq = getTechPrerequisite(tech.id);
+    const prereqMet = prereq === undefined || completedSet.has(prereq);
+    const isLocked = !isCompleted && !isCurrent && !prereqMet;
+    const isSelectable = !isCompleted && !isCurrent && prereqMet;
+
+    // Locked (prereq unmet) rows are visually more dimmed
+    const opacityStyle = isCompleted || isCurrent ? 'opacity:1;' : isLocked ? 'opacity:0.35;' : 'opacity:0.7;';
 
     const row = document.createElement('div');
     row.className = 'tech-row';
     row.style.cssText =
       'display:flex; align-items:center; justify-content:space-between;' +
       `padding:5px 14px; cursor:pointer; transition:background 0.1s;` +
-      (isCompleted ? 'opacity:1;' : isCurrent ? 'opacity:1;' : 'opacity:0.7;');
+      opacityStyle;
 
     row.addEventListener('mouseenter', () => {
       row.style.background = 'rgba(255,255,255,0.05)';
@@ -554,16 +568,26 @@ export class ResearchScreen {
       row.style.background = 'rgba(255,255,255,0.08)';
     });
 
-    // Left side: name
+    // Left side: name (+ lock icon when prereq unmet)
     const nameEl = document.createElement('span');
-    nameEl.textContent = tech.name;
+    nameEl.textContent = isLocked ? `🔒 ${tech.name}` : tech.name;
     nameEl.style.cssText =
       `font-size:12px; flex:1;` +
       (isCompleted
         ? 'color:var(--color-text);'
         : isCurrent
           ? 'color:var(--color-accent);'
-          : 'color:var(--color-text-dim);');
+          : isLocked
+            ? 'color:var(--color-text-dim);'
+            : 'color:var(--color-text-dim);');
+
+    // Tooltip showing what prereq is needed
+    if (isLocked && prereq !== undefined) {
+      const prereqEntry = getTechEntryById(prereq);
+      row.title = prereqEntry
+        ? `Requires: ${prereqEntry.name}`
+        : `Requires: ${prereq}`;
+    }
 
     row.appendChild(nameEl);
 
@@ -602,6 +626,9 @@ export class ResearchScreen {
     } else if (isCurrent) {
       statusEl.textContent = '[→]';
       statusEl.style.color = 'var(--color-accent)';
+    } else if (isLocked) {
+      statusEl.textContent = '[🔒]';
+      statusEl.style.color = 'var(--color-text-dim)';
     } else {
       statusEl.textContent = '[ ]';
       statusEl.style.color = 'var(--color-text-dim)';
@@ -622,6 +649,16 @@ export class ResearchScreen {
    * display the tech name and calculate ETA.
    */
   private selectTechForField(field: ResearchField, techId: string): void {
+    // Prerequisite guard: refuse selection if the prereq hasn't been completed.
+    const state = this.store.getState();
+    const empire = this.getPlayerEmpire(state);
+    const completedTechs = empire?.research.completedTechs ?? [];
+    if (!isTechResearchable(techId, completedTechs)) {
+      // Tech is already done or prereq unmet — silently reject (button should
+      // never be visible for these cases, but defend in depth).
+      return;
+    }
+
     // Persist to store — reducer stores in empire.research.fieldCurrentTech
     this.store.dispatch({
       type: 'SET_RESEARCH_CURRENT_TECH',

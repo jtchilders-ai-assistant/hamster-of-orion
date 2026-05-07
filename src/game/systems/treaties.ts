@@ -623,7 +623,11 @@ export function processTreatyEffects(state: GameState): GameState {
       let updatedTreaties: Treaty[] = [];
       let creditDeltaA = 0;
       let creditDeltaB = 0;
-      let relationMaintenanceBonus = 0;  // Accumulated per-turn bonus for this pair
+      // Fractional per-turn maintenance bonus — accumulated across all active treaties for
+      // this pair and applied when >= 1.0 (design §3.1, capped at TREATY_MAINTENANCE_CAP).
+      let rawMaintenanceBonus = 0;
+      // Longest turnsActive across all active treaties — used for duration bonus (§3.3).
+      let maxTurnsActive = 0;
 
       for (const treaty of rel.treaties) {
         if (!treaty.isActive) {
@@ -649,9 +653,12 @@ export function processTreatyEffects(state: GameState): GameState {
 
         let updatedTreaty: Treaty = { ...treaty, canBreak: canBreakNow };
 
-        // Accumulate per-turn maintenance bonus for this treaty type
+        // Accumulate per-turn maintenance bonus for this treaty type (§3.1)
         const maintenanceRate = TREATY_RELATION_MAINTENANCE[treaty.type] ?? 0;
-        relationMaintenanceBonus += maintenanceRate;
+        rawMaintenanceBonus += maintenanceRate;
+
+        // Track longest active treaty for duration bonus (§3.3)
+        if (turnsActive > maxTurnsActive) maxTurnsActive = turnsActive;
 
         // Trade: advance ramp counter and compute income
         if (treaty.type === 'trade' && treaty.terms.tradeIncome !== undefined) {
@@ -680,13 +687,45 @@ export function processTreatyEffects(state: GameState): GameState {
         treaties: updatedTreaties,
       }));
 
-      // Apply per-turn relation maintenance bonus (capped at TREATY_MAINTENANCE_CAP)
-      // This is fractionally accumulated - we floor to get integer relation change
-      const cappedBonus = Math.min(relationMaintenanceBonus, TREATY_MAINTENANCE_CAP);
-      if (cappedBonus >= 1) {
-        const intBonus = Math.floor(cappedBonus);
-        next = nudgeRelation(next, idA, idB, intBonus);
-        next = nudgeRelation(next, idB, idA, intBonus);
+      // ── Per-turn maintenance bonus (design §3.1) ───────────────────────────
+      // Cap raw bonus at TREATY_MAINTENANCE_CAP, then add to the fractional
+      // accumulator stored on the relation.  Apply floor(accumulated) as an
+      // integer nudge so sub-1 rates still accumulate correctly across turns.
+      const cappedRawBonus = Math.min(rawMaintenanceBonus, TREATY_MAINTENANCE_CAP);
+      if (cappedRawBonus > 0) {
+        // Read current accumulator from the (possibly updated) relation
+        const currentRel = getRelation(next, idA, idB);
+        const prevAccumulator = currentRel?.treatyBonusAccumulator ?? 0;
+        const newAccumulator = prevAccumulator + cappedRawBonus;
+        const intBonus = Math.floor(newAccumulator);
+        const remainder = newAccumulator - intBonus;
+
+        // Persist the remainder for next turn
+        next = updateBilateral(next, idA, idB, r => ({
+          ...r,
+          treatyBonusAccumulator: remainder,
+        }));
+
+        // Apply the integer portion as a relation nudge
+        if (intBonus > 0) {
+          next = nudgeRelation(next, idA, idB, intBonus);
+          next = nudgeRelation(next, idB, idA, intBonus);
+        }
+      }
+
+      // ── Treaty duration bonus (design §3.3) ──────────────────────────────
+      // floor(TurnsActive / 25) × 5, max +20.  Applied once per turn as a
+      // marginal step-change when a new 25-turn threshold is crossed.
+      if (maxTurnsActive > 0 && maxTurnsActive % TREATY_DURATION_BONUS_INTERVAL === 0) {
+        const durationBonus = Math.min(
+          TREATY_DURATION_BONUS_INCREMENT,
+          TREATY_DURATION_BONUS_MAX -
+            calculateTreatyDurationBonus(maxTurnsActive - 1),
+        );
+        if (durationBonus > 0) {
+          next = nudgeRelation(next, idA, idB, durationBonus);
+          next = nudgeRelation(next, idB, idA, durationBonus);
+        }
       }
 
       // Credit empires if trade income accrued

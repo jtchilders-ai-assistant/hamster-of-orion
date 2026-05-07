@@ -90,12 +90,12 @@ describe('Game Loop Integration', () => {
       expect(state.empires.byId['player'].isPlayer).toBe(true);
     });
 
-    it('starts at turn 1 with year 2501', () => {
+    it('starts at turn 1 with year 2624 (per design/game-mechanics/turn-structure.md)', () => {
       store.dispatch(startGame(DEFAULT_OPTIONS));
       const state = store.getState();
 
       expect(state.turn).toBe(1);
-      expect(state.year).toBe(2501);
+      expect(state.year).toBe(2624); // 2623 + 1
     });
 
     it('gives the player a homeworld', () => {
@@ -177,7 +177,7 @@ describe('Game Loop Integration', () => {
         store.dispatch(nextTurn());
       }
       expect(store.getState().turn).toBe(startTurn + 10);
-      expect(store.getState().year).toBe(2501 + 10);
+      expect(store.getState().year).toBe(2624 + 10); // 2623 + 11 turns
     });
 
     it('can advance 50 turns without throwing', () => {
@@ -373,18 +373,18 @@ describe('Game Loop Integration', () => {
 
       const state = store.getState();
       expect(state.turn).toBe(21);
-      expect(state.year).toBe(2521);
+      expect(state.year).toBe(2644); // 2623 + 21
       expect(state.empires.playerId).toBe('player');
       expect(state.planets.allIds.length).toBeGreaterThan(0);
     });
 
-    it('turn counter matches year formula (year = 2500 + turn)', () => {
+    it('turn counter matches year formula (year = 2623 + turn per design doc)', () => {
       store.dispatch(startGame(DEFAULT_OPTIONS));
 
       for (let i = 0; i < 10; i++) {
         store.dispatch(nextTurn());
         const state = store.getState();
-        expect(state.year).toBe(2500 + state.turn);
+        expect(state.year).toBe(2623 + state.turn);
       }
     });
 

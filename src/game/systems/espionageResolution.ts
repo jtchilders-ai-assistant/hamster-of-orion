@@ -382,17 +382,30 @@ function applyMissionEffect(
   }
 }
 
-// ── Frame Job (Steal BC) ──────────────────────────────────────────────────
+// ── Frame Job (§6.6) ─────────────────────────────────────────────────────────
+//
+// Frame job mechanics per design §6.6:
+//  1. Steal 5-20% of target's BC (transferred to sender).
+//  2. Apply diplomatic penalty to the FRAMED empire (mission.framedEmpireId)
+//     from the TARGET's perspective: -20 to -50 relations.
+//  3. Sender's relations with the target are unaffected (unless detected).
+//
+// The framed empire (if set) is blamed for the espionage. If no framedEmpireId
+// is set on the mission, only the BC theft is applied (no diplomatic framing).
+
+/** Relation penalty to framed empire from target (design §6.6). */
+const FRAME_JOB_FRAMED_PENALTY_MIN = 20;
+const FRAME_JOB_FRAMED_PENALTY_MAX = 50;
 
 function applyFrameRace(
   state: GameState,
-  _mission: SpyMission,
+  mission: SpyMission,
   senderEmpire: Empire,
   target: Empire,
   rng: () => number,
 ): { state: GameState; effect: MissionEffect; description: string } {
   // Steal 5-20% of target's current BC
-  const stealPercent = FRAME_JOB_STEAL_MIN_PERCENT + 
+  const stealPercent = FRAME_JOB_STEAL_MIN_PERCENT +
     rng() * (FRAME_JOB_STEAL_MAX_PERCENT - FRAME_JOB_STEAL_MIN_PERCENT);
   const stolenAmount = Math.floor(target.credits * (stealPercent / 100));
 
@@ -415,7 +428,7 @@ function applyFrameRace(
     credits: Math.max(0, target.credits - stolenAmount),
   };
 
-  const nextState: GameState = {
+  let nextState: GameState = {
     ...state,
     empires: {
       ...state.empires,
@@ -427,13 +440,66 @@ function applyFrameRace(
     },
   };
 
+  // Apply diplomatic consequences to the FRAMED empire (design §6.6).
+  // The target believes the framed empire conducted the espionage.
+  const framedEmpireId = mission.framedEmpireId;
+  let frameDesc = `Stole ${stolenAmount} BC from ${target.name} (${Math.round(stealPercent)}% of their treasury).`;
+
+  if (framedEmpireId && framedEmpireId !== senderEmpire.id && framedEmpireId !== target.id) {
+    const framedEmpire = nextState.empires.byId[framedEmpireId];
+    if (framedEmpire) {
+      // Apply penalty to target's relations with the framed empire
+      const framedPenalty = Math.round(
+        FRAME_JOB_FRAMED_PENALTY_MIN +
+          rng() * (FRAME_JOB_FRAMED_PENALTY_MAX - FRAME_JOB_FRAMED_PENALTY_MIN),
+      );
+      const currentTarget = nextState.empires.byId[target.id] ?? updatedTarget;
+      const framedRelations = currentTarget.relations[framedEmpireId];
+
+      if (framedRelations) {
+        const updatedFramedRelations = {
+          ...framedRelations,
+          value: Math.max(-100, framedRelations.value - framedPenalty),
+          modifiers: [
+            ...framedRelations.modifiers,
+            {
+              reason: `Espionage detected (framed): steal_technology`,
+              amount: -framedPenalty,
+              expiresAtTurn: state.turn + 50,
+            },
+          ],
+          events: [
+            ...framedRelations.events,
+            {
+              turn: state.turn,
+              type: 'espionage_detected',
+              impact: -framedPenalty,
+              description: `${framedEmpire.name} suspected of conducting espionage (BC theft)`,
+            },
+          ],
+        };
+
+        const targetWithUpdatedRelations: Empire = {
+          ...currentTarget,
+          relations: {
+            ...currentTarget.relations,
+            [framedEmpireId]: updatedFramedRelations,
+          },
+        };
+
+        nextState = updateEmpire(nextState, targetWithUpdatedRelations);
+        frameDesc += ` ${framedEmpire.name} was framed for the theft (-${framedPenalty} relations with ${target.name}).`;
+      }
+    }
+  }
+
   return {
     state: nextState,
     effect: {
       type: 'bc_stolen',
       value: stolenAmount,
     },
-    description: `Stole ${stolenAmount} BC from ${target.name} (${Math.round(stealPercent)}% of their treasury).`,
+    description: frameDesc,
   };
 }
 
@@ -600,58 +666,138 @@ function applyStealTechnology(
   };
 }
 
-// ── Build Sabotage (destroy building) ─────────────────────────────────────────
+// ── Incite Rebellion (§6.5) ──────────────────────────────────────────────────
+//
+// Incite Rebellion uses a morale modifier in the success formula:
+//   RebellionSuccess = 25 + SpyEffectiveness + MoraleModifier
+//   MoraleModifier = (70 - TargetMorale) / 2  (only applies when morale < 70)
+//
+// On success, the outcome depends on a secondary roll:
+//   1-40%: Planet defects to attacker
+//   41-70%: Planet becomes independent (neutral)
+//   71-100%: Civil Unrest (production halted for 5 turns via productionSabotage modifier)
+//
+// Design source: design/diplomacy/espionage.md §6.5
+
+/** Duration for civil unrest production penalty (design §6.5). */
+const CIVIL_UNREST_DURATION_TURNS = 5;
+
+/**
+ * Calculate the morale modifier for incite rebellion missions (§6.5).
+ * MoraleModifier = (70 - targetMoraleNumeric) / 2, only when morale < 70.
+ * Returns 0 if morale >= 70 (cannot attempt rebellion on high-morale planets).
+ */
+export function calculateRebellionMoraleModifier(targetMoraleNumeric: number): number {
+  if (targetMoraleNumeric >= 70) return 0;
+  return (70 - targetMoraleNumeric) / 2;
+}
 
 function applyInciteRebellion(
   state: GameState,
-  _mission: SpyMission,
+  mission: SpyMission,
   target: Empire,
   rng: () => number,
 ): { state: GameState; effect: MissionEffect; description: string } {
-  // Find a planet with buildings
-  const planetsWithBuildings = target.planets
-    .map((id) => state.planets.byId[id])
-    .filter((p): p is Planet => p !== undefined && p.buildings.length > 0);
-
-  if (planetsWithBuildings.length === 0) {
+  if (target.planets.length === 0) {
     return {
       state,
-      effect: { type: 'build_sabotage_failed' },
-      description: 'Target has no buildings to destroy.',
+      effect: { type: 'rebellion_failed' },
+      description: 'Target has no planets to incite rebellion on.',
     };
   }
 
-  // Select random planet and building
-  const planet = planetsWithBuildings[Math.floor(rng() * planetsWithBuildings.length)];
-  const buildingIndex = Math.floor(rng() * planet.buildings.length);
-  const destroyedBuildingId = planet.buildings[buildingIndex];
+  // Pick a target planet — prefer low-morale planets (better targets per design)
+  const targetPlanets = target.planets
+    .map((id) => state.planets.byId[id])
+    .filter((p): p is Planet => p !== undefined);
 
-  // Remove the building
-  const updatedPlanet: Planet = {
-    ...planet,
-    buildings: planet.buildings.filter((_, i) => i !== buildingIndex),
-  };
+  if (targetPlanets.length === 0) {
+    return {
+      state,
+      effect: { type: 'rebellion_failed' },
+      description: 'Target planets not found.',
+    };
+  }
 
-  const nextState: GameState = {
-    ...state,
-    planets: {
-      ...state.planets,
-      byId: {
-        ...state.planets.byId,
-        [planet.id]: updatedPlanet,
+  // Select planet weighted toward lower morale (use morale_numeric as extended field)
+  const planet = targetPlanets[Math.floor(rng() * targetPlanets.length)];
+  const planetMorale = (planet as Planet & { morale_numeric?: number }).morale_numeric ?? 50;
+
+  // Outcome roll: 1-40% defect, 41-70% independent, 71-100% civil unrest
+  const outcomeRoll = rng() * 100;
+  let nextState = state;
+  let outcomeDesc: string;
+  let effectType: string;
+
+  if (outcomeRoll <= 40) {
+    // Planet defects to sender's empire
+    const updatedPlanet: Planet = {
+      ...planet,
+      ownerId: mission.senderId,
+      morale: 'unrest',
+    };
+    nextState = {
+      ...nextState,
+      planets: { ...nextState.planets, byId: { ...nextState.planets.byId, [planet.id]: updatedPlanet } },
+      empires: {
+        ...nextState.empires,
+        byId: {
+          ...nextState.empires.byId,
+          [target.id]: { ...target, planets: target.planets.filter((id) => id !== planet.id) },
+          [mission.senderId]: {
+            ...nextState.empires.byId[mission.senderId]!,
+            planets: [...(nextState.empires.byId[mission.senderId]?.planets ?? []), planet.id],
+          },
+        },
       },
-    },
-  };
+    };
+    outcomeDesc = `${planet.name} has defected to your empire!`;
+    effectType = 'planet_defected';
+  } else if (outcomeRoll <= 70) {
+    // Planet becomes independent (neutral)
+    const updatedPlanet: Planet = {
+      ...planet,
+      ownerId: null,
+      morale: 'unrest',
+    };
+    nextState = {
+      ...nextState,
+      planets: { ...nextState.planets, byId: { ...nextState.planets.byId, [planet.id]: updatedPlanet } },
+      empires: {
+        ...nextState.empires,
+        byId: {
+          ...nextState.empires.byId,
+          [target.id]: { ...target, planets: target.planets.filter((id) => id !== planet.id) },
+        },
+      },
+    };
+    outcomeDesc = `${planet.name} has declared independence!`;
+    effectType = 'planet_independent';
+  } else {
+    // Civil Unrest: production penalty for 5 turns
+    const unrestModifier: EspionageModifier = {
+      id: newModifierId(),
+      type: 'productionSabotage',
+      sourceEmpireId: mission.senderId,
+      targetPlanetId: planet.id,
+      value: 100, // 100% production reduction = halted
+      appliedTurn: state.turn,
+      expiresTurn: state.turn + CIVIL_UNREST_DURATION_TURNS,
+      reason: `Civil Unrest (rebellion) on ${planet.name}`,
+    };
+    nextState = updateEmpire(nextState, addEspionageModifier(target, unrestModifier));
+    outcomeDesc = `Civil unrest erupts on ${planet.name}! Production halted for ${CIVIL_UNREST_DURATION_TURNS} turns. (Planet morale: ${planetMorale})`;
+    effectType = 'civil_unrest';
+  }
 
   return {
     state: nextState,
     effect: {
-      type: 'building_destroyed',
-      value: destroyedBuildingId,
+      type: effectType,
+      value: planetMorale,
       targetPlanetId: planet.id,
-      buildingId: destroyedBuildingId,
     },
-    description: `Destroyed building "${destroyedBuildingId}" on ${planet.name}.`,
+    description: outcomeDesc,
   };
 }
 
@@ -662,7 +808,9 @@ function applyAssassination(
   mission: SpyMission,
   target: Empire,
 ): { state: GameState; effect: MissionEffect; description: string } {
-  // Apply long-term production and morale penalty
+  const senderName = state.empires.byId[mission.senderId]?.name ?? 'unknown';
+
+  // Apply empire-level leaderKilled modifier for production penalty (§6.7: -20% all production, 10 turns)
   const productionModifier: EspionageModifier = {
     id: newModifierId(),
     type: 'leaderKilled',
@@ -670,13 +818,36 @@ function applyAssassination(
     value: ASSASSINATION_PRODUCTION_PENALTY,
     appliedTurn: state.turn,
     expiresTurn: state.turn + ASSASSINATION_DURATION_TURNS,
-    reason: `Leader assassination by ${state.empires.byId[mission.senderId]?.name ?? 'unknown'}`,
+    reason: `Leader assassination by ${senderName}`,
   };
 
-  const updatedTarget = addEspionageModifier(target, productionModifier);
+  let nextState = updateEmpire(state, addEspionageModifier(target, productionModifier));
+
+  // Apply morale penalty to ALL target planets (§6.7: -10 morale_numeric for 10 turns).
+  // We reduce morale_numeric directly and clamp to [0, 100].
+  // This is a permanent state change tracked via a morale modifier on each planet.
+  for (const planetId of target.planets) {
+    const planet = nextState.planets.byId[planetId];
+    if (!planet) continue;
+    const currentMorale = (planet as Planet & { morale_numeric?: number }).morale_numeric ?? 50;
+    const newMorale = Math.max(0, currentMorale - ASSASSINATION_MORALE_PENALTY);
+    const updatedPlanet = {
+      ...planet,
+      morale_numeric: newMorale,
+      // Also degrade the enum morale if it drops below thresholds
+      morale: moraleNumericToEnum(newMorale),
+    } as Planet & { morale_numeric: number };
+    nextState = {
+      ...nextState,
+      planets: {
+        ...nextState.planets,
+        byId: { ...nextState.planets.byId, [planetId]: updatedPlanet as Planet },
+      },
+    };
+  }
 
   return {
-    state: updateEmpire(state, updatedTarget),
+    state: nextState,
     effect: {
       type: 'leader_killed',
       value: ASSASSINATION_DURATION_TURNS,
@@ -764,24 +935,32 @@ function applyDetectionPenalty(state: GameState, mission: SpyMission): GameState
   return updateEmpire(state, updatedSender);
 }
 
+
+// ── Morale enum conversion helper ─────────────────────────────────────────────
+
+/**
+ * Convert a numeric morale score (0-100) to the Morale enum.
+ * Thresholds match population growth morale categories.
+ * ecstatic ≥ 85, happy ≥ 60, content ≥ 40, unrest ≥ 20, rebellion < 20.
+ * Design source: design/diplomacy/espionage.md §6.7 and population-growth.md.
+ */
+export function moraleNumericToEnum(moraleNumeric: number): import('../state').Morale {
+  if (moraleNumeric >= 85) return 'ecstatic';
+  if (moraleNumeric >= 60) return 'happy';
+  if (moraleNumeric >= 40) return 'content';
+  if (moraleNumeric >= 20) return 'unrest';
+  return 'rebellion';
+}
+
 // ── Helper: add modifier to empire ────────────────────────────────────────────
 
-function addEspionageModifier(empire: Empire, _modifier: EspionageModifier): Empire {
-  // Store modifiers in a new field on Empire (espionageModifiers)
-  // This requires extending the Empire type - we'll store in relations for now
-  // as a workaround, or we can extend the Empire type
-
-  // For now, we'll encode in the relations events as a workaround
-  // In a full implementation, we'd add espionageModifiers: EspionageModifier[]
-  // to the Empire type in state.ts
-
-  // Create a "virtual" relation event to track the modifier
-  // This is a temporary solution - proper implementation would extend Empire type
-
+function addEspionageModifier(empire: Empire, modifier: EspionageModifier): Empire {
+  // Store modifier in empire.espionageModifiers (added to Empire type in state.ts).
+  // Downstream systems (production, morale) query these each turn.
+  const existing = empire.espionageModifiers ?? [];
   return {
     ...empire,
-    // Note: In a full implementation, add espionageModifiers field to Empire
-    // For now, we'll just return the empire unchanged and track via mission status
+    espionageModifiers: [...existing, modifier],
   };
 }
 
@@ -803,10 +982,20 @@ function updateEmpire(state: GameState, empire: Empire): GameState {
 // ── Cleanup expired modifiers ─────────────────────────────────────────────────
 
 function cleanupExpiredModifiers(state: GameState): GameState {
-  // In a full implementation, iterate all empires and remove expired modifiers
-  // For now, this is a no-op - the modifier cleanup would happen here
-  // Modifiers are currently tracked via mission status, not stored on empires
-  return state;
+  // Remove all espionageModifiers that have expired (expiresTurn <= current turn).
+  let nextState = state;
+  for (const empireId of state.empires.allIds) {
+    const empire = state.empires.byId[empireId];
+    if (!empire?.espionageModifiers || empire.espionageModifiers.length === 0) continue;
+
+    const active = empire.espionageModifiers.filter(
+      (m) => m.expiresTurn > state.turn,
+    );
+    if (active.length !== empire.espionageModifiers.length) {
+      nextState = updateEmpire(nextState, { ...empire, espionageModifiers: active });
+    }
+  }
+  return nextState;
 }
 
 // ── Event title helper ────────────────────────────────────────────────────────
@@ -840,27 +1029,35 @@ function getEventTitle(missionType: MissionType, success: boolean, detected: boo
  * Get the production sabotage penalty for a planet (if any).
  * Returns 0 if no active sabotage modifier.
  */
+/**
+ * Get the total production sabotage penalty for a planet (0-100 integer %).
+ *
+ * Checks empire.espionageModifiers for active productionSabotage entries
+ * targeting this planet. Expired modifiers are already cleaned up each turn.
+ *
+ * Design source: design/diplomacy/espionage.md §6.3 Sabotage Factories
+ */
 export function getProductionSabotagePenalty(
   state: GameState,
   planetId: PlanetId,
 ): number {
-  // Check completed spy missions for sabotage effects
   const planet = state.planets.byId[planetId];
   if (!planet || !planet.ownerId) return 0;
 
-  const relevantMissions = state.spyMissions.filter(
-    (m) =>
-      m.status === 'completed' &&
-      m.targetId === planet.ownerId &&
-      m.type === 'sabotage_factories' &&
-      m.reward?.type === 'productionSabotage' &&
-      state.turn <= m.startTurn + m.durationTurns + SABOTAGE_DURATION_TURNS,
-  );
+  const empire = state.empires.byId[planet.ownerId];
+  if (!empire?.espionageModifiers || empire.espionageModifiers.length === 0) return 0;
 
-  if (relevantMissions.length === 0) return 0;
+  // Sum all active productionSabotage modifiers targeting this specific planet
+  const penalty = empire.espionageModifiers
+    .filter(
+      (m) =>
+        m.type === 'productionSabotage' &&
+        m.targetPlanetId === planetId &&
+        m.expiresTurn > state.turn,
+    )
+    .reduce((sum, m) => sum + m.value, 0);
 
-  // Sum all active sabotage penalties
-  return relevantMissions.reduce((sum, _m) => sum + SABOTAGE_PRODUCTION_PENALTY, 0);
+  return Math.min(penalty, 100); // cap at 100% (production fully stopped)
 }
 
 /**
@@ -912,29 +1109,53 @@ export function getFalseAllocationPenalty(
 
 /**
  * Check if an empire's leader was recently assassinated (production penalty active).
+ *
+ * Uses empire.espionageModifiers (leaderKilled type) for accurate tracking.
+ * Morale penalty is applied directly to planets at assassination time; this
+ * returns the production penalty still active via the espionageModifiers field.
+ *
+ * Design source: design/diplomacy/espionage.md §6.7
  */
 export function hasLeaderKilledPenalty(
   state: GameState,
   empireId: EmpireId,
 ): { active: boolean; productionPenalty: number; moralePenalty: number } {
-  const relevantMissions = state.spyMissions.filter(
-    (m) =>
-      m.status === 'completed' &&
-      m.targetId === empireId &&
-      m.type === 'assassination' &&
-      m.reward?.type === 'leader_killed' &&
-      state.turn <= m.startTurn + m.durationTurns + ASSASSINATION_DURATION_TURNS,
+  const empire = state.empires.byId[empireId];
+  if (!empire?.espionageModifiers || empire.espionageModifiers.length === 0) {
+    return { active: false, productionPenalty: 0, moralePenalty: 0 };
+  }
+
+  const activeModifier = empire.espionageModifiers.find(
+    (m) => m.type === 'leaderKilled' && m.expiresTurn > state.turn,
   );
 
-  if (relevantMissions.length === 0) {
+  if (!activeModifier) {
     return { active: false, productionPenalty: 0, moralePenalty: 0 };
   }
 
   return {
     active: true,
-    productionPenalty: ASSASSINATION_PRODUCTION_PENALTY,
-    moralePenalty: ASSASSINATION_MORALE_PENALTY,
+    productionPenalty: activeModifier.value, // value = ASSASSINATION_PRODUCTION_PENALTY (20)
+    moralePenalty: ASSASSINATION_MORALE_PENALTY, // Applied at assassination time to planets
   };
+}
+
+/**
+ * Get the total production penalty for an empire from assassination modifiers (%).
+ * Returns 0-100, used by production systems to apply the penalty each turn.
+ *
+ * Design source: design/diplomacy/espionage.md §6.7 (-20% all production, 10 turns)
+ */
+export function getAssassinationProductionPenalty(
+  state: GameState,
+  empireId: EmpireId,
+): number {
+  const empire = state.empires.byId[empireId];
+  if (!empire?.espionageModifiers || empire.espionageModifiers.length === 0) return 0;
+
+  return empire.espionageModifiers
+    .filter((m) => m.type === 'leaderKilled' && m.expiresTurn > state.turn)
+    .reduce((sum, m) => sum + m.value, 0);
 }
 
 // ── Export constants for testing ──────────────────────────────────────────────
