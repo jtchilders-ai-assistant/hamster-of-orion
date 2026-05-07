@@ -123,11 +123,13 @@ export function aiDecideTreaty(
 
   const relValue = relation.value;
 
-  // Personality-driven diplomacy willingness
+  // Personality-driven diplomacy willingness.
+  // Prefer stored AIPersonality fields (populated from canonical profile at game start);
+  // fall back to getPersonalityProfile() for saves that pre-date ORION-FIX-009.
   const aiEmpire: AIEmpire | undefined = state.aiEmpires[empireId];
   const profile = getPersonalityProfile(empire.raceId);
   const diplomacyScore = aiEmpire?.personality.diplomacy ?? profile.diplomacy;
-  const treatyBonus = profile.treatyBonus;
+  const treatyBonus = aiEmpire?.personality.treatyBonus ?? profile.treatyBonus;
 
   // Determine treaty type to propose based on relation depth
   // Friendly → propose trade; Allied → propose research pact
@@ -186,10 +188,14 @@ export function aiDecideBreakTreaty(
   const activeTreaties = getActiveTreaties(state, empireId, targetId);
   if (activeTreaties.length === 0) return null;
 
+  // Prefer stored AIPersonality fields; fall back to profile for pre-fix saves.
   const profile = getPersonalityProfile(empire.raceId);
+  const aiEmpireForBreak: AIEmpire | undefined = state.aiEmpires[empireId];
+  const storedTraits = aiEmpireForBreak?.personality.traits ?? profile.traits;
+  const backstabTendency = aiEmpireForBreak?.personality.backstabTendency ?? profile.backstabTendency;
 
   // Honorable races never break treaties
-  if (profile.traits.includes('honorable')) return null;
+  if (storedTraits.includes('honorable')) return null;
 
   const relValue = getRelationValue(state, empireId, targetId);
   const ratio = fleetStrengthRatio(state, empireId, targetId);
@@ -199,16 +205,16 @@ export function aiDecideBreakTreaty(
   if (!breakableExists) return null;
 
   const relBelowUnfriendly = relValue < STATE_WAR_THRESHOLD / 2; // < -25
-  const backstabOpportunity = profile.backstabTendency > 40 && ratio > 1.5;
+  const backstabOpportunity = backstabTendency > 40 && ratio > 1.5;
 
   if (!relBelowUnfriendly && !backstabOpportunity) return null;
 
   const priority = backstabOpportunity
-    ? Math.min(10, 5 + Math.round(profile.backstabTendency / 20))
+    ? Math.min(10, 5 + Math.round(backstabTendency / 20))
     : 4;
 
   const reason = backstabOpportunity
-    ? `Opportunistic treaty break: fleet advantage ${ratio.toFixed(1)}x, backstab tendency ${profile.backstabTendency}`
+    ? `Opportunistic treaty break: fleet advantage ${ratio.toFixed(1)}x, backstab tendency ${backstabTendency}`
     : `Relations deteriorated to ${relValue}, breaking treaty`;
 
   return {
@@ -246,12 +252,18 @@ export function aiDecideDeclareWar(
   if (!relation) return null;
   if (relation.state === 'war') return null; // already at war
 
+  // Prefer stored AIPersonality fields (populated from canonical profile at game start);
+  // fall back to getPersonalityProfile() for saves that pre-date ORION-FIX-009.
   const profile = getPersonalityProfile(empire.raceId);
   const aiEmpire: AIEmpire | undefined = state.aiEmpires[empireId];
   const aggression = aiEmpire?.personality.aggression ?? profile.aggression;
 
+  // Use traits from stored personality when available, otherwise from canonical profile.
+  // Stored traits are populated via archetypeToTraits() in newGame.ts.
+  const traits = aiEmpire?.personality.traits ?? profile.traits;
+
   // Peaceful races never start wars (design/diplomacy/ai-personalities.md)
-  if (profile.traits.includes('peaceful')) return null;
+  if (traits.includes('peaceful')) return null;
 
   // Honorable races with low aggression (< 50) never start wars — they only
   // defend when attacked. This applies to Hamsters ("Never declares war first")
@@ -259,7 +271,7 @@ export function aiDecideDeclareWar(
   // Honorable races with high aggression (Guinea Pigs, Budgies) CAN declare war
   // when provoked (relations are unfriendly) — they just keep their treaties.
   const HONORABLE_AGGRESSION_THRESHOLD = 50;
-  if (profile.traits.includes('honorable')) {
+  if (traits.includes('honorable')) {
     if (aggression < HONORABLE_AGGRESSION_THRESHOLD) {
       // Low-aggression honorable races never initiate war
       return null;
@@ -272,7 +284,8 @@ export function aiDecideDeclareWar(
 
   const relValue = relation.value;
   const ratio = fleetStrengthRatio(state, empireId, targetId);
-  const warReluctance = profile.warReluctance;
+  // Prefer stored warReluctance (from canonical profile, set at game start)
+  const warReluctance = aiEmpire?.personality.warReluctance ?? profile.warReluctance;
 
   // Must have a meaningful fleet advantage to risk war (adjusted by war reluctance)
   const requiredRatio = 1.0 + (warReluctance / 100); // 0 reluctance → 1.0x, 40 reluctance → 1.4x

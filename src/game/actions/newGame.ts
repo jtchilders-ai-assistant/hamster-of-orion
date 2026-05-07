@@ -17,6 +17,7 @@ import {
   getRandomLeaderName,
 } from '../systems/races';
 import { getStartingConditions } from '../systems/difficulty';
+import { getPersonalityProfile } from '../ai/ai-personalities';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -305,7 +306,11 @@ function buildAIEmpire(
     defeatedTurn: null,
   };
 
-  // Build AI personality from race's aiBehavior data
+  // Build AI personality from race's aiBehavior data, augmented by the
+  // canonical per-race profile from ai-personalities.ts.
+  // The canonical profile provides: baseFriendliness, warReluctance,
+  // treatyBonus, backstabTendency — values not present in races.json.
+  const canonicalProfile = getPersonalityProfile(raceId);
   const personality: AIPersonality = {
     type: archetypeToPersonalityType(aiBehavior.archetype),
     // Convert 0.0-1.0 scale to 0-100 scale
@@ -314,6 +319,11 @@ function buildAIEmpire(
     diplomacy: Math.round(aiBehavior.diplomacyPriority * 100),
     research: Math.round(aiBehavior.researchFocus * 100),
     traits: archetypeToTraits(aiBehavior.archetype, raceId),
+    // Race-specific diplomacy modifiers from canonical profile
+    baseFriendliness: canonicalProfile.baseFriendliness,
+    warReluctance: canonicalProfile.warReluctance,
+    treatyBonus: canonicalProfile.treatyBonus,
+    backstabTendency: canonicalProfile.backstabTendency,
   };
 
   // Build strategy from race behavior
@@ -514,7 +524,7 @@ export function newGameReducer(state: GameState, action: Action): GameState {
     version: state.version,
     seed: String(seed),
     turn: 1,
-    year: 2501,
+    year: 2624, // 2623 + 1 per design/game-mechanics/turn-structure.md
     difficulty,
     isPaused: false,
     gameSpeed: 'normal',

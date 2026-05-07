@@ -128,6 +128,11 @@ function makeAIEmpire(
     diplomacy: 50,
     research: 40,
     traits: ['logical'],
+    // Race-specific diplomacy fields (ORION-FIX-009)
+    baseFriendliness: 0,
+    warReluctance: 15,
+    treatyBonus: 0,
+    backstabTendency: 0,
     ...personalityOverrides,
   };
 
@@ -263,8 +268,8 @@ describe('aiDecideBreakTreaty', () => {
 
   it('returns null for honorable races even at bad relations', () => {
     const treaty = makeTreaty('t1', 'non_aggression');
-    // hamsters are honorable
-    const state = makeState(-30, 'hamsters', 'guinea_pigs', [treaty]);
+    // hamsters are honorable - explicitly set traits to match their canonical profile
+    const state = makeState(-30, 'hamsters', 'guinea_pigs', [treaty], { traits: ['honorable'] });
     const decision = aiDecideBreakTreaty(state, 'e1', 'e2');
     expect(decision).toBeNull();
   });
@@ -310,7 +315,11 @@ describe('aiDecideDeclareWar', () => {
     // No fleets → ratio=1 > 0.7
     // aggression=85 >= 60 → threshold = STATE_WAR_THRESHOLD * 0.5 = -25
     // relation = -40 (unfriendly, not yet war) < -25 ✓
-    const state = makeState(-40, 'guinea_pigs', 'hamsters', [], { aggression: 85 });
+    const state = makeState(-40, 'guinea_pigs', 'hamsters', [], { 
+      aggression: 85,
+      warReluctance: -30,  // Guinea Pigs are war-eager (negative reluctance)
+      traits: ['honorable'],  // Guinea Pigs are honorable warriors
+    });
     const rel = state.empires.byId.e1!.relations.e2!;
     expect(rel.state).toBe('unfriendly'); // confirm not yet at war
     const decision = aiDecideDeclareWar(state, 'e1', 'e2');
@@ -369,7 +378,11 @@ describe('evaluateDiplomaticOptions', () => {
   it('aggressive empire generates war declaration toward deeply hostile target', () => {
     // Use -40 (unfriendly, not war): warReluctance=-30 → requiredRatio=0.7; no fleets → ratio=1 > 0.7
     // aggression=85 → threshold=-25; relation=-40 < -25 ✓
-    const state = makeState(-40, 'guinea_pigs', 'hamsters', [], { aggression: 85 });
+    const state = makeState(-40, 'guinea_pigs', 'hamsters', [], { 
+      aggression: 85,
+      warReluctance: -30,
+      traits: ['honorable'],
+    });
     const ai = state.aiEmpires['e1']!;
     const decisions = evaluateDiplomaticOptions(state, 'e1', ai);
     const hasWar = decisions.some((d: DiplomaticDecision) => d.action === 'declare_war');
@@ -398,7 +411,11 @@ describe('applyAIDiplomaticDecisions', () => {
 
   it('marks relation as war when aggressive AI declares war', () => {
     // -40 = unfriendly (not yet war); guinea_pigs declare war at < -25 with high aggression
-    const state = makeState(-40, 'guinea_pigs', 'hamsters', [], { aggression: 85 });
+    const state = makeState(-40, 'guinea_pigs', 'hamsters', [], { 
+      aggression: 85,
+      warReluctance: -30,
+      traits: ['honorable'],
+    });
     const next = applyAIDiplomaticDecisions(state);
     const relState = next.empires.byId.e1?.relations.e2?.state;
     expect(relState).toBe('war');

@@ -26,6 +26,70 @@ import {
 } from '../state';
 import { HULL_BASE_HP, ARMOR_MULTIPLIERS } from '../constants';
 
+// ── Racial AI Modifiers ────────────────────────────────────────────────────────
+// Source: design/technical/ai-implementation.md §1.8 and §2.10
+
+/**
+ * Racial threat perception modifiers.
+ * Applied as: Final_Threat = floor(Base_Threat × Racial_Threat_Modifier)
+ *
+ * Values < 1.0 mean the race underestimates threats (overconfident).
+ * Values > 1.0 mean the race overestimates threats (paranoid/fearful).
+ *
+ * Source: design/technical/ai-implementation.md §1.8
+ */
+const RACIAL_THREAT_MODIFIERS: Record<string, number> = {
+  guinea_pigs: 0.70,    // Overconfident warriors
+  ferrets: 0.85,        // Predator confidence
+  budgies: 0.90,        // Warrior's pride
+  hamsters: 1.00,       // Balanced assessment
+  mice: 1.00,           // Logical calculation
+  rats: 1.00,           // Scientific analysis
+  ants: 1.10,           // Collective caution
+  chameleons: 1.10,     // Paranoid spies
+  rabbits: 1.30,        // Fearful prey
+  hermit_crabs: 0.80,   // Confident in defenses
+};
+
+/**
+ * Racial expansion weight multipliers.
+ * Applied as: Final_Score = floor(Expansion_Score × Racial_Expansion_Weight)
+ *
+ * Source: design/technical/ai-implementation.md §2.10
+ */
+const RACIAL_EXPANSION_WEIGHTS: Record<string, number> = {
+  rabbits: 1.40,        // Population-focused
+  ants: 1.25,           // Industrial expansion
+  hamsters: 1.10,       // Balanced growth
+  guinea_pigs: 1.05,    // Conquest over colonization
+  budgies: 1.00,        // Standard
+  mice: 1.00,           // Standard
+  ferrets: 0.95,        // Hunting over settling
+  chameleons: 1.00,     // Standard
+  rats: 0.90,           // Research over expansion
+  hermit_crabs: 0.80,   // Slow, careful expansion
+};
+
+/**
+ * Apply racial threat perception modifier to a raw threat score.
+ * Implements design/technical/ai-implementation.md §1.8:
+ *   Final_Threat = floor(Base_Threat × Racial_Threat_Modifier)
+ */
+export function applyRacialThreatModifier(raceId: string, baseThreat: number): number {
+  const modifier = RACIAL_THREAT_MODIFIERS[raceId] ?? 1.0;
+  return Math.min(100, Math.floor(baseThreat * modifier));
+}
+
+/**
+ * Apply racial expansion weight to a planet colonization score.
+ * Implements design/technical/ai-implementation.md §2.10:
+ *   Final_Score = floor(Expansion_Score × Racial_Expansion_Weight)
+ */
+export function applyRacialExpansionWeight(raceId: string, baseScore: number): number {
+  const weight = RACIAL_EXPANSION_WEIGHTS[raceId] ?? 1.0;
+  return Math.floor(baseScore * weight);
+}
+
 // ── Situation analysis ─────────────────────────────────────────────────────────
 
 /** Phase of the game for production-priority decisions. */
@@ -67,15 +131,21 @@ export function getWarEnemies(
 export function isUnderThreat(
   empireId: EmpireId,
   state: GameState,
-  fleetSizeThreshold: number = 1.5,
+  _fleetSizeThreshold: number = 1.5,
 ): boolean {
   const enemies = getWarEnemies(empireId, state);
   if (enemies.length > 0) return true;
 
-  // Check if any neighbor has a much larger fleet (using fleet power, not ship count)
+  // Check if any neighbor has a much larger fleet (using fleet power, not ship count).
+  // Apply racial threat perception modifier so fearful races (Rabbits) feel threatened
+  // at lower power differentials, and overconfident races (Guinea Pigs) require a
+  // larger gap before they feel threatened.
+  // Source: design/technical/ai-implementation.md §1.8
   const myFleetPower = getEmpireFleetPower(empireId, state);
   const empire = state.empires.byId[empireId];
   if (!empire) return false;
+
+  const raceId = empire.raceId ?? 'hamsters';
 
   for (const otherId of state.empires.allIds) {
     if (otherId === empireId) continue;
@@ -83,7 +153,14 @@ export function isUnderThreat(
     if (!rel) continue;
     if (rel.state === 'war' || rel.state === 'unfriendly') {
       const theirPower = getEmpireFleetPower(otherId, state);
-      if (theirPower > myFleetPower * fleetSizeThreshold) return true;
+      // Compute base threat ratio (0-100 scale)
+      const baseThreat = myFleetPower > 0
+        ? Math.min(100, Math.floor((theirPower / myFleetPower) * 50))
+        : 100;
+      // Apply racial perception modifier
+      const perceivedThreat = applyRacialThreatModifier(raceId, baseThreat);
+      // Threat is "serious" (>60) → empire feels threatened
+      if (perceivedThreat > 60) return true;
     }
   }
   return false;
@@ -342,6 +419,8 @@ export function fleetIsMilitary(fleet: Fleet, state: GameState): boolean {
 }
 
 // ── Expansion target selection ────────────────────────────────────────────────
+//
+// Per design/technical/ai-implementation.md §2 Expansion Priority Scoring
 
 export interface ColonizationCandidate {
   planetId: PlanetId;
@@ -351,37 +430,104 @@ export interface ColonizationCandidate {
 }
 
 /**
+ * Base expansion value by planet size.
+ * Source: design/technical/ai-implementation.md §2.3
+ */
+const EXPANSION_BASE_VALUE: Record<string, number> = {
+  tiny: 20,
+  small: 40,
+  medium: 60,
+  large: 80,
+  huge: 100,
+};
+
+/**
+ * Environment modifier for expansion scoring.
+ * Source: design/technical/ai-implementation.md §2.4
+ */
+const EXPANSION_ENVIRONMENT_MODIFIER: Record<string, number> = {
+  radiated: -40,
+  toxic: -35,
+  inferno: -30,
+  dead: -25,
+  tundra: -20,
+  barren: -15,
+  minimal: 0,
+  desert: 5,
+  steppe: 10,
+  arid: 15,
+  ocean: 20,
+  jungle: 25,
+  terran: 40,
+  gaia: 60,
+};
+
+/**
+ * Resource modifier for expansion scoring.
+ * Source: design/technical/ai-implementation.md §2.5
+ */
+const EXPANSION_RESOURCE_MODIFIER: Record<string, number> = {
+  ultra_poor: -30,
+  poor: -15,
+  normal: 0,
+  rich: 30,
+  ultra_rich: 50,
+};
+
+/**
+ * Distance penalty per parsec.
+ * Source: design/technical/ai-implementation.md §2.7
+ */
+const DISTANCE_PENALTY_PER_PARSEC = 3;
+
+/**
+ * Artifacts world bonus.
+ * Source: design/technical/ai-implementation.md §2.6
+ */
+const ARTIFACTS_BONUS = 40;
+
+/**
  * Score a planet for colonization desirability.
  *
- * Higher is better:
- *   - Resource richness bonus: ultra_rich=4, rich=2, normal=0, poor=-1, ultra_poor=-2
- *   - Size bonus: huge=4, large=3, medium=2, small=1, tiny=0
- *   - Artifacts bonus: +2
- *   - Gaia bonus: +3
+ * Formula (design/technical/ai-implementation.md §2.2):
+ *   Expansion_Score = floor(
+ *     Base_Value +
+ *     Environment_Modifier +
+ *     Resource_Modifier +
+ *     Distance_Penalty +
+ *     Special_Bonus
+ *   )
+ *
+ * Note: Strategic_Bonus and Competition_Modifier are calculated
+ * in findColonizationTargets for context-dependent factors.
  */
-export function scorePlanetForColonization(planet: Planet): number {
-  let score = 0;
+export function scorePlanetForColonization(
+  planet: Planet,
+  distance: number = 0,
+): number {
+  // Base value by planet size (§2.3)
+  const baseValue = EXPANSION_BASE_VALUE[planet.size] ?? 60;
 
-  // Resource richness
-  switch (planet.resourceLevel) {
-    case 'ultra_rich': score += 4; break;
-    case 'rich': score += 2; break;
-    case 'normal': score += 0; break;
-    case 'poor': score -= 1; break;
-    case 'ultra_poor': score -= 2; break;
-  }
+  // Environment modifier (§2.4)
+  // If planet.isGaia is true, use gaia modifier (+60) instead of base type
+  // This handles planets that are flagged as gaia regardless of their base type
+  const envType = planet.isGaia ? 'gaia' : planet.type;
+  const envModifier = EXPANSION_ENVIRONMENT_MODIFIER[envType] ?? 0;
 
-  // Size
-  switch (planet.size) {
-    case 'huge': score += 4; break;
-    case 'large': score += 3; break;
-    case 'medium': score += 2; break;
-    case 'small': score += 1; break;
-    case 'tiny': score += 0; break;
-  }
+  // Resource modifier (§2.5)
+  const resourceModifier = EXPANSION_RESOURCE_MODIFIER[planet.resourceLevel] ?? 0;
 
-  if (planet.hasArtifacts) score += 2;
-  if (planet.isGaia) score += 3;
+  // Distance penalty (§2.7): -Distance_In_Parsecs × 3
+  const distancePenalty = -distance * DISTANCE_PENALTY_PER_PARSEC;
+
+  // Special bonuses (§2.6)
+  let specialBonus = 0;
+  if (planet.hasArtifacts) specialBonus += ARTIFACTS_BONUS;
+  // Note: Homeworld capture bonus is handled separately in strategic scoring
+
+  const score = Math.floor(
+    baseValue + envModifier + resourceModifier + distancePenalty + specialBonus
+  );
 
   return score;
 }
@@ -401,6 +547,10 @@ export function findColonizationTargets(
 ): ColonizationCandidate[] {
   const empire = state.empires.byId[empireId];
   if (!empire || empire.planets.length === 0) return [];
+
+  // Resolve race ID for racial expansion weight
+  // Source: design/technical/ai-implementation.md §2.10
+  const raceId = empire.raceId ?? 'hamsters';
 
   // Compute empire "center of gravity" from owned planets
   let cx = 0;
@@ -437,7 +587,15 @@ export function findColonizationTargets(
       const dy = system.coordinates.y - cy;
       const distance = Math.sqrt(dx * dx + dy * dy);
 
-      const score = scorePlanetForColonization(planet);
+      // Base colonization score including distance penalty
+      // Per design/technical/ai-implementation.md §2.7
+      const baseScore = scorePlanetForColonization(planet, distance);
+
+      // Apply racial expansion weight multiplier
+      // Per design/technical/ai-implementation.md §2.10:
+      //   Final_Score = floor(Expansion_Score × Racial_Expansion_Weight)
+      const score = applyRacialExpansionWeight(raceId, baseScore);
+
       candidates.push({ planetId, systemId, score, distance });
     }
   }

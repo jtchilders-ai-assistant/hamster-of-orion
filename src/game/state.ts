@@ -811,6 +811,14 @@ export interface AIPersonality {
   diplomacy: number;       // 0-100
   research: number;        // 0-100
   traits: AITrait[];
+  /** Base friendliness offset in diplomacy calculations (can be negative). */
+  baseFriendliness: number;  // e.g. Hamsters +20, Guinea Pigs -20
+  /** Reduces willingness to declare war (added to war reluctance check). */
+  warReluctance: number;     // 0-100 (higher = more peaceful)
+  /** Bonus applied to treaty acceptance probability. */
+  treatyBonus: number;       // negative = reluctant to sign
+  /** 0-100: chance per turn to backstab an ally. 0 = never backstabs. */
+  backstabTendency: number;
 }
 
 export interface AIStrategy {
