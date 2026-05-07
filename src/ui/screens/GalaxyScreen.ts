@@ -14,14 +14,12 @@
 import { GameState } from '../../game/state';
 import { Store } from '../../game/store';
 import { InfoPanel } from '../components/InfoPanel';
-import { CommandBar } from '../components/CommandBar';
 import { StarMap } from '../components/StarMap';
 
 export class GalaxyScreen {
   private readonly container: HTMLElement;
   private readonly starMap: StarMap;
   private readonly infoPanel: InfoPanel;
-  private readonly commandBar: CommandBar;
 
   constructor(container: HTMLElement, store: Store<GameState>) {
     this.container = container;
@@ -38,8 +36,7 @@ export class GalaxyScreen {
     // Star map handles canvas rendering and dispatches SELECT_SYSTEM on click
     this.starMap = new StarMap(canvas, store);
 
-    // Command bar — uses an existing wrapper or creates one inside the container
-    this.commandBar = new CommandBar(container, store);
+    // Command bar is managed by the global App, not by individual screens
   }
 
   // ── Public interface (matches Screen interface in App) ─────────────────────
@@ -47,7 +44,6 @@ export class GalaxyScreen {
   render(state: GameState): void {
     this.starMap.render(state);
     this.infoPanel.render(state);
-    this.commandBar.render(state);
   }
 
   show(): void {

@@ -322,6 +322,7 @@ export class StarMap {
     const transform = this.buildTransform(state);
     const selectedId = state.ui.selectedSystem;
     const deployment = state.ui.fleetDeploymentMode;
+    const playerEmpire = state.empires.byId[state.empires.playerId];
 
     // ── Pass 0: Fleet range circle (drawn first so it appears behind everything) ──
     if (deployment) {
@@ -336,10 +337,12 @@ export class StarMap {
       }
     }
 
-    // ── Pass 1: Colony rings ───────────────────────────────────────────────────
+    // ── Pass 1: Colony rings (only for systems the player can see) ─────────────
     for (const id of galaxy.systems.allIds) {
       const sys = galaxy.systems.byId[id];
       if (!sys.ownerId) continue;
+      // Only draw rings for systems the player has explored or is currently detecting
+      if (!playerEmpire.exploredSystems.includes(id) && !playerEmpire.visibleSystems.includes(id)) continue;
       const { x, y } = galaxyToCanvas(sys.coordinates, transform);
       const color = this.empireColorMap.get(sys.ownerId) ?? '#ffffff';
       drawColonyRing(ctx, x, y, color);
@@ -444,11 +447,13 @@ export class StarMap {
       drawSelectionRing(ctx, x, y);
     }
 
-    // ── Pass 7: Labels ─────────────────────────────────────────────────────────
+    // ── Pass 7: Labels (only for explored systems) ─────────────────────────────
     for (const id of galaxy.systems.allIds) {
       const sys = galaxy.systems.byId[id];
       const { x, y } = galaxyToCanvas(sys.coordinates, transform);
       const isSelected = id === selectedId;
+      // Don't show system names unless the player has explored it
+      if (!playerEmpire.exploredSystems.includes(id)) continue;
       drawStarLabel(ctx, x, y, sys.name, isSelected ? '#ffffff' : '#b8d0e8');
     }
   }
