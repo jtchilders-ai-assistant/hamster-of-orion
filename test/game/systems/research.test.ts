@@ -152,6 +152,68 @@ describe('calculatePlanetRP', () => {
     expect(calculatePlanetRP(planetOrion, 'hamsters')).toBeCloseTo(375, 5);
   });
 
+  // ── researchMultiplier field path (ORION-FIX-007) ──────────────────────────
+  // These tests verify the data-driven researchMultiplier path used by the
+  // actual game state (buildPlanetRPInputs in turn.ts passes planet.researchMultiplier).
+  // Without these, the boolean fallback was the only tested path.
+
+  it('researchMultiplier=1.25 (Artifacts world data-driven path) applies +25% RP', () => {
+    // This mirrors what buildPlanetRPInputs produces for an Artifacts world planet
+    // galaxy.ts sets planet.researchMultiplier = 1.25 for Artifacts worlds
+    const planet = makePlanet({
+      population: 100,
+      researchSlider: 30,
+      buildingIds: ['research_lab', 'supercomputer'],
+      hasArtifacts: true,
+      researchMultiplier: 1.25,  // data-driven from planet state
+    });
+    // Scientists: 30, Lab: 2.5, Racial: 1.0 → base 75 RP
+    // researchMultiplier path: 75 × 1.25 = 93.75
+    expect(calculatePlanetRP(planet, 'hamsters')).toBeCloseTo(93.75, 5);
+  });
+
+  it('researchMultiplier=4.0 (Orion data-driven path) applies ×4 RP', () => {
+    // galaxy.ts sets planet.researchMultiplier = 4.0 for Orion
+    const planet = makePlanet({
+      population: 100,
+      researchSlider: 30,
+      buildingIds: ['research_lab', 'supercomputer'],
+      isOrion: true,
+      researchMultiplier: 4.0,  // data-driven from planet state
+    });
+    // Base 75 RP × 4.0 = 300
+    expect(calculatePlanetRP(planet, 'hamsters')).toBeCloseTo(300, 5);
+  });
+
+  it('researchMultiplier takes precedence over boolean flags when both set', () => {
+    // If researchMultiplier is set AND hasArtifacts=true, researchMultiplier wins.
+    // This matches calculatePlanetRP logic: researchMultiplier path is else'd over booleans.
+    const planet = makePlanet({
+      population: 100,
+      researchSlider: 10,
+      buildingIds: [],
+      hasArtifacts: true,    // would be ×1.25 on boolean path
+      researchMultiplier: 2.0,  // explicit override — should use this
+    });
+    // Scientists: 10, Lab: 1.0, Racial: 1.0 → base 10 RP
+    // researchMultiplier=2.0 takes effect: 10 × 2.0 = 20
+    expect(calculatePlanetRP(planet, 'hamsters')).toBeCloseTo(20, 5);
+  });
+
+  it('researchMultiplier=1.0 falls back to boolean flags (backwards compat)', () => {
+    // When researchMultiplier is 1.0 (standard planet), the else branch fires.
+    // hasArtifacts=true should still apply +25% via the boolean fallback.
+    const planet = makePlanet({
+      population: 100,
+      researchSlider: 10,
+      buildingIds: [],
+      hasArtifacts: true,
+      researchMultiplier: 1.0,  // standard planet multiplier
+    });
+    // Base 10 RP; researchMultiplier=1.0 → else branch → hasArtifacts ×1.25 = 12.5
+    expect(calculatePlanetRP(planet, 'hamsters')).toBeCloseTo(12.5, 5);
+  });
+
   it('Guinea Pigs racial modifier 0.80', () => {
     const planet = makePlanet({ population: 100, researchSlider: 10, buildingIds: [] });
     // 10 × 1.0 × 1.0 × 0.80 = 8
