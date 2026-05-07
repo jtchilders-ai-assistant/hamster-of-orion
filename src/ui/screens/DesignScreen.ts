@@ -833,6 +833,17 @@ export class DesignScreen {
       return;
     }
 
+    // Enforce 6-design limit before dispatching (per design/ships/ship-design.md).
+    // Editing/overwriting an existing design (this.editingId is set) is always allowed.
+    const MAX_SHIP_DESIGNS = 6;
+    const isNewDesign = !this.editingId;
+    if (isNewDesign && empire.shipDesigns.length >= MAX_SHIP_DESIGNS) {
+      this.showError(
+        `Ship design limit reached (${MAX_SHIP_DESIGNS} max). Delete an existing design before creating a new one.`,
+      );
+      return;
+    }
+
     const id = this.editingId ?? `design_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
     const cost = calculateDesignCost(designInput);
     const hull = HULL_SPECS[this.working.hullSize];

@@ -167,11 +167,22 @@ export function rootReducer(state: GameState, action: Action): GameState {
 
   // ── Ship Design CRUD ─────────────────────────────────────────────────────
 
+  /** Maximum ship designs an empire may have simultaneously (per design/ships/ship-design.md). */
+  const MAX_SHIP_DESIGNS = 6;
+
   if (action.type === 'ADD_SHIP_DESIGN') {
     const design = (action.payload as { design: import('./state').ShipDesign }).design;
     const empireId = state.empires.playerId;
     const empire = state.empires.byId[empireId];
     if (!empire) return state;
+
+    // Enforce 6-design limit: if this design ID is NEW (not an edit/overwrite),
+    // reject when the empire already has the maximum number of designs.
+    const isNewDesign = !empire.shipDesigns.includes(design.id);
+    if (isNewDesign && empire.shipDesigns.length >= MAX_SHIP_DESIGNS) {
+      // Return state unchanged — UI layer is responsible for showing a message.
+      return state;
+    }
 
     return {
       ...state,
