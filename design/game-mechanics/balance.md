@@ -51,12 +51,22 @@ Core design philosophy ensuring fun, strategic depth, and replayability.
 
 ---
 
-## Economic Balance
+## Economic Balance & Formulas
 
-**Production Scaling**: Compounds over time
-- Early: Small differences
-- Mid: Moderate gaps
-- Late: Exponential divergence
+**Production Compounding Math**:
+- **Max Factories**: A planet can support a maximum number of factories based on population and tech. `Max Factories = Population × (2 + Robotic Controls Level)`.
+- **Factory Cost**: `Cost = 10 BC`, but reduced by advanced construction tech.
+- **Economic Production Scaling**: Production compounds over time. `Total Production = Population × 0.5 + Factories × 1.0`.
+
+**Resource Slider Conversion Math**:
+- **Research (RP)**: 1 BC of production = 1 RP.
+- **Reserve (BC)**: Transferring production to the Planetary Reserve loses 50% efficiency by default. `2 BC of production = +1 Reserve BC`.
+- **Shipbuilding/Defense**: 1 BC = 1 build point.
+
+**Pollution Mechanics**:
+- Pollution (Waste) is generated when industrial output exceeds population. `2 BC of factory production creates 1 unit of waste.`
+- **Waste Cleanup**: By default, cleaning waste costs `1 BC for 2 units of waste`.
+- **Reduced Waste Techs**: Advanced tech reduces the cleanup cost (e.g. 80%, 60%, 40%, 20%, 0% waste generated).
 
 **Ant Production**: Most powerful late-game
 - But slow early (research penalty)
@@ -72,9 +82,10 @@ Core design philosophy ensuring fun, strategic depth, and replayability.
 - Huge ship can solo 5 Large ships
 
 **Tech Advantage Scaling**:
-- 1 tier ahead: +30% effective power
-- 2 tiers ahead: +70% effective power
-- 3+ tiers ahead: Nearly unstoppable
+- In MOO1, advantages scale exponentially with tier gaps. 
+- For attack/defense rolls: every +1 tier advantage adds roughly `+10%` to hit chance or evasion.
+- For ship damage output: Tech Advantage translates roughly to `(Current Weapon Tech Level / Target Armor Tech Level)` multiplier.
+- General rule: 1 tier ahead (+30% effective power), 2 tiers ahead (+70% effective power). 3+ tiers ahead is nearly unstoppable.
 
 ---
 

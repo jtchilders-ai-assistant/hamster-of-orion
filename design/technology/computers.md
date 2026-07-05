@@ -223,7 +223,7 @@ Unique targeting and combat abilities.
 
 **Hit Chance Formula:**
 ```
-Hit_Chance = 50% + (Attack_Rating × 5%) - (Target_Defense × 3%)
+Hit_Chance = 50% + (Attack_Rating - Target_Defense) × 10%
 ```
 
 ### ECM Jammer Progression

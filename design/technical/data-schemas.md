@@ -770,7 +770,7 @@ interface ShipDesign {
   /** Installed weapons */
   weapons: WeaponMount[];
   
-  /** Special systems installed */
+  /** Special systems installed (maximum of 3 per ship design) */
   specials: EntityId[];
   
   /** Total space used */

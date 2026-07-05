@@ -214,7 +214,8 @@ See `game-mechanics/random-events.md` for full event specifications.
 
 **Nebulae**: 
 - Shields don't work in nebula combat
-- Extra danger when fighting in nebulae
+- Sensor range is reduced to 1 parsec for ships inside the nebula, masking systems within and beyond it.
+- Fleet travel speed is reduced to 1 parsec per turn while traversing the nebula.
 
 **Enemy Territory**:
 - Ships may be attacked

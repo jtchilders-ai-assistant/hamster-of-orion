@@ -319,11 +319,17 @@ function get_tech_choices(field, tier, empire):
 
 ### 12. Tech Trees Are Per-Game
 
-Not all technologies appear in every game:
-- Each field has ~15-20 possible techs
-- Only ~60% are available per game
-- Creates strategic variability
-- Espionage and trading can fill gaps
+Not all technologies appear in every game for every empire.
+**Tech Prerequisite Logic**:
+- Every player is randomly missing about 25-40% of the technologies in the game.
+- The Rats (our Psilon equivalent) are the exception, missing very few techs and maintaining a 90%+ complete tree.
+- There are no strict prerequisites linking specific techs; you simply complete a tier to see what is available in the next.
+- To acquire "missing" techs, players must rely on espionage, trade, or capturing enemy ships.
+
+### 12b. Outdated Tech Valuation
+When going back to research a technology from a tier lower than your current highest tier in that field (e.g., if it becomes available through a special event or was previously skipped), its RP cost is reduced by the Miniaturization factor.
+- **Outdated Tech Cost** = `Base_Tech_Cost × (1 - Size_Reduction)`
+- The reduction is 5% per tier difference, capped at 50%.
 
 ---
 

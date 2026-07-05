@@ -133,3 +133,11 @@ The exercise wheels are obviously perpetual motion prototypes (though flawed). T
 The Mice have reverse-engineered everything possible and incorporated it into their cybernetic augmentations. They believe they're on the same path as the Ancient Ones - uploading consciousness to achieve immortality.
 
 "We will complete what the Ancient Ones began. We will become what they became. Pure intellect, unchained from mortal flesh."
+
+## Species-Specific Mechanics (Formulas)
+
+### Mouse Pollution Math
+Mice are technocrats who have optimized waste management, producing significantly less pollution per factory.
+- **Pollution Formula**: `Mouse_Pollution = Standard_Pollution * 0.5`
+- This allows Mice to dedicate 50% less planetary production to ecology/clean-up, freeing up those resources for research and shipbuilding.
+- Additionally, if a planet reaches 0 pollution, Mice gain a `+5%` clean-environment research bonus on that planet.

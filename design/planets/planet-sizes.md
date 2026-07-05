@@ -5,13 +5,13 @@ Planets in MOO1 come in five size categories. Size determines the base maximum p
 
 ## Size Categories
 
-| Size | Base Capacity (Approx) | Frequency | Description |
+| Size | Planet capacity statistical distribution (Base Capacity) | Frequency | Description |
 |------|-----------|-----------|-------------|
 | **Tiny** | 10 - 20 | 15% | Moon-sized worlds. |
-| **Small** | 30 - 40 | 25% | Small planets. |
-| **Medium** | 50 - 70 | 30% | Earth-sized worlds. |
-| **Large** | 80 - 100| 20% | Large terrestrial worlds. |
-| **Huge** | 110 - 200| 10% | Super-terrestrial worlds. |
+| **Small** | 25 - 40 | 25% | Small planets. |
+| **Medium** | 45 - 70 | 30% | Earth-sized worlds. |
+| **Large** | 75 - 100| 20% | Large terrestrial worlds. |
+| **Huge** | 100 - 120| 10% | Super-terrestrial worlds. |
 
 ---
 

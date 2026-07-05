@@ -126,3 +126,11 @@ Key weakness: Cannot fight multiple coordinated enemies. Require time to infiltr
 Chameleons believe the Ancient Ones were master spies who left these facilities as training grounds for future intelligence operatives. They claim to have "infiltrated" Orion centuries ago and know what's inside, but refuse to share details. This is likely a bluff - probably. Maybe. No one knows for certain, which is exactly how they want it.
 
 The Habitrail tubes? Obviously a covert transportation network. The exercise wheels? Clearly interrogation devices (though this seems paranoid even for Chameleons). The water bottles? Dead drop locations for secret messages.
+
+## Species-Specific Mechanics (Formulas)
+
+### Chameleon Framing
+Chameleons can execute a "Frame" espionage mission to make one empire hate another.
+- **Frame Success Formula**: `Frame_Success_% = 30 + SpyEffectiveness - Target_Security`
+- **Effect**: If successful, the target empire's relationship with the framed empire is reduced by `Frame_Damage = 20 + (Chameleon_Computer_Tech_Tier * 2)`.
+- If detected (standard detection roll), the Chameleon empire suffers `-50` relations with BOTH the target and the framed empire.

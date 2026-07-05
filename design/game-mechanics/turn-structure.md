@@ -9,14 +9,19 @@ Hamster of Orion is turn-based. Each turn represents one galactic cycle (~1 year
 
 ### Phase 1: Income & Maintenance
 **Order of Operations**:
-1. **Collect Income**: BC from trade, tribute, captured systems
-2. **Pay Maintenance**: Ships, buildings, spies cost upkeep
-3. **Calculate Net Income**: Total revenue - expenses
+1. **Collect Income**: BC from trade, tribute, captured systems.
+   - Trade Treaty Income formula: `Max Trade Value = (Empire A Planets × Empire B Planets) / 2`. The income ramps up over 25 turns, yielding `Max Trade Value × (Current Turns / 25)` per turn.
+2. **Pay Maintenance**: 
+   - Ship Maintenance = `Sum of (Base Ship Cost × 0.1)` per turn (i.e. 10% of base build cost).
+   - Spy Maintenance = `Sum of Spies × Base Spy Cost`.
+   - Missile Bases / Shields cost Maintenance.
+3. **Calculate Net Income**: Total revenue - expenses.
 
 **Bankruptcy**:
-- If negative BC: Ships scrap randomly until balanced
-- Morale penalties empire-wide
-- Diplomatic reputation damage
+- If reserve BC falls below 0, the empire goes bankrupt.
+- **Scrapping Logic**: The oldest and most outdated ship designs are scrapped automatically, one by one, until the maintenance cost drops enough to balance the budget.
+- Morale penalties empire-wide (Unrest increases).
+- Diplomatic reputation damage.
 
 ---
 
@@ -75,11 +80,12 @@ Hamster of Orion is turn-based. Each turn represents one galactic cycle (~1 year
 ### Phase 6: Movement
 **Fleet Operations**:
 1. All fleets move simultaneously
-2. Calculate arrival times
-3. Detect enemy fleets
-4. Scouts reveal new systems
+2. **Calculate Travel Time**: `Distance_In_Parsecs / Ship_Speed = Turns (rounded up)`. 
+3. **Distance Math**: `Distance_In_Parsecs = sqrt((Target_X - Source_X)^2 + (Target_Y - Source_Y)^2) / Parsec_Scale`.
+4. Detect enemy fleets
+5. Scouts reveal new systems
 
-**Interception**: Fast fleets can intercept slow ones
+**Interception**: Fast fleets can intercept slow ones in open space if their paths and speeds allow.
 
 ---
 
@@ -87,11 +93,13 @@ Hamster of Orion is turn-based. Each turn represents one galactic cycle (~1 year
 **If Fleets Meet**:
 1. Battle initiation
 2. Player choice: Tactical or Auto-resolve
+   - **Combat Auto-Resolve**: Calculates total HP, Attack, and Damage of each fleet. `Win Chance = (Fleet A Power) / (Fleet A Power + Fleet B Power)`. Simulates casualties proportionally.
 3. Combat plays out
 4. Victor determined
-5. Aftermath (salvage, experience)
+5. **Retreat Logic**: Ships that successfully retreat from combat return to their nearest friendly colony in exactly 1 turn, maintaining their Ship Class mapping.
+6. Aftermath (salvage, experience)
 
-**Multiple Battles**: Resolve in order of detection
+**Multiple Battles**: Resolve in order of detection.
 
 ---
 

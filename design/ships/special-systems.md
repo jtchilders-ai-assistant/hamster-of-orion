@@ -12,23 +12,23 @@
 **Strategy**: Ultimate stealth  
 
 ## Automated Repair
-**Effect**: Regenerate 10-15% HP per turn  
+**Effect**: Regenerate 15% HP per turn (End Phase)
 **Cost**: 25,000 RP  
 **Race Favorite**: Mice  
 
 ## Repulsor Beam
-**Effect**: Push enemy ships away  
-**Use**: Prevent bombardment  
-**Strategy**: Defensive planets  
+**Effect**: Push enemy ships away (1 hex)
+**Use**: Prevent boarding/point-blank
+**Strategy**: Defensive ships  
 
 ## Stasis Field
-**Effect**: Disable enemy weapons 2 turns  
+**Effect**: Disable enemy ship for 2 turns  
 **Use**: Neutralize biggest threat  
 **Strategy**: Tactical control  
 
 ## Black Hole Generator
-**Effect**: Instant kill one ship  
-**Limitation**: Once per battle  
+**Effect**: Instantly destroys 25% of the total ships in the target's stack (or 25% HP for single ships)
+**Limitation**: Ignores shields and armor.
 **Cost**: 50,000 RP or discover  
 
 ## Transporters

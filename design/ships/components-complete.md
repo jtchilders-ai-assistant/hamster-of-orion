@@ -87,10 +87,9 @@ Battle computers increase weapon accuracy (Attack Rating). Each point of Attack 
 
 ### Computer Notes
 
-**Hit Chance Formula:**
-```
-Hit_Chance = 50 + (Attack_Rating × 5) - (Target_Defense × 5) + Size_Modifier
-```
+**Combat Formulas:**
+- `Hit_Chance = 50 + (Attack_Rating - Target_Defense) × 10`
+- Minimum hit chance is 5%, maximum is 95%.
 
 ---
 
@@ -243,11 +242,13 @@ The Battle Scanner is a special computer enhancement.
 | Inertial Nullifier | 20 | +4 Defense, +4 Initiative | 20 | 50 BC |
 | Repulsor Beam | 18 | Push ships 1 hex away | 20 | 35 BC |
 | Tractor Beam | 22 | Pull ships 1 hex closer | 20 | 40 BC |
-| Stasis Field | 38 | Disable target 2 turns | 45 | 90 BC |
+| Stasis Field | 38 | Disable target 1 turn | 45 | 90 BC |
 | Displacement Device | 45 | 33% chance to ignore any hit | 40 | 110 BC |
 | High Energy Focus | 48 | +2 Initiative, +1 Attack | 30 | 80 BC |
 | Sub-Space Teleporter | 28 | Teleport to any hex | 35 | 75 BC |
 | Warp Dissipator | 25 | Prevent enemy retreat | 25 | 55 BC |
+| Tech Nullifier | 42 | Reduce enemy attack by -2 to -6 | 35 | 90 BC |
+| Colony Module | 1 | Allows colonizing planets (consumed on use) | 500 | 500 BC |
 
 ### Boarding Systems
 
@@ -533,7 +534,9 @@ Maximum space available for components (MOO1 hull sizes):
       { "id": "displacement", "name": "Displacement Device", "tech_level": 45, "dodge_chance": 0.33, "space": 40, "cost": 110 },
       { "id": "hef", "name": "High Energy Focus", "tech_level": 48, "initiative_bonus": 2, "attack_bonus": 1, "space": 30, "cost": 80 },
       { "id": "teleporter", "name": "Sub-Space Teleporter", "tech_level": 28, "effect": "teleport_any_hex", "space": 35, "cost": 75 },
-      { "id": "dissipator", "name": "Warp Dissipator", "tech_level": 25, "effect": "prevent_retreat", "space": 25, "cost": 55 }
+      { "id": "dissipator", "name": "Warp Dissipator", "tech_level": 25, "effect": "prevent_retreat", "space": 25, "cost": 55 },
+      { "id": "tech_nullifier", "name": "Tech Nullifier", "tech_level": 42, "effect": "reduce_enemy_attack", "space": 35, "cost": 90 },
+      { "id": "colony_module", "name": "Colony Module", "tech_level": 1, "effect": "colonize_planet", "space": 500, "cost": 500 }
     ],
     "boarding": [
       { "id": "transporter_std", "name": "Standard Transporter", "tech_level": 25, "range": 1, "space": 20, "cost": 45 },

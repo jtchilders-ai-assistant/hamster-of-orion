@@ -240,6 +240,17 @@ Food_Produced = Agricultural_Workers × Base_Food_Output × Environment_Fertilit
 Base_Food_Output = 2.0 food per worker
 ```
 
+#### Agricultural Worker Allocation
+
+Unlike later 4X games that use explicit farming sliders or worker assignment slots, Hamster of Orion handles food production **automatically** based on need:
+
+1. **Calculate Requirement:** Determine `Food_Required` for the planet.
+2. **Calculate Worker Yield:** `Yield_Per_Worker = Base_Food_Output × Environment_Fertility × Racial_Modifier`
+3. **Allocate Workers:** `Agricultural_Workers = min(Total_Population, ceil(Food_Required / Yield_Per_Worker))`
+4. **Labor Pool Reduction:** The assigned `Agricultural_Workers` are removed from the available industrial labor pool, effectively reducing the planet's Gross Production capability.
+
+If `Agricultural_Workers` equals the `Total_Population`, the planet is producing as much food as it physically can. If this is still less than `Food_Required`, starvation occurs.
+
 #### Environment Fertility
 
 | Environment | Fertility |

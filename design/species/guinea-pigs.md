@@ -124,3 +124,10 @@ Key weakness: Vulnerable to advanced weapons they can't research fast enough. Re
 
 ## Repurposed Ancient Technology
 Guinea Pigs believe the Ancient Ones were the ultimate warrior race who created these facilities as training grounds. They view the exercise wheels as "endurance training devices" and force all warriors to run in increasingly large wheels as punishment and conditioning. The water bottles are seen as "hydration discipline stations" - warriors must earn their water through combat prowess.
+
+## Species-Specific Mechanics (Formulas)
+
+### Guinea Pig Morale
+Guinea Pigs thrive on conquest and suffer when at peace for too long.
+- **Conquest High**: Whenever a Guinea Pig empire captures an enemy planet, all Guinea Pig planets receive a `+20%` morale boost (max 100%) for 15 turns. This translates directly to a `+10%` production bonus.
+- **Peace Stagnation**: If a Guinea Pig empire is not at war with any major power for 30 consecutive turns, their global morale drops by `-1%` per turn, down to a minimum of 60% (causing a `-20%` production penalty). Declaring war instantly resets this penalty.

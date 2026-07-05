@@ -218,6 +218,7 @@ For players who skip tactical:
 - Success chance = (Your speed ÷ Enemy speed) × 100%
 - Failed retreat = trapped for 1 turn, then can try again
 - Budgies: +20% retreat chance
+- **Hyperspace Comms Constraints**: Retreated ships travel back to the nearest friendly colony. Without Hyperspace Communications technology, retreating fleets cannot be redirected mid-flight and will take the full transit time to arrive.
 
 **Enemy Retreat**:
 - AI retreats when odds poor
@@ -228,15 +229,25 @@ For players who skip tactical:
 
 ## Combat Experience
 
-Ships gain experience through battles:
-- **Rookie**: New ships, -10% accuracy
-- **Regular**: Standard ships, +0%
-- **Veteran**: 3+ battles, +10% accuracy
-- **Elite**: 10+ battles, +20% accuracy
+Ships gain experience through battles. In Hamster of Orion, a ship gains +1 Experience Point (XP) for every combat it survives.
 
-Race bonuses:
-- Budgies: Start at Veteran
-- Ferrets: Gain experience 2x faster
+**Experience Level Thresholds:**
+- **Green (0 XP)**: New ships, -10% accuracy
+- **Regular (1-2 XP)**: Standard ships, +0% accuracy
+- **Veteran (3-9 XP)**: +10% accuracy, +1 Combat Speed
+- **Elite (10-19 XP)**: +20% accuracy, +2 Combat Speed, +5% Critical Hit chance
+- **Legendary (20+ XP)**: +30% accuracy, +3 Combat Speed, +10% Critical Hit chance, +1 Shield Absorption
+
+**Race bonuses:**
+- Budgies: Start at Veteran (3 XP)
+- Ferrets: Gain experience 2x faster (+2 XP per combat)
+
+**Merging Fleets (Averaging Experience):**
+When two fleets merge, or when new ships join a stack of existing ships of the same design, the experience of the combined stack is calculated via a weighted average of total XP, rounded down to the nearest integer.
+
+`Merged_XP = floor( ((Stack_A_Count × Stack_A_XP) + (Stack_B_Count × Stack_B_XP)) / (Stack_A_Count + Stack_B_Count) )`
+
+The new experience level is then determined by the threshold for `Merged_XP`.
 
 ---
 
@@ -262,7 +273,7 @@ Race bonuses:
 **Ethical Choices**:
 - Light bombardment: Soften defenses
 - Heavy bombardment: Destroy everything
-- Biological weapons: Kill population, preserve buildings
+- Biological weapons: **Bio weapon math:** Kills 1 million population per bomb hit (1 pop unit) per turn. Does NOT damage factories or missile bases (preserves infrastructure). Highly effective but damages diplomatic relations.
 - Stellar Converter: Destroy planet entirely
 
 ---
@@ -343,6 +354,17 @@ Total_Base_Cost = 150 + Shield_Cost + Computer_Cost + ECM_Cost + (Missile_Cost �
 
 Where component costs are based on the best available technology at time of construction.
 
+### Maintenance Cost
+
+Planetary defenses incur a strict maintenance cost each turn to remain operational.
+
+```
+Missile_Base_Maintenance = 5 BC per base per turn
+Planetary_Shield_Maintenance = Shield_Class × 2 BC per turn
+```
+
+This maintenance is automatically deducted from the planet's Gross Production (before slider allocations). If the planet cannot pay the maintenance, the structures are temporarily disabled until production improves.
+
 ### Planetary Shield Interaction
 
 - Missile bases benefit from Planetary Shields
@@ -368,6 +390,35 @@ Where component costs are based on the best available technology at time of cons
 - Combat is ongoing while missile bases remain (even if all ships destroyed/retreated)
 - Attackers must destroy all bases to claim victory
 - Bases are removed when planet is captured (not destroyed via combat HP)
+
+---
+
+## Fleet and Military Power
+
+To assist AI decision making and UI representation, the game calculates `Fleet_Power` and `Military_Power`.
+
+### Fleet Power Formula
+
+```
+Fleet_Power = Σ (Ship_Power × Ship_Count) for all ships in the fleet
+
+Ship_Power = floor(
+    (Hull_HP × Armor_Multiplier × 0.5) +
+    (Total_Weapon_Damage × 2.0) +
+    (Shield_Class × 5) +
+    (Combat_Speed × 3)
+) × (1.0 + (Ship_XP / 20))
+```
+
+### Military Power Formula
+
+The overall `Military_Power` of an Empire represents their entire galactic footprint, combining all active fleets and planetary defenses:
+
+```
+Military_Power = Σ (Fleet_Power of all Empire Fleets) + Σ (Planet_Defense_Power of all Empire Planets)
+
+Planet_Defense_Power = (Missile_Bases × 100) + (Planetary_Shield_Class × 50)
+```
 
 ---
 

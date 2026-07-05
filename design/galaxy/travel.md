@@ -41,6 +41,22 @@ Engine tech determines parsecs traveled per turn:
 
 **Example**: 12 parsec journey with Warp 4 (Ion) = 3 turns
 
+### Nebula Travel Interference (Mathematical ETA Intersection)
+
+Nebulae are hazardous regions that restrict hyperspace travel. Any portion of a fleet's journey that passes through a nebula is restricted to a maximum speed of **Warp 1**, regardless of the fleet's engine technology.
+
+To calculate the ETA when a travel path intersects a nebula:
+1. **Define the Travel Segment**: Let the path from the origin star $P_1$ to destination $P_2$ be a line segment of length $D$.
+2. **Define the Nebula**: The nebula is a circle centered at $C$ with radius $R$.
+3. **Find Intersections**: Parameterize the segment with $t \in [0, 1]$ where $P(t) = P_1 + t(P_2 - P_1)$. Solve for $t$ where $||P(t) - C||^2 = R^2$ using the quadratic formula.
+4. **Calculate Segments**: 
+   - If intersections $t_1$ and $t_2$ exist within $[0, 1]$, the distance traveled *inside* the nebula is $D_{neb} = D \times |t_2 - t_1|$.
+   - The distance traveled *outside* the nebula is $D_{norm} = D - D_{neb}$.
+5. **Calculate ETA**: The total turns required is calculated by applying the normal warp speed ($S$) to the outside distance, and Warp 1 to the inside distance:
+   $$ \text{Total Turns} = \lceil \frac{D_{norm}}{S} + \frac{D_{neb}}{1} \rceil $$
+
+*(Note: In MOO1, ships simply moved at 1 parsec per turn while inside the nebula visually, but the math under the hood guarantees the ETA reflects this intersection exactly.)*
+
 ---
 
 ## Fuel Range (Fuel Cell Technology)

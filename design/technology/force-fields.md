@@ -114,7 +114,7 @@ Special devices: Repulsor Beams, Cloaking Devices, Stasis Fields, and ultimate w
 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
-| Repulsor Beam | 16 | Repulsor Beam | Push enemy ships 2 hexes away |
+| Repulsor Beam | 16 | Repulsor Beam | Push enemy ships 1 hex away |
 | Class V Deflector Shield | 20 | Class V Deflector | -5 damage per hit |
 
 ---
@@ -298,7 +298,7 @@ Personal shields add directly to defending/attacking troops' combat rolls.
 
 | Component | Tech Level | Effect | Space | Cost |
 |-----------|------------|--------|-------|------|
-| Repulsor Beam | 16 | Push enemy ships 2 hexes | 20 | 35 BC |
+| Repulsor Beam | 16 | Push enemy ships 1 hex | 20 | 35 BC |
 
 **Mechanics:**
 - Activates automatically when enemy ship enters range 2
@@ -714,7 +714,7 @@ If not in your tree, must acquire via:
             "category": "tactical_field",
             "unlocks": "repulsor_beam",
             "effect": {
-              "push_distance": 2,
+              "push_distance": 1,
               "description": "Push enemy ships away, prevents close-range attacks"
             },
             "component": {
@@ -1152,7 +1152,7 @@ If not in your tree, must acquire via:
 
 | System | Tech Level | Effect | Space | Cost |
 |--------|------------|--------|-------|------|
-| Repulsor Beam | 16 | Push 2 hexes | 20 | 35 BC |
+| Repulsor Beam | 16 | Push 1 hex | 20 | 35 BC |
 | Cloaking Device | 27 | +5 Def, invisible | 30 | 80 BC |
 | Zyro Shield | 31 | 75% − 1%/missile TL missile destroy | 25 | 70 BC |
 | Stasis Field | 37 | Disable 1 turn | 45 | 90 BC |
@@ -1192,6 +1192,7 @@ If not in your tree, must acquire via:
 
 ### Stasis Field Edge Cases
 - Cannot target same ship two consecutive combat rounds
+- **Range limit:** Strictly 1 hex (must be adjacent to target).
 - Stasis target immune to friendly and enemy fire while in stasis
 - **Stasis DOES prevent retreat** — a ship in stasis cannot move or retreat that round (contrary to a previous note which said otherwise; this is the authoritative ruling)
 - After stasis expires, ship can retreat normally on the next round

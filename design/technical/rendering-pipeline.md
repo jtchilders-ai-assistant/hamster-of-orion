@@ -308,6 +308,26 @@ class GalaxyMapRenderer {
 
 ---
 
+## Fog of War Rendering Rules
+
+The galaxy map obfuscates data based on exploration status (matching MOO1 mechanics):
+
+### 1. Unexplored Systems (Fog of War Active)
+If `fogOfWar.has(system.id)` is true, the renderer applies the following rules:
+- **Shown Data**: Only the star's color and size are rendered. The 2D coordinates are fully accurate. The star name is displayed.
+- **Obfuscated Data**: 
+  - Planet counts, types, sizes, and richness are hidden.
+  - Population and factory counts are hidden.
+  - Owner flags and borders are hidden (rendered as neutral/unclaimed).
+  - Orbiting fleets are completely invisible.
+
+### 2. Explored Systems (Fog of War Cleared)
+Once a player's ship visits a system, or it is revealed via Advanced Scanners:
+- **Shown Data**: Planet types, sizes, richness, max population, current population, current factories, owner flag, borders, and orbiting fleets.
+- **Stale Data**: If a system was explored but is no longer within scanner range or occupied, the UI displays the *last known state*. It renders normally but fleets are hidden (unless advanced scanners are active). The UI may overlay a subtle desaturation effect to indicate stale data.
+
+---
+
 ## Star System Rendering
 
 ```javascript

@@ -44,7 +44,7 @@ Ground combat is initiated from the **Bombardment / Invasion decision screen** (
 ```
 
 **Notes:**
-- Troops come from transport ships in the attacking fleet. No transports = no invasion possible.
+- Troops are simply your population that have been sent to an enemy planet via the Transport slider on the planet screen. No specialized transport ships need to be built.
 - The slider lets players hold some troops in reserve (in case of failure).
 - CANCEL returns to the Bombardment screen without attacking.
 
@@ -77,8 +77,8 @@ After launching an invasion, the ground combat screen displays. This is **non-in
 ║                                                             ║
 ║   [    ANIMATED DICE ROLL / COMBAT ANIMATION    ]           ║
 ║                                                             ║
-║   Attackers roll: 7, 4, 9, 2, 5, 6, 3, 8, 1, 4, 7, 5      ║
-║   Defenders roll: 3, 8, 2, 6, 4, 1, 7, 3                   ║
+║   Attacker Roll: 87  (67 + 20 tech bonus)                   ║
+║   Defender Roll: 53  (43 + 10 base bonus)                   ║
 ║                                                             ║
 ║   ─────────────────────────────────────────────────────    ║
 ║                                                             ║
@@ -136,11 +136,15 @@ The UI displays the combat modifiers each side has:
 
 These bonuses are shown as `+N%` next to the troop count in the portrait panels.
 
-### Dice Roll Mechanic (Under the Hood)
-- Each troop rolls 1d10
-- Hits counted per attacker/defender threshold
-- Casualties = hits above threshold
-- (This is transparent to the player — shown as visual rolls)
+### Dice Roll Mechanic (MOO1 Math)
+- Ground combat is resolved in a series of 1-on-1 attacks until one side has been completely eliminated.
+- **Roll Formula:** Each attack consists of a roll of `1d100` made by each side.
+- **Bonuses:** The race's current best ground combat technology bonuses for weapons, armor, and personal shields are added to their respective rolls.
+- **Racial Advantage:** The Bulrathi receive an automatic `+20` to all ground combat rolls.
+- **Resolution:** The highest total score wins the attack, killing off `1` unit of the loser's population. In the case of a tie, both sides lose `1` unit.
+- **Capture Threshold:** The planet is captured when the defending troops are reduced to `0` and the attacker has at least `1` troop remaining. If both sides are simultaneously reduced to `0` (via a tie on the last troops), the invasion fails and the planet remains with the defender, though empty of population.
+
+*(Note: To save time in the UI for large battles, the system rapidly calculates the series of 1-on-1 attacks and displays them in batched round summaries, showing the net casualties of multiple rolls at once.)*
 
 ---
 
@@ -247,42 +251,18 @@ After a successful COLONIZE, the captured planet transitions immediately into yo
 
 ---
 
-## 6. Troop Sources and Transport Ships
+## 6. Troop Sources and Transports
 
 ### How Troops Get There
-Troops are carried in **Military Transport Ships** (built at colonies). These are distinct from Colony Transports used for population transfer.
+In Master of Orion 1, troops are not separate military units and you do not build "Transport Ships" at a shipyard. Troops are simply your planet's **population**. 
 
-See `design/economy/ship-costs.md` §16B for authoritative costs and capacities:
+To invade, you go to the Planet screen of one of your colonies, select the **Transport** option, and select how many millions of population to send, targeting the enemy planet.
+These population units fly across the map as transport fleets. If they arrive at an enemy planet, they act as invading troops in Ground Combat. 
 
-| Transport Type | Cost | Maintenance | Troop Capacity |
-|----------------|------|-------------|----------------|
-| Light Transport | 50 BC | 1 BC/turn | 5 troops |
-| Heavy Transport | 100 BC | 2 BC/turn | 10 troops |
-| Assault Transport | 200 BC | 4 BC/turn | 20 troops |
-
-**Note:** Colony Ships (population transports) are civilian vessels and cannot carry military troops.
-
-### Transport Ships in Fleet Deployment
-When deploying a fleet that includes transports, the Fleet Deployment panel shows:
-
-```
-┌─Fleet─Deployment──────────────┐
-│  FLEET AT FIRMA               │
-│                               │
-│  ┌───────┐  ┌───────┐        │
-│  │WARSHIP│  │TRANSP.│        │
-│  │    3  │  │    2  │  15 🪖  │
-│  └───────┘  └───────┘        │
-│  (select all for deployment)  │
-│                               │
-│  Troops aboard: 15 total      │
-│  (1× Heavy: 10, 1× Light: 5)  │
-│                               │
-│  [CANCEL]       [ACCEPT]      │
-└───────────────────────────────┘
-```
-
-The `🪖 15` badge shows total troops available in the transport ships in this fleet.
+- Each 1 million population = 1 troop.
+- Transport fleets move at a speed determined by your current engine technology.
+- If they arrive at a friendly planet, they merge into the population.
+- If they arrive at an enemy planet, Ground Combat begins (if space defenses are cleared).
 
 ---
 

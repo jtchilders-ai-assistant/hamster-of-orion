@@ -101,10 +101,10 @@ The galaxy is divided into four distinct regions from the lore, each with unique
 **Strategic Role**: End-game objective
 
 **Characteristics**:
-- Energy barrier blocks detailed scans
-- 3-system buffer around Orion (no planets)
-- Guardian patrols
-- Unknown dangers
+- **Energy Barrier Masking**: Sensors cannot penetrate the Orion region until the Guardian is defeated or a fleet enters the system (though entering triggers combat). Scans from outside return static.
+- **Buffer Clearing**: There is a forced 3-parsec buffer around Orion where no other star systems may spawn, isolating it completely.
+- Guardian patrols intercept any fleet entering the system.
+- Unknown dangers wait for the unwary.
 
 **Orion System**:
 - Planet Orion at exact center

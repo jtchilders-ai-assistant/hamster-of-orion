@@ -34,11 +34,11 @@ Vote_Weight = Race_Population / Total_Galactic_Population
 
 ### Voting Behavior
 
-Races vote based on:
-- **Diplomatic relations** with candidates
-- **Alliances** (allies vote for each other)
-- **Wars** (enemies vote against)
-- **Racial personality** (some races more likely to abstain)
+AI Races vote using strict logic based on MOO1:
+- A race will **always vote for themselves** if they are one of the two candidates.
+- If not a candidate, an AI will vote for an ally **only if** that ally already holds at least 1/3 of the total votes (making them a strong candidate).
+- An AI will **never** vote for an empire they are at war with, regardless of other factors.
+- **Diplomatic relations** govern the remaining decisions (e.g., voting for a highly trusted friend vs. abstaining).
 
 ### Abstention
 

@@ -243,15 +243,22 @@ Base_Scrap_Rate = 0.25 (25% of construction cost)
 
 ### 10. Auto-Scrap (Bankruptcy)
 
-When empire cannot pay maintenance:
+When empire cannot pay maintenance (Empire_Treasury drops below 0):
 
 ```
 While Empire_Treasury < 0:
-    Ship = select_random_ship()  # Or oldest/weakest
-    Scrap_Value = Ship.cost × Emergency_Scrap_Rate
-    Empire_Treasury += Scrap_Value
-    Remove ship from fleet
-    
+    # 1. Scrap Ships first
+    If Fleet_Has_Ships:
+        Ship = select_oldest_ship()  # deterministic criteria: scrap oldest design first (highest maintenance/value ratio)
+        Scrap_Value = Ship.cost × Emergency_Scrap_Rate
+        Empire_Treasury += Scrap_Value
+        Remove ship from fleet
+    # 2. Scrap Missile Bases if no ships remain
+    Else If Empire_Has_Missile_Bases:
+        Planet = select_poorest_planet_with_bases() # lowest production output
+        Scrap 1 Missile Base at Planet
+        Empire_Treasury += Base_Scrap_Value (e.g. 25 BC)
+        
 Emergency_Scrap_Rate = 0.10 (10% - hasty scrapping)
 ```
 

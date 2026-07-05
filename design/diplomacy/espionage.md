@@ -131,29 +131,33 @@ if AllSpiesFailTrigger:
 
 ### 1.2 Spy Effectiveness Calculation
 
-Every spy has an effectiveness rating that modifies all mission success chances:
+Every spy operation has an effectiveness rating that modifies all mission success chances. This effectiveness relies heavily on the difference between the attacker's SPYING budget (converted to active agents) and the defender's SECURITY budget (counter-intel agents), resolving the UI/UX budget contradiction.
 
 ```
-SpyEffectiveness = (BaseEffectiveness + RacialBonus + SpyRollBonus + TechBonus - TargetSecurity) * racial_aggression_multiplier
+SpyEffectiveness = (BaseEffectiveness + BudgetBonus + RacialBonus + SpyRollBonus + TechBonus - TargetSecurity) * racial_aggression_multiplier
 ```
 
 **Variables:**
 - `BaseEffectiveness` = 30 (all spies start here)
+- `BudgetBonus` = `(Attacker_Agents_Assigned - Defender_Counter_Agents) × 5`
+  - *Agents are calculated dynamically from the budget:* `Agents = floor(Budget_BC_Per_Turn / 50)`
 - `RacialBonus` = Espionage racial modifier percentage (see Section 2)
-- `SpyRollBonus` = Flat bonus added directly to spy rolls (Chameleons only: +30, matches MOO1)
-- `TechBonus` = Computer tech level advantage × 2 (see Section 3)
-- `TargetSecurity` = Target empire's security level × 10 (see Section 4)
-- `racial_aggression_multiplier` = Per-race multiplier defined in Section 2.1 (Multiplier column). Chameleons: 1.60×, Ferrets: 1.10×, Rats: 1.00×, Hamsters: 1.00×, Mice: 1.00×, Budgies: 1.00×, Rabbits: 1.00×, Guinea Pigs: 1.00×, Hermit Crabs: 1.00×. Ants are excluded by `can_conduct_espionage: false` flag, so the multiplier never applies to them.
+- `SpyRollBonus` = Flat modifier (Chameleons get +30)
+- `TechBonus` = `(AttackerComputerTechLevel - DefenderComputerTechLevel) × 2`
+  - *Tech Level Integer Conversion:* A race's Computer Tech Level is defined as the total number of Computer field technologies they have successfully researched (e.g., 5 techs researched = Level 5).
+- `TargetSecurity` = The defender's fixed Security Level modifier (see Section 4.1)
 
-**Example: Chameleon spy vs Hamster with moderate security**
+**Example Calculation:**
 ```
-RacialBonus = 60 (Chameleons percentage modifier)
-SpyRollBonus = 30 (Chameleons flat +30 to spy rolls, MOO1 mechanic)
-TechBonus = (15 - 12) × 2 = 6 (Chameleon tech level 15, Hamster 12)
+BaseEffectiveness = 30
+BudgetBonus = (4 offensive agents - 2 counter-intel agents) × 5 = +10
+RacialBonus = 60    (Chameleon percentage modifier)
+SpyRollBonus = 30   (Chameleon flat +30 to spy rolls, MOO1 mechanic)
+TechBonus = (15 - 12) × 2 = 6 (Chameleons have 15 Computer techs, Hamsters have 12)
 TargetSecurity = 3 × 10 = 30 (Security Level 3)
 racial_aggression_multiplier = 1.60 (Chameleons)
 
-SpyEffectiveness = (30 + 60 + 30 + 6 - 30) × 1.60 = 96 × 1.60 = 153.6 → 154 (capped to 95 by success clamping)
+SpyEffectiveness = (30 + 10 + 60 + 30 + 6 - 30) × 1.60 = 106 × 1.60 = 169.6 → 169 (capped to 95 by success clamping)
 ```
 
 ---

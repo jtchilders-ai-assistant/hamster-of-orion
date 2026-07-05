@@ -105,11 +105,20 @@ Determined by:
 
 ## Conquered Populations
 
-**Newly Captured Planets**:
-- Population may resist (morale penalty)
-- Production reduced until stabilized
-- Garrison troops help maintain order
-- Over time, population integrates
+**Newly Captured Planets & Conquered integration math**:
+- When a planet is conquered, the surviving population suffers a 50% morale/efficiency penalty. 
+- **Morale baseline calculation:** `Morale = 100 - Conquered_Penalty`. Normal morale is 100 (if well-fed and clean).
+- **Integration rate:** This penalty decreases by 5% per turn. 
+- Until it reaches 0%, the population acts as 'Conquered' and produces proportionally less output.
+- Garrison troops help maintain order against rebellion events.
+
+---
+
+## Transport Travel Time Logic
+
+When transporting population via colony transports or invading with troop transports:
+- **Travel Time:** `Travel_Time = ceil(Distance_in_Parsecs / Fleet_Speed)`
+- **Speed calculation:** Transports travel at the speed of the slowest engine tech unlocked by the empire. They do not need to be designed in the ship designer.
 
 ---
 

@@ -125,6 +125,18 @@ Key weakness: Predictable. Cannot adapt to unexpected strategies. Complete espio
 
 ---
 
+## Species-Specific Mechanics (Formulas)
+
+### Ant Thresholds
+Ants gain production efficiency bonuses based on population density thresholds.
+- **Density Bonus Formula**: `Bonus_% = (Current_Population / Max_Population) * 25%`
+- **Threshold**: The planet must be at least 50% populated to begin receiving this density bonus. (i.e. if <50%, bonus is 0%).
+- This is in addition to their base +50% production racial bonus, making fully populated Ant worlds exponentially more productive.
+
+### Special Abilities Formulas
+- **Rapid Industrialization**: For the first 30 turns after a new colony is founded, the BC cost to construct a Factory is reduced by 50%.
+- **Overpopulation**: `Ant_Max_Pop = Base_Max_Pop * 1.25` (rounded down). This applies dynamically to all planets colonized by the Collective.
+
 ## Homeworld Lore vs. Gameplay
 **Lore:** Formicae is an arid world — the ancient birthplace of the Collective, carved into vast tunnel networks by the first colonies.
 **Gameplay:** The in-game starting planet is always Terran (equal starting conditions for all species). Formicae is treated as the Collective's original homeworld, long since integrated into the broader empire before the events of the game.

@@ -278,6 +278,20 @@ Each tier has a "pool" of possible technologies. The game randomly selects which
 
 ---
 
+## Miniaturization & Weapon Sizing
+
+In Master of Orion, weapon base sizes and costs decrease as your research level in the Weapons field increases past the weapon's tech level. 
+
+**Miniaturization Formula:**
+```
+Size = Base_Space × (Weapon_Tech_Level / Player_Weapons_Tech_Level)
+Cost = Base_Cost × (Weapon_Tech_Level / Player_Weapons_Tech_Level)
+```
+- **Minimums:** Size and cost cannot be reduced below 25% of their original base values.
+- Hull space (Small=25, Medium=70, Large=280, Huge=1400) remains constant; ships fit more weapons because components shrink.
+
+---
+
 ## Weapon Categories Summary
 
 ### Beam Weapons (22 total)
@@ -289,6 +303,11 @@ Direct fire, instant hit, cannot be intercepted.
 | Medium Beams | 6 | 17-28 | Graviton through Auto-Blaster |
 | Heavy Beams | 5 | 30-37 | Heavy Phasor through Disruptor |
 | Ultimate Beams | 5 | 45-48 | Death Ray through Mauler Device |
+
+**Special Targeting Notes:**
+- **Death Ray:** Ignores shields entirely and does not suffer range dissipation penalties. Auto-kills Small hull ships.
+- **Stellar Converter logic:** Fires 4 separate attacks of 10-35 damage each. Stellar Converter ignores planetary shields and destroys the planet entirely if the planet is reduced to 0 population by the attack.
+- **Megabolt Cannon:** Does not chain in MOO1. However, as per requested design enhancement, it chains to up to 3 adjacent targets dealing 50% damage to secondary targets.
 
 ### Missiles (8 total)
 Tracking projectiles, can be intercepted. **All missiles grant attack rating bonuses.**
@@ -317,7 +336,7 @@ Heavy warheads, cannot be intercepted, fire every 2 turns.
 | 23 | Anti-Matter | 30 |
 | 40 | Hellfire | 4 attacks × 25 damage each |
 | 43 | Proton | 75 |
-| 50 | Plasma | 150 (-15 damage per space traveled) |
+| 50 | Plasma | 150 (-5 damage per hex traveled before impact) |
 
 ### Bombs (5 total)
 Planetary bombardment weapons.

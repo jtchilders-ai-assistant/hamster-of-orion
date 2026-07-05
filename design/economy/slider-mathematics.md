@@ -45,7 +45,7 @@ SHIP_BC = Net_Production × (SHIP_Percent / 100)
 - When the full ship cost is reached, the ship is launched
 - Overflow (BC beyond ship cost) rolls into the next item in queue
 - If queue is empty, overflow goes to **Empire Reserve**
-- Starbases are built in-system; ships are produced and immediately available
+- **Shipyard definition:** A shipyard is defined implicitly by allocating SHIP BC on a planet. There is no explicit 'Star Base' requirement to build ships (like in MOO2). However, building huge ships requires high planetary production, effectively making mature planets your shipyards.
 
 ### DEF — Planetary Defenses
 Allocates BC toward missile bases and planetary shields.
@@ -59,8 +59,12 @@ Build priority within DEF (player sets, default order):
 2. Planetary Shields (until desired tier reached)
 3. Excess DEF BC → Empire Reserve
 
-**Missile Base Cost:** Base 100 BC (reduced by Construction tech).  
-**Planetary Shield Cost:** Varies by tech tier; see `../technology/force-fields.md`.
+**Missile Base Cost:** Base 100 BC (reduced by Construction tech, modified by attributes).  
+**Missile Base combat attributes/cost modifier:** `Base cost = 100 × (1 + 0.1 × Tech_Level_Bonus)`. Tech_Level_Bonus is derived as `floor((Highest_Tech_Level - 1) / 5)`.
+**Missile Base refit & shield upgrade costs:** Missile Base Refit Cost = 25 BC per base (to upgrade existing bases to newly researched armor/missiles). Shield Upgrade Cost = Full cost of the new shield tier.
+**Refit time funding pools:** Refit costs are funded directly by the DEF slider. The slider will allocate BC to the "Refit Pool" until the cost is fully met, at which point the bases instantly upgrade.
+
+**Planetary shield floor/mitigation math:** Planetary shields mitigate incoming damage by subtracting their class rating (e.g. 5 for Class V) from EACH incoming attack's damage. Minimum damage is reduced to a floor of 0. Some weapons (like the Stellar Converter) ignore planetary shields entirely.
 
 ### IND — Industry (Factory Construction)
 Allocates BC toward building new factories.
@@ -144,7 +148,7 @@ Cleanup modifiers by tech level (from `../technology/planetology.md`):
 
 ## 3. ECO — Population Growth Bonus Phase
 
-After cleanup is paid, remaining ECO BC can accelerate population growth.
+After cleanup is paid, remaining ECO BC can accelerate population growth via cloning.
 
 ```
 Growth_BC = min(Remaining_ECO_BC, Growth_BC_Cap)
@@ -152,10 +156,9 @@ Growth_Bonus = Growth_BC × Growth_BC_Efficiency
 Remaining_ECO_BC -= Growth_BC
 ```
 
-- **Growth_BC_Efficiency:** 1 BC → 0.1 additional population growth per turn (base)
-- **Growth_BC_Cap:** `Max_Population - Current_Population` (cannot grow beyond cap)
-- Growth bonus stacks additively with natural growth rate
-- Growth bonus applies once per turn (not compounding within the turn)
+- **Growth_BC_Efficiency:** 1 BC → 0.05 additional population growth per turn (Base cloning costs 20 BC per +1 population).
+- **Growth_BC_Cap:** `(Max_Population - Current_Population) × 20` (cannot grow beyond cap)
+- **Cloning logic order:** Growth calculation order: 1. Logistic natural growth applied. 2. Cloning BC applied (20 BC per +1 pop). 3. Cap at Max Population. Any overflow BC from cloning max-out goes to Terraforming.
 
 If the planet is already at maximum population, this phase is skipped and BC passes to terraforming.
 

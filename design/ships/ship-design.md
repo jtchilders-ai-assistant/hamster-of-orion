@@ -119,10 +119,10 @@ Example: Research "Class II Shields" → All your ships now have Class II Shield
 
 ## Miniaturization
 
-As tech advances, weapons shrink:
-- Each tech tier above a weapon: **-50% space cost**
-- Allows fitting more weapons on same hull
-- Encourages upgrading to new weapon types
+As your Weapons technology outpaces a weapon's tech level, that weapon shrinks in size and cost:
+- **Formula:** Size = Base_Space × (Weapon_Tech_Level / Player_Weapons_Tech_Level)
+- Allows fitting more weapons on same hull as your tech improves.
+- Capped at 25% of original size.
 
 ---
 
@@ -133,9 +133,9 @@ As tech advances, weapons shrink:
 - Specials: Reserve Fuel Tanks
 - Role: Exploration
 
-### Colony Ship (Small Hull)
+### Colony Ship (Large Hull)
 - Weapons: None  
-- Specials: Colony Module
+- Specials: Colony Module (requires 500 space)
 - Role: Colonization
 
 ### Fighter (Small Hull)

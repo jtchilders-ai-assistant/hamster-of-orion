@@ -317,8 +317,8 @@ The Guardian is NOT a random event - it is a fixed encounter guarding the Orion 
 
 **Reward on Defeat**:
 - Access to Orion system (richest planet in galaxy)
-- Death Ray technology
-- Possible additional Ancient technologies
+- Death Ray technology (plus Particle Data, etc.)
+- **Orion Tech Fallback**: If the player has already researched these technologies, they receive up to 4 advanced technologies from random fields instead.
 
 ---
 
@@ -424,6 +424,7 @@ The Guardian is NOT a random event - it is a fixed encounter guarding the Orion 
       "respawn_turns": 50,
       "is_random_event": false,
       "reward_technology": "death_ray",
+      "reward_tech_fallback": "If Death Ray (and other fixed Orion techs) are already owned, the player receives up to 4 advanced technologies from random fields as a fallback.",
       "reward_system_access": "orion"
     }
   }
@@ -580,17 +581,24 @@ A deadly disease outbreak devastates a colony's population.
 - Requires: Population > 20 million on target
 - Galaxy requirement: has_colonies
 
+**Mathematical Target Selection**:
+When the event triggers, the initial target planet is selected via a weighted probability model prioritizing high population and trade hubs:
+1. **Filter**: Select all colonized planets in the galaxy with Population > 20.
+2. **Weight Calculation**: For each eligible colony, calculate its weight:
+   $$ \text{Weight} = (\frac{\text{Population}}{10}) + (\text{Active Trade Routes} \times 5) $$
+3. **Selection**: Sum the weights of all eligible colonies ($\text{TotalWeight}$). Generate a random number $R \in [0, \text{TotalWeight}]$. Iterate through the colonies; the first colony to make the cumulative sum $\ge R$ is infected.
+
 **Duration**: 3-5 turns (unless cured)
 
 **Effects**:
 - -10% to -20% population per turn while active
-- Spreads to adjacent colonies (25% chance per turn)
-- Can be cured with Atmospheric Terraforming tech or Bio Toxin Antidote
+- Spreads to adjacent colonies (20% chance per turn via trade routes or to any star within 3 parsecs). Fleets arriving from a plagued planet can also spread it.
 
 **Mitigation**:
-- Bio Toxin Antidote: Immediate cure
+- Universal Antidote: Immediate cure
+- Bio Toxin Antidote: Death rate reduced by 50%
 - Atmospheric Terraforming: Duration reduced by 50%
-- Soil Enrichment: Death rate reduced by 50%
+- Soil Enrichment: Death rate reduced by 25%
 
 ```json
 {
@@ -614,13 +622,16 @@ A deadly disease outbreak devastates a colony's population.
       "min": 10,
       "max": 20
     },
-    "spread_chance_per_turn": 0.25,
-    "spread_range_parsecs": 3
+    "spread_selection": {
+      "chance_per_turn": 0.20,
+      "logic": "Spreads via trade routes to trade partners or to colonies within 3 parsecs. Fleets arriving from a plagued planet can also spread it."
+    }
   },
   "mitigation": {
-    "bio_toxin_antidote": {"effect": "cure_immediate"},
+    "universal_antidote": {"effect": "cure_immediate"},
+    "bio_toxin_antidote": {"effect": "death_rate_reduction", "percent": 50},
     "atmospheric_terraforming": {"effect": "duration_reduction", "percent": 50},
-    "soil_enrichment": {"effect": "death_rate_reduction", "percent": 50}
+    "soil_enrichment": {"effect": "death_rate_reduction", "percent": 25}
   }
 }
 ```

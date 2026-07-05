@@ -435,7 +435,7 @@ When a colony is clicked, shows detailed management:
 │  │  Missile Bases:  2    │  │                                                 ││
 │  │  Shield Level:  III   │  └─────────────────────────────────────────────────┘│
 │  │  Waste:          3%   │                                                     │
-│  │  Production:    56 BC │                                                     │
+│  │  Production (PP): 56 BC │ (Production Points = Gross Production)            │
 │  │                       │                                                     │
 │  └───────────────────────┘                                                     │
 │                                                                                 │
@@ -449,10 +449,10 @@ When a colony is clicked, shows detailed management:
 
 | Slider | Purpose | Builds |
 |--------|---------|--------|
-| **SHIP** | Ship construction | Ships from design queue |
+| **SHIP** | Ship construction | Ships from design queue (overflow goes to Empire Reserve) |
 | **DEF** | Planetary defense | Missile bases, planetary shields |
 | **IND** | Industrial growth | Factories (up to max) |
-| **ECO** | Ecology/terraform | Waste cleanup, terraforming |
+| **ECO** | Ecology/terraform | Waste cleanup, terraforming (Pollution exceeding 10% max pop threshold reduces capacity) |
 | **TECH** | Research contribution | Adds to empire research pool |
 
 ---

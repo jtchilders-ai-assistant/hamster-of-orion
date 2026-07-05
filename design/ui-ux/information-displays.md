@@ -737,3 +737,22 @@ Reports, statistics, graphs, and data visualization screens. Essential for strat
 All information displays designed for clarity and strategic decision-making. UI/UX documentation complete!
 
 Next: Narrative content (opening crawl, race flavor text, victory epilogues).
+
+## Detailed Calculation Formulas
+
+### Empire Score Calculation
+The Empire Score evaluates a player's relative power across the galaxy.
+`Total_Score = Population_Score + Fleet_Score + Tech_Score + Diplomatic_Score`
+- **Population_Score**: `Total_Population / 10`
+- **Fleet_Score**: `Sum of (Ship_Size_Class_Multiplier * Ship_Tech_Tier)`
+  * *Multiplier: Small=1, Medium=2, Large=4, Huge=8*
+- **Tech_Score**: `Sum of (Tech_Cost / 100)` for all researched technologies.
+- **Diplomatic_Score**: `(Allied_Empires_Count * 100) + (Non_Aggression_Pacts * 50) + Sum_of_Relations_with_all_Empires`
+
+### Diplomatic Relations Algorithm
+The Diplomatic Relation between Empire A and Empire B ranges from -100 (Blood Feud) to +100 (Harmony).
+`Relations = Base_Personality_Modifiers + Treaty_Modifiers - Border_Friction - Incident_Hostility`
+- **Base_Personality_Modifiers**: Dependent on species pairings (e.g. +10 for Hamsters, -20 for Guinea Pigs vs Hamsters).
+- **Treaty_Modifiers**: +20 for Trade, +15 for Research Pact, +50 for Alliance.
+- **Border_Friction**: `-5` for every system colonized within 3 parsecs of the other's colonies.
+- **Incident_Hostility**: `-20` per spy caught, `-50` for broken treaties. (Decays by `+1` per turn of peace).

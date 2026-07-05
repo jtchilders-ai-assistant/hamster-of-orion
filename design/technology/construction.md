@@ -196,7 +196,7 @@ Armor and equipment for planetary invasions.
 
 | Tech Name | Tech Level | Unlocks | Effect |
 |-----------|------------|---------|--------|
-| Molecular Bonding | 52 | — | All armor +25% HP |
+| Molecular Bonding | 52 | — | Absorbs 20% of incoming damage |
 | Bio-Terminator Suit | 55 | Bio-Terminator Suit | +40 ground combat |
 
 ---
@@ -273,10 +273,16 @@ In MOO1, all 4 hull sizes are available from the start. Construction technology 
 
 ### Repair Systems
 
+**Auto-Repair percentage bases:**
+- At the end of each combat round, auto-repair systems repair a fixed percentage of armor structure points.
+- They have base 10%, 15%, or 25% options across the game depending on what is equipped, but the primary techs unlock the following:
+
 | System | Tech Level | HP/Turn | Space | Cost |
 |--------|------------|---------|-------|------|
-| Automated Repair | 14 | 15% | 25 | 40 BC |
-| Advanced Damage Control | 36 | 30% | 35 | 80 BC |
+| Automated Repair Unit | 14 | 10% | 25 | 40 BC |
+| Advanced Damage Control | 36 | 25% | 35 | 80 BC |
+
+*(Note: In MOO1, standard auto repair is 10%, and advanced is 25%. A 15% repair may come from a special leader or artifact).*
 
 ---
 
@@ -758,7 +764,8 @@ In MOO1, all 4 hull sizes are available from the start. Construction technology 
             "tech_level": 52,
             "category": "armor",
             "effect": {
-              "armor_bonus": 0.25
+              "damage_absorbed_percent": 0.20,
+              "description": "Molecular Bonding armor absorbs 20% of incoming damage before other shields apply."
             }
           },
           {

@@ -681,9 +681,9 @@ When a missile token enters a ship’s point defense range, PD fires automatical
 ║ │    10-30M casualties per turn                        │   ║
 ║ │    -50 diplomatic relations (war crime)              │   ║
 ║ │                                                       │   ║
-║ │ [BIOLOGICAL WEAPON] - Genocidal plague (if unlocked) │   ║
-║ │    Wipes out 90% of population                       │   ║
-║ │    Planet radioactive for 50 turns                   │   ║
+║ │ [BIOLOGICAL WEAPON] - (if equipped)                    │   ║
+║ │    Kills 1M population per bomb hit per turn         │   ║
+║ │    Preserves factories and planet infrastructure     │   ║
 ║ │    -100 diplomatic ALL empires (atrocity)            │   ║
 ║ │    May trigger united war against you                │   ║
 ║ │                                                       │   ║

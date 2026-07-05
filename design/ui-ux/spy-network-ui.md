@@ -365,3 +365,14 @@ In the Game Menu → Options, players can configure:
 
 *Document created: 2026-04-13*  
 *MOO1 reference: Original espionage system (spy slider, target selection, start-of-turn results)*
+
+## Detailed Calculation Formulas (UI Context)
+
+### Mission Success Probability Formula
+The UI displays the expected success probability to the player before launching a spy mission.
+`Probability = Base_Mission_Success + Spy_Effectiveness - Target_Security_Defense`
+- **Base_Mission_Success**: 30% for Tech Theft, 40% for Sabotage, 25% for Rebellion, 10% for Assassination.
+- **Spy_Effectiveness**: `Racial_Bonus + (Attacker_Computer_Tech_Tier * 2)`
+- **Target_Security_Defense**: `(Target_Security_Level * 10) + Racial_Defense_Bonus`
+
+*Note: Displayed probability is clamped between 5% and 95%.*

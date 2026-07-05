@@ -128,3 +128,11 @@ Ferrets have studied Ancient facilities with predatory intensity. Their conclusi
 The Habitrail tubes are obviously pursuit corridors for hunting prey through multiple dimensions. The exercise wheels test prey's endurance before the kill. The food dispensers are traps for unwary creatures.
 
 Ferrets have incorporated Ancient targeting systems into their weapons technology, achieving accuracy the original builders never intended. "We are better hunters than even the Ancient Ones. When we reach Orion, we will prove it."
+
+## Species-Specific Mechanics (Formulas)
+
+### Ferret First Strike & Initiative
+In tactical combat, turn order (Initiative) determines who moves and fires first.
+- **Initiative Formula**: `Initiative = Base_Ship_Speed + Computer_Level + Racial_Initiative_Bonus`
+- **Ferret First Strike Algorithm**: Ferrets possess a unique "always fire first" First Strike capability. In the combat code, Ferret ships bypass the standard Initiative sorting for the first round of engagement, guaranteeing they act before all non-Ferret ships regardless of enemy speed or computer level. If both sides are Ferrets, standard Initiative sorting is used between them.
+- **Retreat Logic**: If Ferret fleet power drops below 30% of the enemy's present fleet power in combat, their ships gain a `+50%` chance to successfully retreat before taking damage.

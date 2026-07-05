@@ -252,7 +252,22 @@ Effective_Cleanup_Cost = Pollution × 0.5 × Cleanup_Modifier
 Net_Production = Total_Production - Cleanup_Cost
 ```
 
-If cleanup cost is not fully paid, pollution accumulates and reduces planet population capacity.
+If cleanup cost is not fully paid, pollution accumulates. 
+**Pollution threshold value:** Pollution only causes capacity reduction after exceeding a threshold equal to 10% of the planet's `Max_Population`. 
+
+**Pollution accumulation & capacity reduction math:**
+```
+Uncleaned_Waste_BC = Cleanup_Cost - ECO_BC_Allocated
+Pollution_Units = Uncleaned_Waste_BC × (2 / Cleanup_Modifier)
+Accumulated_Pollution += Pollution_Units
+
+If Accumulated_Pollution > (Max_Population × 0.10):
+    Excess_Pollution = Accumulated_Pollution - (Max_Population × 0.10)
+    Capacity_Reduction = floor(Excess_Pollution / 10)
+    Effective_Max_Pop = Max_Population - Capacity_Reduction
+```
+
+**Production Points formula:** Production Points (PP) is defined purely as Gross Production (Factory_Production + Population_Production) × Mineral_Richness_Modifier. Production Points do not factor in waste cleanup, whereas Net Production does.
 
 ---
 
@@ -452,6 +467,9 @@ When a planet is blockaded by enemy ships:
 - But cannot build ships (only ground defenses, missiles, shields)
 - Excess production goes to reserve
 
+### Overflow Handling
+Any production slider overflow (e.g., Ship queue empty, Defenses full, Factories maxed, Eco complete) goes directly to the **Empire Reserve**. All overflow to the Reserve from all planets is aggregated at the end of the turn and is immediately available for spending on the *subsequent* turn.
+
 ### Bombed Factories
 Planetary bombardment can destroy factories:
 ```
@@ -464,6 +482,7 @@ When capturing an enemy planet:
 - Factories remain (may be damaged by invasion)
 - Factory technology level uses YOUR tech (not previous owner)
 - This may result in idle factories if you have lower Robotic Controls
+- **Conquered integration math:** The surviving population suffers a 50% morale/efficiency penalty. This penalty decreases by 5% per turn. Until it reaches 0%, the population acts as 'Conquered' and produces proportionally less output.
 
 ---
 

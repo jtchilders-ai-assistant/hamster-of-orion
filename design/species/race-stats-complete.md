@@ -547,10 +547,10 @@ InitialRelationship = BaseInitial + (DiplomacyBonus / 3)
         {
           "id": "eureka_moments",
           "name": "Eureka Moments",
-          "description": "5% chance per turn to receive free breakthrough technology",
+          "description": "15% chance upon completing a tech to grant 50% RP towards next tech in that field",
           "effect": {
-            "type": "free_tech_chance",
-            "value": 5
+            "type": "breakthrough_on_completion_chance",
+            "value": 15
           }
         },
         {

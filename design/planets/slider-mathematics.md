@@ -132,6 +132,12 @@ Max_Missile_Bases = min(Max_Missile_Bases, 50)  # Hard cap
 | Class XV | 2000 BC | 26 | 15 damage |
 | Class XX | 4000 BC | 36 | 20 damage |
 
+**Planetary shield floor/mitigation math:** Planetary shields subtract their class rating (e.g. 5 for Class V) from EACH incoming weapon hit. The damage is reduced to a floor of 0.
+**Refit time funding pools & costs:** 
+- Missile Base Refit Cost = 25 BC per base.
+- Shield Upgrade Cost = Full cost of the new shield.
+- Refitting is funded by the DEF slider, filling a specific refit progress pool until complete.
+
 ---
 
 ### 5. IND Slider (Industry/Factories)
@@ -197,8 +203,11 @@ Where:
 Pollution_Deficit = Cleanup_Cost - Ecology_BC
 Accumulated_Pollution += Pollution_Deficit
 
+Threshold = Max_Population × 0.10
+
 If Accumulated_Pollution > Threshold:
-    Max_Population -= 1 (per 10 pollution accumulated)
+    Excess = Accumulated_Pollution - Threshold
+    Max_Population -= floor(Excess / 10)
 ```
 
 #### Terraforming Spending
@@ -219,17 +228,18 @@ If Terraform_Progress >= Terraform_Cost:
 
 **Maximum Terraforming:** Limited by your Terraforming tech level.
 
-#### Population Growth Bonus
+#### Population Growth Bonus (Cloning)
 
-After terraforming is maxed:
+After terraforming is maxed (or if terraform tier is not yet reachable):
 
 ```
 Growth_Bonus_BC = Ecology_BC - Cleanup_Cost
-
-Growth_Bonus_Pop = floor(Growth_Bonus_BC / 20)  # 20 BC = +1 pop
 ```
 
-This adds directly to population (instant growth, not natural growth).
+**Cloning logic order:**
+1. Logistic natural growth applied first.
+2. Cloning BC applied. `Growth_Bonus_Pop = floor(Growth_Bonus_BC / 20)` (Base cloning costs 20 BC = +1 pop).
+3. Cap at Max Population. Any overflow goes to Empire Reserve.
 
 ---
 

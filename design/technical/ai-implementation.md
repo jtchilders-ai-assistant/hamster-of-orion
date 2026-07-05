@@ -45,12 +45,12 @@ Where `Fleet_Power` is calculated as:
 ```
 Fleet_Power = Σ (Ship_Power × Ship_Count) for all ship designs
 
-Ship_Power = floor(
+Ship_Power = floor( (
     (Hull_HP × Armor_Multiplier × 0.5) +
     (Total_Weapon_Damage × 2.0) +
     (Shield_Class × 5) +
     (Speed × 3)
-)
+) × (1.0 + (Ship_XP / 20)) )
 ```
 
 **Hull HP by Size (MOO1):**
@@ -758,6 +758,27 @@ function should_retreat(ship, combat_state):
     return false
 ```
 
+### 4.11 Objective Generation Logic
+
+The `generate_objectives(empire, game_state)` function scans the galaxy state to dynamically build a list of actionable targets:
+1. **Defensive Objectives**:
+   - Loop through all owned planets. If an enemy fleet is inbound and `Arrival_Time <= 3 turns`, generate an `Intercept Enemy Fleet` objective.
+   - If an owned planet has zero missile bases and borders an unfriendly neighbor, generate a `Defend Colony` objective.
+2. **Expansion & Escort**:
+   - If a Colony Ship is traveling unprotected, generate an `Escort Colony Ship` objective targeting the ship's current location/path.
+3. **Offensive Objectives**:
+   - If at war, identify the enemy's closest and most productive colonies. Generate `Attack Enemy Colony` objectives.
+   - If the enemy homeworld is known and within range, generate `Attack Enemy Homeworld`.
+4. **Exploration**:
+   - For every unexplored star system within fuel range, generate an `Explore Unknown` objective.
+
+### 4.12 Expansion Blocking Algorithms
+
+The AI actively analyzes the map to choke off player (and rival AI) expansion:
+- **Chokepoint Identification**: The AI looks for systems that act as the only bridge between the player's cluster and the rest of the galaxy.
+- **Preemptive Colonization**: If a chokepoint system contains a habitable world, the AI artificially boosts its `Target_Score` by `+50` in the Expansion Phase (Section 2) to settle it before the player can.
+- **Blockade Objective Generation**: If the AI cannot settle the chokepoint (e.g., toxic/barren), but has adequate fleet power, it generates a `Guard Chokepoint` objective (Base Value 60). An armed fleet will be stationed there to intercept any player colony ships attempting to cross.
+
 ---
 
 ## 5. Diplomatic Stance Calculations
@@ -799,9 +820,12 @@ Stance_Score = floor(
 | +31 to +60 | Cooperative |
 | > +60 | Allied |
 
-### 5.4 Base Relationship
+### 5.4 Base Relationship & Drift
 
 Uses the current diplomatic relationship value (-100 to +100).
+- **Diplomatic Drift Rate**: If no active treaties exist, a non-zero Base Relationship naturally drifts toward `0` by `1` point per turn. (e.g. `+15` becomes `+14`; `-20` becomes `-19`). Honorable races (Budgies, Mice) drift negative relations towards `0` at `2` points per turn if the player ceases hostilities.
+- **Treaty Effects**: If active treaties exist, `Base_Relationship += (Trade_Treaty_Value / Total_Economy) × 2` (up to a max of +100).
+- **War State**: If at war, `Base_Relationship = -100`. Drift does not apply while at war.
 
 ### 5.5 Power Assessment
 
@@ -1049,9 +1073,10 @@ function respond_to_treaty(empire, proposer, treaty_type):
     strategic_value = calculate_treaty_value(empire, proposer, treaty_type)
     base_chance += strategic_value
     
-    # Gift bonus (if offered)
+    # Gift/Bribe bonus (if offered)
     if treaty_includes_gift(treaty):
-        gift_value = treaty.gift_amount / 100
+        # Bribe Impact Formula (MOO1): Bribe impact scales inversely with the target's total economy.
+        gift_value = (treaty.gift_amount / max(1, proposer.total_production)) * 50
         base_chance += min(gift_value, 30)
     
     # Personality
@@ -1076,9 +1101,17 @@ function respond_to_treaty(empire, proposer, treaty_type):
 |------------|------------------|-------------|--------|
 | Simple | Random factor ±30 | Fog of war | None |
 | Easy | Random factor ±20 | Fog of war | None |
-| Average | Random factor ±10 | Full map | None |
-| Hard | Random factor ±5 | Full map | +25% production |
-| Impossible | Optimal decisions | Full vision | +50% all resources |
+| Average | Random factor ±10 | Normal Intel | None |
+| Hard | Random factor ±5 | Extended Intel | +25% production |
+| Impossible | Optimal decisions | Omniscient | +50% all resources |
+
+### 6.1b Intelligence Thresholds (Information Access)
+
+Both the player and AI are subject to intelligence thresholds based on spy allocations (espionage levels):
+- **Level 0 (No Spies)**: Can only see empire borders and total population.
+- **Level 1 (Basic Infiltration)**: Unlocks visibility of fleet sizes and total factory count.
+- **Level 2 (Active Network)**: Unlocks current technology levels and planetary production details.
+- **Level 3 (Deep Cover)**: Unlocks current research focus, detailed ship designs, and specific planet defenses.
 
 ### 6.2 Difficulty Constants
 

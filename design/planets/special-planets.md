@@ -34,8 +34,7 @@ Certain planets in the galaxy offer significant strategic advantages or unique r
 **Description**: Planets containing remnants of ancient civilizations.
 
 **Bonus**: 
-- **One-time technology**: First empire to colonize receives a random technology for free
-- The tech could be from any field and any level
+- **Artifact tech selection:** First empire to colonize receives a one-time technology for free. Artifact worlds grant 1 free random tech from any field up to the player's current max tier + 2.
 - **2x research multiplier** on this planet (ongoing)
 
 **Rarity**: 2-6 per galaxy depending on galaxy size.

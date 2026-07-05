@@ -83,10 +83,10 @@ MinDistance = BaseMinDistance × (1 - ClusterFactor × 0.3)
 ```
 
 Where:
-- `BaseMinDistance` = 35 parsecs (prevents stars from overlapping)
-- `ClusterFactor` = 0.0 to 1.0 (how clustered the generation should be)
-- Minimum distance within clusters = ~25 parsecs
-- Minimum distance between clusters = ~50 parsecs
+- `BaseMinDistance` = 10 units (or 2 parsecs). This is the strict star overlap logic from MOO1 ensuring no two stars generate closer than 2 parsecs.
+- `ClusterFactor` = A density variable (0.0 to 1.0) defining the gravitational clustering of stars. A higher ClusterFactor groups stars into localized dense regions, leaving more empty void space elsewhere.
+- Minimum distance within clusters enforces the 2 parsec absolute rule.
+- Minimum distance between distinct clusters = ~5 parsecs.
 
 ### 2.3 Star Placement Algorithm
 
@@ -650,6 +650,14 @@ function PlaceOrion(stars, map_center):
         guardian: true             // Protected by Guardian ship
     }
     
+    // Orion buffer zone clearing algorithm
+    // Removes any standard stars generated too close to Orion to ensure it sits isolated in the center
+    buffer_radius = 45 // 3 parsecs isolation distance
+    for i from stars.length - 1 down to 0:
+        star = stars[i]
+        if star.id != best_star.id AND distance(star, best_star) < buffer_radius:
+            stars.remove_at(i)
+            
     return best_star
 ```
 
@@ -874,6 +882,35 @@ function CalculateIdealPositions(player_count, config):
     
     return positions[0:player_count]
 
+function GetPerimeterPosition(distance_along_perimeter, config, margin):
+    // Maps a 1D distance along the rectangle's perimeter to 2D coordinates (x,y).
+    // Perimeter path starts at top-left (margin, margin) and goes clockwise.
+    
+    top_edge = config.width - 2 * margin
+    right_edge = config.height - 2 * margin
+    bottom_edge = top_edge
+    left_edge = right_edge
+    
+    d = distance_along_perimeter % (top_edge + right_edge + bottom_edge + left_edge)
+    
+    // Top edge (moving left to right)
+    if d <= top_edge:
+        return {x: margin + d, y: margin}
+    d -= top_edge
+    
+    // Right edge (moving top to bottom)
+    if d <= right_edge:
+        return {x: config.width - margin, y: margin + d}
+    d -= right_edge
+    
+    // Bottom edge (moving right to left)
+    if d <= bottom_edge:
+        return {x: config.width - margin - d, y: config.height - margin}
+    d -= bottom_edge
+    
+    // Left edge (moving bottom to top)
+    return {x: margin, y: config.height - margin - d}
+
 function FindCandidateStars(stars, ideal, used, config):
     candidates = []
     search_radius = 100
@@ -1062,6 +1099,13 @@ function GenerateGalaxy(size, player_count, seed=null):
     
     // Step 9: Assign regions
     AssignRegions(galaxy.stars, map_center, config)
+    
+    // Step 9b: Apply Safe Zone Habitability Guarantee
+    // Override Safe Zone planets to prevent entirely barren starts
+    for star in galaxy.stars:
+        if star.region == "safe_zones" AND star.planet.environment in ["toxic", "radiated", "inferno", "dead"]:
+            // Reroll to a baseline habitable minimum (e.g. minimal or tundra)
+            star.planet.environment = random_choice(["minimal", "tundra", "barren"])
     
     // Step 10: Validate galaxy
     validation = ValidateGalaxy(galaxy)

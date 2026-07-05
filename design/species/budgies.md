@@ -123,3 +123,17 @@ Balance consideration: Their ship combat bonus is huge (+50%) but offset by prod
 
 ## Repurposed Ancient Technology
 Budgies believe the Habitrail tubes were clearly designed as three-dimensional flight training courses. They've converted them into the most complex pilot training simulators in the galaxy. They view the exercise wheels as "primitive attempts at understanding circular flight patterns" and study them intensely to perfect their barrel rolls.
+
+## Species-Specific Mechanics (Formulas)
+
+### Budgie Interactions
+Budgies respect military strength. Their diplomatic relationship with other empires is directly modified by relative fleet power.
+- **Respect Modifier**: `Respect_Score = (Your_Fleet_Power / Budgie_Fleet_Power) * 20` (Capped at +40).
+- If your fleet power is less than 50% of theirs, they apply a `-20` "Disdain" penalty to relations.
+- **Honorable Duel**: If you defeat a Budgie fleet in combat without retreating, you gain an immediate `+15` relation boost ("Warrior's Respect").
+
+### Budgie Combat Initiative & Defense
+In tactical combat, turn order (Initiative) is determined for each ship.
+- **Initiative Formula**: `Initiative = Base_Ship_Speed + Computer_Level + Racial_Initiative_Bonus`
+- **Budgie Initiative Algorithm**: Budgies receive a flat `+3` Racial_Initiative_Bonus to all ships. While they do not have an absolute "always first" First Strike like Ferrets, this massive initiative boost means Budgies will almost always move and fire before non-Ferret opponents of equivalent or slightly higher technology.
+- **Defense Bonus**: Budgie ships add `+3` to their Defense rating (dodge chance against beam weapons) due to erratic, three-dimensional flight patterns.

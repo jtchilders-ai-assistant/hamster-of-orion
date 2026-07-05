@@ -144,3 +144,12 @@ Hermit Crabs don't experience food as a resource. Instead, their "food" slider a
 **Gameplay:** The in-game starting planet is always Terran (equal starting conditions for all species). Treat Crystalia as ancient backstory — the original homeworld from which they expanded long before the events of the game. Their Universal Adaptation ability still applies to all hostile worlds they subsequently colonize.
 
 See `design/galaxy/generation-algorithm.md` — `ConfigureAsHomeworld()` for the balance rationale.
+
+## Species-Specific Mechanics (Formulas)
+
+### Crab Mineral Conversion
+Hermit Crabs are masters of their planetary environments and defensive fortresses.
+- **Deep Core Mining**: Hermit Crabs extract extra value from planetary minerals.
+- **Conversion Formula**: `Extra_Production = Planet_Base_Production * (0.10 * Planet_Mineral_Richness_Tier)`
+  * (Poor = 0, Normal = 1, Rich = 2, Ultra-Rich = 3)
+- This means an Ultra-Rich Crab world gains an additional +30% production above the standard Ultra-Rich bonus.

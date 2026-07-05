@@ -137,7 +137,7 @@ Where:
   Engine_Bonus = Engine_Maneuver_Rating × 2
   Computer_Bonus = Battle_Scanner_Bonus (if equipped: +3)
   Racial_Bonus = Race-specific (Budgies: +3)
-  Experience_Bonus = -1 (Rookie), 0 (Regular), +1 (Veteran), +2 (Elite)
+  Experience_Bonus = -1 (Green), 0 (Regular), +1 (Veteran), +2 (Elite)
   Random = roll(1, 6)
 ```
 
@@ -154,7 +154,8 @@ function calculate_initiative_order(combat):
     # Sort descending (highest initiative acts first)
     sorted_ships = sort(all_ships, key=initiative, descending=True)
     
-    # Ties broken by: 1) Higher maneuver, 2) Smaller ship, 3) Random
+    # Ties broken by: 1) Defender goes first, 2) Higher maneuver, 3) Smaller ship, 4) Random
+    # (MOO1 Canonical: Defender wins initiative ties)
     return sorted_ships
 ```
 
@@ -218,11 +219,9 @@ function resolve_beam_attack(attacker, weapon, target, combat):
         damage_fraction = (roll - hit_threshold) / success_range
         base_damage = weapon.damage_min + floor(damage_fraction * (weapon.damage_max - weapon.damage_min))
         
-        # Apply range penalty
-        distance = hex_distance(attacker.position, target.position)
-        if not weapon.has_special("no_range_penalty"):
-            range_penalty = max(0, (distance - weapon.optimal_range) * 0.10)
-            base_damage = floor(base_damage * (1 - range_penalty))
+        # MOO1 Range Penalty (Distance Decay)
+        # Instead of a damage multiplier, distance modifies hit chance directly.
+        # Implemented below in calculate_hit_chance.
         
         # Apply racial damage bonus (Ferrets: +25%)
         racial_modifier = get_racial_damage_modifier(attacker.race)
@@ -255,19 +254,17 @@ Where:
                            + Inertial_Nullifier     (+4 if equipped; replaces Stabilizer)
                            + Cloaking_Device        (+5 if cloaked)
                            + Racial_Defense_Bonus   (Alkari/Budgies: +3)
+                           + Range_Penalty          (+1 defense for each space beyond 1)
 
 Floor: 5% (always some chance to miss)
 Ceiling: 95% (always some chance to hit)
 
-NOTE: Experience bonuses, size modifiers, point-blank bonuses, and range penalties
-are intentional design enhancements beyond MOO1. They are applied AFTER the
-differential calculation and are clearly documented as such.
+NOTE: Experience bonuses, size modifiers, point-blank bonuses are intentional
+design enhancements beyond MOO1. They are applied AFTER the differential calculation.
 
 Enhancement modifiers (applied after base differential, documented as non-MOO1):
-  + Experience_Bonus (Rookie: -5%, Regular: 0%, Veteran: +5%, Elite: +10%)
-  + Point_Blank_Bonus (1 hex: +10%)
+  + Experience_Bonus (Green: -5%, Regular: 0%, Veteran: +5%, Elite: +10%)
   + Size_Target_Bonus (per size class above Small: +5%)
-  - Range_Penalty (Medium: -5%, Long: -10%, Very Long: -20%)
 ```
 
 ### 10. Hit Chance Calculation
@@ -293,22 +290,17 @@ function calculate_hit_chance(attacker, weapon, target):
         defender_level += 5  # Cloaking Device: +5 to effective defender level
     defender_level += get_racial_defense_level_bonus(target.race)  # Budgies: +3
     
+    # MOO1 Beam Distance Decay: +1 to defender's level for each hex beyond 1
+    # Only applies if the weapon is capable of firing beyond 1 space (Extended range / High Energy Focus)
+    distance = hex_distance(attacker.position, target.position)
+    if distance > 1 and not weapon.has_special("no_range_penalty"):
+        defender_level += (distance - 1)
+        
     # Base differential hit chance
     hit_chance = 50 + (attacker_level - defender_level) * 10
     
     # --- Enhancement modifiers (non-MOO1, documented additions) ---
     hit_chance += get_experience_accuracy_bonus(attacker.experience_level)
-    
-    # Range modifiers
-    distance = hex_distance(attacker.position, target.position)
-    if distance == 1:
-        hit_chance += 10  # Point blank (enhancement)
-    elif distance >= 5 and distance <= 8:
-        hit_chance -= 5   # Medium range
-    elif distance >= 9 and distance <= 15:
-        hit_chance -= 10  # Long range
-    elif distance > 15:
-        hit_chance -= 20  # Very long range
     
     # Size modifier — larger targets easier to hit (enhancement, no MOO1 basis)
     size_diff = target.size_class - 1  # Small = 1, Medium = 2, Large = 3, Huge = 4
@@ -476,6 +468,44 @@ function apply_weapon_effects(target, weapon, damage, combat):
     # --- double_shield_damage and armor_piercing ---
     # Both handled directly inside apply_damage() before this function is called.
     # No additional action needed here.
+    
+    # --- black_hole_generator ---
+    # Instantly destroys 25% of the total ships in the target's stack (or 25% HP for single ships)
+    # Ignores shields and armor. Does not conflict with Automated Repair (which triggers in End Phase).
+    if "black_hole_generator" in effects:
+        damage_amount = floor(target.max_hp * 0.25)
+        target.current_hp = max(0, target.current_hp - damage_amount)
+        if target.current_hp <= 0:
+            destroy_ship(target)
+            
+    # --- gyro_destabilizer ---
+    # Bypasses shields entirely and directly damages the hull structure
+    if "gyro_destabilizer" in effects:
+        target.current_hp -= damage
+        if target.current_hp <= 0:
+            destroy_ship(target)
+            
+    # --- pulsar ---
+    # Deals damage to all adjacent hexes. Resolved outside this function usually,
+    # but if called here, applies AoE around attacker.
+    
+    # --- tractor_beam ---
+    # Reduces target maneuverability and prevents moving away.
+    if "tractor_beam" in effects:
+        target.status_effects.append({
+            type: "tractor_web",
+            duration: 1,
+            maneuver_penalty: 2
+        })
+        
+    # --- repulsor_beam ---
+    # Pushes the target 1 hex away immediately if they are adjacent.
+    if "repulsor_beam" in effects:
+        if hex_distance(attacker.position, target.position) == 1:
+            push_direction = get_direction(attacker.position, target.position)
+            push_hex = get_adjacent_hex(target.position, push_direction)
+            if hex_is_empty(push_hex, combat):
+                target.position = push_hex
 ```
 
 ### 11c. Crew Loss Penalties
@@ -696,12 +726,24 @@ function resolve_missile_impact(missile, combat):
         log_combat("Missile intercepted by point defense")
         return
     
-    # Calculate hit chance (missiles are easier to dodge than beams)
-    hit_chance = 80 - (target.ecm_rating * 5) - (target.maneuver_rating * 2)
-    hit_chance = clamp(hit_chance, 10, 95)
+    # Calculate hit chance (MOO1 Missile Math)
+    # Attacker Level = Battle Computer Mark + Missile Targeting Bonus
+    # Defender Level (Target_Defense) = Target Maneuverability + ECM Level
+    attacker_level = missile.attacker.battle_computer_mark + missile.weapon.missile_targeting
+    
+    defender_level = target.maneuver_class
+    if target.has_system("inertial_stabilizer"):
+        defender_level += 2
+    if target.has_system("inertial_nullifier"):
+        defender_level += 4
+    defender_level += get_racial_defense_level_bonus(target.race)
+    defender_level += target.ecm_rating
+    
+    hit_chance = 50 + (attacker_level - defender_level) * 10
+    hit_chance = clamp(hit_chance, 5, 95)
     
     if random(1, 100) <= hit_chance:
-        # Missile hits
+        # Missile hits (Unlike beams, missiles deal flat damage on hit)
         apply_damage(target, missile.damage, missile.weapon)
         log_combat("Missile hit for " + missile.damage + " damage")
     else:
@@ -978,7 +1020,11 @@ function check_combat_end(combat):
 function award_experience(combat):
     for ship in combat.attacker_ships + combat.defender_ships:
         if ship.current_hp > 0:
-            ship.battles_survived += 1
+            # Ferret exp gain algorithm: gain 2 battles worth of experience per battle
+            if ship.race == "ferrets":
+                ship.battles_survived += 2
+            else:
+                ship.battles_survived += 1
             
             # Experience thresholds
             if ship.battles_survived >= 10:
@@ -1042,6 +1088,15 @@ function ai_select_target(ship, combat):
     # Select highest scoring target
     target_scores.sort(key=score, descending=True)
     return target_scores[0].enemy
+
+function calculate_threat(ship):
+    # Calculates the threat output of a ship based on its weapons and HP
+    weapon_dps = 0
+    for w in ship.weapons:
+        weapon_dps += ((w.damage_min + w.damage_max) / 2) * w.attacks_per_turn
+    
+    survivability = ship.max_hp + (ship.shield_class * 5)
+    return (weapon_dps * 10) + survivability
 ```
 
 ### 34. AI Movement
@@ -1434,6 +1489,22 @@ function run_combat(attacker_fleet, defender_fleet, location):
     process_salvage(combat)
     
     return combat.result
+
+function process_salvage(combat):
+    # Salvage algorithm: Victor gets a chance to salvage tech from destroyed enemy ships
+    victor = combat.result.winner
+    if not victor or victor == "mutual_destruction":
+        return
+        
+    destroyed_enemy_ships = get_destroyed_ships(get_enemy_side(victor), combat)
+    for ship in destroyed_enemy_ships:
+        # 5% chance per destroyed ship to discover a technology they had
+        if random(1, 100) <= 5:
+            tech = select_random_unknown_tech(ship.empire, victor.empire)
+            if tech:
+                grant_technology(victor.empire, tech)
+                log_campaign("Salvaged technology " + tech.name + " from destroyed " + ship.design)
+                break # Limit to 1 tech salvaged per battle
 ```
 
 ---
@@ -1613,5 +1684,29 @@ Ships with **Marine Barracks** (future component, if implemented) receive a +10%
 
 ---
 
+## Clarifications on Specific Mechanics
+
+### 44. Fractional Damage Rounding
+- When a game effect causes damage to be multiplied by a fraction (e.g., Planetary Atmospheres halving torpedo damage, or advanced force fields absorbing a percentage of damage), the resulting damage is always **rounded down (floored)** to the nearest integer.
+- The absolute minimum damage for a successful attack is **1** (unless an effect like Displacement Device entirely negates the hit, or a shield entirely absorbs it).
+- When a percentage rule applies to a count of objects rather than damage (e.g., Anti-Missile Rockets destroying 35% of incoming missiles), the resulting destroyed count is also **rounded down**, with a minimum of 0.
+
+### 45. Percentage Weapons and Deflector Shields
+- Special weapons that reduce stats by a percentage (such as Ion Stream Projector or Neutron Stream Projector reducing target armor by 20% or 40% respectively) **bypass deflector shields entirely**. They strike the hull/armor directly to strip it away, although they do not inflict standard HP damage.
+
+### 46. Repulsor Beam Collision Logic
+- Repulsor Beams hurl enemy targets back 1 space away from the firing ship each turn. 
+- **Map Edge Collision:** If the repelled ship is pushed against the edge of the tactical combat map and cannot move backward, it takes no collision damage but is pinned against the edge (it cannot be pushed off the map). 
+- **Ship Collision:** If pushed into a hex occupied by another ship, it is pushed to the nearest adjacent valid hex further away.
+
+### 47. Stasis Field Limits
+- The Stasis Field Generator traps enemy ships in a time bubble for 1 turn.
+- **Range Limit:** The Stasis Field has a strict maximum range of **1 space**. It can only be used on targets immediately adjacent to the firing ship.
+
+### 48. Torpedo Movement on the Map Grid
+- Torpedoes are launched and moved during the Missile Phase.
+- **Movement Speed:** Torpedoes move across the hex grid each turn according to their defined `speed` stat (e.g., Anti-Matter Torpedo speed = 4, Plasma Torpedo = 6) exactly like missiles. 
+
 *Last Updated: 2026-04-12*
 *Specification: spec-008 - Combat Damage Resolution Algorithm*
+

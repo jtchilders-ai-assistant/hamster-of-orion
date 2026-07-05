@@ -237,6 +237,11 @@ HamsterTradeIncome = TradeIncome × 1.25
 **Effect**: Extort BC or tech from weaker race
 **Relations**: -20 if accepted, -50 if rejected and you attack
 
+**Winning Side Tribute Formula**:
+`Max_Tribute_Demand_BC = (Winner_Fleet_Power - Loser_Fleet_Power) * 5`
+- The demand is capped at `Loser_Treasury + (Loser_Net_Income * 10)`.
+- If tech is demanded instead of BC, the max allowed tech tier is `Floor(Winner_Fleet_Power / Loser_Fleet_Power)`.
+
 **When to Use**:
 - Overwhelmingly stronger
 - Need quick resources

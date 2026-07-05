@@ -130,3 +130,11 @@ All Ancient structures are teaching tools - cosmic textbooks left for successor 
 Rats have learned more from studying Ancient technology than any other race. They believe they're closest to understanding - and potentially reversing - whatever process transformed the Ancient Ones.
 
 "We will not merely find Orion. We will understand Orion. Understanding is greater than possession."
+
+## Species-Specific Mechanics (Formulas)
+
+### Rat Breakthrough Selection
+Rats are the ultimate scientists (equivalent to Psilons) and have superior research mechanics.
+- **Breakthrough Chance**: When completing a technology, Rats have a `15%` chance to achieve a "Scientific Breakthrough."
+- **Effect**: A breakthrough instantly grants 50% of the required RP toward the next technology selected in that same field.
+- **Tech Tree Access**: Rats have a `100%` chance to have all technologies available in their tech tree choices (other races typically have a randomized 50-70% subset available).

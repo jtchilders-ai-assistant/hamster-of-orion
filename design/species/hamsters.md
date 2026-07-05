@@ -124,3 +124,11 @@ Their weakness is that they're mediocre at everything except diplomacy. Expert p
 
 ## Repurposed Ancient Technology
 Hamsters believe the Ancient Ones were benevolent caretakers who left these facilities as gifts for their descendants. They view habitrail tubes as "The Great Network" - proof that the universe is interconnected. Their cultural mythology centers on the idea that they were meant to bring all races together, just as the tubes once connected all habitats.
+
+## Species-Specific Mechanics (Formulas)
+
+### Hamster Trade Math
+Hamsters are the ultimate merchants of the galaxy.
+- **Trade Hub Bonus**: `Hamster_Trade_Income = Base_Trade_Income * 1.25`
+- **Treaty Forgiveness**: Hamsters suffer 50% less negative relation penalty from border friction and minor incidents.
+- **Golden Age**: If a Hamster empire maintains active trade treaties with at least 3 other major empires for 20 continuous turns, they enter a Golden Age, generating an extra `+10%` BC globally.

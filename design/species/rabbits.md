@@ -131,3 +131,10 @@ The exercise wheels were "meditation devices for contemplating the cycles of lif
 Rabbits believe the Ancient Ones would be proud of their exponential growth. "They left us a garden galaxy. We have filled it with life, as they intended. We are the inheritors, the living continuation of their legacy."
 
 Every new Rabbit colony has a shrine thanking the Ancient Ones for their fertile gift.
+
+## Species-Specific Mechanics (Formulas)
+
+### Rabbit Colonization Times
+Rabbits reproduce and establish themselves with terrifying speed.
+- **Swarm Growth**: The base population growth formula is enhanced. `Rabbit_Growth = Base_Growth * 2.0`
+- **Rapid Establishment**: When a Rabbit colony ship settles a new planet, the starting population is 5M (instead of the standard 2M), and the planet's factory construction cost is reduced by `25%` for the first 20 turns, allowing them to rapidly industrialize new worlds.

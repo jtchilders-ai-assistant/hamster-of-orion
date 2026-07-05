@@ -302,6 +302,41 @@ Each race has distinct AI behavior patterns affecting diplomacy, warfare, expans
 
 ---
 
+## AI Numerical Thresholds (MOO1 Mechanics)
+
+### Tech Investment Algorithm
+AI empires allocate a percentage of their total planetary production to research, defined by a base value plus a personality modifier. This allocation is adjusted by the perceived threat level (if at war or threatened).
+
+`Tech_Allocation_% = Base_Allocation + Personality_Modifier - (Threat_Level * 0.5)`
+
+*   **Base_Allocation**: 20% (Peace), 10% (War)
+*   **Personality_Modifier**:
+    *   Rats, Mice (Technocrats): +25%
+    *   Hamsters (Balanced): +10%
+    *   Guinea Pigs, Budgies (Militaristic): -10% (minimum 5%)
+    *   Others: +0%
+*   **Threat_Level**: Scales from 0 to 50 based on enemy fleet proximity and relative power.
+
+### War Declaration Thresholds
+The AI evaluates a `War_Score` each turn for every known empire to decide if they should declare war (or prepare for it).
+
+`War_Score = (Target_Value + Opportunism) - (Relations_Score + Target_Threat) * Aggression_Multiplier`
+
+*   **Target_Value**: Sum of target's rich/ultra-rich planets and strategic choke points (10 points each).
+*   **Opportunism**: +30 if the target is already at war with another major power, +20 if target's fleet is on the other side of the galaxy.
+*   **Relations_Score**: Current diplomatic relation (-100 to +100).
+*   **Target_Threat**: Ratio of Target Fleet Power to AI Fleet Power (e.g., if equal, this is 50. If Target is 2x stronger, this is 100).
+*   **Aggression_Multiplier**:
+    *   Guinea Pigs, Ferrets: 1.5
+    *   Chameleons: 1.2
+    *   Budgies: 1.0 (requires `Relations_Score` < -20 to trigger)
+    *   Hamsters, Mice, Ants: 0.8
+    *   Rabbits, Rats, Hermit Crabs: 0.2 (Defensive only)
+
+If `War_Score > 100`, the AI will begin massing fleets and looking for a Casus Belli. If `War_Score > 150`, they declare war immediately.
+
+---
+
 ## AI Difficulty Modifiers
 
 **Easy AI**:

@@ -556,6 +556,12 @@ If player is not a candidate:
 - All accepting races become enemies
 - Coalition war until resolution
 
+**Coalition War End Conditions**:
+A Galactic Coalition War (Final War) ends if one of the following occurs:
+1. **Defiance Crushed**: The defiant empire is completely eliminated from the galaxy.
+2. **Defiant Supremacy**: The defiant empire successfully captures the homeworld of the elected Master of Orion.
+3. **Stalemate Exhaustion**: If the war continues for 50 turns without either side being eliminated, the war ends in an uneasy truce, and a new Council vote is forcibly convened.
+
 ---
 
 ## 7. Special Cases
