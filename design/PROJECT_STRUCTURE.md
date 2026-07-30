@@ -1,7 +1,7 @@
 # Hamster of Orion - Project Structure
 
 > **Note:** This file reflects the actual design document layout as of 2026-04-18.
-> Files marked ❌ are planned but not yet written.
+> Files marked ✅ are planned but not yet written.
 
 ## Actual Folder Layout
 

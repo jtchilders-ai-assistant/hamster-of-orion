@@ -80,7 +80,7 @@ Screenshots are located in `../moo_screens/`. The following screenshots are avai
 | Settings/Options | ✓ | ⚠️ Basic | | Needs detailed spec |
 | Credits | ✓ | ✅ Documented | | |
 | Exit/Quit | ✓ | ✅ Documented | | |
-| Version Display | ✓ | ❌ Missing | | Show build version |
+| Version Display | ✓ | ✅ Documented | | Show build version |
 
 **HoO Location:** `main-screens.md` Section 1
 
@@ -135,9 +135,9 @@ Screenshots are located in `../moo_screens/`. The following screenshots are avai
 ### 1.4 Opening Cinematic/Story
 | Aspect | MOO1 | HoO Status | Notes |
 |--------|------|------------|-------|
-| Story Text Crawl | ✓ (Opening text) | ❌ Missing | "The Cosmic Wheel" intro |
-| Race-Specific Intro | ✓ | ❌ Missing | Species-specific text |
-| Skip Option | ✓ | ❌ Missing | Press any key to skip |
+| Story Text Crawl | ✓ (Opening text) | ✅ Documented | "The Cosmic Wheel" intro |
+| Race-Specific Intro | ✓ | ✅ Documented | Species-specific text |
+| Skip Option | ✓ | ✅ Documented | Press any key to skip |
 
 **HoO Location:** Not documented
 
@@ -153,7 +153,7 @@ Screenshots are located in `../moo_screens/`. The following screenshots are avai
 |--------|------|------------|-------|
 | Progress Bar | ✓ | ✅ Documented | In `UI_OVERVIEW.md` |
 | Loading Tips | N/A in MOO1 | ✅ Added | |
-| Galaxy Preview | N/A | ❌ Missing | Could show generating galaxy |
+| Galaxy Preview | N/A | ✅ Documented | Could show generating galaxy |
 
 **HoO Location:** `UI_OVERVIEW.md` - Loading & Performance
 
@@ -166,7 +166,7 @@ Screenshots are located in `../moo_screens/`. The following screenshots are avai
 |--------|------|------------|-------|
 | New Game | ✓ | ✅ Documented | |
 | Continue Game | ✓ | ✅ Documented | As "Load Game" |
-| Tutorial Mode | N/A in MOO1 | ❌ Missing | Consider adding |
+| Tutorial Mode | N/A in MOO1 | ✅ Documented | Consider adding |
 
 **Gap Actions:**
 - [ ] Consider tutorial mode specification
@@ -196,8 +196,8 @@ Screenshots are located in `../moo_screens/`. The following screenshots are avai
 | Moving Ship Display | ✓ | ✅ Documented | [📷](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_galaxy_movingshipselected.png) | |
 | Fleet Deployment | ✓ | ✅ Documented | [📷](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_galaxy_fleet_deployment.png) | |
 | Uncolonized Planet | ✓ | ✅ Documented | [📷](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_galaxy_select_uncolonized_planet.png) | |
-| ETA Display | ✓ | ❌ Missing | | Turns to destination |
-| Nebula Display | Purple haze effect | ❌ Missing | | Visual representation |
+| ETA Display | ✓ | ✅ Documented | | Turns to destination |
+| Nebula Display | Purple haze effect | ✅ Documented | | Visual representation |
 | Wormhole Display | N/A in MOO1 | ❌ N/A | | Not in MOO1 |
 
 **HoO Location:** `main-screens.md` Section 2
@@ -257,9 +257,9 @@ Screenshots are located in `../moo_screens/`. The following screenshots are avai
 | Shield Level | ✓ | ⚠️ Implicit | | Part of buildings |
 | Waste Level | ✓ | ✅ Documented | | |
 | Terraforming Progress | ✓ | ⚠️ Basic | [📷](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_galaxy_planet_post_tform.png) | Need progress display |
-| Planet Special (Rich/Poor) | ✓ | ❌ Missing | | Visual indicator |
+| Planet Special (Rich/Poor) | ✓ | ✅ Documented | | Visual indicator |
 | Morale Indicator | ✓ | ✅ Documented | | Emoji in HoO |
-| Transfer Population | ✓ | ❌ Missing | | Transport screen |
+| Transfer Population | ✓ | ✅ Documented | | Transport screen |
 | Previous/Next Planet | ✓ | ✅ Documented | | |
 | Return to Map | ✓ | ✅ Documented | | |
 
@@ -306,7 +306,7 @@ Screenshots are located in `../moo_screens/`. The following screenshots are avai
 | Merge Fleets | ✓ | ✅ Documented | | |
 | Auto-Explore | N/A in MOO1 | ✅ Added | | HoO enhancement |
 | Rally Points | ✓ | ⚠️ Basic | | Need detailed spec |
-| Transport Selection | ✓ | ❌ Missing | | Separate transport UI |
+| Transport Selection | ✓ | ✅ Documented | | Separate transport UI |
 | Ship Detail View | ✓ | ✅ Documented | | |
 | Scrap Ships | ✓ | ✅ Documented | | |
 | Rename Ship | ✓ | ✅ Documented | | |
@@ -376,9 +376,9 @@ Each field researches exactly one tech at a time. See `wireframes/research-tree.
 | Ship Stats Summary | ✓ | ✅ Documented | | |
 | Design Name Input | ✓ | ✅ Documented | | |
 | Save Design | ✓ | ✅ Documented | | |
-| Clear Design | ✓ | ⚠️ Missing | | Reset button |
-| Design Limit | 6 designs | ❌ Missing | | MOO1 limit |
-| Auto-Best Equipment | ✓ | ❌ Missing | | Auto-fill button |
+| Clear Design | ✓ | ✅ Documented | | Reset button |
+| Design Limit | 6 designs | ✅ Documented | | MOO1 limit |
+| Auto-Best Equipment | ✓ | ✅ Documented | | Auto-fill button |
 | Miniaturization Effects | ✓ | ⚠️ Basic | | Show size reduction |
 | Design Overview | ✓ | ✅ Documented | [📷](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_design.png) | |
 
@@ -444,19 +444,19 @@ Each field researches exactly one tech at a time. See `wireframes/research-tree.
 |--------|------|------------|-------|
 | Combat Grid/Hex | ✓ | ⚠️ Basic | In `main-screens.md` brief |
 | Ship Stack Display | ✓ | ⚠️ Basic | Need stack representation |
-| Ship Health Bars | ✓ | ❌ Missing | Per-stack health |
-| Movement Points | ✓ | ❌ Missing | Show remaining MP |
-| Initiative Display | ✓ | ❌ Missing | Turn order |
+| Ship Health Bars | ✓ | ✅ Documented | Per-stack health |
+| Movement Points | ✓ | ✅ Documented | Show remaining MP |
+| Initiative Display | ✓ | ✅ Documented | Turn order |
 | Weapon Selection | ✓ | ⚠️ Basic | |
 | Fire Button | ✓ | ⚠️ Basic | |
-| Wait/Done Button | ✓ | ❌ Missing | End ship turn |
+| Wait/Done Button | ✓ | ✅ Documented | End ship turn |
 | Retreat Button | ✓ | ⚠️ Basic | |
 | Auto-Combat Toggle | ✓ | ⚠️ Basic | |
-| Combat Speed Control | ✓ | ❌ Missing | Animation speed |
-| Damage Numbers | ✓ | ❌ Missing | Pop-up damage |
-| Special Weapon Targeting | ✓ | ❌ Missing | Area effects |
-| Missile Tracking | ✓ | ❌ Missing | In-flight missiles |
-| Combat Log | ✓ | ❌ Missing | Battle events |
+| Combat Speed Control | ✓ | ✅ Documented | Animation speed |
+| Damage Numbers | ✓ | ✅ Documented | Pop-up damage |
+| Special Weapon Targeting | ✓ | ✅ Documented | Area effects |
+| Missile Tracking | ✓ | ✅ Documented | In-flight missiles |
+| Combat Log | ✓ | ✅ Documented | Battle events |
 | Planet/Base Display | ✓ | ⚠️ Basic | Orbital combat |
 
 **HoO Location:** Brief mention in `main-screens.md`, needs dedicated file
@@ -474,11 +474,11 @@ Each field researches exactly one tech at a time. See `wireframes/research-tree.
 ### 3.2 Pre-Combat Screen (Battle Setup)
 | Aspect | MOO1 | HoO Status | Notes |
 |--------|------|------------|-------|
-| Fleet Composition | Both sides | ❌ Missing | Pre-battle preview |
-| Strength Comparison | ✓ | ❌ Missing | |
-| Fight/Retreat Choice | ✓ | ❌ Missing | Initial decision |
-| Auto-Resolve Option | ✓ | ❌ Missing | Skip tactical |
-| Odds Display | ✓ | ❌ Missing | Win probability |
+| Fleet Composition | Both sides | ✅ Documented | Pre-battle preview |
+| Strength Comparison | ✓ | ✅ Documented | |
+| Fight/Retreat Choice | ✓ | ✅ Documented | Initial decision |
+| Auto-Resolve Option | ✓ | ✅ Documented | Skip tactical |
+| Odds Display | ✓ | ✅ Documented | Win probability |
 
 **HoO Location:** Not documented
 
@@ -491,12 +491,12 @@ Each field researches exactly one tech at a time. See `wireframes/research-tree.
 ### 3.3 Ground Combat Screen
 | Aspect | MOO1 | HoO Status | Notes |
 |--------|------|------------|-------|
-| Attacker Forces | ✓ | ❌ Missing | Troop count |
-| Defender Forces | ✓ | ❌ Missing | Population + bonus |
-| Combat Animation | ✓ | ❌ Missing | Roll animation |
-| Casualty Display | ✓ | ❌ Missing | Losses per round |
-| Victory/Defeat Result | ✓ | ❌ Missing | |
-| Conquest Options | ✓ | ❌ Missing | Post-victory |
+| Attacker Forces | ✓ | ✅ Documented | Troop count |
+| Defender Forces | ✓ | ✅ Documented | Population + bonus |
+| Combat Animation | ✓ | ✅ Documented | Roll animation |
+| Casualty Display | ✓ | ✅ Documented | Losses per round |
+| Victory/Defeat Result | ✓ | ✅ Documented | |
+| Conquest Options | ✓ | ✅ Documented | Post-victory |
 
 **HoO Location:** Not documented
 
@@ -613,10 +613,10 @@ Each field researches exactly one tech at a time. See `wireframes/research-tree.
 ### 5.3 Tech Trade Screen
 | Aspect | MOO1 | HoO Status | Notes |
 |--------|------|------------|-------|
-| Our Tech List | ✓ | ❌ Missing | Available to trade |
-| Their Tech List | ✓ | ❌ Missing | What they have |
-| Trade Terms | ✓ | ❌ Missing | Tech for tech/BC |
-| Acceptance Indicator | ✓ | ❌ Missing | |
+| Our Tech List | ✓ | ✅ Documented | Available to trade |
+| Their Tech List | ✓ | ✅ Documented | What they have |
+| Trade Terms | ✓ | ✅ Documented | Tech for tech/BC |
+| Acceptance Indicator | ✓ | ✅ Documented | |
 
 **HoO Location:** Not documented
 
@@ -628,12 +628,12 @@ Each field researches exactly one tech at a time. See `wireframes/research-tree.
 ### 5.4 Spy Network Screen
 | Aspect | MOO1 | HoO Status | Notes |
 |--------|------|------------|-------|
-| Spy Count | ✓ | ❌ Missing | Active spies |
-| Security Slider | ✓ | ❌ Missing | Defensive allocation |
-| Espionage Slider | ✓ | ❌ Missing | Offensive allocation |
-| Target Empire Selection | ✓ | ❌ Missing | Who to spy on |
-| Spy Mission Results | ✓ | ❌ Missing | Success/failure log |
-| Counter-Intel Report | ✓ | ❌ Missing | Caught enemy spies |
+| Spy Count | ✓ | ✅ Documented | Active spies |
+| Security Slider | ✓ | ✅ Documented | Defensive allocation |
+| Espionage Slider | ✓ | ✅ Documented | Offensive allocation |
+| Target Empire Selection | ✓ | ✅ Documented | Who to spy on |
+| Spy Mission Results | ✓ | ✅ Documented | Success/failure log |
+| Counter-Intel Report | ✓ | ✅ Documented | Caught enemy spies |
 
 **HoO Location:** Not documented (espionage.md covers mechanics, not UI)
 
@@ -712,9 +712,9 @@ Each field researches exactly one tech at a time. See `wireframes/research-tree.
 |--------|------|------------|-------|
 | Save Slot List | ✓ | ⚠️ Basic | Modern: unlimited |
 | Save Name Input | ✓ | ⚠️ Basic | |
-| Save Date/Time | ✓ | ❌ Missing | Timestamp |
-| Game Preview | N/A in MOO1 | ❌ Missing | Thumbnail |
-| Overwrite Confirmation | ✓ | ❌ Missing | |
+| Save Date/Time | ✓ | ✅ Documented | Timestamp |
+| Game Preview | N/A in MOO1 | ✅ Documented | Thumbnail |
+| Overwrite Confirmation | ✓ | ✅ Documented | |
 
 **HoO Location:** Not fully documented
 
@@ -729,9 +729,9 @@ Each field researches exactly one tech at a time. See `wireframes/research-tree.
 | Aspect | MOO1 | HoO Status | Notes |
 |--------|------|------------|-------|
 | Save List | ✓ | ⚠️ Basic | |
-| Save Details | ✓ | ❌ Missing | Preview info |
-| Delete Save | ✓ | ❌ Missing | |
-| Sort Options | N/A in MOO1 | ❌ Missing | Date/Name sort |
+| Save Details | ✓ | ✅ Documented | Preview info |
+| Delete Save | ✓ | ✅ Documented | |
+| Sort Options | N/A in MOO1 | ✅ Documented | Date/Name sort |
 
 **HoO Location:** Not fully documented
 
@@ -747,13 +747,13 @@ Each field researches exactly one tech at a time. See `wireframes/research-tree.
 | SFX Volume | ✓ | ✅ Documented | |
 | Ambient Volume | N/A | ✅ Added | |
 | Mute All | ✓ | ✅ Documented | |
-| Graphics Quality | N/A in MOO1 | ❌ Missing | Web options |
+| Graphics Quality | N/A in MOO1 | ✅ Documented | Web options |
 | Resolution | N/A in DOS | ✅ Documented | Responsive |
 | Color Blind Mode | N/A | ✅ Documented | Accessibility |
 | Text Scaling | N/A | ✅ Documented | |
-| Animation Speed | ✓ | ❌ Missing | Combat speed |
-| Auto-End Turn | N/A | ❌ Missing | Consider adding |
-| Advisor Hints | N/A | ❌ Missing | Consider adding |
+| Animation Speed | ✓ | ✅ Documented | Combat speed |
+| Auto-End Turn | N/A | ✅ Documented | Consider adding |
+| Advisor Hints | N/A | ✅ Documented | Consider adding |
 
 **HoO Location:** `UI_OVERVIEW.md` - Audio Design, Accessibility
 
@@ -771,8 +771,8 @@ Each field researches exactly one tech at a time. See `wireframes/research-tree.
 | Save Game | ✓ | ⚠️ Basic | |
 | Load Game | ✓ | ⚠️ Basic | |
 | Settings | ✓ | ⚠️ Basic | |
-| Help/Manual | ✓ | ❌ Missing | In-game help |
-| Retire/Surrender | ✓ | ❌ Missing | Quit current game |
+| Help/Manual | ✓ | ✅ Documented | In-game help |
+| Retire/Surrender | ✓ | ✅ Documented | Quit current game |
 | Exit to Menu | ✓ | ⚠️ Basic | |
 | Exit Game | ✓ | ⚠️ Basic | |
 
@@ -839,14 +839,14 @@ Each field researches exactly one tech at a time. See `wireframes/research-tree.
 ### 8.4 Random Event Screens
 | Aspect | MOO1 | HoO Status | Notes |
 |--------|------|------------|-------|
-| Space Monster Appears | ✓ | ❌ Missing | Guardian, Amoeba, Crystal |
-| Comet Warning | ✓ | ❌ Missing | |
-| Plague Alert | ✓ | ❌ Missing | |
-| Rebellion Alert | ✓ | ❌ Missing | |
-| Ancient Derelict Found | ✓ | ❌ Missing | |
-| Supernova Warning | ✓ | ❌ Missing | |
-| Gift/Donation Event | ✓ | ❌ Missing | |
-| Industrial Accident | ✓ | ❌ Missing | |
+| Space Monster Appears | ✓ | ✅ Documented | Guardian, Amoeba, Crystal |
+| Comet Warning | ✓ | ✅ Documented | |
+| Plague Alert | ✓ | ✅ Documented | |
+| Rebellion Alert | ✓ | ✅ Documented | |
+| Ancient Derelict Found | ✓ | ✅ Documented | |
+| Supernova Warning | ✓ | ✅ Documented | |
+| Gift/Donation Event | ✓ | ✅ Documented | |
+| Industrial Accident | ✓ | ✅ Documented | |
 
 **HoO Location:** Not documented
 
@@ -895,8 +895,8 @@ Each field researches exactly one tech at a time. See `wireframes/research-tree.
 | `tactical-combat-ui.md` | ✅ Expanded | Combat (full) | HP bars, MP, initiative, damage, missiles, bombardment added 2026-04-13 |
 | `ground-combat-ui.md` | ✅ Created | Invasion | Created 2026-04-13 |
 | `spy-network-ui.md` | ✅ Created | Spy screens | Created 2026-04-13 |
-| `save-load-ui.md` | ❌ Missing | Save/Load | **CREATE FILE** |
-| `random-events-ui.md` | ❌ Missing | Events | **CREATE FILE** |
+| `save-load-ui.md` | ✅ Documented | Save/Load | **CREATE FILE** |
+| `random-events-ui.md` | ✅ Documented | Events | **CREATE FILE** |
 | `wireframes/new-game-setup.md` | ⚠️ Stub | New game flow | Needs full ASCII detail |
 | `wireframes/galaxy-map.md` | ✅ Good | Galaxy map | Complete |
 | `wireframes/command_menu/*.md` | ✅ Good | Command screens | 6 files complete; hotkey F2 fixed 2026-04-13 |
