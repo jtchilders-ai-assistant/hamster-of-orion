@@ -155,18 +155,19 @@ Hostile environments also reduce effective maximum population:
 
 ### 5. Cloning Technology
 
-Cloning technology provides a flat bonus to population growth:
+Cloning technology accelerates population growth by reducing the BC cost of purchasing population via the ECO slider:
 
-| Technology Level | Technology Name | Flat Bonus per Turn |
-|------------------|-----------------|---------------------|
-| 11 | Cloning | +2 pop/turn |
-| 22 | Advanced Cloning | +5 pop/turn |
+| Technology Level | Technology Name | ECO Growth Cost | Efficiency (Pop per BC) |
+|------------------|-----------------|-----------------|-------------------------|
+| None | — | 20 BC / pop | 0.05 |
+| 11 | Cloning | 10 BC / pop | 0.10 |
+| 22 | Advanced Cloning | 5 BC / pop | 0.20 |
 
 ```
-Total_Growth = Natural_Growth + Cloning_Bonus
+Growth_BC_Bonus = ECO_BC_Spent × Efficiency
 ```
 
-**Note:** Cloning bonus applies per planet per turn, regardless of current population.
+**Note:** Growth BC bonus applies per planet per turn and is funded entirely by the ECO slider (after pollution cleanup). See `slider-mathematics.md` §3 for the ECO spending priority algorithm.
 
 ---
 
@@ -175,9 +176,9 @@ Total_Growth = Natural_Growth + Cloning_Bonus
 ```
 Natural_Growth = Population × Base_Growth_Rate × Environment_Growth_Mod × Racial_Mod × (1 - Population / Max_Population)
 
-Cloning_Bonus = Cloning_Tech_Bonus  # 0, 2, or 5
+ECO_Slider_Growth = Growth_BC_Spent × Efficiency
 
-Total_Growth = Natural_Growth + Cloning_Bonus
+Total_Growth = Natural_Growth + ECO_Slider_Growth
 
 New_Population = min(Population + floor(Total_Growth + Fractional_Population), Max_Population)
 
@@ -391,9 +392,9 @@ To colonize hostile environments, specific technology is required:
   ],
 
   "cloning": [
-    { "tech_level": 0, "name": "None", "bonus_per_turn": 0 },
-    { "tech_level": 11, "name": "Cloning", "bonus_per_turn": 2 },
-    { "tech_level": 22, "name": "Advanced Cloning", "bonus_per_turn": 5 }
+    { "tech_level": 0, "name": "None", "cost_per_pop": 20, "efficiency": 0.05 },
+    { "tech_level": 11, "name": "Cloning", "cost_per_pop": 10, "efficiency": 0.10 },
+    { "tech_level": 22, "name": "Advanced Cloning", "cost_per_pop": 5, "efficiency": 0.20 }
   ],
 
   "environment_colonization": [
@@ -518,9 +519,9 @@ function calculate_population_growth(planet, empire):
     growth_factor = 1 - (population / max_population)
     natural_growth = population * base_rate * env_modifier * racial_modifier * morale_modifier * growth_factor
     
-    # Add cloning bonus
-    cloning_bonus = get_cloning_bonus(empire)
-    total_growth = natural_growth + cloning_bonus
+    # Add ECO slider growth bonus (funded from slider mathematics)
+    eco_growth_bonus = planet.eco_growth_bonus  # Calculated in slider allocation phase
+    total_growth = natural_growth + eco_growth_bonus
     
     # Apply fractional tracking
     total_with_fractional = total_growth + planet.fractional_population
@@ -538,7 +539,7 @@ function calculate_population_growth(planet, empire):
     }
 
 function calculate_max_population(planet, empire):
-    base_size = planet.base_max_population  # 20/40/60/80/100
+    base_size = planet.base_max_population  # 15/32/55/85/120
     terraforming_bonus = get_terraforming_bonus(empire)
     soil_bonus = get_soil_enrichment_bonus(planet)  # 0, 25, or 50 — per-planet, paid at upgrade time
     env_capacity = get_environment_capacity_modifier(planet.environment)
@@ -625,20 +626,20 @@ function process_food(planet, empire):
 
 **Setup:**
 - Race: Hamsters (1.0 modifier)
-- Planet: Large Terran (80 base pop)
+- Planet: Large Terran (85 base pop)
 - Current Population: 40
 - Terraforming: +20
 - Morale: 75 (Happy)
-- No cloning
+- No ECO slider growth funding
 
 **Calculation:**
-1. Max Population: (80 + 20) × 1.0 × 1.0 = 100
+1. Max Population: (85 + 20) × 1.0 × 1.0 = 105
 2. Environment modifier: 1.0 (Terran)
 3. Racial modifier: 1.0 (Hamsters)
 4. Morale modifier: 0.5 + (75/200) = 0.875
-5. Growth factor: 1 - (40/100) = 0.6
-6. Natural growth: 40 × 0.10 × 1.0 × 1.0 × 0.875 × 0.6 = **2.1**
-7. **Growth this turn: 2 (fractional 0.1 carries over)**
+5. Growth factor: 1 - (40/105) = 0.619
+6. Natural growth: 40 × 0.10 × 1.0 × 1.0 × 0.875 × 0.619 = **2.17**
+7. **Growth this turn: 2 (fractional 0.17 carries over)**
 
 ---
 
@@ -646,23 +647,24 @@ function process_food(planet, empire):
 
 **Setup:**
 - Race: Rabbits (2.0 modifier)
-- Planet: Huge Jungle (100 base pop)
+- Planet: Huge Jungle (120 base pop)
 - Current Population: 30
 - Terraforming: +40
 - Soil Enrichment: +25 (Basic)
 - Morale: 100 (Ecstatic)
-- Advanced Cloning: +5/turn
+- Advanced Cloning: Efficiency 0.20
+- ECO Slider Funding: 50 BC (post-cleanup)
 
 **Calculation:**
-1. Max Population: (100 + 40 + 25) × 1.0 = 165
+1. Max Population: (120 + 40 + 25) × 1.0 = 185
 2. Environment modifier: 0.9 (Jungle)
 3. Racial modifier: 2.0 (Rabbits)
 4. Morale modifier: 1.0 (Ecstatic)
-5. Growth factor: 1 - (30/175) = 0.829
-6. Natural growth: 30 × 0.10 × 0.9 × 2.0 × 1.0 × (1 - 30/165) = 30 × 0.10 × 0.9 × 2.0 × 0.818 = **4.42**
-7. Cloning bonus: +5
-8. Total growth: 4.48 + 5 = **9.48**
-9. **Growth this turn: 9 (fractional 0.48 carries over)**
+5. Growth factor: 1 - (30/185) = 0.838
+6. Natural growth: 30 × 0.10 × 0.9 × 2.0 × 1.0 × 0.838 = **4.53**
+7. ECO growth bonus: 50 BC × 0.20 = **10.0**
+8. Total growth: 4.53 + 10.0 = **14.53**
+9. **Growth this turn: 14 (fractional 0.53 carries over)**
 
 ---
 
@@ -670,21 +672,21 @@ function process_food(planet, empire):
 
 **Setup:**
 - Race: Hermit Crabs (0.5 modifier, ignores environment)
-- Planet: Medium Radiated (60 base pop)
+- Planet: Medium Radiated (55 base pop)
 - Current Population: 20
 - Terraforming: +30
 - Morale: 100 (base +50 bonus)
-- No cloning
+- No ECO slider growth funding
 
 **Calculation:**
-1. Max Population: (60 + 30) × 1.0 × 1.0 = 90 (ignores capacity penalty)
+1. Max Population: (55 + 30) × 1.0 × 1.0 = 85 (ignores capacity penalty)
 2. Environment modifier: 1.0 (Hermit Crabs ignore)
 3. Racial modifier: 0.5 (Hermit Crabs)
 4. Morale modifier: 1.0
-5. Growth factor: 1 - (20/90) = 0.778
-6. Natural growth: 20 × 0.10 × 1.0 × 0.5 × 1.0 × 0.778 = **0.78**
-7. **Growth this turn: 0 (fractional 0.78 carries over)**
-8. After 2 turns: fractional reaches 1.56, growth = 1
+5. Growth factor: 1 - (20/85) = 0.765
+6. Natural growth: 20 × 0.10 × 1.0 × 0.5 × 1.0 × 0.765 = **0.76**
+7. **Growth this turn: 0 (fractional 0.76 carries over)**
+8. After 2 turns: fractional reaches 1.52, growth = 1
 
 ---
 

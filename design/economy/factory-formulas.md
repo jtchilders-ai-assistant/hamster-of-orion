@@ -77,7 +77,8 @@ Total_Production = (Factory_Production + Population_Production) × Mineral_Richn
 
 Where:
   Factory_Production = Operating_Factories × 1 × Racial_Production_Modifier
-  Population_Production = Population × Base_Pop_Output × Racial_Production_Modifier
+  Active_Population = Population × (1 - TECH_Percent / 100)
+  Population_Production = Active_Population × Base_Pop_Output × Racial_Production_Modifier
 
   Base_Pop_Output = 0.5 + (Planetology_TL / 50 × 1.5)
     # Scales from 0.5 BC/pop at TL 0 → 2.0 BC/pop at TL 50
@@ -102,13 +103,14 @@ See `planets/generation-tables.md` §5 for full richness probability tables.
 **Example:** A Hamster planet with 50 population, 100 factories, Planetology TL 25, Normal richness:
 - Base_Pop_Output: 0.5 + (25/50 × 1.5) = 1.25 BC/pop
 - Factory Production: 100 × 1 × 1.00 = 100 BC
-- Population Production: 50 × 1.25 × 1.00 = 62.5 BC
-- Subtotal: 162.5 BC × 1.00 (Normal) = **162.5 BC/turn**
+- Active Population: 50 × (1 - 0.20) = 40 (assuming TECH is 20%)
+- Population Production: 40 × 1.25 × 1.00 = 50 BC
+- Subtotal: 150 BC × 1.00 (Normal) = **150 BC/turn**
 
-**Early-game example (TL 1, Normal richness):** 50 pop, 100 factories, Hamsters:
+**Early-game example (TL 1, Normal richness):** 50 pop, 100 factories, Hamsters, 20% TECH:
 - Base_Pop_Output: 0.5 + (1/50 × 1.5) = 0.53 BC/pop
-- Factory Production: 100 BC, Population Production: 26.5 BC
-- **Total: 126.5 BC/turn** (nearly identical to fixed-0.5 formula early-game)
+- Factory Production: 100 BC, Active Population: 40, Population Production: 21.2 BC
+- **Total: 121.2 BC/turn**
 
 ---
 
@@ -275,10 +277,10 @@ If Accumulated_Pollution > (Max_Population × 0.10):
 
 ### 10. Production Slider Allocation
 
-The ECO slider determines what percentage of workers are assigned to industrial/ecological tasks:
+The IND slider determines what percentage of workers are assigned to industrial tasks:
 
 ```
-Workers_For_Production = Total_Population × (Production_Slider_Percent ÷ 100)
+Workers_For_Production = Total_Population × (IND_Percent ÷ 100)
 Effective_Operating_Factories = min(Factories_Built, Workers_For_Production × Robotic_Controls_Level)
 ```
 
@@ -395,8 +397,9 @@ function calculate_planetary_production(planet, empire):
     operating_factories = min(planet.factories, max_operable)
     
     # Calculate gross production (before richness modifier)
+    active_population = planet.population * (1 - empire.sliders.tech / 100)
     factory_production = operating_factories * base_factory_output * racial_modifier
-    population_production = planet.population * base_pop_output * racial_modifier
+    population_production = active_population * base_pop_output * racial_modifier
     gross_production = (factory_production + population_production) * mineral_richness_modifier
     
     # Calculate pollution cleanup

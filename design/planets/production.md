@@ -50,8 +50,8 @@ The heart of planet management: five sliding scales allocate population/resource
 **Display Text**: `Clean / Terraform` status
 **Strategy** (in priority order):
 - Priority 1: Waste Cleanup (Clean) — mandatory first charge.
-- Priority 2: Population Growth Bonus — accelerate population toward max.
-- Priority 3: Terraforming — permanently increase planet max population.
+- Priority 2: Terraforming — permanently increase planet max population.
+- Priority 3: Population Growth Bonus — accelerate population toward max (via Cloning).
 
 *Note: See `../economy/slider-mathematics.md` §ECO for exact formulas.*
 

@@ -60,7 +60,7 @@ Build priority within DEF (player sets, default order):
 3. Excess DEF BC → Empire Reserve
 
 **Missile Base Cost:** Base 100 BC (reduced by Construction tech, modified by attributes).  
-**Missile Base combat attributes/cost modifier:** `Base cost = 100 × (1 + 0.1 × Tech_Level_Bonus)`. Tech_Level_Bonus is derived as `floor((Highest_Tech_Level - 1) / 5)`.
+**Missile Base combat attributes/cost modifier:** `Base cost = 100 × (1 + 0.1 × Tech_Level_Bonus)`. Tech_Level_Bonus is derived as `floor((Highest_Construction_Tech_Level - 1) / 5)`.
 **Missile Base refit & shield upgrade costs:** Missile Base Refit Cost = 25 BC per base (to upgrade existing bases to newly researched armor/missiles). Shield Upgrade Cost = Full cost of the new shield tier.
 **Refit time funding pools:** Refit costs are funded directly by the DEF slider. The slider will allocate BC to the "Refit Pool" until the cost is fully met, at which point the bases instantly upgrade.
 
@@ -178,7 +178,7 @@ When `Terraforming_Progress` reaches the next tier's cost:
 - Progress resets to 0 for the next tier
 - Partial progress carries over (no waste)
 
-Terraforming tier costs and max-pop bonuses: see `population-growth.md` Terraforming table.
+Terraforming tier costs and max-pop bonuses: see `population-growth.md` Terraforming table. Cost is 5 BC per +1 Max Population.
 
 **Terraforming cannot progress beyond the tech tier the empire has researched.** Excess BC at the max researched tier → Empire Reserve.
 
@@ -203,9 +203,9 @@ Cleanup_Cost = Pollution × 0.5 × Cleanup_Modifier
 Net_Production = Gross_Production - Cleanup_Cost
 ```
 
-This Net_Production is then split by SHIP / DEF / IND / ECO percentages (renormalized to exclude TECH):
+This Net_Production is then split by SHIP / DEF / IND / ECO percentages:
 
-> **Note on TECH slider and production split:** TECH_Percent removes population from the labor pool before production is calculated. The remaining SHIP + DEF + IND + ECO percentages must still sum to 100% among themselves. In practice, increasing TECH from 0% to 20% doesn't give 20% to TECH "out of" the other sliders — it removes 20% of population from production entirely, and the other 4 sliders split 100% of the (now smaller) Net_Production.
+> **Note on TECH slider and production split:** TECH_Percent is an independent slider that removes population from the labor pool before production is calculated. The remaining SHIP + DEF + IND + ECO sliders are independent of TECH and must sum to exactly 100% of the Net_Production. For example, if you set TECH to 20%, you lose 20% of your labor pool, but your remaining SHIP+DEF+IND+ECO sliders still distribute 100% of whatever Net_Production remains.
 
 ---
 
@@ -214,7 +214,8 @@ This Net_Production is then split by SHIP / DEF / IND / ECO percentages (renorma
 The 5 sliders must always sum to 100%:
 
 ```
-SHIP + DEF + IND + ECO + TECH = 100
+SHIP + DEF + IND + ECO = 100
+(TECH is handled independently from 0 to 100%)
 ```
 
 When the player adjusts one slider, the others must be adjusted to maintain the sum. See §7 (Locking Mechanics) for how this is handled when some sliders are locked.
@@ -232,7 +233,7 @@ Players can **lock** individual sliders to prevent the auto-governor from adjust
 1. A slider can be locked at any value from 0% to 100%
 2. **At least one slider must remain unlocked** (otherwise re-balancing is impossible)
 3. The sum of locked sliders cannot exceed 100% (game prevents this)
-4. If locked sliders sum to exactly 100%, all unlocked sliders are forced to 0%
+4. If locked production sliders sum to exactly 100%, all unlocked production sliders are forced to 0%
 
 ### Re-balancing Algorithm
 
@@ -316,7 +317,7 @@ This is treated identically to other overflow: it goes into the empire-wide pool
 - Race: Hamsters (production modifier 1.0, research modifier 1.0)
 - Population: 40M, Factories: 80, Planet: Medium
 - Robotic Controls II (2:1), no waste reduction, base eco restoration
-- Sliders: SHIP 30%, DEF 0%, IND 20%, ECO 30%, TECH 20%
+- Sliders: SHIP 40%, DEF 0%, IND 20%, ECO 40%, TECH 20%
 
 **Step 1 — Active Population:**
 ```
@@ -348,17 +349,17 @@ Net_Production = 96.96 - 40 = 56.96 → 56 BC (floor)
 
 **Step 5 — Slider Allocation:**
 ```
-SHIP_BC = 56 × 0.30 = 16.8 → 16 BC (floor) toward ship queue
+SHIP_BC = 56 × 0.40 = 22.4 → 22 BC (floor) toward ship queue
 DEF_BC  = 56 × 0.00 = 0 BC
 IND_BC  = 56 × 0.20 = 11.2 → 11 BC toward factories
-ECO_BC  = 56 × 0.30 = 16.8 → 16 BC to ECO
+ECO_BC  = 56 × 0.40 = 22.4 → 22 BC to ECO
 ```
 
 **Step 6 — ECO Phase:**
 ```
 Cleanup already paid (from Gross_Production above)
-Remaining ECO_BC = 16 BC → all goes to growth bonus
-Growth_Bonus = 16 × 0.1 = +1.6 additional pop growth this turn
+Remaining ECO_BC = 22 BC → all goes to growth bonus
+Growth_Bonus = 22 × 0.05 = +1.1 additional pop growth this turn
 ```
 
 **Step 7 — TECH:**
@@ -375,7 +376,7 @@ TECH_RP = 8 × 1.0 × 1.0 = 8 RP/turn (distributed across 6 research fields)
 - Race: Ants (1.5 production, large planet at max: 100M pop, 500 factories)
 - Robotic Controls V (5:1), Reduced Industrial Waste 40%, Enhanced Eco Restoration
 - Planet is at max population and max factories
-- Sliders: SHIP 0%, DEF 0%, IND 30%, ECO 30%, TECH 40%
+- Sliders: SHIP 0%, DEF 0%, IND 50%, ECO 50%, TECH 40%
 
 **Gross Production:**
 ```
@@ -398,11 +399,11 @@ Net_Production = 903 - 40 = 863 BC
 ```
 SHIP_BC = 0 BC (queue empty → Reserve)
 DEF_BC  = 0 BC
-IND_BC  = 863 × 0.30 = 258.9 BC → max factories already reached → Reserve
-ECO_BC  = 863 × 0.30 = 258.9 BC → cleanup done; max pop → no growth; max terraform → Reserve
+IND_BC  = 863 × 0.50 = 431.5 BC → max factories already reached → Reserve
+ECO_BC  = 863 × 0.50 = 431.5 BC → cleanup done; max pop → no growth; max terraform → Reserve
 ```
 
-**Reserve this turn:** 0 + 258.9 + 258.9 = **~518 BC to Empire Reserve**
+**Reserve this turn:** 0 + 431.5 + 431.5 = **~863 BC to Empire Reserve**
 
 **TECH:** 40M scientists × 1.5 (racial) = 60 RP/turn
 
@@ -466,7 +467,8 @@ This uncleaned pollution reduces effective planet capacity, increasing populatio
       "value": 0,
       "locked": false,
       "min": 0,
-      "max": 100
+      "max": 100,
+      "independent": true
     }
   },
 
@@ -495,7 +497,7 @@ This uncleaned pollution reduces effective planet capacity, increasing populatio
     "base_pop_output_min":              0.5,
     "base_pop_output_max":              2.0,
     "mineral_richness_applied_to":      "gross_production",
-    "eco_growth_bc_efficiency":         0.1,
+    "eco_growth_bc_efficiency":         0.05,
     "base_cleanup_cost_per_pollution":  0.5
   },
   "mineral_richness_modifiers": {
