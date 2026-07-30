@@ -9,7 +9,16 @@ The tech tree follows Master of Orion 1's elegant design:
 - **Miniaturization** - older techs become cheaper/smaller as you advance
 - **Research choices** - typically 2-3 options per level per field
 
-## The Six Technology Fields
+**Reference Materials:**
+- [MOO1 Manual (PC)](file:///Users/jchilders/mywork/hamster-of-orion/reference/Master_of_Orion_-_Manual_-_PC.pdf)
+- [StrategyWiki MOO1 Tech Guide](file:///Users/jchilders/mywork/hamster-of-orion/reference/strategywiki-moo1.txt)
+
+**Reference Screenshots:**
+![Technology Screen](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_tech.png)
+![New Technology Discovered](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_new_tech.png)
+![Select New Research](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_start_of_turn_select_new_research.png)
+
+---
 
 ### 1. **Weapons**
 Offensive systems for ships and ground combat

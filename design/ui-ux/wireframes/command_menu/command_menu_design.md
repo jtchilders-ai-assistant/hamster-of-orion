@@ -88,9 +88,19 @@ This screen is a **full-screen modal** and does **NOT** display the bottom comma
 
 ---
 
+---
+
+## 4-Column Interaction Element Table
+
+| UI Element | (a) Trigger Response | (b) Visual Transition | (c) Return Path / Exit Method |
+| :--- | :--- | :--- | :--- |
+| **`[DESIGN]` Command Button** | Opens Ship Design Workspace modal | Fades out Galaxy Map view and opens Ship Design workspace (`moo_design.png`) | Click `[BUILD]`, `[CANCEL]`, or press `Esc` to return to Galaxy Map |
+
+---
+
 ## Reference Screenshots
 
 | File | Description |
 |------|-------------|
-| [`../../../moo_screens/moo_ship_design.png`](../../../moo_screens/moo_ship_design.png) | MOO1 Ship Design screen — primary reference |
-| [`../../../moo_screens/moo_design.png`](../../../moo_screens/moo_design.png) | MOO1 Ship Design screen (same image, alternate filename) |
+| [moo_ship_design.png](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_ship_design.png) | MOO1 Ship Design screen — primary reference |
+| [moo_design.png](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_design.png) | MOO1 Ship Design screen (same image, alternate filename) |

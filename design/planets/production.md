@@ -3,6 +3,11 @@
 ## Overview
 The heart of planet management: five sliding scales allocate population/resources. Simple, elegant, strategic.
 
+**Reference Materials:**
+- [Planetary Controls Explained PDF](file:///Users/jchilders/mywork/hamster-of-orion/design/Master%20of%20Orion%20Planetary%20Controls%20Explained.pdf)
+- [MOO1 Manual (PC)](file:///Users/jchilders/mywork/hamster-of-orion/reference/Master_of_Orion_-_Manual_-_PC.pdf)
+- [StrategyWiki Reference Text](file:///Users/jchilders/mywork/hamster-of-orion/reference/strategywiki-moo1.txt)
+
 ---
 
 ## The Five Sliders

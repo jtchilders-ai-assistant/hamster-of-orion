@@ -203,14 +203,22 @@ When research completes, a popup announces the discovery at the **start of the n
 
 ---
 
-## Reference Screenshots
+---
 
-All paths are relative to `design/moo_screens/` from the project root.
+## 4-Column Interaction Element Table
+
+| UI Element | (a) Trigger Response | (b) Visual Transition | (c) Return Path / Exit Method |
+| :--- | :--- | :--- | :--- |
+| **`[TECH]` Command Button** | Opens Technology & Research Screen modal | Fades out Galaxy Map view and opens Tech screen (`moo_tech.png`) | Click `[OK]` or press `Esc` to return to Galaxy Map |
+
+---
+
+## Reference Screenshots
 
 | File | What it shows |
 |------|--------------|
-| [`../../moo_screens/moo_tech.png`](../../moo_screens/moo_tech.png) | Main RESEARCH screen — left field list, right tech tree, bottom description panel |
-| [`../../moo_screens/moo_new_tech.png`](../../moo_screens/moo_new_tech.png) | New technology discovery popup with next-research selection options |
-| [`../../moo_screens/moo_new_tech_eco_increase.png`](../../moo_screens/moo_new_tech_eco_increase.png) | Tech screen: Planetology selected, showing RP reallocation and ETA impact |
-| [`../../moo_screens/moo_tech_eco_reduction.png`](../../moo_screens/moo_tech_eco_reduction.png) | Tech screen: reduced Planetology RP, demonstrating ETA increase |
-| [`../../moo_screens/moo_start_of_turn_select_new_research.png`](../../moo_screens/moo_start_of_turn_select_new_research.png) | Start-of-turn research selection screen (full-screen option list) |
+| [moo_tech.png](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_tech.png) | Main RESEARCH screen — left field list, right tech tree, bottom description panel |
+| [moo_new_tech.png](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_new_tech.png) | New technology discovery popup with next-research selection options |
+| [moo_new_tech_eco_increase.png](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_new_tech_eco_increase.png) | Tech screen: Planetology selected, showing RP reallocation and ETA impact |
+| [moo_tech_eco_reduction.png](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_tech_eco_reduction.png) | Tech screen: reduced Planetology RP, demonstrating ETA increase |
+| [moo_start_of_turn_select_new_research.png](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_start_of_turn_select_new_research.png) | Start-of-turn research selection screen (full-screen option list) |

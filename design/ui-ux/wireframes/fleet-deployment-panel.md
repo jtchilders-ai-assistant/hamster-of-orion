@@ -221,4 +221,4 @@ Both buttons use the standard MOO1 raised pixel-art button style.
 
 ## Reference Screenshots
 
-![MOO1 Galaxy Map Fleet Deployment](../../moo_screens/moo_galaxy_fleet_deployment.png)
+![MOO1 Galaxy Map Fleet Deployment](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_galaxy_fleet_deployment.png)

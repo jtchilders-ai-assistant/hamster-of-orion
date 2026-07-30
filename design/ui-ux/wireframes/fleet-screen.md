@@ -132,41 +132,19 @@ Buttons use the standard MOO1 raised-border style (lighter top/left edges, darke
 
 ---
 
-## Interactions
+## 4-Column Interaction Element Table
 
-| Action | Result |
-|--------|--------|
-| Click fleet row | Return to Galaxy Map with that fleet selected |
-| Click SPECS | View detailed ship design specs |
-| Click SCRAP | Open ship scrapping interface |
-| Click OK | Close screen, return to Galaxy Map |
-| Press ESC | Close screen, return to Galaxy Map |
-
----
-
-## Design Constraints
-
-- **Maximum 6 ship designs**: The game only allows 6 active ship designs at a time
-- **Column headers**: Show design names (e.g., "Scout", "Fighter", "Destroyer")
-- **Empty cells**: If no ships of a type exist at a location, cell is solid black
-- **Scrolling**: If many fleets exist, list scrolls vertically
-- **No decorative border**: The screen has a plain black background; the title + rule provide the only top decoration
-
----
-
-## Example Data
-
-| System | Scout | Fighter | Destroyer | Cruiser | Battleship | Colony |
-|--------|-------|---------|-----------|---------|------------|--------|
-| FIRMA | 12 | 4 | - | - | - | 1 |
-| CENTAURI | 3 | - | 2 | - | - | - |
-| → ALTAIR (3) | 6 | 8 | - | - | - | - |
-| SOL | - | - | - | 1 | - | - |
-
-*Fleet Maintenance: 45 BC/turn*
+| UI Element | (a) Trigger Response | (b) Visual Transition | (c) Return Path / Exit Method |
+| :--- | :--- | :--- | :--- |
+| **Fleet Row Selection** | Selects fleet row item | Highlights row with gold outline and focuses camera on host system | Remains selected; double click opens system on Galaxy Map |
+| **`[SPECS]` Button** | Opens ship specification detail modal | Displays component loadout, weapon stats, and hull schematics | Click `[Close]` or press `Esc` to return to Fleet View |
+| **`[SCRAP]` Button** | Triggers ship scrapping confirmation prompt | Displays confirmation modal `"Scrap selected ships for BC refund?"` | Click `[Cancel]` or press `Esc` to dismiss scrap modal |
+| **`[OK]` Button** | Closes Fleet Screen | Fades out screen (`200ms`) and restores Galaxy Map view | Returns directly to Galaxy Map (`moo_galaxy_home.png`) |
+| **Keyboard `Esc` Key** | Cancels active sub-modal or closes Fleet Screen | Fades out screen | Returns directly to Galaxy Map (`moo_galaxy_home.png`) |
 
 ---
 
 ## Reference Screenshots
 
-![MOO1 Fleet Screen](../../moo_screens/moo_fleet_screen.png)
+![MOO1 Fleet Screen](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_fleet_screen.png)
+

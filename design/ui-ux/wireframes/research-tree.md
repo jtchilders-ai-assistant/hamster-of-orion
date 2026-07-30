@@ -304,8 +304,8 @@ All screenshots are relative to `design/moo_screens/` from the project root.
 
 | File | What it shows |
 |------|--------------|
-| [`../moo_screens/moo_tech.png`](../moo_screens/moo_tech.png) | Main technology screen — left field list, right tech tree, bottom description |
-| [`../moo_screens/moo_new_tech.png`](../moo_screens/moo_new_tech.png) | "New Technology" discovery popup with next-research selection |
-| [`../moo_screens/moo_new_tech_eco_increase.png`](../moo_screens/moo_new_tech_eco_increase.png) | Tech screen showing Planetology field selected; RP reallocation effect on ETA |
-| [`../moo_screens/moo_tech_eco_reduction.png`](../moo_screens/moo_tech_eco_reduction.png) | Tech screen with reduced ecology RP allocation; demonstrates ETA changes |
-| [`../moo_screens/moo_start_of_turn_select_new_research.png`](../moo_screens/moo_start_of_turn_select_new_research.png) | Start-of-turn research selection screen (full-screen option picker) |
+| [moo_tech.png](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_tech.png) | Main technology screen — left field list, right tech tree, bottom description |
+| [moo_new_tech.png](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_new_tech.png) | "New Technology" discovery popup with next-research selection |
+| [moo_new_tech_eco_increase.png](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_new_tech_eco_increase.png) | Tech screen showing Planetology field selected; RP reallocation effect on ETA |
+| [moo_tech_eco_reduction.png](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_tech_eco_reduction.png) | Tech screen with reduced ecology RP allocation; demonstrates ETA changes |
+| [moo_start_of_turn_select_new_research.png](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_start_of_turn_select_new_research.png) | Start-of-turn research selection screen (full-screen option picker) |

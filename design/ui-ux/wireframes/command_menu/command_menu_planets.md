@@ -138,11 +138,21 @@ At the start of a turn when scouts or colony ships reveal a new world:
 
 ---
 
+---
+
+## 4-Column Interaction Element Table
+
+| UI Element | (a) Trigger Response | (b) Visual Transition | (c) Return Path / Exit Method |
+| :--- | :--- | :--- | :--- |
+| **`[PLANETS]` Command Button** | Opens Colony Overview List screen | Fades out Galaxy Map view and opens Planets List overview (`moo_planets.png`) | Click `[OK]`, select a colony row, or press `Esc` to return to Galaxy Map |
+
+---
+
 ## Reference Screenshots
 
 | Screenshot | Description |
 |------------|-------------|
-| ![MOO1 Planets Screen](../../../moo_screens/moo_planets.png) | Main Planet Management screen (F6) — full colony list with stats |
-| ![Colony Ship Arrives](../../../moo_screens/moo_colony_ship_arrives_at_potential_planet.png) | Event overlay when a colony ship reaches an uninhabited planet |
-| ![New Colony Screen](../../../moo_screens/moo_new_colony_screen.png) | Post-colonization confirmation screen with full planet stats |
-| ![New Planet Reveal](../../../moo_screens/moo_start_of_turn_new_planet_reveal.png) | Start-of-turn notification revealing a newly discovered world |
+| ![MOO1 Planets Screen](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_planets.png) | Main Planet Management screen (F6) — full colony list with stats |
+| ![Colony Ship Arrives](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_colony_ship_arrives_at_potential_planet.png) | Event overlay when a colony ship reaches an uninhabited planet |
+| ![New Colony Screen](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_new_colony_screen.png) | Post-colonization confirmation screen with full planet stats |
+| ![New Planet Reveal](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_start_of_turn_new_planet_reveal.png) | Start-of-turn notification revealing a newly discovered world |

@@ -194,32 +194,16 @@ Ship systems (Computer, Shield, ECM, Armor, Engine, Maneuver) do **NOT** consume
 
 ---
 
-## Interactions
+## 4-Column Interaction Element Table
 
-| Action | Result |
-|--------|--------|
-| Click hull size (top) | Changes available space |
-| Click weapon slot | Opens weapon selection popup |
-| Adjust weapon count | Changes space used |
-| Click special slot | Opens special equipment selection |
-| Click style arrows | Changes ship appearance (cosmetic) |
-| Edit name | Changes design name |
-| Click CLEAR | Removes all weapons/specials |
-| Click CANCEL | Exits without saving |
-| Click BUILD | Saves design |
-
----
-
-## Design Workflow
-
-1. **Select hull size** at the top of screen (determines total space)
-2. **Choose ship appearance** (cosmetic style)
-3. **Add weapons** to up to 4 slots with desired counts
-4. **Add special equipment** if needed (colony module, fuel tanks, etc.)
-5. **Name the design**
-6. **Click BUILD** to save
-
-Ship systems are handled automatically - no selection needed!
+| UI Element | (a) Trigger Response | (b) Visual Transition | (c) Return Path / Exit Method |
+| :--- | :--- | :--- | :--- |
+| **Hull Size Radio (Frigate..Titan)** | Sets active ship hull size | Recalculates available space; updates hull 3D preview | Remains selected until another size or command button is clicked |
+| **Weapon Slot Selector** | Opens weapon category picker modal | Displays available beam/missile/bomb tech list overlay | Click `[Close]` or press `Esc` to return to design workspace |
+| **Special Equipment Selector** | Opens special component picker modal | Displays shield generators, engine boosters, colony modules list | Click `[Close]` or press `Esc` to return to design workspace |
+| **`[CLEAR]` Button** | Prompts confirmation to reset design | Clears all equipped weapon and special slots | Click `[Cancel]` to dismiss reset prompt |
+| **`[BUILD]` Button** | Validates space usage and saves ship design | Saves design to active fleet roster (Slot 1-6) and exits | Returns to Galaxy Map (`moo_galaxy_home.png`) |
+| **`[CANCEL]` Button / `Esc` Key** | Discards unsaved design changes | Fades out design workspace | Returns to Galaxy Map (`moo_galaxy_home.png`) |
 
 ---
 
@@ -227,5 +211,5 @@ Ship systems are handled automatically - no selection needed!
 
 | File | Description |
 |------|-------------|
-| [`../../moo_screens/moo_ship_design.png`](../../moo_screens/moo_ship_design.png) | MOO1 Ship Design screen — primary reference |
-| [`../../moo_screens/moo_design.png`](../../moo_screens/moo_design.png) | MOO1 Ship Design screen (same image, alternate filename) |
+| [moo_ship_design.png](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_ship_design.png) | MOO1 Ship Design screen — primary reference |
+| [moo_design.png](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_design.png) | MOO1 Ship Design screen (same image, alternate filename) |

@@ -649,18 +649,18 @@ From the screenshots, the star map has these confirmed visual elements:
 
 All screenshots are from Master of Orion (1993) and located at:
 
-- [Home screen / default state](../../moo_screens/moo_galaxy_home.png)
-- [Unexplored star selected](../../moo_screens/moo_galaxy_unexplored.png)
-- [Ship/fleet select at colony](../../moo_screens/moo_galaxy_shipselect.png)
-- [After ship destination selected](../../moo_screens/moo_galaxy_aftershipdestinationselected.png)
-- [Moving ship/fleet selected](../../moo_screens/moo_galaxy_movingshipselected.png)
-- [Fleet deployment panel](../../moo_screens/moo_galaxy_fleet_deployment.png)
-- [Uncolonized planet selected](../../moo_screens/moo_galaxy_select_uncolonized_planet.png)
-- [Ship destination out of range](../../moo_screens/moo_galaxy_ship_select_destination_out_of_range.png)
-- [New colony planet panel](../../moo_screens/moo_galaxy_planet_new.png)
-- [Post-terraformed planet panel](../../moo_screens/moo_galaxy_planet_post_tform.png)
-- [Colony at max population](../../moo_screens/moo_galaxy_planet_is_full.png)
-- [Colony at max factories](../../moo_screens/moo_galaxy_max_factories.png)
+- [Home screen / default state](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_galaxy_home.png)
+- [Unexplored star selected](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_galaxy_unexplored.png)
+- [Ship/fleet select at colony](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_galaxy_shipselect.png)
+- [After ship destination selected](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_galaxy_aftershipdestinationselected.png)
+- [Moving ship/fleet selected](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_galaxy_movingshipselected.png)
+- [Fleet deployment panel](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_galaxy_fleet_deployment.png)
+- [Uncolonized planet selected](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_galaxy_select_uncolonized_planet.png)
+- [Ship destination out of range](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_galaxy_ship_select_destination_out_of_range.png)
+- [New colony planet panel](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_galaxy_planet_new.png)
+- [Post-terraformed planet panel](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_galaxy_planet_post_tform.png)
+- [Colony at max population](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_galaxy_planet_is_full.png)
+- [Colony at max factories](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_galaxy_max_factories.png)
 
 ---
 

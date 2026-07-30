@@ -146,8 +146,16 @@ Three 3D-raised buttons, left to right:
 
 ---
 
+## 4-Column Interaction Element Table
+
+| UI Element | (a) Trigger Response | (b) Visual Transition | (c) Return Path / Exit Method |
+| :--- | :--- | :--- | :--- |
+| **`[FLEET]` Command Button** | Opens Fleet Command Overview modal | Fades out Galaxy Map view and opens Fleet overview screen (`moo_fleet_screen.png`) | Click `[OK]` or press `Esc` to return to Galaxy Map |
+
+---
+
 ## Reference Screenshots
 
 | File | Description |
 |------|-------------|
-| [`../../../moo_screens/moo_fleet_screen.png`](../../../moo_screens/moo_fleet_screen.png) | Actual MOO1 Fleet Overview screen showing table layout, ship icons, and bottom buttons |
+| [moo_fleet_screen.png](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_fleet_screen.png) | Actual MOO1 Fleet Overview screen showing table layout, ship icons, and bottom buttons |

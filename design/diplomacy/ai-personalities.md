@@ -3,6 +3,14 @@
 ## Overview
 Each race has distinct AI behavior patterns affecting diplomacy, warfare, expansion, and tech priorities.
 
+**Reference Materials:**
+- [MOO1 Manual (PC)](file:///Users/jchilders/mywork/hamster-of-orion/reference/Master_of_Orion_-_Manual_-_PC.pdf)
+- [StrategyWiki MOO1 Diplomacy Guide](file:///Users/jchilders/mywork/hamster-of-orion/reference/strategywiki-moo1.txt)
+
+**Reference Screenshots:**
+![Races Diplomacy Screen](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_races.png)
+![Races Report](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_races_report.png)
+
 ---
 
 ## Personality Archetypes

@@ -48,12 +48,14 @@ All game screens follow the MOO1 layout pattern:
 
 ## Visual Style
 
+For complete CSS design tokens, HSL color palettes, typography, button states, slider styling, and micro-animations, see the master [UI Style Guide & Design System](file:///Users/jchilders/mywork/hamster-of-orion/design/ui-ux/style-guide.md).
+
 ### Art Direction
-**Dignified Ridiculousness**:
+**Dignified Sci-Fi & Tactile Tactical Glass**:
 - Portraits: Serious pet portraits (formal attire, dramatic lighting)
-- UI: Professional, military-grade interface
-- Iconography: Clear, functional symbols
-- Color: Space-appropriate palette
+- UI: Professional, military-grade glassmorphic interface (`backdrop-filter: blur(12px)`)
+- Iconography: Clear, functional symbols with neon indicator badges
+- Color: Space-appropriate dark theme with Imperial Gold and Plasma Cyan accents
 
 ### Color Palette
 

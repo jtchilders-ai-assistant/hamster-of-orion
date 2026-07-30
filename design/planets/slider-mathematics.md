@@ -4,6 +4,11 @@
 
 The five-slider system is the heart of planetary management in Hamster of Orion. Each slider allocates a percentage of the planet's production capacity to different outputs. This document specifies exact formulas for how slider percentages convert to actual output, slider interactions, and resource overflow mechanics.
 
+**Reference Materials:**
+- [Planetary Controls Explained PDF](file:///Users/jchilders/mywork/hamster-of-orion/design/Master%20of%20Orion%20Planetary%20Controls%20Explained.pdf)
+- [MOO1 Manual (PC)](file:///Users/jchilders/mywork/hamster-of-orion/reference/Master_of_Orion_-_Manual_-_PC.pdf)
+- [StrategyWiki Reference Text](file:///Users/jchilders/mywork/hamster-of-orion/reference/strategywiki-moo1.txt)
+
 **Key MOO1 Faithful Mechanics:**
 - Five sliders must sum to 100% (or less)
 - Production capacity is shared across all sliders

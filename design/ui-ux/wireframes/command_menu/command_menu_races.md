@@ -219,9 +219,17 @@ After choosing a race, the player selects an empire **banner color**. This deter
 
 ---
 
+## 4-Column Interaction Element Table
+
+| UI Element | (a) Trigger Response | (b) Visual Transition | (c) Return Path / Exit Method |
+| :--- | :--- | :--- | :--- |
+| **`[RACES]` Command Button** | Opens Races / Diplomacy Screen | Fades out Galaxy Map view and opens Races Screen (`moo_races.png`) | Click any main command button or press `Esc` to return to Galaxy Map |
+
+---
+
 ## Reference Screenshots
 
 | File | Description |
 |------|-------------|
-| [`../../../moo_screens/moo_new_game_race_select.png`](../../../moo_screens/moo_new_game_race_select.png) | New-game race selection screen — large portrait on left, race list and special abilities on right. Shares portrait artwork with in-game RACES screen. |
-| [`../../../moo_screens/moo_new_game_banner_select.png`](../../../moo_screens/moo_new_game_banner_select.png) | New-game banner/color selection screen — color swatches grid with race portrait. Determines empire flag color on the galaxy map. |
+| [moo_new_game_race_select.png](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_new_game_race_select.png) | New-game race selection screen — large portrait on left, race list and special abilities on right. Shares portrait artwork with in-game RACES screen. |
+| [moo_new_game_banner_select.png](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_new_game_banner_select.png) | New-game banner/color selection screen — color swatches grid with race portrait. Determines empire flag color on the galaxy map. |

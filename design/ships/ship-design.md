@@ -4,6 +4,14 @@
 
 Players design custom ships by selecting hull size, appearance, weapons, and special equipment. Ship systems (engines, shields, computers, etc.) are **automatically set to your best available technology** - no manual selection required.
 
+**Reference Materials:**
+- [MOO1 Manual (PC)](file:///Users/jchilders/mywork/hamster-of-orion/reference/Master_of_Orion_-_Manual_-_PC.pdf)
+- [StrategyWiki MOO1 Reference Text](file:///Users/jchilders/mywork/hamster-of-orion/reference/strategywiki-moo1.txt)
+
+**Reference Screenshots:**
+![Ship Design Overview](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_design.png)
+![Ship Design Detail](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_ship_design.png)
+
 ---
 
 ## Design Philosophy (MOO1-Faithful)

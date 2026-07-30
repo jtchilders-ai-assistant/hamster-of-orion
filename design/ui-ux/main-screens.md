@@ -2,7 +2,12 @@
 
 **Updated to match MOO1 layout based on reference screenshots.**
 
-Reference: `design/moo_screens/` and `design/ui-ux/wireframes/moo1-reference-wireframes.md`
+**Reference Materials:**
+- [MOO1 Manual (PC)](file:///Users/jchilders/mywork/hamster-of-orion/reference/Master_of_Orion_-_Manual_-_PC.pdf)
+- [Planetary Controls Explained PDF](file:///Users/jchilders/mywork/hamster-of-orion/design/Master%20of%20Orion%20Planetary%20Controls%20Explained.pdf)
+- [StrategyWiki Reference Text](file:///Users/jchilders/mywork/hamster-of-orion/reference/strategywiki-moo1.txt)
+- Screenshot Directory: [design/moo_screens/](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/)
+- Reference Wireframes: [moo1-reference-wireframes.md](file:///Users/jchilders/mywork/hamster-of-orion/design/ui-ux/wireframes/moo1-reference-wireframes.md)
 
 ---
 
@@ -32,7 +37,7 @@ Reference: `design/moo_screens/` and `design/ui-ux/wireframes/moo1-reference-wir
 
 **Step 1: Galaxy Generation**
 
-![New Game Menu](../moo_screens/moo_new_game_menu.png)
+![New Game Menu](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_new_game_menu.png)
 
 ```
 ┌─────────────────────────────────────────────────────┐
@@ -57,7 +62,7 @@ Reference: `design/moo_screens/` and `design/ui-ux/wireframes/moo1-reference-wir
 
 **Step 2: Race Selection**
 
-![Race Selection](../moo_screens/moo_new_game_race_select.png)
+![Race Selection](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_new_game_race_select.png)
 
 ```
 ┌─────────────────────────────────────────────────────┐
@@ -82,15 +87,15 @@ Reference: `design/moo_screens/` and `design/ui-ux/wireframes/moo1-reference-wir
 
 **Step 3: Banner Selection**
 
-![Banner Select](../moo_screens/moo_new_game_banner_select.png)
+![Banner Select](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_new_game_banner_select.png)
 
 **Step 4: Emperor Name**
 
-![Emperor Name](../moo_screens/moo_new_game_emporer_name.png)
+![Emperor Name](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_new_game_emporer_name.png)
 
 **Step 5: Home World Name**
 
-![Home World Name](../moo_screens/moo_new_game_home_world_name.png)
+![Home World Name](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_new_game_home_world_name.png)
 
 ---
 
@@ -98,7 +103,7 @@ Reference: `design/moo_screens/` and `design/ui-ux/wireframes/moo1-reference-wir
 
 **NOTE: This is the primary game screen. Layout matches MOO1 exactly.**
 
-![Galaxy Map - Home View](../moo_screens/moo_galaxy_home.png)
+![Galaxy Map - Home View](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_galaxy_home.png)
 
 ### Screen Structure
 ```
@@ -160,7 +165,7 @@ When your own colony is selected, shows full colony details with production slid
 
 ### Info Panel State: Unexplored Star
 
-![Unexplored Star](../moo_screens/moo_galaxy_unexplored.png)
+![Unexplored Star](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_galaxy_unexplored.png)
 
 ```
 ┌─────────────────────┐
@@ -190,21 +195,21 @@ When your own colony is selected, shows full colony details with production slid
 
 ### Info Panel State: Ship Selection
 
-![Ship Select](../moo_screens/moo_galaxy_shipselect.png)
+![Ship Select](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_galaxy_shipselect.png)
 
 After selecting a destination:
 
-![After Ship Destination Selected](../moo_screens/moo_galaxy_aftershipdestinationselected.png)
+![After Ship Destination Selected](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_galaxy_aftershipdestinationselected.png)
 
 While a ship is moving:
 
-![Moving Ship Selected](../moo_screens/moo_galaxy_movingshipselected.png)
+![Moving Ship Selected](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_galaxy_movingshipselected.png)
 
 ### Info Panel State: Fleet Deployment (Fleet at Colony Selected)
 
 When you click a fleet orbiting a system, the **Fleet Deployment** panel appears. This panel has 5 ship slots and deployment controls.
 
-![Fleet Deployment](../moo_screens/moo_galaxy_fleet_deployment.png)
+![Fleet Deployment](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_galaxy_fleet_deployment.png)
 
 ```
 ┌─────────────────────────┐
@@ -260,7 +265,7 @@ When you click a fleet orbiting a system, the **Fleet Deployment** panel appears
 
 ### Info Panel State: Destination Out of Range
 
-![Ship Destination Out of Range](../moo_screens/moo_galaxy_ship_select_destination_out_of_range.png)
+![Ship Destination Out of Range](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_galaxy_ship_select_destination_out_of_range.png)
 
 ### Info Panel State: Fleet In Transit
 ```
@@ -292,23 +297,23 @@ When you click a fleet orbiting a system, the **Fleet Deployment** panel appears
 
 **New Colony:**
 
-![New Colony Planet](../moo_screens/moo_galaxy_planet_new.png)
+![New Colony Planet](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_galaxy_planet_new.png)
 
 **Post-Terraformed Colony:**
 
-![Post-Terraformed Planet](../moo_screens/moo_galaxy_planet_post_tform.png)
+![Post-Terraformed Planet](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_galaxy_planet_post_tform.png)
 
 **Colony at Population Cap:**
 
-![Colony Is Full](../moo_screens/moo_galaxy_planet_is_full.png)
+![Colony Is Full](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_galaxy_planet_is_full.png)
 
 **Colony at Max Factories:**
 
-![Max Factories](../moo_screens/moo_galaxy_max_factories.png)
+![Max Factories](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_galaxy_max_factories.png)
 
 ### Uncolonized Planet
 
-![Uncolonized Planet Selected](../moo_screens/moo_galaxy_select_uncolonized_planet.png)
+![Uncolonized Planet Selected](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_galaxy_select_uncolonized_planet.png)
 
 ### Selection Behavior
 **Something is always selected.** When the game starts, your homeworld is automatically selected. Clicking empty space does NOT deselect - you must click another star or fleet to change selection.
@@ -340,15 +345,15 @@ The MAP button cycles through overlay modes:
 
 **Colonies Overlay:**
 
-![Map - Colonies Selected](../moo_screens/moo_map_colonies_selected.png)
+![Map - Colonies Selected](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_map_colonies_selected.png)
 
 **Environments Overlay:**
 
-![Map - Environments Selected](../moo_screens/moo_map_environments_selected.png)
+![Map - Environments Selected](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_map_environments_selected.png)
 
 **Minerals Overlay:**
 
-![Map - Minerals Selected](../moo_screens/moo_map_minerals_selected.png)
+![Map - Minerals Selected](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_map_minerals_selected.png)
 
 ### Star Map Symbols
 ```
@@ -376,7 +381,7 @@ Fleet Indicators:
 
 ### Planets List View
 
-![Planets Screen](../moo_screens/moo_planets.png)
+![Planets Screen](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_planets.png)
 
 Shows all your colonies. Click any to manage.
 
@@ -463,17 +468,17 @@ Based on `moo_tech.png` screenshot.
 
 **This is a full navigation screen with the bottom command bar** (QoL improvement over MOO1's modal). Use F-keys or the command bar to switch screens. The OK button in the lower-right returns to Galaxy Map.
 
-![Technology Screen](../moo_screens/moo_tech.png)
+![Technology Screen](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_tech.png)
 
 ### Researching New Technology
 
 When a new research topic becomes available:
 
-![Select New Research](../moo_screens/moo_start_of_turn_select_new_research.png)
+![Select New Research](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_start_of_turn_select_new_research.png)
 
 When a technology is fully researched:
 
-![New Technology Discovered](../moo_screens/moo_new_tech.png)
+![New Technology Discovered](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_new_tech.png)
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
@@ -550,9 +555,9 @@ When a technology is fully researched:
 
 Based on `moo_design.png` and `moo_ship_design.png` screenshots.
 
-![Ship Design Overview](../moo_screens/moo_design.png)
+![Ship Design Overview](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_design.png)
 
-![Ship Design Detail](../moo_screens/moo_ship_design.png)
+![Ship Design Detail](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_ship_design.png)
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
@@ -618,7 +623,7 @@ Based on `moo_design.png` and `moo_ship_design.png` screenshots.
 
 Based on `moo_fleet_screen.png` screenshot.
 
-![Fleet Screen](../moo_screens/moo_fleet_screen.png)
+![Fleet Screen](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_fleet_screen.png)
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
@@ -747,19 +752,19 @@ Based on `moo_fleet_screen.png` screenshot.
 
 ### Colony Ship Arrives at Potential Planet
 
-![Colony Ship Arrives](../moo_screens/moo_colony_ship_arrives_at_potential_planet.png)
+![Colony Ship Arrives](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_colony_ship_arrives_at_potential_planet.png)
 
 ### New Colony Screen
 
-![New Colony Screen](../moo_screens/moo_new_colony_screen.png)
+![New Colony Screen](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_new_colony_screen.png)
 
 ### New Planet Revealed
 
-![New Planet Reveal](../moo_screens/moo_start_of_turn_new_planet_reveal.png)
+![New Planet Reveal](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_start_of_turn_new_planet_reveal.png)
 
 ### New Ships Produced
 
-![New Ships This Turn](../moo_screens/moo_start_of_turn_new_ships.png)
+![New Ships This Turn](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/moo_start_of_turn_new_ships.png)
 
 ---
 

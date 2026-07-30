@@ -2,11 +2,13 @@
 
 ## Overview
 
-This document specifies all user interface interactions for Hamster of Orion, matching Master of Orion (1993) behavior with modern web enhancements. It covers click behaviors, keyboard shortcuts, slider mechanics, list navigation, context menus, drag-and-drop, focus states, and modal interaction patterns.
+This document specifies all user interface interactions for Hamster of Orion, matching Master of Orion (1993) behavior with modern web enhancements. It covers click behaviors, keyboard shortcuts, slider mechanics, list navigation, context menus, drag-and-drop, focus states, modal interaction patterns, and explicit return paths for all interactions.
 
-**Reference**: Master of Orion (1993) UI Controls  
-**Target Platform**: Modern web browsers (Chrome, Firefox, Safari, Edge)  
-**Input Methods**: Mouse/trackpad (primary), keyboard, touch (tablet)
+**Reference Materials:**
+- [MOO1 Manual (PC)](file:///Users/jchilders/mywork/hamster-of-orion/reference/Master_of_Orion_-_Manual_-_PC.pdf)
+- [Planetary Controls Explained PDF](file:///Users/jchilders/mywork/hamster-of-orion/design/Master%20of%20Orion%20Planetary%20Controls%20Explained.pdf)
+- [StrategyWiki Reference Text](file:///Users/jchilders/mywork/hamster-of-orion/reference/strategywiki-moo1.txt)
+- Screenshot Directory: [design/moo_screens/](file:///Users/jchilders/mywork/hamster-of-orion/design/moo_screens/)
 
 ---
 
