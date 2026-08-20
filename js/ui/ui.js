@@ -227,6 +227,13 @@ globalThis.HOO = globalThis.HOO || {};
     var bar = el('div', { cls: 'ratio-bar' });
     var fill = el('div', { cls: 'ratio-fill' });
     bar.appendChild(fill);
+    // in-bar % readout: light label on the empty track + dark copy clipped to the fill
+    var pctUnder = el('div', { cls: 'ratio-pct' });
+    var pctClip = el('div', { cls: 'ratio-clip' });
+    var pctOver = el('div', { cls: 'ratio-pct' });
+    pctClip.appendChild(pctOver);
+    bar.appendChild(pctUnder);
+    bar.appendChild(pctClip);
     var note = el('div', { cls: 'ratio-note' });
 
     function pctFromEvent(e) {
@@ -251,7 +258,11 @@ globalThis.HOO = globalThis.HOO || {};
     function update() {
       var v = opts.get();
       fill.style.width = v + '%';
-      note.textContent = opts.note ? opts.note() : (Math.round(v) + '%');
+      pctClip.style.width = v + '%';
+      var pctText = opts.pctLabel ? opts.pctLabel() : (Math.round(v) + '%');
+      pctUnder.textContent = pctText;
+      pctOver.textContent = pctText;
+      note.textContent = opts.note ? opts.note() : '';
       var isLocked = opts.locked && opts.locked();
       row.classList.toggle('locked', !!isLocked);
       label.classList.toggle('locked', !!isLocked);

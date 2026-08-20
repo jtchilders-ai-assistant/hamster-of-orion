@@ -344,7 +344,8 @@ globalThis.HOO = globalThis.HOO || {};
       label: 'Security', cls: 'r-def',
       get: function () { return (player.securityAlloc || 0) * 5; },
       set: function (v) { player.securityAlloc = Math.round(v / 5); },
-      note: function () { return player.securityAlloc + '% of production'; }
+      pctLabel: function () { return (player.securityAlloc || 0) + '%'; },
+      note: function () { return 'of production'; }
     }));
     head.appendChild(secWrap);
     content.appendChild(head);
@@ -393,7 +394,8 @@ globalThis.HOO = globalThis.HOO || {};
         label: 'Spies', cls: 'r-tech',
         get: function () { return sp.alloc * 10; },
         set: function (v) { sp.alloc = Math.round(v / 10); },
-        note: function () { return sp.count + ' net · ' + sp.alloc + '%'; }
+        pctLabel: function () { return sp.alloc + '%'; },
+        note: function () { return sp.count + ' network' + (sp.count === 1 ? '' : 's'); }
       }));
       var missions = el('div', { cls: 'opt-row', style: 'margin-top:4px;' });
       [['hide', 'Hide'], ['espionage', 'Espionage'], ['sabotage', 'Sabotage']].forEach(function (m) {
@@ -660,7 +662,8 @@ globalThis.HOO = globalThis.HOO || {};
       label: 'Tax', cls: 'r-ind',
       get: function () { return emp.taxRate * 5; },
       set: function (v) { emp.taxRate = Math.round(v / 5); },
-      note: function () { return emp.taxRate + '% → reserve (2:1)'; }
+      pctLabel: function () { return emp.taxRate + '%'; },
+      note: function () { return '→ reserve (2:1)'; }
     }));
     content.appendChild(taxWrap);
     content.appendChild(el('div', { cls: 'stat mono', style: 'margin-top:4px;', html: 'Planetary Reserve: <b>' + U.fmt(emp.reserve) + '</b> BC — fund colonies from their panel.' }));
@@ -690,7 +693,7 @@ globalThis.HOO = globalThis.HOO || {};
           HOO.UI.rebalance(emp.research.alloc, f, v, emp.research.locked);
           Object.keys(rows).forEach(function (k) { rows[k]._update(); });
         },
-        note: function () { return Math.round(emp.research.alloc[f]) + '%'; },
+        note: function () { return ''; },
         lockable: true,
         locked: function () { return !!emp.research.locked[f]; },
         toggleLock: function () { emp.research.locked[f] = !emp.research.locked[f]; }

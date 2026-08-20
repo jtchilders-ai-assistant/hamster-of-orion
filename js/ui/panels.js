@@ -188,7 +188,7 @@ globalThis.HOO = globalThis.HOO || {};
       def: function () { return defNote(emp, s, c); },
       ind: function () { return indNote(emp, s, c); },
       eco: function () { return ecoNote(emp, s, c); },
-      tech: function () { return Math.round(c.alloc.tech) + '%'; }
+      tech: function () { return techNote(emp, s, c); }
     };
     Object.keys(labels).forEach(function (key) {
       rows[key] = HOO.UI.ratioRow({
@@ -291,49 +291,86 @@ globalThis.HOO = globalThis.HOO || {};
     c.locks = {};
   }
 
+  // spendable BC this colony will have next turn (mirrors processColony)
+  function colonySpend(emp, s) {
+    var spend = HOO.Colony.rawProduction(emp, s) * (emp.economy ? emp.economy.ratio : 1);
+    if (emp.taxRate > 0) spend -= spend * emp.taxRate / 100;
+    return Math.max(0, spend);
+  }
+
+  // Ship: turns until the next ship, or "N/turn"
   function shipNote(emp, s, c) {
     if (c.alloc.ship <= 0) return '—';
-    var raw = HOO.Colony.rawProduction(emp, s) * (emp.economy ? emp.economy.ratio : 1);
-    var bc = raw * c.alloc.ship / 100 * HOO.Colony.mineralMult(s);
+    var bc = colonySpend(emp, s) * c.alloc.ship / 100 * HOO.Colony.mineralMult(s);
+    if (bc <= 0) return '—';
     if (c.buildingStargate) {
       var need = HOO.Colony.STARGATE_COST - c.stargateProgress;
-      return Math.max(1, Math.ceil(need / Math.max(1, bc))) + ' yr';
+      return Math.max(1, Math.ceil(need / bc)) + ' turns';
     }
     var dsg = emp.designs[c.buildDesign];
-    if (!dsg || bc <= 0) return '—';
-    var remaining = dsg.cost - c.shipProgress;
-    if (bc >= dsg.cost) return Math.floor(bc / dsg.cost) + '/yr';
-    return Math.max(1, Math.ceil(remaining / bc)) + ' yr';
+    if (!dsg) return '—';
+    if (bc >= dsg.cost) return Math.floor(bc / dsg.cost) + '/turn';
+    return Math.max(1, Math.ceil((dsg.cost - c.shipProgress) / bc)) + ' turns';
   }
 
+  // Def: SHIELD while a planetary shield builds, else turns per base or "N/turn"
   function defNote(emp, s, c) {
-    if (c.alloc.def <= 0) return c.bases ? String(c.bases) + ' base' + (c.bases > 1 ? 's' : '') : '—';
-    var best = HOO.Colony.bestMissileLevel(emp);
-    if (c.bases > 0 && c.baseMissileLevel < best) return 'UPGRD';
-    if (emp.derived.planetShield > c.shield && !s.inNebula) return 'SHIELD';
-    var raw = HOO.Colony.rawProduction(emp, s) * (emp.economy ? emp.economy.ratio : 1);
-    var bc = raw * c.alloc.def / 100 * HOO.Colony.mineralMult(s);
+    if (c.alloc.def <= 0) return '—';
+    var bc = colonySpend(emp, s) * c.alloc.def / 100 * HOO.Colony.mineralMult(s);
     if (bc <= 0) return '—';
-    return Math.max(1, Math.ceil((HOO.Colony.MISSILE_BASE_COST - c.baseProgress) / bc)) + ' yr';
+    var best = HOO.Colony.bestMissileLevel(emp);
+    if (c.bases > 0 && c.baseMissileLevel < best) return 'UPGRADE';
+    if (emp.derived.planetShield > c.shield && !s.inNebula) return 'SHIELD';
+    var cost = HOO.Colony.MISSILE_BASE_COST;
+    if (bc >= cost) return Math.floor(bc / cost) + '/turn';
+    return Math.max(1, Math.ceil((cost - c.baseProgress) / bc)) + ' turns';
   }
 
+  // Ind: factories built per turn, or MAX when the cap is (about to be) reached
   function indNote(emp, s, c) {
+    var d = emp.derived;
     var mp = HOO.Colony.maxPop(emp, s);
-    var maxFact = mp * Math.min(emp.derived.controls, c.controls);
-    if (c.factories >= maxFact) return c.alloc.ind > 0 ? 'RESERVE' : 'MAX';
-    if (c.controls < emp.derived.controls && !HOO.DATA.raceById[emp.raceId].freeRefit) return 'REFIT';
-    return Math.round(c.factories) + '/' + Math.round(maxFact);
+    var maxFact = mp * Math.min(d.controls, c.controls);
+    if (c.factories >= maxFact) return 'MAX';
+    if (c.alloc.ind <= 0) return '—';
+    if (c.controls < d.controls && !HOO.DATA.raceById[emp.raceId].freeRefit && c.factories > 0) return 'REFIT';
+    var bc = colonySpend(emp, s) * c.alloc.ind / 100 * HOO.Colony.mineralMult(s);
+    var nf = bc / HOO.Colony.factoryCostAt(emp, c.controls);
+    if (nf <= 0) return '—';
+    if (c.factories + nf >= maxFact) return 'MAX';
+    return '+' + U.fmt(nf, nf < 10 ? 1 : 0) + '/turn';
   }
 
+  // Eco: forward-looking status — WASTE / CLEAN / ATMOS / SOIL / TERRAFORM / +POP
   function ecoNote(emp, s, c) {
-    var status = c.ecoStatus || (s.planet.waste > 0 ? 'WASTE' : 'CLEAN');
     var race = HOO.DATA.raceById[emp.raceId];
-    if (race.wasteImmune) return status;
+    var p = s.planet;
+    var d = emp.derived;
+    if (race.wasteImmune) return 'CLEAN';
     var minPct = HOO.Colony.ecoCleanPct(emp, s);
-    if (minPct > 0 && (status === 'WASTE' || Math.round(c.alloc.eco) < minPct)) {
-      return status + ' · min ' + Math.min(100, minPct) + '%';
+    // locked below the clean minimum: waste will pile up
+    if (c.locks && c.locks.eco && Math.round(c.alloc.eco) < minPct) return 'WASTE';
+    var spend = colonySpend(emp, s);
+    var surplusBC = spend * Math.max(0, c.alloc.eco - minPct) / 100;
+    var def = HOO.CONST.PLANET_TYPES[p.type];
+    if (surplusBC > 0.5) {
+      if (def.hostility > 0 && d.canAtmos && !p.envConverted) return 'ATMOS';
+      if (def.hostility === 0 && d.canSoil && p.special === 'none') return 'SOIL';
+      if (def.hostility === 0 && d.canAdvSoil && (p.special === 'none' || p.special === 'fertile')) return 'SOIL';
+      if (d.terraformAdd > p.terraformed) return 'TERRAFORM';
+      var boost = Math.min(surplusBC / d.popCost, c.pop / 4, Math.max(0, HOO.Colony.maxPop(emp, s) - c.pop));
+      if (boost >= 0.5) return '+' + Math.round(boost) + ' POP';
     }
-    return status;
+    return 'CLEAN';
+  }
+
+  // Tech: research points this colony will contribute next turn
+  function techNote(emp, s, c) {
+    if (c.quarantine || c.novaThreat) return '0 RP';
+    var rp = colonySpend(emp, s) * c.alloc.tech / 100 * HOO.Colony.researchMult(s);
+    var race = HOO.DATA.raceById[emp.raceId];
+    if (race.researchBonus) rp *= (1 + race.researchBonus);
+    return U.fmt(rp, 0) + ' RP';
   }
 
   function cycleShip(c, emp, s) {
