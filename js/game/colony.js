@@ -178,13 +178,11 @@ globalThis.HOO = globalThis.HOO || {};
     if (c.inRebellion) { c.ecoStatus = 'REBELLION'; return { research: 0, notices: notices }; }
 
     // manual p.14: the Ecology allocation is automatically raised to the minimum
-    // needed to keep the planet clean (unless the player has locked the bar)
-    var projectedWaste = Math.min(p.size * 0.75, p.waste + newWaste);
-    if (spend > 0 && projectedWaste > 0 && !(c.locks && c.locks.eco)) {
-      var needPct = Math.ceil((projectedWaste / d.wastePerBC) / spend * 100);
-      if (needPct > c.alloc.eco) {
-        raiseEco(c, Math.min(needPct, 100));
-      }
+    // needed to keep the planet clean (unless the player has locked the bar).
+    // Uses the same shared formula the UI displays, so bar and engine always agree.
+    if (spend > 0 && !(c.locks && c.locks.eco)) {
+      var needPct = ecoMinPct(emp, starObj);
+      if (needPct > c.alloc.eco) raiseEco(c, needPct);
     }
 
     var mm = mineralMult(starObj);
@@ -348,8 +346,14 @@ globalThis.HOO = globalThis.HOO || {};
         var mp2 = maxPop(emp, starObj);
         var boost = Math.min(ecoBC / d.popCost, c.pop / 4, Math.max(0, mp2 - c.pop));
         c.boostPop = boost;
+        ecoBC -= boost * d.popCost;
         if (boost >= 0.5) c.ecoStatus = '+' + Math.round(boost) + ' POP';
       } else c.boostPop = 0;
+      // 6) nothing left to improve: surplus flows to the reserve (like industry)
+      if (ecoBC > 0.5) {
+        emp.reserve += ecoBC / 2;
+        c.ecoStatus = 'RESERVE';
+      }
     }
 
     // ---------- TECH ----------
@@ -383,17 +387,33 @@ globalThis.HOO = globalThis.HOO || {};
     return starObj.planet.waste / emp.derived.wastePerBC;
   }
 
-  // minimum eco % for a clean planet next year (for UI display)
-  function ecoCleanPct(emp, starObj) {
+  // the single source of truth for a colony's spendable BC estimate
+  // (mirrors processColony: economy ratio, AI difficulty bonus, reserve tax)
+  function spendEstimate(emp, starObj) {
     var c = starObj.planet.colony;
+    var spend = rawProduction(emp, starObj) * (emp.economy ? emp.economy.ratio : 1);
+    if (!emp.isPlayer && c && c.aiBonus) spend *= c.aiBonus;
+    if (emp.taxRate > 0) spend -= spend * emp.taxRate / 100;
+    return Math.max(0, spend);
+  }
+
+  // the single source of truth for the minimum eco % that keeps a planet clean.
+  // Used by the engine's auto-raise, the panel display, presets, and the AI.
+  function ecoMinPct(emp, starObj) {
+    var c = starObj.planet.colony;
+    var p = starObj.planet;
     var d = emp.derived;
     var race = HOO.DATA.raceById[emp.raceId];
-    if (race.wasteImmune) return 0;
+    if (race.wasteImmune || !c) return 0;
     var working = Math.min(c.factories, c.pop * Math.min(d.controls, c.controls));
-    var incoming = working * d.wastePct;
-    var spend = Math.max(1, rawProduction(emp, starObj) * (emp.economy ? emp.economy.ratio : 1));
-    return Math.ceil((starObj.planet.waste + incoming) / d.wastePerBC / spend * 100);
+    var projected = Math.min(p.size * 0.75, p.waste + working * d.wastePct);
+    var spend = spendEstimate(emp, starObj);
+    if (spend <= 0 || projected <= 0) return 0;
+    return Math.min(100, Math.ceil((projected / d.wastePerBC) / spend * 100));
   }
+
+  // legacy alias
+  function ecoCleanPct(emp, starObj) { return ecoMinPct(emp, starObj); }
 
   function bestMissileLevel(emp) {
     var lv = 0;
@@ -426,7 +446,7 @@ globalThis.HOO = globalThis.HOO || {};
   HOO.Colony = {
     create: create, colonies: colonies, maxPop: maxPop, rawProduction: rawProduction,
     empireEconomy: empireEconomy, processColony: processColony, growPopulation: growPopulation,
-    ecoCleanNeed: ecoCleanNeed, ecoCleanPct: ecoCleanPct,
+    ecoCleanNeed: ecoCleanNeed, ecoCleanPct: ecoCleanPct, ecoMinPct: ecoMinPct, spendEstimate: spendEstimate,
     factoryCostAt: factoryCostAt, mineralMult: mineralMult, researchMult: researchMult,
     envGrowthMult: envGrowthMult, bestMissileLevel: bestMissileLevel,
     MISSILE_BASE_COST: MISSILE_BASE_COST, STARGATE_COST: STARGATE_COST, star: star

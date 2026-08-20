@@ -195,6 +195,12 @@ globalThis.HOO = globalThis.HOO || {};
         label: labels[key], cls: 'r-' + key,
         get: function () { return c.alloc[key]; },
         set: function (v) {
+          // eco springs back to the clean minimum unless the bar is locked
+          // (manual p.14 — lock the bar to deliberately let the planet get dirty)
+          if (key === 'eco' && !c.locks.eco) {
+            var minPct = HOO.Colony.ecoMinPct(emp, s);
+            if (v < minPct) v = minPct;
+          }
           HOO.UI.rebalance(c.alloc, key, v, c.locks);
           Object.keys(rows).forEach(function (k2) { rows[k2]._update(); });
         },
@@ -263,10 +269,7 @@ globalThis.HOO = globalThis.HOO || {};
     var g = HOO.game;
     var race = HOO.DATA.raceById[emp.raceId];
     var d = emp.derived;
-    var working = Math.min(c.factories, c.pop * Math.min(d.controls, c.controls));
-    var raw = Math.max(1, HOO.Colony.rawProduction(emp, star) * (emp.economy ? emp.economy.ratio : 1));
-    var ecoNeed = race.wasteImmune ? 4 :
-      U.clamp(Math.ceil((star.planet.waste + working * d.wastePct) / d.wastePerBC / raw * 100) + 4, 6, 45);
+    var ecoNeed = race.wasteImmune ? 4 : U.clamp(HOO.Colony.ecoMinPct(emp, star), 4, 80);
 
     var w = { ship: 0, def: 0, ind: 0, eco: ecoNeed, tech: 0 };
     var rest = 100 - ecoNeed;
@@ -291,11 +294,9 @@ globalThis.HOO = globalThis.HOO || {};
     c.locks = {};
   }
 
-  // spendable BC this colony will have next turn (mirrors processColony)
+  // spendable BC this colony will have next turn (shared with the engine)
   function colonySpend(emp, s) {
-    var spend = HOO.Colony.rawProduction(emp, s) * (emp.economy ? emp.economy.ratio : 1);
-    if (emp.taxRate > 0) spend -= spend * emp.taxRate / 100;
-    return Math.max(0, spend);
+    return HOO.Colony.spendEstimate(emp, s);
   }
 
   // Ship: turns until the next ship, or "N/turn"
@@ -341,13 +342,13 @@ globalThis.HOO = globalThis.HOO || {};
     return '+' + U.fmt(nf, nf < 10 ? 1 : 0) + '/turn';
   }
 
-  // Eco: forward-looking status — WASTE / CLEAN / ATMOS / SOIL / TERRAFORM / +POP
+  // Eco: forward-looking status — WASTE / CLEAN / ATMOS / SOIL / TERRAFORM / +POP / RESERVE
   function ecoNote(emp, s, c) {
     var race = HOO.DATA.raceById[emp.raceId];
     var p = s.planet;
     var d = emp.derived;
     if (race.wasteImmune) return 'CLEAN';
-    var minPct = HOO.Colony.ecoCleanPct(emp, s);
+    var minPct = HOO.Colony.ecoMinPct(emp, s);
     // locked below the clean minimum: waste will pile up
     if (c.locks && c.locks.eco && Math.round(c.alloc.eco) < minPct) return 'WASTE';
     var spend = colonySpend(emp, s);
@@ -360,6 +361,7 @@ globalThis.HOO = globalThis.HOO || {};
       if (d.terraformAdd > p.terraformed) return 'TERRAFORM';
       var boost = Math.min(surplusBC / d.popCost, c.pop / 4, Math.max(0, HOO.Colony.maxPop(emp, s) - c.pop));
       if (boost >= 0.5) return '+' + Math.round(boost) + ' POP';
+      return 'RESERVE'; // surplus has nowhere to go — it flows to the reserve at 2:1
     }
     return 'CLEAN';
   }

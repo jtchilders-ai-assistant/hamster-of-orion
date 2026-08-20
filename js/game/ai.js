@@ -193,12 +193,9 @@ globalThis.HOO = globalThis.HOO || {};
       var maxFact = mp * Math.min(d.controls, c.controls);
       var a = { ship: 0, def: 0, ind: 0, eco: 10, tech: 0 };
 
-      // ecology need: keep clean
-      var working = Math.min(c.factories, c.pop * Math.min(d.controls, c.controls));
-      var raw = Math.max(1, HOO.Colony.rawProduction(emp, e.star));
-      var wasteCost = (star.planet.waste + working * d.wastePct) / d.wastePerBC;
-      a.eco = U.clamp(Math.ceil(wasteCost / raw * 100) + 4, 6, 45);
-      if (HOO.DATA.raceById[emp.raceId].wasteImmune) a.eco = 5;
+      // ecology need: keep clean (same shared formula as engine & UI)
+      a.eco = U.clamp(HOO.Colony.ecoMinPct(emp, star) + 2, 4, 60);
+      if (HOO.DATA.raceById[emp.raceId].wasteImmune) a.eco = 4;
 
       if (c.factories < maxFact * 0.9) {
         a.ind = 100 - a.eco - 10;
