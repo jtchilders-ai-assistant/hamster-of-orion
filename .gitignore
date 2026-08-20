@@ -1,0 +1,14 @@
+# copyrighted reference material — never commit
+Master_of_Orion_-_Manual_-_PC.pdf
+*.pdf
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/
+
+# node artifacts (tests run from a scratch dir, but just in case)
+node_modules/
+npm-debug.log*
