@@ -1,5 +1,13 @@
 # Hamster of Orion — Production-Readiness Review Findings
 
+> **Historical document — every finding below was fixed before the 1.0.0 release.**
+>
+> This is the pre-fix audit report, kept in the repo as a record of what was
+> checked and why the code looks the way it does. The findings are written in
+> the present tense because they described the code *as it stood on 2026-08-20*.
+> **They do not describe current behaviour.** See `CHANGELOG.md` for the fixes,
+> and `git log` for the commits that landed them.
+
 Generated 2026-08-20 by a 20-agent review (10 domain reviewers + 10 adversarial verifiers, every finding traced to code) plus hands-on browser testing. 142 findings raised; 140 confirmed against the code, 2 refuted and dropped. Cross-domain duplicates are kept where two reviewers found the same issue independently (noted inline).
 
 

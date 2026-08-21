@@ -6,7 +6,7 @@ globalThis.HOO = globalThis.HOO || {};
 
   // build identifier: shown in the window title and available to any screen
   // (title screen, save meta, bug reports)
-  HOO.VERSION = '1.0.0';
+  HOO.VERSION = '1.0.1';
 
   function rebuild() {
     HOO.UI.closeAll();
@@ -23,6 +23,31 @@ globalThis.HOO = globalThis.HOO || {};
       if (orphans[i].parentNode) orphans[i].parentNode.removeChild(orphans[i]);
     }
     HOO.UI.buildFrame();
+  }
+
+  // Adopt a different game (new, loaded, or imported) and rebuild around it.
+  // A save can satisfy the loader's checks and still be too damaged to render;
+  // without this the running session is already gone by the time the frame
+  // throws, leaving a blank screen and hours of play lost. adopt() returns
+  // false if the save could not be read at all.
+  function switchGame(adopt) {
+    var prev = HOO.game ? HOO.State.exportString() : null;
+    if (!adopt()) return false;
+    try {
+      HOO.Notices.resetHistory();
+      // fault flags belong to the game that was replaced, not this one —
+      // otherwise "Restore Stable State" would load the old game's backup
+      stateSuspect = false;
+      faultDialogUp = false;
+      rebuild();
+      return true;
+    } catch (e) {
+      console.error(e);
+      if (prev && HOO.State.importString(prev)) {
+        try { rebuild(); } catch (e2) { console.error(e2); }
+      }
+      return false;
+    }
   }
 
   var processing = false;
@@ -254,7 +279,10 @@ globalThis.HOO = globalThis.HOO || {};
     HOO.NewGame.showTitle();
   }
 
-  HOO.Main = { rebuild: rebuild, endTurn: endTurn, boot: boot, cycleColonies: cycleColonies, cycleFleets: cycleFleets };
+  HOO.Main = {
+    rebuild: rebuild, switchGame: switchGame, endTurn: endTurn, boot: boot,
+    cycleColonies: cycleColonies, cycleFleets: cycleFleets
+  };
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', boot);

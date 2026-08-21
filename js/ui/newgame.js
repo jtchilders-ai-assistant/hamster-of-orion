@@ -23,8 +23,8 @@ globalThis.HOO = globalThis.HOO || {};
 
     var menu = el('div', { cls: 'title-menu' });
     function tryLoad(slot) {
-      if (HOO.State.load(slot)) HOO.Main.rebuild();
-      else HOO.UI.dialog('Archive Damaged', 'This save could not be read — it may be corrupt or from a newer build.');
+      var ok = HOO.Main.switchGame(function () { return HOO.State.load(slot); });
+      if (!ok) HOO.UI.dialog('Archive Damaged', 'This save could not be read — it may be corrupt or from a newer build.');
     }
     var hasAuto = !!HOO.State.saveMeta('auto');
     if (hasAuto) {
@@ -136,8 +136,7 @@ globalThis.HOO = globalThis.HOO || {};
     btnRow.appendChild(el('button', {
       cls: 'btn primary', style: 'padding:10px 22px;', text: 'Begin — Cycle 2623',
       onclick: function () {
-        HOO.State.newGame(opts);
-        HOO.Main.rebuild();
+        HOO.Main.switchGame(function () { HOO.State.newGame(opts); return true; });
         // opening narrative
         var r = HOO.DATA.raceById[opts.raceId];
         HOO.UI.dialog('The Wheel Turns',

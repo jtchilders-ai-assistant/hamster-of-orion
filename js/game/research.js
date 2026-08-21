@@ -65,6 +65,11 @@ globalThis.HOO = globalThis.HOO || {};
   }
 
   function startProject(emp, field, techId) {
+    // re-picking the project already under way must not throw away the
+    // accumulated investment (a stale research-choice toast can offer the
+    // current project again turns after it was raised)
+    var pr = emp.research.projects[field];
+    if (pr && pr.techId === techId && !pr.done) return;
     emp.research.projects[field] = { techId: techId, invested: 0, done: false };
   }
 

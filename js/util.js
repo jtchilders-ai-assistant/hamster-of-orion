@@ -78,6 +78,14 @@ globalThis.HOO = globalThis.HOO || {};
     });
   }
 
+  // Colours reach markup through style="color:…" and SVG stroke/fill, where
+  // escaping alone would not stop a value that closes the attribute. Empire and
+  // star colours come out of the save file verbatim, so an imported save is
+  // untrusted input: anything that is not a plain hex literal is discarded.
+  function safeColor(c) {
+    return /^#[0-9a-fA-F]{3,8}$/.test(c) ? c : '#9AA7C0';
+  }
+
   // spoked wheel SVG (the signature motif)
   function wheelSvg(size, color, spokes) {
     spokes = spokes || 8;
@@ -109,6 +117,7 @@ globalThis.HOO = globalThis.HOO || {};
     seedRng: seedRng, getRngState: getRngState, setRngState: setRngState,
     rand: rand, rint: rint, roll100: roll100, pick: pick, shuffle: shuffle, chance: chance,
     clamp: clamp, lerp: lerp, dist: dist, fmt: fmt,
-    el: el, clearEl: clearEl, esc: esc, wheelSvg: wheelSvg, roman: roman
+    el: el, clearEl: clearEl, esc: esc, safeColor: safeColor,
+    wheelSvg: wheelSvg, roman: roman
   };
 })();

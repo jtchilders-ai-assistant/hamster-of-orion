@@ -98,7 +98,7 @@ globalThis.HOO = globalThis.HOO || {};
         var emp = g.empires[p.colony.empire];
         var race = HOO.DATA.raceById[emp.raceId];
         bits.push(el('hr', { cls: 'hr' }));
-        bits.push(kv('Colony', '<span style="color:' + emp.color + '">' + U.esc(race.name) + '</span>'));
+        bits.push(kv('Colony', '<span style="color:' + U.safeColor(emp.color) + '">' + U.esc(race.name) + '</span>'));
         bits.push(kv('Population', String(Math.round(p.colony.pop))));
         if (p.colony.bases) bits.push(kv('Missile bases', String(p.colony.bases)));
       } else {
@@ -553,7 +553,7 @@ globalThis.HOO = globalThis.HOO || {};
         cls: 'kv', style: 'cursor:pointer;',
         onclick: function () { showFleet(f); }
       }, [
-        el('span', { cls: 'k', html: '<span style="color:' + emp.color + '">▲</span> ' + U.esc(race.name) }),
+        el('span', { cls: 'k', html: '<span style="color:' + U.safeColor(emp.color) + '">▲</span> ' + U.esc(race.name) }),
         el('span', { cls: 'v muted-t', text: summary.join(', ') || '?' })
       ]));
     });
@@ -569,18 +569,18 @@ globalThis.HOO = globalThis.HOO || {};
     var emp = g.empires[f.empire];
     var race = HOO.DATA.raceById[emp.raceId];
 
-    var head = [el('div', { cls: 'eyebrow', style: 'color:' + emp.color, text: race.name + ' fleet' })];
+    var head = [el('div', { cls: 'eyebrow', style: 'color:' + U.safeColor(emp.color), text: race.name + ' fleet' })];
     if (f.at !== null) {
-      head.push(kv('Position', 'Orbiting ' + g.stars[f.at].name));
+      head.push(kv('Position', 'Orbiting ' + U.esc(g.stars[f.at].name)));
     } else if (f.empire === 0) {
-      head.push(kv('In transit', g.stars[f.from] ? (g.stars[f.from].name + ' → ' + g.stars[f.to].name + ' · ' + HOO.Fleet.eta(g, f) + ' yr') : ('→ ' + g.stars[f.to].name)));
+      head.push(kv('In transit', g.stars[f.from] ? (U.esc(g.stars[f.from].name) + ' → ' + U.esc(g.stars[f.to].name) + ' · ' + HOO.Fleet.eta(g, f) + ' yr') : ('→ ' + U.esc(g.stars[f.to].name))));
     } else {
       // manual (Deep Space Scanners): an enemy fleet's destination is revealed
       // only by the Improved Space Scanner; destination + ETA by the Advanced
       var d0 = g.empires[0].derived;
       head.push(kv('Position', 'Deep space — in transit'));
       if (d0.scanShowsDest) {
-        head.push(kv('Destination', g.stars[f.to].name +
+        head.push(kv('Destination', U.esc(g.stars[f.to].name) +
           (d0.scanShowsPlanets ? ' · ETA ' + HOO.Fleet.eta(g, f) + ' yr' : '')));
       }
     }
@@ -695,11 +695,13 @@ globalThis.HOO = globalThis.HOO || {};
   }
 
   // kept for compatibility with older callers
-  function deployTo(destStar) { directDeploy(destStar); }
+
+  // drop a half-issued order when the galaxy underneath it is replaced
+  function clearPendingOrders() { pendingTransport = null; pendingReloc = null; }
 
   HOO.Panels = {
     showStar: showStar, showFleet: showFleet, showBlank: showBlank,
-    deployTo: deployTo, directDeploy: directDeploy, getCurrentSel: getCurrentSel,
-    transportTo: transportTo, relocTo: relocTo
+    directDeploy: directDeploy, getCurrentSel: getCurrentSel,
+    transportTo: transportTo, relocTo: relocTo, clearPendingOrders: clearPendingOrders
   };
 })();

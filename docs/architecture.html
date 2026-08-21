@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hamster of Orion — Stack Explorer</title>
+<style>
+  /* ---- theme tokens (light default, dark via OS or toggle) ---- */
+  :root {
+    color-scheme: light;
+    --page:       #f9f9f7;
+    --surface:    #fcfcfb;
+    --ink:        #0b0b0b;
+    --ink-2:      #52514e;
+    --ink-muted:  #898781;
+    --hairline:   #e1e0d9;
+    --ring:       rgba(11,11,11,0.10);
+    --c-found:    #2a78d6;  /* blue    — foundation  */
+    --c-data:     #eb6834;  /* orange  — data        */
+    --c-game:     #1baf7a;  /* aqua    — game engine */
+    --c-ui:       #eda100;  /* yellow  — ui          */
+    --c-boot:     #e87ba4;  /* magenta — bootstrap   */
+    --c-platform: #898781;  /* neutral — platform    */
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --page:       #0d0d0d;
+      --surface:    #1a1a19;
+      --ink:        #ffffff;
+      --ink-2:      #c3c2b7;
+      --ink-muted:  #898781;
+      --hairline:   #2c2c2a;
+      --ring:       rgba(255,255,255,0.10);
+      --c-found:    #3987e5;
+      --c-data:     #d95926;
+      --c-game:     #199e70;
+      --c-ui:       #c98500;
+      --c-boot:     #d55181;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page:       #0d0d0d;
+    --surface:    #1a1a19;
+    --ink:        #ffffff;
+    --ink-2:      #c3c2b7;
+    --ink-muted:  #898781;
+    --hairline:   #2c2c2a;
+    --ring:       rgba(255,255,255,0.10);
+    --c-found:    #3987e5;
+    --c-data:     #d95926;
+    --c-game:     #199e70;
+    --c-ui:       #c98500;
+    --c-boot:     #d55181;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--page);
+    color: var(--ink);
+    font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 28px 20px 80px; }
+
+  header.top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+  h1 { font-size: 26px; margin: 0 0 4px; letter-spacing: -0.01em; }
+  .sub { color: var(--ink-2); margin: 0; max-width: 62ch; }
+  h2 { font-size: 17px; margin: 44px 0 4px; }
+  .caption { color: var(--ink-2); font-size: 13.5px; margin: 0 0 14px; max-width: 78ch; }
+  button {
+    font: inherit; color: var(--ink); background: var(--surface);
+    border: 1px solid var(--hairline); border-radius: 8px;
+    padding: 6px 12px; cursor: pointer;
+  }
+  button:hover { border-color: var(--ink-muted); }
+
+  /* ---- stat tiles ---- */
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 22px; }
+  .tile {
+    background: var(--surface); border: 1px solid var(--ring); border-radius: 10px;
+    padding: 12px 14px 10px;
+  }
+  .tile .n { font-size: 26px; font-weight: 650; line-height: 1.15; }
+  .tile .l { font-size: 12.5px; color: var(--ink-2); margin-top: 2px; }
+
+  /* ---- layer diagram ---- */
+  .explorer { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 16px; align-items: start; }
+  @media (max-width: 880px) { .explorer { grid-template-columns: 1fr; } }
+
+  .stack { display: flex; flex-direction: column; gap: 8px; }
+  .layer {
+    background: var(--surface); border: 1px solid var(--ring); border-radius: 10px;
+    padding: 10px 12px;
+    border-left: 4px solid var(--lc, var(--hairline));
+  }
+  .layer-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+  .layer-name { font-weight: 650; font-size: 13.5px; }
+  .layer-note { color: var(--ink-muted); font-size: 12px; }
+  .nodes { display: flex; flex-wrap: wrap; gap: 6px; }
+  .node {
+    font: 12.5px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+    color: var(--ink);
+    background: var(--page);
+    border: 1px solid var(--hairline); border-radius: 7px;
+    padding: 5px 9px; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: opacity 120ms, border-color 120ms, box-shadow 120ms;
+  }
+  .node .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--lc); flex: none; }
+  .node:hover { border-color: var(--ink-muted); }
+  .node.sel { border-color: var(--lc); box-shadow: 0 0 0 2px var(--lc); }
+  .node.flash { border-color: var(--lc); box-shadow: 0 0 0 2px var(--lc); }
+  .stack.dimming .node:not(.sel):not(.flash) { opacity: 0.45; }
+
+  .flow-hint {
+    display: flex; align-items: center; gap: 10px;
+    color: var(--ink-muted); font-size: 12.5px; margin: 2px 4px;
+  }
+  .flow-hint .arrow { font-size: 15px; }
+
+  /* ---- detail panel ---- */
+  .detail {
+    background: var(--surface); border: 1px solid var(--ring); border-radius: 10px;
+    padding: 14px 16px; position: sticky; top: 16px; min-height: 220px;
+  }
+  .detail .file { font: 600 14px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace; word-break: break-all; }
+  .detail .meta { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0 10px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; color: var(--ink-2);
+    border: 1px solid var(--hairline); border-radius: 999px; padding: 2px 9px;
+  }
+  .chip .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .detail p { margin: 0 0 8px; font-size: 13.5px; color: var(--ink-2); }
+  .detail p strong { color: var(--ink); }
+  .detail .empty { color: var(--ink-muted); font-size: 13.5px; }
+  .kv { font-size: 13px; color: var(--ink-2); margin-top: 10px; border-top: 1px solid var(--hairline); padding-top: 10px; }
+  .kv b { color: var(--ink); font-weight: 600; }
+  code { font: 12.5px ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--page); border: 1px solid var(--hairline); border-radius: 5px; padding: 1px 5px; }
+
+  /* ---- LOC chart ---- */
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; margin: 0 0 14px; }
+  .legend .chip { cursor: default; }
+  .chart { background: var(--surface); border: 1px solid var(--ring); border-radius: 10px; padding: 16px 18px 12px; }
+  .grp-head { font-size: 12px; font-weight: 650; color: var(--ink-2); text-transform: uppercase; letter-spacing: 0.05em; margin: 12px 0 6px; display: flex; align-items: center; gap: 7px; }
+  .grp-head:first-child { margin-top: 0; }
+  .grp-head .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .row { display: grid; grid-template-columns: 128px 1fr 52px; gap: 10px; align-items: center; padding: 1px 0; }
+  .row .name { font: 12.5px ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--ink); text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .row .track { position: relative; height: 20px; display: flex; align-items: center; cursor: default; }
+  .row .bar { height: 12px; border-radius: 0 4px 4px 0; background: var(--bc); min-width: 2px; }
+  .row .val { font-size: 12.5px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+  .row:hover .bar { outline: 2px solid var(--surface); box-shadow: 0 0 0 3px var(--bc); }
+  details.tbl { margin-top: 14px; color: var(--ink-2); font-size: 13px; }
+  details.tbl summary { cursor: pointer; }
+  details.tbl table { border-collapse: collapse; margin-top: 8px; }
+  details.tbl th, details.tbl td { text-align: left; padding: 3px 14px 3px 0; border-bottom: 1px solid var(--hairline); font-variant-numeric: tabular-nums; }
+
+  /* ---- tooltip ---- */
+  #tip {
+    position: fixed; pointer-events: none; z-index: 50; display: none;
+    background: var(--surface); color: var(--ink); border: 1px solid var(--hairline);
+    border-radius: 8px; padding: 7px 10px; font-size: 12.5px; max-width: 280px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+  }
+  #tip .t1 { font-weight: 650; }
+  #tip .t2 { color: var(--ink-2); }
+
+  /* ---- turn pipeline ---- */
+  .pipe { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .step {
+    font-size: 13px; background: var(--surface); border: 1px solid var(--hairline);
+    border-radius: 8px; padding: 6px 11px; cursor: pointer;
+  }
+  .step:hover { border-color: var(--ink-muted); }
+  .step.sel { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
+  .pipe .sep { color: var(--ink-muted); }
+  .step-detail {
+    margin-top: 12px; background: var(--surface); border: 1px solid var(--ring);
+    border-radius: 10px; padding: 12px 16px; font-size: 13.5px; color: var(--ink-2); min-height: 52px;
+  }
+  .step-detail b { color: var(--ink); }
+
+  footer { margin-top: 48px; color: var(--ink-muted); font-size: 12.5px; border-top: 1px solid var(--hairline); padding-top: 14px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div>
+      <h1>Hamster of Orion — the software stack</h1>
+      <p class="sub">A zero-dependency, zero-build 4X strategy game. Plain HTML + CSS + vanilla JavaScript:
+      27 IIFE modules share one global namespace (<code>HOO</code>), and the
+      <code>&lt;script&gt;</code> order in <code>index.html</code> <em>is</em> the dependency graph.</p>
+    </div>
+    <button id="themeBtn" title="Toggle light/dark">◐ Theme</button>
+  </header>
+
+  <div class="tiles" id="tiles"></div>
+
+  <h2>The stack, layer by layer</h2>
+  <p class="caption">Each layer only calls the layers <em>below</em> it, through the shared
+  <code>HOO</code> namespace. <code>index.html</code> loads scripts bottom-up (foundation first,
+  bootstrap last), so every global a module needs already exists when it runs.
+  <strong>Click any module</strong> for details, or
+  <button id="playBtn" style="font-size:12.5px;padding:3px 9px;">▶ Play load order</button></p>
+
+  <div class="explorer">
+    <div class="stack" id="stack"></div>
+    <aside class="detail" id="detail"><div class="empty">Select a module on the left to see what it does, what it exposes, and what it depends on.</div></aside>
+  </div>
+
+  <h2>Module size — lines of code by layer</h2>
+  <p class="caption">11,010 lines of JavaScript, hand-written with no framework. The UI layer is the
+  heaviest (screens.js alone is 1,251 lines); the game engine carries the MOO-1993 rules;
+  the foundation is a tiny 123-line utility belt. Hover a bar for detail.</p>
+  <div class="legend" id="legend"></div>
+  <div class="chart" id="chart"></div>
+
+  <h2>What happens when you press Enter</h2>
+  <p class="caption">One keystroke turns the Wheel. <code>main.js</code> guards the cycle and
+  <code>game/turn.js</code> sequences the year — click a step to see which modules do the work.</p>
+  <div class="pipe" id="pipe"></div>
+  <div class="step-detail" id="stepDetail">Click a step above.</div>
+
+  <footer>Generated from the repository as of v1.0.0 · 27 JS modules · load order per
+  <code>index.html</code> · turn phases per <code>js/game/turn.js</code>. This page is itself
+  dependency-free — open it from <code>file://</code> like the game.</footer>
+</div>
+
+<div id="tip"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ---------- data ----------
+  var LAYERS = {
+    boot:     { name: 'Bootstrap',   cvar: '--c-boot',     note: 'entry point — loaded last, drives everything' },
+    ui:       { name: 'UI',          cvar: '--c-ui',       note: 'DOM screens + canvas rendering — reads game state, issues commands' },
+    game:     { name: 'Game engine', cvar: '--c-game',     note: 'the MOO-1993 rules — pure logic, no DOM' },
+    data:     { name: 'Data',        cvar: '--c-data',     note: 'static content on HOO.DATA — races, tech tree, names, events' },
+    found:    { name: 'Foundation',  cvar: '--c-found',    note: 'loaded first — everything above uses it' },
+    platform: { name: 'Platform',    cvar: '--c-platform', note: 'what the browser provides — the only "framework" here' }
+  };
+
+  var MODULES = [
+    { file: 'js/main.js', layer: 'boot', loc: 292, ns: 'HOO.Main, HOO.VERSION',
+      desc: 'Bootstrap and turn orchestration. Builds the frame, wires the End Turn wheel, guards against re-entrant turns, and if a mid-cycle fault occurs offers a rollback to the pre-turn backup.',
+      uses: 'HOO.Turn to run the year; HOO.State for backup/restore; HOO.UI / HOO.CombatUI to rebuild the interface.' },
+
+    { file: 'js/ui/ui.js', layer: 'ui', loc: 419, ns: 'HOO.UI',
+      desc: 'The UI framework: app frame, modal/overlay registry, shared widgets, toasts, and global keyboard handling (Enter, Esc, 1–6, G, Tab, F, H).',
+      uses: 'DOM. Other UI modules register their screens through it.' },
+    { file: 'js/ui/map.js', layer: 'ui', loc: 775, ns: 'HOO.Map',
+      desc: 'The galaxy map, drawn on a <canvas> with a requestAnimationFrame render loop. Pan/zoom, star and fleet selection, green/red fleet paths with ETA preview as you hover.',
+      uses: 'Canvas 2D + rAF; reads HOO.State; sends orders through HOO.Fleet.' },
+    { file: 'js/ui/panels.js', layer: 'ui', loc: 708, ns: 'HOO.Panels',
+      desc: 'Sidebar context panels for star systems, colonies, and fleets: the five production ratio bars, one-click allocation presets, transport and relocation actions.',
+      uses: 'HOO.Colony, HOO.Fleet, HOO.ShipDesign for the numbers it shows and the commands it issues.' },
+    { file: 'js/ui/screens.js', layer: 'ui', loc: 1251, ns: 'HOO.Screens',
+      desc: 'The largest module: the seven station screens (Game, Design, Fleet, Races, Planets, Tech, Status) plus save slots, settings, message log, and in-game help.',
+      uses: 'Nearly every game module — it is the window onto all of them. localStorage for save-slot management.' },
+    { file: 'js/ui/combatui.js', layer: 'ui', loc: 506, ns: 'HOO.CombatUI',
+      desc: 'The tactical combat view: renders the 10×8 battle grid, ship stacks, orders, and animations on its own full-screen overlay with its own key handling.',
+      uses: 'Canvas 2D; HOO.Combat resolves what this module displays.' },
+    { file: 'js/ui/notices.js', layer: 'ui', loc: 448, ns: 'HOO.Notices',
+      desc: 'Turn results: dismissable dispatches over the map, battle prompts, GNN crises, High Council interludes, and the game-over sequence.',
+      uses: 'Consumes the notice queue that HOO.Turn builds each year.' },
+    { file: 'js/ui/newgame.js', layer: 'ui', loc: 176, ns: 'HOO.NewGame',
+      desc: 'Title screen and new-game setup: galaxy size, difficulty, number of opponents, and race selection.',
+      uses: 'HOO.Galaxy + HOO.State to create the new game.' },
+
+    { file: 'js/game/state.js', layer: 'game', loc: 458, ns: 'HOO.State, HOO.CONST',
+      desc: 'The single source of truth: constants (galaxy sizes, five difficulties, 13 planet types), the game-state object, tech lookup helpers, and serialize / save / load — autosave every turn plus a rolling pre-turn backup.',
+      uses: 'localStorage (hoo_save_* keys) for persistence; HOO.util for RNG state capture.' },
+    { file: 'js/game/galaxy.js', layer: 'game', loc: 276, ns: 'HOO.Galaxy',
+      desc: 'Procedural galaxy generation: stars, planets and their 13 environments, nebulas, mineral rich/poor worlds, artifacts, and homeworld placement.',
+      uses: 'HOO.util seeded RNG; HOO.DATA name pools and races.' },
+    { file: 'js/game/colony.js', layer: 'game', loc: 562, ns: 'HOO.Colony',
+      desc: 'Colony economy per the manual: five production ratio bars, factories, industrial waste and ecology cleanup, terraforming, planetary reserve, trade income, maintenance, and population growth.',
+      uses: 'HOO.CONST, HOO.State tech levels, HOO.DATA race modifiers.' },
+    { file: 'js/game/research.js', layer: 'game', loc: 150, ns: 'HOO.Research',
+      desc: 'The research model: six-field slider allocation, cost = level² with race multipliers, 15% interest, breakthrough odds from overinvestment, and miniaturization.',
+      uses: 'HOO.DATA.TECHS; each empire sees only a randomized slice of the tree.' },
+    { file: 'js/game/shipdesign.js', layer: 'game', loc: 257, ns: 'HOO.ShipDesign',
+      desc: 'The ship designer: four hulls (40–5,000 tons), computers, shields, ECM, six armor materials, engines, four weapon slots and three special-device slots, with space validation. Six designs in commission.',
+      uses: 'HOO.DATA.HULLS / TECHS; miniaturization from HOO.Research.' },
+    { file: 'js/game/fleet.js', layer: 'game', loc: 268, ns: 'HOO.Fleet',
+      desc: 'Fleets, movement, and range: warp speed, fuel range from home territory, colony transports, ship relocation, and per-turn arrival handling.',
+      uses: 'HOO.State for positions; nebulas (warp 1) from galaxy data.' },
+    { file: 'js/game/combat.js', layer: 'game', loc: 870, ns: 'HOO.Combat',
+      desc: 'Tactical space combat on a 10×8 grid: initiative from maneuver + computer mark, the manual’s exact to-hit table, tracked missiles, torpedoes, shields, missile bases, retreat with parting shots, and auto-resolve.',
+      uses: 'Pure logic — HOO.CombatUI renders it; HOO.Turn invokes it.' },
+    { file: 'js/game/ground.js', layer: 'game', loc: 297, ns: 'HOO.Ground',
+      desc: 'What happens at the planet: bombardment, transport landings, ground combat, and colonization of new worlds.',
+      uses: 'HOO.DATA race ground-combat bonuses; feeds notices to HOO.Turn.' },
+    { file: 'js/game/espionage.js', layer: 'game', loc: 199, ns: 'HOO.Espionage',
+      desc: 'Spy networks implementing the manual’s security and infiltration roll tables exactly: technology theft, sabotage of bases and factories, framing third parties, hiding, and incited rebellions.',
+      uses: 'HOO.util roll tables; HOO.Diplomacy for the fallout when spies are caught.' },
+    { file: 'js/game/diplomacy.js', layer: 'game', loc: 332, ns: 'HOO.Diplomacy',
+      desc: 'Fifteen relation levels from Feud to Harmony, the starting-relations matrix, treaties (non-aggression, alliance, trade), tribute, tech exchange, threats, war weariness, yearly drift, and first contact.',
+      uses: 'HOO.DATA.START_RELATIONS and leader personalities.' },
+    { file: 'js/game/council.js', layer: 'game', loc: 146, ns: 'HOO.Council',
+      desc: 'The High Council: convenes once two-thirds of the galaxy is settled, elects a Master of Orion by two-thirds vote — accept, abstain, or defy the galaxy in a Final War.',
+      uses: 'Vote weights from HOO.Colony populations and HOO.Diplomacy relations.' },
+    { file: 'js/game/events_run.js', layer: 'game', loc: 422, ns: 'HOO.EventsRun',
+      desc: 'The runtime engine for random events: fires and advances the crises defined in data/events.js — comets, plagues, supernovas, rebellions, pirates, and monster battles (Amoeba, Crystal, the Guardian).',
+      uses: 'HOO.DATA.EVENTS definitions; builds battles via HOO.Combat.' },
+    { file: 'js/game/ai.js', layer: 'game', loc: 733, ns: 'HOO.AI',
+      desc: 'The AI empires: per-personality, per-objective planning each turn — colony allocation, research choices, ship design, fleet targeting, and diplomatic stances, with the manual’s difficulty handicaps.',
+      uses: 'Calls the same engine modules the player does — Colony, Research, ShipDesign, Fleet, Diplomacy.' },
+    { file: 'js/game/turn.js', layer: 'game', loc: 368, ns: 'HOO.Turn',
+      desc: 'The turn sequencer. nextTurn() runs the yearly cycle: AI planning → economy, production & research → population growth and elimination → fleet & transport movement → battle detection → espionage → diplomacy → random events → council.',
+      uses: 'Orchestrates every other game module; queues notices for the UI.' },
+
+    { file: 'js/data/names.js', layer: 'data', loc: 57, ns: 'HOO.DATA (names)',
+      desc: 'Name pools: STAR_NAMES, SHIP_NAMES, LEADER_NAMES — the flavor vocabulary the generators draw from.',
+      uses: 'Pure data. Consumed by HOO.Galaxy and HOO.ShipDesign.' },
+    { file: 'js/data/races.js', layer: 'data', loc: 162, ns: 'HOO.DATA (races)',
+      desc: 'The ten sentient races with their MOO-1993 stat blocks — Budgies/Alkari through Hermit Crabs/Silicoid — homeworlds, the starting-relations matrix, leader personalities and objectives.',
+      uses: 'Pure data. Consumed across the engine and the new-game screen.' },
+    { file: 'js/data/tech.js', layer: 'data', loc: 680, ns: 'HOO.DATA (tech)',
+      desc: 'The full technology tree across six research fields, the hull table, and the special-device catalog (cloaking devices, stasis fields, black hole generators…). The largest data file.',
+      uses: 'Pure data. Consumed by Research, ShipDesign, Colony, Combat.' },
+    { file: 'js/data/events.js', layer: 'data', loc: 75, ns: 'HOO.DATA.EVENTS',
+      desc: 'Definitions for random crises and disasters — comets, plagues, monsters, pirates, derelicts (manual p.50).',
+      uses: 'Pure data. Executed by HOO.EventsRun.' },
+
+    { file: 'js/util.js', layer: 'found', loc: 123, ns: 'HOO.util',
+      desc: 'The utility belt every layer stands on: a seeded mulberry32 RNG (rand, rint, roll100, pick, shuffle) whose state is captured in saves so games replay deterministically, plus small formatting helpers.',
+      uses: 'Nothing — it is the bottom of the JS stack.' },
+
+    { file: 'index.html', layer: 'platform', loc: 51, ns: '—',
+      desc: 'The whole build system: 27 <script> tags in dependency order. Inline SVG favicon (no network request), Google Fonts loaded non-blocking as a progressive enhancement — offline and file:// play fall back to system fonts instantly.',
+      uses: 'Just a browser. No bundler, no server, no install.' },
+    { file: 'css/style.css', layer: 'platform', loc: 648, ns: '—',
+      desc: 'A hand-written 644-line design system: the “command console” theme (void / panel / gold), every widget, screen, and panel styled in one file.',
+      uses: 'Plain CSS — no preprocessor.' },
+    { file: 'Browser APIs', layer: 'platform', loc: 0, ns: '—',
+      desc: 'The runtime: Canvas 2D (galaxy map, tactical combat), the DOM (screens and panels), localStorage (autosave, six slots, pre-turn backup), requestAnimationFrame (map render loop), and optionally Google Fonts when online.',
+      uses: 'This is the entire external surface of the project.' }
+  ];
+
+  var LAYER_ORDER = ['boot', 'ui', 'game', 'data', 'found', 'platform'];
+
+  var STEPS = [
+    { t: '1 · Enter', d: '<b>main.js</b> catches the keypress (or the Wheel button), refuses re-entrant turns, and has <b>state.js</b> write a rolling pre-turn backup to localStorage — if anything faults mid-cycle, the chronicle rolls back.' },
+    { t: '2 · AI plans', d: '<b>ai.js</b> gives every computer empire its orders — colony allocation, research, ship designs, fleet targets — using the same engine calls the player’s UI makes.' },
+    { t: '3 · Economy & research', d: '<b>colony.js</b> runs every colony’s five production bars (ships, defense, factories, ecology, tech) and <b>research.js</b> advances the six fields, rolling for breakthroughs.' },
+    { t: '4 · Population', d: '<b>colony.js</b> grows (or starves) populations; empires with no colonies left are eliminated.' },
+    { t: '5 · Fleets move', d: '<b>fleet.js</b> advances every fleet and transport along its course and reports arrivals.' },
+    { t: '6 · Battles', d: 'Where hostile fleets meet, <b>combat.js</b> builds the battle — you command it on the 10×8 grid via <b>combatui.js</b>, or auto-resolve. <b>ground.js</b> handles bombardment and invasions.' },
+    { t: '7 · Spies & diplomacy', d: '<b>espionage.js</b> resolves every spy mission on the manual’s roll tables; <b>diplomacy.js</b> drifts relations, updates contacts, and reacts to the year’s incidents.' },
+    { t: '8 · Events & council', d: '<b>events_run.js</b> may fire a crisis (comet, plague, monster…); once two-thirds of the galaxy is settled, <b>council.js</b> convenes the High Council.' },
+    { t: '9 · Autosave & redraw', d: '<b>state.js</b> autosaves; the UI layer rebuilds — <b>notices.js</b> delivers dispatches, <b>map.js</b> redraws the galaxy, and the year advances.' }
+  ];
+
+  // load order = index.html script order
+  var LOAD_ORDER = ['js/util.js',
+    'js/data/names.js', 'js/data/races.js', 'js/data/tech.js', 'js/data/events.js',
+    'js/game/state.js', 'js/game/galaxy.js', 'js/game/colony.js', 'js/game/research.js',
+    'js/game/shipdesign.js', 'js/game/fleet.js', 'js/game/combat.js', 'js/game/ground.js',
+    'js/game/espionage.js', 'js/game/diplomacy.js', 'js/game/council.js', 'js/game/events_run.js',
+    'js/game/ai.js', 'js/game/turn.js',
+    'js/ui/ui.js', 'js/ui/map.js', 'js/ui/panels.js', 'js/ui/screens.js',
+    'js/ui/combatui.js', 'js/ui/notices.js', 'js/ui/newgame.js', 'js/main.js'];
+
+  var byFile = {};
+  MODULES.forEach(function (m) { byFile[m.file] = m; });
+
+  // ---------- stat tiles ----------
+  var jsLoc = MODULES.filter(function (m) { return m.layer !== 'platform'; })
+                     .reduce(function (s, m) { return s + m.loc; }, 0);
+  var tiles = [
+    { n: '0', l: 'dependencies · build steps' },
+    { n: '27', l: 'JS modules, one &lt;script&gt; tag each' },
+    { n: jsLoc.toLocaleString(), l: 'lines of vanilla JavaScript' },
+    { n: '1', l: 'global namespace — HOO' },
+    { n: 'file://', l: 'runs from a double-click, offline' }
+  ];
+  document.getElementById('tiles').innerHTML = tiles.map(function (t) {
+    return '<div class="tile"><div class="n">' + t.n + '</div><div class="l">' + t.l + '</div></div>';
+  }).join('');
+
+  // ---------- layer diagram ----------
+  var stackEl = document.getElementById('stack');
+  var html = '';
+  LAYER_ORDER.forEach(function (key, i) {
+    var L = LAYERS[key];
+    var mods = MODULES.filter(function (m) { return m.layer === key; });
+    html += '<div class="layer" style="--lc: var(' + L.cvar + ')">' +
+      '<div class="layer-head"><span class="layer-name">' + L.name + '</span>' +
+      '<span class="layer-note">' + L.note + '</span></div><div class="nodes">' +
+      mods.map(function (m) {
+        return '<button class="node" data-file="' + m.file + '" style="--lc: var(' + L.cvar + ')">' +
+               '<span class="dot"></span>' + m.file.replace(/^js\//, '') + '</button>';
+      }).join('') + '</div></div>';
+    if (i === 0) html += '<div class="flow-hint"><span class="arrow">↓</span> calls flow downward through <code>HOO.*</code> &nbsp;·&nbsp; <span class="arrow">↑</span> scripts load bottom-up</div>';
+  });
+  stackEl.innerHTML = html;
+
+  var detailEl = document.getElementById('detail');
+  var selected = null;
+
+  function select(file) {
+    selected = file;
+    stackEl.querySelectorAll('.node').forEach(function (n) {
+      n.classList.toggle('sel', n.getAttribute('data-file') === file);
+    });
+    stackEl.classList.toggle('dimming', !!file);
+    var m = byFile[file];
+    if (!m) { detailEl.innerHTML = '<div class="empty">Select a module.</div>'; return; }
+    var L = LAYERS[m.layer];
+    detailEl.innerHTML =
+      '<div class="file">' + m.file + '</div>' +
+      '<div class="meta">' +
+        '<span class="chip"><span class="dot" style="background:var(' + L.cvar + ')"></span>' + L.name + '</span>' +
+        (m.loc ? '<span class="chip">' + m.loc.toLocaleString() + ' lines</span>' : '') +
+        (m.ns !== '—' ? '<span class="chip">' + m.ns + '</span>' : '') +
+      '</div>' +
+      '<p>' + m.desc + '</p>' +
+      '<div class="kv"><b>Depends on / talks to:</b> ' + m.uses + '</div>';
+  }
+
+  stackEl.addEventListener('click', function (e) {
+    var n = e.target.closest('.node');
+    if (n) select(n.getAttribute('data-file') === selected ? null : n.getAttribute('data-file'));
+  });
+
+  // ---------- play load order ----------
+  var playing = false;
+  document.getElementById('playBtn').addEventListener('click', function () {
+    if (playing) return;
+    playing = true;
+    select(null);
+    var i = 0;
+    var nodes = LOAD_ORDER.map(function (f) {
+      return stackEl.querySelector('.node[data-file="' + f + '"]');
+    });
+    (function tick() {
+      nodes.forEach(function (n) { n && n.classList.remove('flash'); });
+      if (i >= nodes.length) {
+        playing = false;
+        stackEl.classList.remove('dimming');
+        return;
+      }
+      stackEl.classList.add('dimming');
+      if (nodes[i]) {
+        nodes[i].classList.add('flash');
+        nodes[i].scrollIntoView({ block: 'nearest' });
+        detailEl.innerHTML = '<div class="file">loading ' + (i + 1) + ' / ' + LOAD_ORDER.length +
+          '</div><p style="margin-top:8px"><code>&lt;script src="' + LOAD_ORDER[i] + '"&gt;</code></p>' +
+          '<p>' + byFile[LOAD_ORDER[i]].desc + '</p>';
+      }
+      i++;
+      setTimeout(tick, 420);
+    })();
+  });
+
+  // ---------- LOC chart (grouped by layer; bars thin, rounded data-end) ----------
+  var legendEl = document.getElementById('legend');
+  legendEl.innerHTML = LAYER_ORDER.filter(function (k) { return k !== 'platform'; })
+    .map(function (k) {
+      return '<span class="chip"><span class="dot" style="background:var(' + LAYERS[k].cvar + ')"></span>' +
+             LAYERS[k].name + '</span>';
+    }).join('');
+
+  var chartEl = document.getElementById('chart');
+  var maxLoc = Math.max.apply(null, MODULES.map(function (m) { return m.loc; }));
+  var chartOrder = ['found', 'data', 'game', 'ui', 'boot']; // validated adjacent color order
+  var chtml = '';
+  chartOrder.forEach(function (key) {
+    var L = LAYERS[key];
+    var mods = MODULES.filter(function (m) { return m.layer === key; })
+                      .slice().sort(function (a, b) { return b.loc - a.loc; });
+    var subtotal = mods.reduce(function (s, m) { return s + m.loc; }, 0);
+    chtml += '<div class="grp-head"><span class="dot" style="background:var(' + L.cvar + ')"></span>' +
+             L.name + ' · ' + subtotal.toLocaleString() + ' lines</div>';
+    mods.forEach(function (m) {
+      var w = (m.loc / maxLoc * 100).toFixed(1);
+      chtml += '<div class="row" data-file="' + m.file + '" style="--bc: var(' + L.cvar + ')">' +
+        '<div class="name">' + m.file.replace(/^js\//, '') + '</div>' +
+        '<div class="track"><div class="bar" style="width:' + w + '%"></div></div>' +
+        '<div class="val">' + m.loc.toLocaleString() + '</div></div>';
+    });
+  });
+  // table view (accessibility relief for low-contrast light-mode hues)
+  chtml += '<details class="tbl"><summary>View as table</summary><table><tr><th>Module</th><th>Layer</th><th>Lines</th></tr>' +
+    MODULES.filter(function (m) { return m.layer !== 'platform'; })
+      .slice().sort(function (a, b) { return b.loc - a.loc; })
+      .map(function (m) {
+        return '<tr><td>' + m.file + '</td><td>' + LAYERS[m.layer].name + '</td><td>' + m.loc.toLocaleString() + '</td></tr>';
+      }).join('') + '</table></details>';
+  chartEl.innerHTML = chtml;
+
+  // tooltip
+  var tip = document.getElementById('tip');
+  chartEl.addEventListener('mousemove', function (e) {
+    var row = e.target.closest('.row');
+    if (!row) { tip.style.display = 'none'; return; }
+    var m = byFile[row.getAttribute('data-file')];
+    var pct = (m.loc / jsLoc * 100).toFixed(1);
+    tip.innerHTML = '<div class="t1">' + m.file + '</div>' +
+      '<div class="t2">' + m.loc.toLocaleString() + ' lines · ' + pct + '% of the JS · ' +
+      LAYERS[m.layer].name + '</div>';
+    tip.style.display = 'block';
+    var x = Math.min(e.clientX + 14, window.innerWidth - tip.offsetWidth - 8);
+    var y = Math.min(e.clientY + 14, window.innerHeight - tip.offsetHeight - 8);
+    tip.style.left = x + 'px'; tip.style.top = y + 'px';
+  });
+  chartEl.addEventListener('mouseleave', function () { tip.style.display = 'none'; });
+  chartEl.addEventListener('click', function (e) {
+    var row = e.target.closest('.row');
+    if (row) {
+      select(row.getAttribute('data-file'));
+      document.getElementById('stack').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+
+  // ---------- turn pipeline ----------
+  var pipeEl = document.getElementById('pipe');
+  pipeEl.innerHTML = STEPS.map(function (s, i) {
+    return (i ? '<span class="sep">→</span>' : '') +
+      '<button class="step" data-i="' + i + '">' + s.t + '</button>';
+  }).join('');
+  var stepDetail = document.getElementById('stepDetail');
+  pipeEl.addEventListener('click', function (e) {
+    var b = e.target.closest('.step');
+    if (!b) return;
+    pipeEl.querySelectorAll('.step').forEach(function (s) { s.classList.toggle('sel', s === b); });
+    stepDetail.innerHTML = STEPS[+b.getAttribute('data-i')].d;
+  });
+
+  // ---------- theme toggle ----------
+  document.getElementById('themeBtn').addEventListener('click', function () {
+    var root = document.documentElement;
+    var osDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var cur = root.getAttribute('data-theme') || (osDark ? 'dark' : 'light');
+    root.setAttribute('data-theme', cur === 'dark' ? 'light' : 'dark');
+  });
+})();
+</script>
+</body>
+</html>

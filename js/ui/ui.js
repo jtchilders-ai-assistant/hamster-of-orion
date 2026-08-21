@@ -85,8 +85,11 @@ globalThis.HOO = globalThis.HOO || {};
 
   // ---------- toast feed ----------
   /*
-    opts: {tag, text, kind: ''|'gold'|'red'|'green', starId, sticky, buttons:[{label, fn}], timeout}
+    opts: {tag, text, kind: ''|'gold'|'red'|'green', starId, sticky, buttons:[{label, fn}], timeout, key}
   */
+  // hard ceiling for a stack of nothing but sticky toasts — beyond this the
+  // feed would cover the whole map and clip its own oldest entries
+  var MAX_STICKY = 6;
   function toast(opts) {
     if (!toastStack) return null;
     var t = el('div', { cls: 'toast ' + (opts.kind || '') + (opts.starId !== undefined && opts.starId !== null ? ' link' : '') });
@@ -124,14 +127,31 @@ globalThis.HOO = globalThis.HOO || {};
     // sticky/button toasts carry decisions (e.g. the next-research choice) and
     // must never be silently evicted by a busy turn
     t._sticky = !!(opts.sticky || (opts.buttons && opts.buttons.length));
+    // keyed toasts supersede their own predecessor: a fresh offer for the same
+    // subject replaces the stale one instead of stacking beside it
+    t._key = opts.key || null;
+    if (t._key) {
+      for (var ki = toastStack.children.length - 1; ki >= 0; ki--) {
+        if (toastStack.children[ki]._key === t._key) toastStack.removeChild(toastStack.children[ki]);
+      }
+    }
     toastStack.appendChild(t);
-    // cap the stack: evict the oldest non-sticky toast first
+    // Cap the stack: evict the oldest non-sticky toast first. The toast just
+    // added is never a candidate — otherwise a stack of accumulated sticky
+    // decisions would swallow every new dispatch on arrival.
     while (toastStack.children.length > 7) {
       var victim = null;
       for (var vi = 0; vi < toastStack.children.length; vi++) {
-        if (!toastStack.children[vi]._sticky) { victim = toastStack.children[vi]; break; }
+        var cand = toastStack.children[vi];
+        if (cand !== t && !cand._sticky) { victim = cand; break; }
       }
-      if (!victim) break; // everything left is sticky — let the stack grow rather than eat a choice
+      // nothing but sticky decisions left — drop the oldest rather than let the
+      // feed grow past the map, where entries clip out of reach for good
+      if (!victim) {
+        if (toastStack.children.length <= MAX_STICKY) break;
+        victim = toastStack.children[0] === t ? toastStack.children[1] : toastStack.children[0];
+      }
+      if (!victim) break;
       toastStack.removeChild(victim);
     }
     if (!opts.sticky && !(opts.buttons && opts.buttons.length)) {

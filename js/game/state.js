@@ -363,11 +363,22 @@ globalThis.HOO = globalThis.HOO || {};
 
   // required top-level fields — reject anything that would crash the engine later
   function validGame(g) {
-    return !!(g && typeof g === 'object' &&
+    if (!(g && typeof g === 'object' &&
       typeof g.year === 'number' &&
+      typeof g.w === 'number' && typeof g.h === 'number' &&
       Array.isArray(g.empires) && g.empires.length > 0 &&
       Array.isArray(g.stars) && g.stars.length > 0 &&
-      Array.isArray(g.fleets) && Array.isArray(g.transports));
+      Array.isArray(g.nebulas) &&
+      Array.isArray(g.fleets) && Array.isArray(g.transports))) return false;
+    // every star the renderer and panels touch must carry the fields they read;
+    // a structurally "plausible" save that is missing them would be adopted and
+    // then throw halfway through rebuilding the frame
+    for (var i = 0; i < g.stars.length; i++) {
+      var s = g.stars[i];
+      if (!s || typeof s !== 'object' || typeof s.x !== 'number' || typeof s.y !== 'number' ||
+        !s.explored || typeof s.explored !== 'object') return false;
+    }
+    return true;
   }
 
   // parse + validate a save string and adopt it as HOO.game.

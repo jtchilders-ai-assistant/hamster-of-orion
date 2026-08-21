@@ -8,7 +8,6 @@ globalThis.HOO = globalThis.HOO || {};
   var canvas, ctx, wrap;
   var view = { x: 0, y: 0, scale: 1 };
   var selectedStar = null, selectedFleet = null;
-  var deployMode = null;   // legacy explicit mode (kept for API compat)
   var transportMode = null; // {fromStarId, pop}
   var relocMode = null;    // {starId}
   var hoverTip = null, hoverStar = null;
@@ -27,6 +26,10 @@ globalThis.HOO = globalThis.HOO || {};
     // drop state tied to the previous frame's DOM / galaxy
     hoverTip = null; banner = null; bannerText = null; starfield = null;
     hoverStar = null; dragging = null; pointers = {}; pinch = null; suppressTap = false;
+    // an order awaiting a destination click must not survive into a different
+    // galaxy: the stored star ids would address the wrong (or no) system
+    transportMode = null; relocMode = null;
+    if (HOO.Panels && HOO.Panels.clearPendingOrders) HOO.Panels.clearPendingOrders();
     resize();
     if (!resizeBound) {
       resizeBound = true;
@@ -291,7 +294,7 @@ globalThis.HOO = globalThis.HOO || {};
   }
 
   function cancelModesQuiet() {
-    deployMode = null; transportMode = null; relocMode = null;
+    transportMode = null; relocMode = null;
   }
 
   function centerOn(starId) {
@@ -333,7 +336,7 @@ globalThis.HOO = globalThis.HOO || {};
     // unexplored names stay hidden — same as the map labels and the sidebar
     var html = '<div class="t-name">' + (known ? U.esc(s.name) : 'Uncharted System') + '</div>';
     if (!known) {
-      html += '<div class="t-sub">Unexplored ' + s.color + ' star</div>';
+      html += '<div class="t-sub">Unexplored ' + U.esc(s.color) + ' star</div>';
     } else if (!s.planet) {
       html += '<div class="t-sub">No habitable planets</div>';
     } else {
@@ -343,7 +346,7 @@ globalThis.HOO = globalThis.HOO || {};
       html += '<div class="t-sub">' + def.name + ' · size ' + Math.round(p.size) + (sp.name ? ' · ' + sp.name : '') + '</div>';
       if (p.colony) {
         var emp = g.empires[p.colony.empire];
-        html += '<div class="t-sub" style="color:' + emp.color + '">' + U.esc(HOO.DATA.raceById[emp.raceId].name) + ' colony · pop ' + Math.round(p.colony.pop) + '</div>';
+        html += '<div class="t-sub" style="color:' + U.safeColor(emp.color) + '">' + U.esc(HOO.DATA.raceById[emp.raceId].name) + ' colony · pop ' + Math.round(p.colony.pop) + '</div>';
       }
     }
     if (s.orion && g.guardian.alive) html += '<div class="t-sub" style="color:#E8635A">Guarded by something vast</div>';
@@ -353,7 +356,7 @@ globalThis.HOO = globalThis.HOO || {};
   function showTipFleet(f, mx, my) {
     var g = HOO.game;
     var emp = g.empires[f.empire];
-    var html = '<div class="t-name" style="color:' + emp.color + '">' + U.esc(HOO.DATA.raceById[emp.raceId].name) + ' fleet</div>';
+    var html = '<div class="t-name" style="color:' + U.safeColor(emp.color) + '">' + U.esc(HOO.DATA.raceById[emp.raceId].name) + ' fleet</div>';
     var sub = HOO.Fleet.shipCount(f) + ' ships';
     if (f.at === null) {
       // enemy ETAs need the Advanced Space Scanner (manual: Deep Space Scanners)
@@ -377,15 +380,13 @@ globalThis.HOO = globalThis.HOO || {};
   function hideTip() { if (hoverTip) hoverTip.style.display = 'none'; }
 
   // ---------- modes ----------
-  function setDeployMode(m) { deployMode = m; markDirty(); }
   function setTransportMode(m) { transportMode = m; markDirty(); }
   function setRelocMode(m) { relocMode = m; markDirty(); }
   function cancelModes() {
-    deployMode = null; transportMode = null; relocMode = null;
+    transportMode = null; relocMode = null;
     markDirty();
     if (selectedStar !== null) HOO.Panels.showStar(selectedStar);
   }
-  function getModes() { return { deploy: deployMode, transport: transportMode, reloc: relocMode }; }
 
   function select(starId) { selectedStar = starId; selectedFleet = null; markDirty(); }
   function selectFleet(f) { selectedFleet = f; selectedStar = null; markDirty(); }
@@ -409,7 +410,13 @@ globalThis.HOO = globalThis.HOO || {};
       if (!canvas.parentNode) return;       // frame torn down
       requestAnimationFrame(frame);
       if (document.hidden) return;
-      var animating = selectedStar !== null || selectedFleet !== null || dragging;
+      // A colony is selected for almost the whole game, so the pulse cadence
+      // would otherwise repaint the entire scene at 30fps forever — including
+      // behind a full-screen panel or in an unfocused window. Pulse only when
+      // the board is actually on screen and being looked at; a dirty frame
+      // still draws immediately either way.
+      var occluded = !document.hasFocus() || (HOO.UI && HOO.UI.hasOverlay && HOO.UI.hasOverlay());
+      var animating = !occluded && (selectedStar !== null || selectedFleet !== null || dragging);
       var wait = dirty ? 0 : (animating ? 33 : 250);
       if (ts - last < wait) return;
       pulse += Math.min(0.12, Math.max(0, (ts - last)) * 0.0024); // 0.04/frame at 60fps
@@ -472,10 +479,6 @@ globalThis.HOO = globalThis.HOO || {};
         ctx.stroke();
       });
     }
-
-    // deploy line preview
-    var dm = deployMode || transportMode || relocMode;
-    if (dm && hoverTip) { /* line drawn on hover target in modes below */ }
 
     // relocation lines
     HOO.Colony.colonies(g, 0).forEach(function (e) {
@@ -756,8 +759,8 @@ globalThis.HOO = globalThis.HOO || {};
 
   HOO.Map = {
     init: init, fitView: fitView, select: select, selectFleet: selectFleet, getSelected: getSelected,
-    setDeployMode: setDeployMode, setTransportMode: setTransportMode, setRelocMode: setRelocMode,
-    cancelModes: cancelModes, getModes: getModes,
+    setTransportMode: setTransportMode, setRelocMode: setRelocMode,
+    cancelModes: cancelModes,
     centerOn: centerOn, clearSelection: clearSelection,
     setShowRanges: setShowRanges, getShowRanges: getShowRanges,
     requestDraw: markDirty

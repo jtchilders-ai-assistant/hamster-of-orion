@@ -123,7 +123,7 @@ Or none of them.
 There are two paths to mastery of the galaxy:
 
 ### 1. Diplomatic Victory (Council Election)
-When more than half the galaxy has been colonized, the High Council forms to elect a Master of Orion. Through cunning alliances, strategic trades, and careful diplomacy, secure a two-thirds majority vote. Races vote based on their relationship with you, their fear of your military, and your total population.
+When two-thirds of the galaxy has been colonized, the High Council forms to elect a Master of Orion. Through cunning alliances, strategic trades, and careful diplomacy, secure a two-thirds majority vote. Races vote based on their relationship with you, their fear of your military, and your total population.
 
 Accept the Council's decision and rule through legitimacy, or reject it and prove your worth through fire and blood.
 
@@ -152,7 +152,7 @@ But the *scale* is absurd.
 
 This is the game's core tension: **dignified ridiculousness**.
 
-The UI treats everything with gravitas. The music is sweeping and epic. The writing never winks at the camera. But the *scenario* is inherently silly, and that contrast is where the humor lives.
+The UI treats everything with gravitas. The writing never winks at the camera. But the *scenario* is inherently silly, and that contrast is where the humor lives.
 
 ### Examples of Tone:
 

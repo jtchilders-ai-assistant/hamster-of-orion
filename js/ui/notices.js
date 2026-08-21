@@ -36,10 +36,20 @@ globalThis.HOO = globalThis.HOO || {};
       var ch = HOO.Research.choices(emp0, n.tech.cat);
       if (ch.length > 1) {
         opts.sticky = true;
+        // one standing offer per field: a newer discovery supersedes the older
+        // prompt rather than stacking a second, stale one beside it
+        opts.key = 'research:' + n.tech.cat;
         opts.buttons = ch.map(function (t) {
           return {
             label: '→ ' + t.name + ' (lv ' + t.level + ')',
-            fn: function () { HOO.Research.startProject(emp0, n.tech.cat, t.id); }
+            fn: function () {
+              // the offer may have gone stale (tech since acquired by theft,
+              // trade or conquest) — only act if it is still a live choice
+              var live = HOO.Research.choices(emp0, n.tech.cat);
+              for (var i = 0; i < live.length; i++) {
+                if (live[i].id === t.id) { HOO.Research.startProject(emp0, n.tech.cat, t.id); return; }
+              }
+            }
           };
         });
         opts.text = n.text + ' Choose our next ' + HOO.CONST.FIELD_NAMES[n.tech.cat] + ' project:';
@@ -78,7 +88,7 @@ globalThis.HOO = globalThis.HOO || {};
       };
     }
     HOO.UI.toast({
-      tag: 'Colonial Administration', kind: 'green', sticky: true,
+      tag: 'Colonial Administration', kind: 'green', sticky: true, key: 'ecoboost',
       text: tech.name + ' opens ecology projects on ' + open + (open === 1 ? ' world' : ' worlds') + '. Raise Eco spending to begin the work? (Drawn from tech, then industry, bases and ships; returned to research on completion.)',
       buttons: [
         { label: '+10% Eco', fn: apply(10) },
@@ -92,6 +102,9 @@ globalThis.HOO = globalThis.HOO || {};
   // the Game menu (Message Log). Not serialized; it lives with the session.
   var history = [];
   function getHistory() { return history; }
+  // a new or loaded game starts a new chronicle — the previous empire's
+  // dispatches must not surface in its Message Log
+  function resetHistory() { history.length = 0; }
 
   // sequentially process turn results, then call done()
   function presentTurn(res, done) {
@@ -122,9 +135,10 @@ globalThis.HOO = globalThis.HOO || {};
       queue.push(function (next) { councilSession(res.council, next); });
     }
 
-    // 4. game over check
+    // 4. game over check (once — a player who chose to keep playing after the
+    // verdict must not be shown it again every cycle)
     queue.push(function (next) {
-      if (g.gameOver) gameOverScreen();
+      if (g.gameOver && !g.gameOver.acknowledged) gameOverScreen();
       next();
     });
 
@@ -152,6 +166,17 @@ globalThis.HOO = globalThis.HOO || {};
   // ---------- combat prompt ----------
   function promptCombat(pc, next) {
     var g = HOO.game;
+    // Battles were built during turn processing, but anything resolved since
+    // then (an AI-vs-AI fight at the same star, or an earlier prompt in this
+    // same queue) has already changed the fleets and bases those stacks were
+    // snapshotted from. Rebuild from live state so a second battle at one star
+    // cannot resurrect losses from the first. Monster sieges carry their own
+    // pre-built battle and have no buildBattle descriptor.
+    if (!pc.meta.monsterEvent) {
+      var fresh = HOO.Turn.buildBattle(g, pc.meta);
+      if (!fresh) return next(); // the fight no longer exists
+      pc.battle = fresh;
+    }
     var b = pc.battle;
     var star = b.star;
     var enemySide = b.sides[0].empId === 0 ? b.sides[1] : b.sides[0];
@@ -166,7 +191,7 @@ globalThis.HOO = globalThis.HOO || {};
 
     HOO.UI.dialog('Battle at ' + star.name,
       '<div class="narrative"><span class="speaker">Fleet Command</span>Our forces (' + mine + ' units) have engaged ' +
-      (enemySide.monster ? enemyName : 'the ' + enemyName) + ' (' + theirs + ' units) at ' + U.esc(star.name) + '.</div>',
+      (enemySide.monster ? U.esc(enemyName) : 'the ' + U.esc(enemyName)) + ' (' + theirs + ' units) at ' + U.esc(star.name) + '.</div>',
       [
         {
           label: 'Command the Battle', fn: function () {
@@ -197,7 +222,7 @@ globalThis.HOO = globalThis.HOO || {};
     var star = b.star;
     var playerWon = b.winner !== null && b.sides[b.winner] && b.sides[b.winner].empId === 0;
     var summary = playerWon ? 'Victory. The system is ours to command.' :
-      (b.winner === null ? 'Mutual annihilation over ' + star.name + '.' : 'Defeat. Surviving ships have withdrawn.');
+      (b.winner === null ? 'Mutual annihilation over ' + U.esc(star.name) + '.' : 'Defeat. Surviving ships have withdrawn.');
     // offer bombardment if we won over an enemy colony
     var buttons = [{ label: 'Continue', fn: next }];
     if (playerWon && star.planet && star.planet.colony && star.planet.colony.empire !== 0 &&
@@ -344,8 +369,10 @@ globalThis.HOO = globalThis.HOO || {};
         HOO.UI.dialog('A Verdict Is Reached', html, [
           {
             label: 'Accept — Claim the Wheel', fn: function () {
+              // acceptRuling sets g.gameOver; the queue's final step presents
+              // the game-over screen, so calling it here too would stack a
+              // duplicate dialog on the climax of the game
               HOO.Council.acceptRuling(g, rec);
-              gameOverScreen();
               next();
             }
           },
@@ -358,8 +385,8 @@ globalThis.HOO = globalThis.HOO || {};
         HOO.UI.dialog('A Verdict Is Reached', html, [
           {
             label: 'Accept Their Rule (Defeat)', cls: '', fn: function () {
+              // see above — the queue's game-over step presents this once
               HOO.Council.acceptRuling(g, rec);
-              gameOverScreen();
               next();
             }
           },
@@ -399,11 +426,23 @@ globalThis.HOO = globalThis.HOO || {};
       html = '<div class="narrative"><span class="speaker">The Chronicles</span>' + winnerTxt + ' The long memory of the ' + race.name + ' ends here — another name carved into the ruins for some future race to puzzle over.</div>';
     }
     html += '<p class="muted-t" style="margin-top:10px;">Cycle ' + g.year + ' · ' + (g.year - HOO.CONST.START_YEAR) + ' years of rule</p>';
-    HOO.UI.dialog(title, html, [
-      { label: 'Keep Playing', cls: '' },
-      { label: 'Main Menu', fn: function () { HOO.UI.closeAll(); HOO.NewGame.showTitle(); } }
-    ], true);
+    var buttons = [];
+    // an eliminated empire has nothing left to play on with — offering
+    // "Keep Playing" there just re-summons this dialog on every Enter
+    if (go.how !== 'eliminated') {
+      buttons.push({
+        label: 'Keep Playing', cls: '',
+        // remember the verdict was seen so the end of every later cycle does
+        // not re-open this dialog for the rest of the session
+        fn: function () { go.acknowledged = true; }
+      });
+    }
+    buttons.push({ label: 'Main Menu', fn: function () { HOO.UI.closeAll(); HOO.NewGame.showTitle(); } });
+    HOO.UI.dialog(title, html, buttons, true);
   }
 
-  HOO.Notices = { presentTurn: presentTurn, gameOverScreen: gameOverScreen, getHistory: getHistory };
+  HOO.Notices = {
+    presentTurn: presentTurn, gameOverScreen: gameOverScreen,
+    getHistory: getHistory, resetHistory: resetHistory
+  };
 })();

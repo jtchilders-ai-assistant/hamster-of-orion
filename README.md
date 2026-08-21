@@ -1,6 +1,21 @@
 # Hamster of Orion
 
+*An unaffiliated, non-commercial fan project. Not endorsed by the rights holders of Master of Orion — see [Disclaimer](#disclaimer).*
+
 A browser-based 4X strategy game that faithfully recreates the mechanics of *Master of Orion* (MicroProse, 1993), set in the Great Awakening universe described in `LORE.md`. One hundred twenty-three years after the pets of a vanished humanity achieved sentience, ten races contend for the galaxy — and for the Cosmic Wheel waiting behind Orion's barrier.
+
+## Play It
+
+**[▶ Play in your browser](https://jtchilders-ai-assistant.github.io/hamster-of-orion/)** — no install, no build step, nothing to download.
+
+To run it locally instead, clone the repo and open `index.html` directly (double-click it — there is no server or build step). Everything is vanilla HTML/CSS/JS loaded with plain `<script>` tags; the only network request is an optional Google Fonts stylesheet, and the game falls back to system fonts offline.
+
+```bash
+git clone https://github.com/jtchilders-ai-assistant/hamster-of-orion.git
+cd hamster-of-orion && open index.html
+```
+
+Browsing the source? [`docs/architecture.html`](docs/architecture.html) is an interactive map of the 27 modules, what each one exposes, and the load order — open it in a browser.
 
 ## How to Play
 
@@ -41,7 +56,7 @@ Click a star to view it; click a fleet triangle to command it. With a fleet sele
 
 Minor reports (surveys, spy captures, construction) arrive as dismissable dispatches over the map — click one to jump to the system it mentions. Only battles, wars, first contact, GNN crises, and the High Council interrupt you. An alert bar under the header flags colonies in trouble (waste, rebellion, plague, decline); click a chip to go there. Colony panels include one-click allocation presets — Develop, Defend, Research, Shipyard — and shift-clicking a preset applies it to every colony.
 
-Keyboard: **Enter** turns the Wheel · **Esc** closes/cancels · **1–6** open Design, Fleet, Races, Planets, Tech, Status · **G** game menu · **Tab** cycles colonies · **F** cycles fleets · **H** jumps home.
+Keyboard: **Enter** turns the Wheel · **Esc** closes/cancels · **1–6** open Design, Fleet, Races, Planets, Tech, Status · **G** game menu · **?** help & shortcuts · **Tab** cycles colonies · **F** cycles fleets · **H** jumps home.
 
 *"The Wheel turns whether you run in it or not. Better to run, and make it turn your way."*
 

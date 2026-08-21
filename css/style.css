@@ -80,6 +80,7 @@ button { font-family: inherit; color: inherit; }
   padding: 7px 14px;
   cursor: pointer;
   transition: border-color 0.15s, background 0.15s, color 0.15s;
+  -webkit-user-select: none;
   user-select: none;
 }
 .btn:hover:not(:disabled) { border-color: var(--gold); color: var(--gold); }
@@ -281,6 +282,7 @@ button { font-family: inherit; color: inherit; }
 .station-overlay {
   position: fixed; inset: 0;
   background: rgba(6, 9, 15, 0.82);
+  -webkit-backdrop-filter: blur(3px);
   backdrop-filter: blur(3px);
   display: flex; align-items: center; justify-content: center;
   z-index: 40;
@@ -590,7 +592,9 @@ table.data td.r, table.data th.r { text-align: right; }
   line-height: 1;
 }
 .toast .t-x:hover { color: var(--ink); }
-.toast.fadeout { opacity: 0; transition: opacity 0.5s; }
+/* pointer-events off so a dismissed toast cannot be clicked again during the
+   half-second it spends fading out (its buttons would fire twice) */
+.toast.fadeout { opacity: 0; transition: opacity 0.5s; pointer-events: none; }
 @keyframes toastin { from { opacity: 0; transform: translateX(14px); } }
 @media (prefers-reduced-motion: reduce) {
   .toast { animation: none; }

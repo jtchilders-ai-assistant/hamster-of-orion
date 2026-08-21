@@ -34,8 +34,10 @@ globalThis.HOO = globalThis.HOO || {};
   }
 
   function doLoad(slot) {
-    if (HOO.State.load(slot)) { HOO.UI.closeAll(); HOO.Main.rebuild(); }
-    else HOO.UI.dialog('Archive Damaged', 'Save slot ' + slot + ' could not be read — it may be corrupt or from a newer build.');
+    HOO.UI.closeAll();
+    if (!HOO.Main.switchGame(function () { return HOO.State.load(slot); })) {
+      HOO.UI.dialog('Archive Damaged', 'Save slot ' + slot + ' could not be read — it may be corrupt or from a newer build.');
+    }
   }
 
   function deleteSave(slot) {
@@ -96,8 +98,10 @@ globalThis.HOO = globalThis.HOO || {};
       if (!file) return;
       var reader = new FileReader();
       reader.onload = function () {
-        if (HOO.State.importString(String(reader.result))) { HOO.UI.closeAll(); HOO.Main.rebuild(); }
-        else HOO.UI.dialog('Import Failed', 'That file is not a valid Hamster of Orion save (or comes from a newer build).');
+        HOO.UI.closeAll();
+        if (!HOO.Main.switchGame(function () { return HOO.State.importString(String(reader.result)); })) {
+          HOO.UI.dialog('Import Failed', 'That file is not a valid Hamster of Orion save (or comes from a newer build).');
+        }
       };
       reader.readAsText(file);
     });
@@ -603,7 +607,7 @@ globalThis.HOO = globalThis.HOO || {};
       card.appendChild(el('div', { style: 'display:flex; align-items:center; gap:8px;' }, [
         el('span', { style: 'font-size:20px;', text: race.glyph }),
         el('div', {}, [
-          el('div', { style: 'font-family:var(--font-display); font-weight:600; color:' + emp.color, text: race.name }),
+          el('div', { style: 'font-family:var(--font-display); font-weight:600; color:' + U.safeColor(emp.color), text: race.name }),
           el('div', { cls: 'dim-t', style: 'font-size:11px;', text: U.esc(emp.leaderName) + ' · ' + HOO.DATA.PERSONALITIES[emp.personality].name + ' ' + HOO.DATA.OBJECTIVES[emp.objective].name })
         ])
       ]));
@@ -1228,7 +1232,7 @@ globalThis.HOO = globalThis.HOO || {};
       known.forEach(function (e) {
         var v = cat[1](e);
         var row = el('div', { style: 'display:grid; grid-template-columns:110px 1fr; gap:8px; align-items:center; margin:3px 0;' });
-        row.appendChild(el('div', { cls: 'mono', style: 'font-size:11px; color:' + e.color, text: HOO.DATA.raceById[e.raceId].name }));
+        row.appendChild(el('div', { cls: 'mono', style: 'font-size:11px; color:' + U.safeColor(e.color), text: HOO.DATA.raceById[e.raceId].name }));
         var bar = el('div', { style: 'height:10px; background:var(--void-2); border:1px solid var(--line); border-radius:3px; overflow:hidden;' });
         // any nonzero value gets a visible sliver — log scaling can round to 0%
         var pctW = v > 0 ? Math.max(2, Math.round(Math.log(1 + v) / Math.log(1 + max) * 100)) : 0;

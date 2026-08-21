@@ -151,11 +151,15 @@ globalThis.HOO = globalThis.HOO || {};
           }
         }
       }
-      if (sd.withBases && opts.star && opts.star.planet.colony && opts.star.planet.colony.bases > 0) {
+      // many stars have no planet at all (rollPlanet returns null), so every
+      // planet dereference here needs the guard — an interdictor-equipped
+      // defender meeting a fleet at a barren star used to abort the turn
+      var col = opts.star && opts.star.planet ? opts.star.planet.colony : null;
+      if (sd.withBases && col && col.bases > 0) {
         b.stacks.push(baseStack(g, emp, opts.star, side));
       }
-      if (emp && emp.derived.hasInterdictor && side === 1 && opts.star && opts.star.planet.colony &&
-        opts.star.planet.colony.empire === emp.id) b.interdictor = true;
+      if (emp && emp.derived.hasInterdictor && side === 1 && col &&
+        col.empire === emp.id) b.interdictor = true;
     });
 
     // nebula: deflector shields are inoperative for every combatant (manual: Nebulas);

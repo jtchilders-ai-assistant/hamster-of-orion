@@ -259,6 +259,11 @@ globalThis.HOO = globalThis.HOO || {};
 
   // land one transport: ground resolution plus player-facing notices
   function landTransport(g, t) {
+    // this year's landings were extracted before ground combat ran, so the
+    // owner may have been eliminated by an earlier landing in the same batch —
+    // a dead empire must not invade, or it founds a colony no loop will process
+    var owner = g.empires[t.empire];
+    if (!owner || owner.dead) return;
     var ns = HOO.Ground.resolveLanding(g, t);
     ns.forEach(function (n) {
       var star = g.stars[t.to];
@@ -279,7 +284,6 @@ globalThis.HOO = globalThis.HOO || {};
         weaponIds: ['stellar_converter', 'plasma_torpedoes', 'death_ray', 'scatter_pack_x'],
         weaponCount: 3, specials: {}
       };
-      g.guardian.monsterRef = mon;
       return HOO.Combat.createBattle(g, {
         star: star,
         attacker: { empId: cb.attackerEmp, fleets: fleets },
@@ -322,7 +326,10 @@ globalThis.HOO = globalThis.HOO || {};
       return;
     }
     if (cb.guardian) {
-      var mon = g.guardian.monsterRef;
+      // read the monster from this battle, not a shared field: two empires can
+      // fight the Guardian in the same year and the later build would otherwise
+      // overwrite the reference the player's battle needs
+      var mon = battle && battle.sides[1] ? battle.sides[1].monster : null;
       if (mon && mon.hits <= 0) {
         g.guardian.alive = false;
         g.notices.push({
@@ -356,6 +363,6 @@ globalThis.HOO = globalThis.HOO || {};
 
   HOO.Turn = {
     nextTurn: nextTurn, powerOf: powerOf, powerRank: powerRank,
-    eliminateEmpire: eliminateEmpire, afterBattle: afterBattle
+    eliminateEmpire: eliminateEmpire, afterBattle: afterBattle, buildBattle: buildBattle
   };
 })();

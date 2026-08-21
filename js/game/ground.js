@@ -131,6 +131,10 @@ globalThis.HOO = globalThis.HOO || {};
         if (o.id === attId || o.dead) return;
         HOO.Diplomacy.adjust(g, o.id, attId, -8, true);
       });
+      // bombing out the last colony ends the empire now, exactly as an invasion
+      // or a monster does — otherwise its fleets fight on for another year and
+      // the victory/defeat check is a turn late
+      if (!HOO.Colony.colonies(g, defEmp.id).length) HOO.Turn.eliminateEmpire(g, defEmp);
     }
     return report;
   }

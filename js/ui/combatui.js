@@ -11,12 +11,17 @@ globalThis.HOO = globalThis.HOO || {};
   var battle, playerSide, current, awaiting, autoMode, onDoneCb, finished;
   var cellW = 72, cellH = 64, pad = 8;
   var hoverCell = null;
+  // logical (CSS-pixel) board size; the backing store is this times the device
+  // pixel ratio so the tactical grid is not blurry on HiDPI displays
+  var boardW = 0, boardH = 0, boardDpr = 1;
 
   // combat has its own control surface: swallow global hotkeys (Enter, G, 1-6,
   // Tab, Escape...) while the battle overlay is up, since it bypasses HOO.UI's
   // overlay registry and hasOverlay() cannot see it
   function keyBlock(e) {
-    if (e.key === 'Escape' || e.key === 'Tab') e.preventDefault();
+    // Tab must keep moving focus, or the battle controls are unreachable
+    // without a mouse; only Escape is swallowed (a battle cannot be dismissed)
+    if (e.key === 'Escape') e.preventDefault();
     e.stopPropagation();
   }
 
@@ -45,8 +50,13 @@ globalThis.HOO = globalThis.HOO || {};
 
     var gw = el('div', { cls: 'combat-grid-wrap' });
     canvas = el('canvas', { id: 'combat-canvas' });
-    canvas.width = C().COLS * cellW + pad * 2;
-    canvas.height = C().ROWS * cellH + pad * 2;
+    boardW = C().COLS * cellW + pad * 2;
+    boardH = C().ROWS * cellH + pad * 2;
+    boardDpr = window.devicePixelRatio || 1;
+    canvas.width = boardW * boardDpr;
+    canvas.height = boardH * boardDpr;
+    canvas.style.width = boardW + 'px';
+    canvas.style.height = boardH + 'px';
     ctx = canvas.getContext('2d');
     gw.appendChild(canvas);
     screen.appendChild(gw);
@@ -244,7 +254,7 @@ globalThis.HOO = globalThis.HOO || {};
   // ---------- input ----------
   function cellFromEvent(e) {
     var r = canvas.getBoundingClientRect();
-    var sx = canvas.width / r.width, sy = canvas.height / r.height;
+    var sx = boardW / r.width, sy = boardH / r.height;
     var x = Math.floor(((e.clientX - r.left) * sx - pad) / cellW);
     var y = Math.floor(((e.clientY - r.top) * sy - pad) / cellH);
     if (x < 0 || x >= C().COLS || y < 0 || y >= C().ROWS) return null;
@@ -311,7 +321,8 @@ globalThis.HOO = globalThis.HOO || {};
   // ---------- rendering ----------
   function render() {
     if (!ctx) return;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.setTransform(boardDpr, 0, 0, boardDpr, 0, 0);
+    ctx.clearRect(0, 0, boardW, boardH);
 
     // grid
     ctx.strokeStyle = 'rgba(38,49,73,0.7)';
