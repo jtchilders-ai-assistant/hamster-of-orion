@@ -562,9 +562,12 @@ globalThis.HOO = globalThis.HOO || {};
       if (n <= 0 || !emp.designs[slot]) return;
       var dsg = emp.designs[slot];
       var row = el('div', { style: 'display:grid; grid-template-columns: 1fr auto; gap:6px; align-items:center; margin:6px 0;' });
-      var lab = el('div', {}, [
+      var lab = el('div', {
+        style: 'cursor:pointer;', title: 'View class specifications',
+        onclick: function () { HOO.Screens.designSpecs(emp, dsg, n); }
+      }, [
         el('div', { style: 'font-size:13px;', text: dsg.name }),
-        el('div', { cls: 'dim-t mono', style: 'font-size:10px;', text: 'warp ' + dsg.warp + ' · ' + n + ' in fleet' })
+        el('div', { cls: 'dim-t mono', style: 'font-size:10px;', text: 'warp ' + dsg.warp + ' · ' + n + ' in fleet · specs ▸' })
       ]);
       var ctl = el('div', { style: 'display:flex; gap:3px; align-items:center;' });
       var num = el('span', { cls: 'mono', style: 'width:38px; text-align:center;', text: String(counts[slot]) });

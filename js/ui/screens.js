@@ -272,6 +272,55 @@ globalThis.HOO = globalThis.HOO || {};
     HOO.UI.modal(wrap, { title: 'Ship Design Bureau', width: 980 });
   }
 
+  // ================= SHIP CLASS SPECS =================
+  function designSpecs(emp, d, activeCount) {
+    var content = el('div', {});
+    function section(title) {
+      content.appendChild(el('div', { cls: 'eyebrow', style: 'margin-top:10px; display:block;', text: title }));
+    }
+    function row(k, v, sub) {
+      content.appendChild(el('div', { cls: 'kv' }, [
+        el('span', { cls: 'k', text: k }),
+        el('span', { cls: 'v', text: v + (sub ? ' · ' + sub : '') })
+      ]));
+    }
+    var T = HOO.DATA.techById;
+    var hullName = HOO.ShipDesign.hull(d.hullId).name;
+
+    content.appendChild(el('div', { cls: 'dim-t mono', style: 'font-size:11px;', text: hullName + ' hull · ' + U.fmt(d.cost) + ' BC' + (activeCount != null ? ' · ' + activeCount + ' in service' : '') }));
+
+    section('Systems');
+    row('Engines', T[d.engineId].name, 'warp ' + d.warp);
+    row('Computer', d.computerId ? T[d.computerId].name : 'None', d.computerId ? '+' + T[d.computerId].effect.mark + ' attack' : '');
+    row('Shield', d.shieldId ? T[d.shieldId].name : 'None', d.shieldId ? 'absorbs ' + d.shieldCls : '');
+    row('ECM', d.ecmId ? T[d.ecmId].name : 'None', d.ecmId ? 'mark ' + d.ecmMark : '');
+    row('Armor', T[d.armorId].name + (d.doubleArmor ? ' II' : ''), d.hits + ' hit points');
+
+    section('Weapons');
+    if (!d.weapons.length) {
+      content.appendChild(el('div', { cls: 'muted-t', style: 'font-size:12px;', text: 'None — this class is unarmed and cannot attack.' }));
+    }
+    d.weapons.forEach(function (w) {
+      var e = T[w.id].effect;
+      row(w.count + '× ' + T[w.id].name, e.wclass, e.dmin + '-' + e.dmax + ' dmg · range ' + (e.range || 1));
+    });
+
+    section('Special Devices');
+    if (!d.specials.length) content.appendChild(el('div', { cls: 'muted-t', style: 'font-size:12px;', text: 'None' }));
+    d.specials.forEach(function (sid) {
+      row(T[sid].name, HOO.DATA.SPECIAL_STATS[T[sid].effect.special].desc);
+    });
+
+    section('Performance');
+    row('Attack level', String(d.attack));
+    row('Defense', String(d.defense));
+    row('Initiative', String(d.initiative));
+    row('Combat speed', String(d.combatSpeed));
+    if (d.extraRange) row('Fuel range', '+' + d.extraRange + ' pc', 'reserve tanks');
+
+    HOO.UI.modal(content, { title: d.name + ' — Class Specifications', width: 560 });
+  }
+
   // ================= FLEET SCREEN =================
   function fleetScreen() {
     var g = HOO.game;
@@ -289,7 +338,12 @@ globalThis.HOO = globalThis.HOO || {};
         card.appendChild(el('div', { cls: 'dim-t mono', style: 'font-size:11px;', text: d.hullId + ' · warp ' + d.warp + ' · ' + U.fmt(d.cost) + ' BC · ' + count + ' active' }));
         var wl = d.weapons.map(function (w) { return w.count + '× ' + HOO.DATA.techById[w.id].name; }).join(', ');
         card.appendChild(el('div', { cls: 'muted-t', style: 'font-size:11px; margin:3px 0;', text: wl || 'Unarmed' }));
-        card.appendChild(el('button', {
+        var btns = el('div', { style: 'display:flex; gap:6px;' });
+        btns.appendChild(el('button', {
+          cls: 'btn small', text: 'Specs',
+          onclick: function () { designSpecs(emp, d, count); }
+        }));
+        btns.appendChild(el('button', {
           cls: 'btn small danger', text: 'Scrap Class',
           onclick: function () {
             HOO.UI.dialog('Scrap ' + d.name + '?', 'All ' + count + ' ships of this class will be decommissioned. 25% of their cost returns to the Planetary Reserve.', [
@@ -298,6 +352,7 @@ globalThis.HOO = globalThis.HOO || {};
             ]);
           }
         }));
+        card.appendChild(btns);
       } else {
         card.appendChild(el('div', { cls: 'dim-t', text: 'Empty berth' }));
       }
@@ -792,5 +847,5 @@ globalThis.HOO = globalThis.HOO || {};
     HOO.UI.modal(content, { title: 'Galactic Status', width: 640 });
   }
 
-  HOO.Screens = { open: open, audienceScreen: audienceScreen, statusScreen: statusScreen };
+  HOO.Screens = { open: open, audienceScreen: audienceScreen, statusScreen: statusScreen, designSpecs: designSpecs };
 })();

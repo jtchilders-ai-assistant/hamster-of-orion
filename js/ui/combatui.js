@@ -27,6 +27,7 @@ globalThis.HOO = globalThis.HOO || {};
     titleEl = el('div', { style: 'font-family:var(--font-display); font-weight:700; letter-spacing:0.06em; text-transform:uppercase;', text: 'Battle of ' + b.star.name });
     top.appendChild(titleEl);
     top.appendChild(el('div', { cls: 'spacer', style: 'flex:1;' }));
+    top.appendChild(el('div', { cls: 'stat mono', id: 'combat-current', text: '' }));
     top.appendChild(el('div', { cls: 'stat mono', id: 'combat-round', text: 'Round 1' }));
     screen.appendChild(top);
 
@@ -92,6 +93,8 @@ globalThis.HOO = globalThis.HOO || {};
     current = s;
     var roundEl = document.getElementById('combat-round');
     if (roundEl) roundEl.textContent = 'Round ' + battle.round + ' / ' + HOO.CONST.COMBAT_MAX_TURNS;
+    var curEl = document.getElementById('combat-current');
+    if (curEl) curEl.textContent = s.name + ' ×' + s.count + ' — ' + armamentSummary(s);
 
     if (s.side === playerSide && !autoMode && s.kind !== 'monster') {
       awaiting = true;
@@ -123,6 +126,28 @@ globalThis.HOO = globalThis.HOO || {};
       if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
       if (onDoneCb) onDoneCb(battle);
     }, 700);
+  }
+
+  function armamentSummary(s) {
+    if (!s.weapons.length) return 'unarmed';
+    return s.weapons.map(function (w) { return w.count + '× ' + w.tech.name; }).join(', ');
+  }
+
+  // why an attack click on an enemy did nothing
+  function cantFireReason(s, t) {
+    if (!s.weapons.length) return s.name + ' carries no weapons — it cannot attack.';
+    var hasShots = s.weapons.some(function (w) { return w.shotsLeft > 0; });
+    if (!hasShots) return s.name + ' has expended all ammunition.';
+    var onlyMissiles = s.weapons.every(function (w) {
+      return w.shotsLeft <= 0 || w.tech.effect.wclass === 'missile';
+    });
+    if (onlyMissiles && !s.missilesOn) return 'Missiles are held. Toggle Missiles to fire.';
+    var onlyBombs = s.weapons.every(function (w) {
+      var wc = w.tech.effect.wclass;
+      return w.shotsLeft <= 0 || wc === 'bomb' || wc === 'bio';
+    });
+    if (onlyBombs && !t.planetary) return 'Bombs can only target the planet.';
+    return 'Target out of range. Move closer.';
   }
 
   // ---------- input ----------
@@ -171,7 +196,7 @@ globalThis.HOO = globalThis.HOO || {};
         });
         if (!anyLeft || battle.over) { current.done = true; awaiting = false; step(); }
       } else {
-        log('Target out of range. Move closer.');
+        log(cantFireReason(current, t));
         renderLog();
       }
     } else if (!t) {
