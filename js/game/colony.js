@@ -204,6 +204,21 @@ globalThis.HOO = globalThis.HOO || {};
       if (c.transferFund < 0.5) c.transferFund = 0;
     }
 
+    // factories full and fitted to current robotic controls: the Ind bar has
+    // nothing left to buy, so hand it to research. Player colonies only — the
+    // AI re-plans its bars every year. Uses the clean-planet cap (waste
+    // ignored) so a temporary waste spike can't trigger the shift early.
+    if (emp.isPlayer && c.alloc.ind >= 0.5 && c.controls >= d.controls &&
+      !(c.locks && (c.locks.ind || c.locks.tech))) {
+      var cleanMaxFact = Math.max(10, p.size) * Math.min(d.controls, c.controls);
+      if (c.factories >= cleanMaxFact) {
+        var movedInd = c.alloc.ind;
+        c.alloc.ind = 0;
+        c.alloc.tech += movedInd;
+        notices.push({ type: 'eco', text: starObj.name + ' has reached maximum factories — ' + Math.round(movedInd) + '% industry allocation moved to research. (Lock the Ind bar to route surplus industry to the reserve instead.)' });
+      }
+    }
+
     var mm = mineralMult(starObj);
     var a = c.alloc;
     var shipBC = spend * a.ship / 100 * mm;
@@ -378,6 +393,19 @@ globalThis.HOO = globalThis.HOO || {};
       }
     }
 
+    // an auto-boosted Eco bar (applyEcoBoost) hands its boost back to research
+    // once every finite ecology project on this world is complete, keeping at
+    // least the clean minimum behind
+    if (c.ecoBoost > 0 && !ecoWorkRemaining(emp, starObj)) {
+      var giveBack = Math.min(c.ecoBoost, Math.max(0, c.alloc.eco - ecoMinPct(emp, starObj)));
+      c.ecoBoost = 0;
+      if (giveBack > 0.5 && !(c.locks && (c.locks.eco || c.locks.tech))) {
+        c.alloc.eco -= giveBack;
+        c.alloc.tech += giveBack;
+        notices.push({ type: 'eco', text: starObj.name + ': ecology projects complete — ' + Math.round(giveBack) + '% of production returned to research.' });
+      }
+    }
+
     // ---------- TECH ----------
     if (techBC > 0 && !c.quarantine && !c.novaThreat) {
       research = techBC * researchMult(starObj);
@@ -386,22 +414,62 @@ globalThis.HOO = globalThis.HOO || {};
     return { research: research, notices: notices };
   }
 
-  // raise the eco allocation to needPct, drawing from unlocked bars proportionally
-  function raiseEco(c, needPct) {
-    var keys = ['ship', 'def', 'ind', 'tech'];
+  // automatic reallocations always draw from the same bars in the same order:
+  // research first, then industry, then bases, then ships
+  var DRAW_ORDER = ['tech', 'ind', 'def', 'ship'];
+
+  // move up to `want` percentage points onto c.alloc[toKey], drawing from the
+  // unlocked source bars in DRAW_ORDER; returns the points actually moved.
+  // Callers are responsible for checking the destination bar's own lock.
+  function shiftAlloc(c, toKey, want) {
     var locks = c.locks || {};
-    var lockedSum = 0;
-    keys.forEach(function (k) { if (locks[k]) lockedSum += c.alloc[k]; });
-    needPct = Math.min(needPct, 100 - lockedSum);
-    if (needPct <= c.alloc.eco) return;
-    var free = keys.filter(function (k) { return !locks[k]; });
-    var freeSum = 0;
-    free.forEach(function (k) { freeSum += c.alloc[k]; });
-    var take = Math.min(needPct - c.alloc.eco, freeSum);
-    c.alloc.eco += take;
-    if (freeSum > 0) {
-      free.forEach(function (k) { c.alloc[k] = Math.max(0, c.alloc[k] - take * c.alloc[k] / freeSum); });
-    }
+    var moved = 0;
+    DRAW_ORDER.forEach(function (k) {
+      if (k === toKey || locks[k] || moved >= want) return;
+      var take = Math.min(c.alloc[k], want - moved);
+      c.alloc[k] -= take;
+      moved += take;
+    });
+    c.alloc[toKey] += moved;
+    return moved;
+  }
+
+  // raise the eco allocation to needPct, drawing tech → ind → def → ship
+  function raiseEco(c, needPct) {
+    if (needPct <= c.alloc.eco) return 0;
+    return shiftAlloc(c, 'eco', needPct - c.alloc.eco);
+  }
+
+  // is any finite ecology project (atmospheric conversion, soil enrichment,
+  // terraforming) still open on this world? Mirrors the project ladder in
+  // processColony; pop-boosting is open-ended and deliberately not counted.
+  function ecoWorkRemaining(emp, starObj) {
+    var p = starObj.planet;
+    var d = emp.derived;
+    var def = HOO.CONST.PLANET_TYPES[p.type];
+    if (def.hostility > 0 && d.canAtmos && !p.envConverted) return true;
+    if (def.hostility === 0 && d.canSoil && p.special === 'none') return true;
+    if (def.hostility === 0 && d.canAdvSoil && (p.special === 'none' || p.special === 'fertile')) return true;
+    if (d.terraformAdd > p.terraformed) return true;
+    return false;
+  }
+
+  // raise Eco by `pct` points on every colony with an open ecology project,
+  // sourced tech → ind → def → ship. The added points are remembered on the
+  // colony (c.ecoBoost) and handed back to research when its projects finish.
+  function applyEcoBoost(g, emp, pct) {
+    var boosted = 0;
+    colonies(g, emp.id).forEach(function (e) {
+      var c = e.colony;
+      if (c.inRebellion || (c.locks && c.locks.eco)) return;
+      if (!ecoWorkRemaining(emp, e.star)) return;
+      var moved = shiftAlloc(c, 'eco', pct);
+      if (moved > 0) {
+        c.ecoBoost = (c.ecoBoost || 0) + moved;
+        boosted++;
+      }
+    });
+    return boosted;
   }
 
   // manual (Planetology): Soil Enrichment raises max population 25%, Advanced
@@ -486,6 +554,7 @@ globalThis.HOO = globalThis.HOO || {};
     create: create, colonies: colonies, maxPop: maxPop, rawProduction: rawProduction,
     empireEconomy: empireEconomy, processColony: processColony, growPopulation: growPopulation,
     ecoCleanNeed: ecoCleanNeed, ecoCleanPct: ecoCleanPct, ecoMinPct: ecoMinPct, spendEstimate: spendEstimate,
+    raiseEco: raiseEco, ecoWorkRemaining: ecoWorkRemaining, applyEcoBoost: applyEcoBoost,
     factoryCostAt: factoryCostAt, mineralMult: mineralMult, researchMult: researchMult,
     envGrowthMult: envGrowthMult, bestMissileLevel: bestMissileLevel,
     MISSILE_BASE_COST: MISSILE_BASE_COST, STARGATE_COST: STARGATE_COST, star: star

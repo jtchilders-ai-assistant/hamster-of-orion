@@ -318,27 +318,12 @@ globalThis.HOO = globalThis.HOO || {};
     c.locks = {};
   }
 
-  // mirror of the engine's end-of-turn eco auto-raise (colony.js raiseEco):
+  // the engine's end-of-turn eco auto-raise (colony.js raiseEco), applied live:
   // keep an unlocked Eco bar at the clean minimum whenever any bar changes,
-  // stealing proportionally from the unlocked ship/def/ind/tech bars
+  // drawing from the unlocked bars in order: tech, ind, def, ship
   function enforceEcoFloor(emp, starObj, c) {
-    var locks = c.locks || {};
-    if (locks.eco) return;
-    var minPct = HOO.Colony.ecoMinPct(emp, starObj);
-    if (c.alloc.eco >= minPct) return;
-    var keys = ['ship', 'def', 'ind', 'tech'];
-    var lockedSum = 0;
-    keys.forEach(function (k) { if (locks[k]) lockedSum += c.alloc[k]; });
-    var needPct = Math.min(minPct, 100 - lockedSum);
-    if (needPct <= c.alloc.eco) return;
-    var free = keys.filter(function (k) { return !locks[k]; });
-    var freeSum = 0;
-    free.forEach(function (k) { freeSum += c.alloc[k]; });
-    var take = Math.min(needPct - c.alloc.eco, freeSum);
-    c.alloc.eco += take;
-    if (freeSum > 0) {
-      free.forEach(function (k) { c.alloc[k] = Math.max(0, c.alloc[k] - take * c.alloc[k] / freeSum); });
-    }
+    if (c.locks && c.locks.eco) return;
+    HOO.Colony.raiseEco(c, HOO.Colony.ecoMinPct(emp, starObj));
   }
 
   // spendable BC this colony will have next turn (shared with the engine)

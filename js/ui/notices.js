@@ -46,6 +46,46 @@ globalThis.HOO = globalThis.HOO || {};
       }
     }
     HOO.UI.toast(opts);
+    // eco-tech breakthrough: offer to put the new capability to work at once
+    var ECO_TECH = { terraform: 1, soil: 1, advSoil: 1, atmos: 1 };
+    if (n.type === 'discovery' && n.tech && n.tech.effect && ECO_TECH[n.tech.effect.type]) {
+      offerEcoBoost(n.tech);
+    }
+  }
+
+  // a new ecology technology (terraforming, soil enrichment, atmospheric
+  // conversion) opens projects on existing worlds — offer a one-click Eco
+  // boost. Each boosted colony hands the extra allocation back to research
+  // automatically when its ecology projects finish (colony.js applyEcoBoost).
+  function offerEcoBoost(tech) {
+    var g = HOO.game;
+    var emp0 = g.empires[0];
+    var open = HOO.Colony.colonies(g, 0).filter(function (e) {
+      return !e.colony.inRebellion && !(e.colony.locks && e.colony.locks.eco) &&
+        HOO.Colony.ecoWorkRemaining(emp0, e.star);
+    }).length;
+    if (!open) return;
+    function apply(pct) {
+      return function () {
+        var boosted = HOO.Colony.applyEcoBoost(g, emp0, pct);
+        HOO.UI.toast({
+          tag: 'Colonial Administration', kind: 'green', timeout: 9000,
+          text: 'Eco allocation raised on ' + boosted + (boosted === 1 ? ' world' : ' worlds') + '. Each returns the boost to research when its projects are done.'
+        });
+        // re-render the sidebar if a colony's bars are on display
+        var sel = HOO.Map.getSelected();
+        if (sel && sel.star !== null && sel.star !== undefined) HOO.Panels.showStar(sel.star);
+      };
+    }
+    HOO.UI.toast({
+      tag: 'Colonial Administration', kind: 'green', sticky: true,
+      text: tech.name + ' opens ecology projects on ' + open + (open === 1 ? ' world' : ' worlds') + '. Raise Eco spending to begin the work? (Drawn from tech, then industry, bases and ships; returned to research on completion.)',
+      buttons: [
+        { label: '+10% Eco', fn: apply(10) },
+        { label: '+25% Eco', fn: apply(25) },
+        { label: 'Not Now' }
+      ]
+    });
   }
 
   // session message log — dismissed toasts and digests can be re-read from
