@@ -15,14 +15,51 @@ globalThis.HOO = globalThis.HOO || {};
     return Math.max(4, Math.round(tech.level * tech.level * COST_FACTOR * diff * mult));
   }
 
-  // next unknown techs in a field, by level (choice list)
+  // ---- per-game tech tree subset (manual: Technology) ----
+  // Each empire receives only a random portion of every field's tree at game
+  // start; missing techs can only be obtained via espionage, trade, or
+  // conquest. Rats (the Psilon analog) receive a larger selection.
+  // Guarantee: at least one tech survives in every 5-level tier of a field,
+  // so no field ever dead-ends purely from a bad roll.
+  var TREE_CHANCE = 0.5;
+  var TREE_CHANCE_WIDE = 0.75;
+
+  function generateTree(emp) {
+    var race = HOO.DATA.raceById[emp.raceId];
+    var p = race.extraTechChoices ? TREE_CHANCE_WIDE : TREE_CHANCE;
+    var tree = {};
+    HOO.CONST.FIELDS.forEach(function (f) {
+      var tiers = {}; // 5-level band -> techs in it
+      HOO.DATA.TECHS[f].forEach(function (t) {
+        var k = Math.ceil(t.level / 5);
+        (tiers[k] = tiers[k] || []).push(t);
+        // starting/known techs are always in-tree
+        if (emp.techFlags[t.id] || U.chance(p)) tree[t.id] = 1;
+      });
+      Object.keys(tiers).forEach(function (k) {
+        var got = tiers[k].some(function (t) { return tree[t.id]; });
+        if (!got) tree[U.pick(tiers[k]).id] = 1; // tier rolled dry — keep one
+      });
+    });
+    emp.research.tree = tree;
+  }
+
+  // can this empire's own scientists ever reach the tech this game?
+  // Known techs always count; empires without a tree (legacy saves) see everything.
+  function inTree(emp, techId) {
+    if (emp.techFlags[techId]) return true;
+    var tree = emp.research && emp.research.tree;
+    return tree ? !!tree[techId] : true;
+  }
+
+  // next unknown in-tree techs in a field, by level (choice list)
   function choices(emp, field) {
     var race = HOO.DATA.raceById[emp.raceId];
-    var n = race.researchBonus ? 3 : 2; // Rats see more of the tree
+    var n = 2 + (race.extraTechChoices || 0); // Rats pick from a wider window
     var all = HOO.DATA.TECHS[field];
     var out = [];
     for (var i = 0; i < all.length && out.length < n; i++) {
-      if (!emp.techFlags[all[i].id]) out.push(all[i]);
+      if (!emp.techFlags[all[i].id] && inTree(emp, all[i].id)) out.push(all[i]);
     }
     return out;
   }
@@ -44,17 +81,21 @@ globalThis.HOO = globalThis.HOO || {};
 
   // invest a year's research points; returns [{empire, tech}] discoveries
   function processResearch(g, emp, points) {
-    var race = HOO.DATA.raceById[emp.raceId];
-    if (race.researchBonus) points *= (1 + race.researchBonus);
     var discoveries = [];
     var alloc = emp.research.alloc;
     var totalAlloc = 0;
-    HOO.CONST.FIELDS.forEach(function (f) { totalAlloc += alloc[f] || 0; });
+    // exhausted fields (null project) don't count — their slider share is
+    // redistributed to live fields instead of evaporating
+    HOO.CONST.FIELDS.forEach(function (f) {
+      if (emp.research.projects[f]) totalAlloc += alloc[f] || 0;
+    });
     if (totalAlloc <= 0) return discoveries;
 
+    var stale = false;
     HOO.CONST.FIELDS.forEach(function (f) {
       var pr = emp.research.projects[f];
       if (!pr) return;
+      if (emp.techFlags[pr.techId]) { stale = true; return; } // acquired elsewhere — re-pick below
       var tech = HOO.DATA.techById[pr.techId];
       var add = points * (alloc[f] || 0) / totalAlloc;
 
@@ -71,14 +112,15 @@ globalThis.HOO = globalThis.HOO || {};
       if (pr.invested >= cost) {
         var chancePct = Math.min(90, ((pr.invested - cost) / cost) * 50);
         if (U.roll100() <= chancePct) {
-          HOO.State.grantTech(emp, tech.id);
-          discoveries.push({ empire: emp, tech: tech });
           pr.done = true;
+          if (HOO.State.grantTech(emp, tech.id)) {
+            discoveries.push({ empire: emp, tech: tech });
+          }
         }
       }
     });
 
-    if (discoveries.length) ensureProjects(emp);
+    if (discoveries.length || stale) ensureProjects(emp);
     return discoveries;
   }
 
@@ -97,6 +139,7 @@ globalThis.HOO = globalThis.HOO || {};
 
   HOO.Research = {
     baseCost: baseCost, choices: choices, startProject: startProject,
+    generateTree: generateTree, inTree: inTree,
     ensureProjects: ensureProjects, processResearch: processResearch, progress: progress
   };
 })();

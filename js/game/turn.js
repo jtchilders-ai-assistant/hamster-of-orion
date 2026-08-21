@@ -166,19 +166,18 @@ globalThis.HOO = globalThis.HOO || {};
       if (!rel) return false;
       if (rel.war) return true;
       if (rel.treaty === 'alliance') return false;
+      // non-aggression pact: signatory fleets never engage automatically
+      // (manual: combat requires the pact to be deliberately broken)
+      if (rel.treaty === 'nonAggression') return false;
       // encounters over one's colony: intruder provokes defense
       var colEmp = star2.planet && star2.planet.colony ? star2.planet.colony.empire : null;
       if (colEmp === a.id || colEmp === b.id) {
-        if (rel.treaty === 'nonAggression' && U.rand() < 0.6) return false;
         HOO.Diplomacy.adjust(g2, a.id, b.id, -5, true);
         HOO.Diplomacy.adjust(g2, b.id, a.id, -5, true);
         return true;
       }
-      if (rel.treaty === 'nonAggression') return false;
-      // neutral encounter over unclaimed system: minor incident
-      HOO.Diplomacy.adjust(g2, a.id, b.id, -2, true);
-      HOO.Diplomacy.adjust(g2, b.id, a.id, -2, true);
-      return U.rand() < 0.3;
+      // peaceful fleets may share an unclaimed system without incident
+      return false;
     }
 
     function pickAttacker(a, b, colonyEmp) {
@@ -202,13 +201,20 @@ globalThis.HOO = globalThis.HOO || {};
       }
     });
 
-    // 6. transports land (after combat)
+    // 6. transports land (after combat). Where a player battle is still
+    //    queued for the UI, the landing waits for that battle to resolve
+    //    (manual: space combat at a system resolves before transports land),
+    //    so invaders run the gauntlet of whatever survives the fighting.
+    var pendingBattleAt = {};
+    playerCombats.forEach(function (pc) { pendingBattleAt[pc.meta.star.id] = pc; });
     landings.forEach(function (t) {
-      var ns = HOO.Ground.resolveLanding(g, t);
-      ns.forEach(function (n) {
-        var involved = t.empire === 0 || (g.stars[t.to].planet && g.stars[t.to].planet.colony && g.stars[t.to].planet.colony.empire === 0);
-        if (involved || g.stars[t.to].explored[0]) g.notices.push(n);
-      });
+      var pc = pendingBattleAt[t.to];
+      if (pc) {
+        pc.meta.deferredLandings = pc.meta.deferredLandings || [];
+        pc.meta.deferredLandings.push(t);
+      } else {
+        landTransport(g, t);
+      }
     });
 
     // 7. espionage
@@ -233,12 +239,32 @@ globalThis.HOO = globalThis.HOO || {};
     HOO.EventsRun.maybeFire(g).forEach(function (n) { g.notices.push(n); });
     HOO.EventsRun.progress(g).forEach(function (n) { g.notices.push(n); });
 
+    // space monsters arriving over a player-led defense fight tactically,
+    // through the same queue as other player battles (consume-and-clear:
+    // events_run would otherwise auto-resolve leftovers next year)
+    var mdescs = g.monsterCombats || [];
+    g.monsterCombats = [];
+    mdescs.forEach(function (desc) {
+      var mb = HOO.EventsRun.buildMonsterBattle(g, desc);
+      if (mb) playerCombats.push({ meta: { star: g.stars[desc.starId], monsterEvent: true }, battle: mb });
+    });
+
     // 10. council
     var council = null;
     if (HOO.Council.shouldConvene(g)) council = HOO.Council.holdElection(g);
 
     g.rngState = U.getRngState();
     return { playerCombats: playerCombats, council: council, notices: g.notices };
+  }
+
+  // land one transport: ground resolution plus player-facing notices
+  function landTransport(g, t) {
+    var ns = HOO.Ground.resolveLanding(g, t);
+    ns.forEach(function (n) {
+      var star = g.stars[t.to];
+      var involved = t.empire === 0 || (star.planet && star.planet.colony && star.planet.colony.empire === 0);
+      if (involved || star.explored[0]) g.notices.push(n);
+    });
   }
 
   function buildBattle(g, cb) {
@@ -250,7 +276,7 @@ globalThis.HOO = globalThis.HOO || {};
       var mon = {
         name: 'Guardian of Orion', maxHits: g.guardian.maxHits, hits: g.guardian.hits,
         attack: 10, defense: 9, shield: 13, ecm: 8, speed: 2, initiative: 25,
-        weaponIds: ['stellar_converter', 'plasma_torpedoes', 'scatter_pack_x_missiles', 'scatter_pack_x'],
+        weaponIds: ['stellar_converter', 'plasma_torpedoes', 'death_ray', 'scatter_pack_x'],
         weaponCount: 3, specials: {}
       };
       g.guardian.monsterRef = mon;
@@ -283,6 +309,18 @@ globalThis.HOO = globalThis.HOO || {};
 
   function afterBattle(g, cb, battle) {
     var star = cb.star;
+    // transports held back for this queued battle land now, running the
+    // gauntlet of whatever ships and bases survived the fighting
+    if (cb.deferredLandings) {
+      var held = cb.deferredLandings;
+      cb.deferredLandings = null;
+      held.forEach(function (t) { landTransport(g, t); });
+    }
+    if (cb.monsterEvent) {
+      // settle the monster's siege: slain, repelled, or breakthrough
+      HOO.EventsRun.monsterBattleResolved(g, battle).forEach(function (n) { g.notices.push(n); });
+      return;
+    }
     if (cb.guardian) {
       var mon = g.guardian.monsterRef;
       if (mon && mon.hits <= 0) {
@@ -302,6 +340,8 @@ globalThis.HOO = globalThis.HOO || {};
       }
       return;
     }
+    // a pitched battle introduces the combatants even if no envoy survives
+    HOO.Diplomacy.makeContact(g, cb.pair[0], cb.pair[1]);
     // battle report notice
     if (battle && (cb.pair.indexOf(0) >= 0 || star.explored[0])) {
       var w = battle.winner;

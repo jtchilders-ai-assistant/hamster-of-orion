@@ -10,10 +10,12 @@ globalThis.HOO = globalThis.HOO || {};
     if (emp.dead || emp.isPlayer) return;
     manageDesigns(g, emp);
     manageResearch(g, emp);
+    manageExpansion(g, emp);   // sets wantColonyShip/wantScouts before allocations read them
     manageColonies(g, emp);
-    manageExpansion(g, emp);
+    manageReserve(g, emp);
     manageTransports(g, emp);
     manageWar(g, emp);
+    manageGuardian(g, emp);
     manageDiplomacy(g, emp);
     manageSpies(g, emp);
   }
@@ -62,6 +64,45 @@ globalThis.HOO = globalThis.HOO || {};
     for (var i = 0; i < 6; i++) if (!emp.designs[i]) return i;
     return -1;
   }
+  // scouts are found by role or shape, never by a hard-coded slot number
+  function scoutSlotOf(emp) {
+    var s = slotOf(emp, function (d) { return d.role === 'scout' || (d.extraRange > 0 && !d.hasColonyBase); });
+    if (s >= 0) return s;
+    return slotOf(emp, function (d) { return d.hullId === 'small' && !d.weapons.length && !d.hasColonyBase; });
+  }
+
+  // special systems worth mounting on warships, roughly cheapest-first
+  var SPECIAL_PREF = ['battleScanner', 'lightning', 'zyro', 'antiMissile', 'advDamControl', 'autoRepair',
+    'inertialNull', 'inertialStab', 'heFocus', 'repulsor', 'cloak', 'oracle', 'warpDissipator',
+    'teleporter', 'stasis', 'ionicPulsar', 'pulsar', 'blackHole'];
+  // devices that fill the same role: mount only the best of each group
+  var SPECIAL_GROUP = {
+    lightning: 'md', zyro: 'md', antiMissile: 'md',
+    advDamControl: 'rep', autoRepair: 'rep',
+    inertialNull: 'in', inertialStab: 'in',
+    ionicPulsar: 'pu', pulsar: 'pu'
+  };
+
+  // mount the most useful special systems that still fit the hull
+  function mountSpecials(emp, spec, design, maxCount) {
+    var SD = HOO.ShipDesign;
+    var known = SD.specials(emp);
+    var used = {};
+    var best = design;
+    SPECIAL_PREF.forEach(function (key) {
+      if (spec.specials.length >= maxCount) return;
+      var grp = SPECIAL_GROUP[key] || key;
+      if (used[grp]) return;
+      var t = null;
+      known.forEach(function (k) { if (k.effect.special === key) t = k; });
+      if (!t) return;
+      spec.specials.push(t.id);
+      var d = SD.compute(emp, spec);
+      if (d && d.valid) { best = d; used[grp] = true; }
+      else spec.specials.pop();
+    });
+    return best;
+  }
 
   function manageDesigns(g, emp) {
     if (g.turn % 8 !== emp.id % 8) return; // stagger redesign work
@@ -82,7 +123,7 @@ globalThis.HOO = globalThis.HOO || {};
     var bestMissile = missiles.length ? missiles[missiles.length - 1] : null;
     var bestBomb = bombs.length ? bombs[bombs.length - 1] : null;
 
-    // ensure a colony ship design exists (replace with extended-environment versions)
+    // ensure a colony ship design exists, and refit it with newer engines as they arrive
     var colSlot = slotOf(emp, function (d) { return d.hasColonyBase; });
     if (colSlot < 0) {
       var fs = freeSlot(emp);
@@ -94,10 +135,37 @@ globalThis.HOO = globalThis.HOO || {};
           weapons: [], specials: ['colony_base']
         });
       }
+    } else if (emp.designs[colSlot] && (eng.effect.warp > emp.designs[colSlot].warp ||
+      (emp.designs[colSlot].colonyHostility !== undefined &&
+        emp.designs[colSlot].colonyHostility < emp.derived.maxHostility))) {
+      // refresh on newer engines OR when controlled-environment tech outgrows
+      // the frozen base module (a stale ship can't settle newly reachable worlds)
+      var colNew = SD.compute(emp, {
+        name: 'Colony Ship', hullId: 'large', engineId: eng.id, computerId: null,
+        shieldId: null, ecmId: null, armorId: arm.id, doubleArmor: false,
+        weapons: [], specials: ['colony_base']
+      });
+      if (colNew && colNew.valid) emp.designs[colSlot] = colNew;
+    }
+
+    // keep a scout design on the books so exploration never eats warships
+    if (scoutSlotOf(emp) < 0) {
+      var fsS = freeSlot(emp);
+      if (fsS >= 0) {
+        var rft = null;
+        SD.specials(emp).forEach(function (t) { if (t.effect.special === 'reserveFuel') rft = t; });
+        var sd = SD.compute(emp, {
+          name: 'Scout', hullId: 'small', engineId: eng.id, computerId: null, shieldId: null,
+          ecmId: null, armorId: arm.id, doubleArmor: false, weapons: [], specials: rft ? [rft.id] : []
+        });
+        if (sd && sd.valid) { sd.role = 'scout'; emp.designs[fsS] = sd; }
+      }
     }
 
     // main warship: refresh when tech has moved on
     var age = emp.designAge || 0;
+    var conLv = HOO.State.techLevel(emp, 'construction');
+    var hullId = conLv > 30 ? 'huge' : (conLv > 14 ? 'large' : 'medium');
     var warSlot = slotOf(emp, function (d) { return d.role === 'war'; });
     var wantNew = warSlot < 0;
     if (!wantNew && warSlot >= 0) {
@@ -105,12 +173,12 @@ globalThis.HOO = globalThis.HOO || {};
       var curBest = cur.weapons.length ? HOO.DATA.techById[cur.weapons[0].id].level : 0;
       if (bestBeam && bestBeam.level > curBest + 6) wantNew = true;
       if (bestMissile && bestMissile.level > curBest + 8) wantNew = true;
+      if (cur.hullId !== hullId) wantNew = true; // construction unlocked a bigger hull
     }
     if (wantNew && (bestBeam || bestMissile)) {
       var fs2 = freeSlot(emp);
       if (fs2 < 0) { scrapWorst(g, emp); fs2 = freeSlot(emp); }
       if (fs2 >= 0) {
-        var hullId = HOO.State.techLevel(emp, 'construction') > 14 ? 'large' : 'medium';
         var spec = {
           name: U.pick(HOO.DATA.SHIP_NAMES[hullId]), hullId: hullId,
           engineId: eng.id, computerId: comp ? comp.id : null,
@@ -124,7 +192,8 @@ globalThis.HOO = globalThis.HOO || {};
         spec.weapons = wl;
         var d2 = SD.compute(emp, spec);
         if (d2 && d2.valid) {
-          // scale up counts to fill space
+          // mount special devices first, then scale weapon counts to fill space
+          d2 = mountSpecials(emp, spec, d2, hullId === 'huge' ? 3 : 2);
           var guard = 0;
           while (guard++ < 60) {
             var grew = false;
@@ -154,6 +223,7 @@ globalThis.HOO = globalThis.HOO || {};
           doubleArmor: false, weapons: [{ id: bestBomb.id, count: 2 }], specials: []
         };
         var bd = SD.compute(emp, bspec);
+        if (bd && bd.valid) bd = mountSpecials(emp, bspec, bd, 1);
         var guard2 = 0;
         while (bd && bd.valid && guard2++ < 40) {
           bspec.weapons[0].count++;
@@ -166,16 +236,23 @@ globalThis.HOO = globalThis.HOO || {};
   }
 
   function scrapWorst(g, emp) {
-    // scrap the oldest non-colony design with fewest ships
+    // scrap the non-colony design with the least invested value;
+    // spare the scout unless it is the only thing left to scrap
     var worst = -1, worstScore = Infinity;
+    var scout = -1, scoutScore = Infinity;
     for (var i = 0; i < 6; i++) {
       var d = emp.designs[i];
       if (!d || d.hasColonyBase) continue;
       var count = 0;
       g.fleets.forEach(function (f) { if (f.empire === emp.id) count += f.ships[i]; });
       var score = count * d.cost;
+      if (d.role === 'scout' || d.extraRange > 0) {
+        if (score < scoutScore) { scoutScore = score; scout = i; }
+        continue;
+      }
       if (score < worstScore) { worstScore = score; worst = i; }
     }
+    if (worst < 0) worst = scout;
     if (worst >= 0) HOO.ShipDesign.scrapDesign(g, emp, worst);
   }
 
@@ -198,7 +275,7 @@ globalThis.HOO = globalThis.HOO || {};
       if (HOO.DATA.raceById[emp.raceId].wasteImmune) a.eco = 4;
 
       if (c.factories < maxFact * 0.9) {
-        a.ind = 100 - a.eco - 10;
+        a.ind = Math.max(0, 100 - a.eco - 10);
         a.tech = 10;
       } else {
         // developed: research + defense + ships
@@ -207,23 +284,53 @@ globalThis.HOO = globalThis.HOO || {};
         if (c.bases >= 6 + (atWar ? 6 : 0)) defShare = 0;
         var indShare = c.factories < maxFact ? 10 : 0;
         a.ship = shipShare; a.def = defShare; a.ind = indShare;
-        a.tech = Math.max(0, 100 - a.eco - a.ship - a.def - a.ind);
+        a.tech = 0; // remainder flows into research in normalizeAlloc
       }
 
       // building choice: colony ships from the biggest colony
       if (wantColonyShip && star.id === biggestColony(g, emp)) {
         var colSlot = slotOf(emp, function (dd) { return dd.hasColonyBase; });
-        if (colSlot >= 0) { c.buildDesign = colSlot; a.ship = Math.max(a.ship, 40); a.tech = Math.max(0, 100 - a.eco - a.ship - a.def - a.ind); }
+        if (colSlot >= 0) {
+          c.buildDesign = colSlot;
+          // the colony ship takes priority: squeeze def/ind/tech into what remains
+          a.ship = Math.min(Math.max(a.ship, 40), 100 - a.eco);
+          var room = 100 - a.eco - a.ship;
+          var rest = a.def + a.ind + a.tech;
+          if (rest > room) {
+            a.def = Math.floor(a.def * room / Math.max(1, rest));
+            a.ind = Math.floor(a.ind * room / Math.max(1, rest));
+            a.tech = Math.max(0, room - a.def - a.ind);
+          }
+        }
       } else {
         var warSlot = slotOf(emp, function (dd) { return dd.role === 'war'; });
         var bomberSlot = slotOf(emp, function (dd) { return dd.role === 'bomber'; });
-        if (atWar && bomberSlot >= 0 && U.chance(0.3)) c.buildDesign = bomberSlot;
+        var scoutSlot = scoutSlotOf(emp);
+        if (emp.wantScouts && scoutSlot >= 0 && U.chance(0.2)) c.buildDesign = scoutSlot;
+        else if (atWar && bomberSlot >= 0 && U.chance(0.3)) c.buildDesign = bomberSlot;
         else if (warSlot >= 0) c.buildDesign = warSlot;
       }
+      normalizeAlloc(a); // the five bars always total exactly 100% (manual: Planet Production)
       // difficulty production bonus is applied as a hidden multiplier on AI allocations
       c.aiBonus = diff.aiProd;
       c.alloc = a;
     });
+  }
+
+  // enforce the MOO invariant: the five spending bars total exactly 100%.
+  // Eco keeps its clean minimum; the other bars scale down proportionally,
+  // and any leftover percent flows into research.
+  function normalizeAlloc(a) {
+    var keys = ['ship', 'def', 'ind', 'tech'];
+    a.eco = U.clamp(Math.round(a.eco), 0, 100);
+    var sum = 0;
+    keys.forEach(function (k) { a[k] = Math.max(0, Math.round(a[k])); sum += a[k]; });
+    var room = 100 - a.eco;
+    if (sum > room) {
+      keys.forEach(function (k) { a[k] = sum > 0 ? Math.floor(a[k] * room / sum) : 0; });
+      sum = a.ship + a.def + a.ind + a.tech;
+    }
+    a.tech += room - sum;
   }
 
   function biggestColony(g, emp) {
@@ -253,14 +360,18 @@ globalThis.HOO = globalThis.HOO || {};
       g.fleets.forEach(function (f) {
         if (f.empire !== emp.id || f.at === null || f.ships[colSlot] <= 0) return;
         var here = g.stars[f.at];
-        if (here.planet && !here.planet.colony && HOO.Ground.canColonize(g, emp, here)) {
-          HOO.Ground.colonize(g, emp.id, here.id, f);
-          if (g.empires[0] && !g.empires[0].dead) {
+        if (here.planet && !here.planet.colony && HOO.Ground.canColonize(g, emp, here, f)) {
+          if (HOO.Ground.colonize(g, emp.id, here.id, f) && g.empires[0] && !g.empires[0].dead) {
             g.notices.push({ type: 'info', text: 'The ' + HOO.DATA.raceById[emp.raceId].name + ' have founded a colony at ' + here.name + '.', ifExplored: here.id });
           }
           return;
         }
-        var t = targets[0];
+        // steer toward the best target THIS ship's base module can settle;
+        // manageDesigns refreshes the shared design when tech outgrows it
+        var t = null;
+        for (var ti = 0; ti < targets.length; ti++) {
+          if (HOO.Ground.canColonize(g, emp, targets[ti], f)) { t = targets[ti]; break; }
+        }
         if (t && f.at !== t.id) {
           var counts = [0, 0, 0, 0, 0, 0];
           counts[colSlot] = 1;
@@ -275,8 +386,15 @@ globalThis.HOO = globalThis.HOO || {};
       return sz * (sp.prodMult || 1) + (sp.research ? 40 : 0) + (sp.growth > 1 ? 20 : 0);
     }
 
-    // scouts explore
-    var scoutSlot = 0;
+    // scouts explore (found by role, never a hard-coded slot; warships stay home)
+    var scoutSlot = scoutSlotOf(emp);
+    var unexploredAny = g.stars.some(function (s) { return !s.explored[emp.id]; });
+    var scoutCount = 0;
+    if (scoutSlot >= 0) {
+      g.fleets.forEach(function (f) { if (f.empire === emp.id) scoutCount += f.ships[scoutSlot]; });
+    }
+    emp.wantScouts = scoutSlot >= 0 && unexploredAny && scoutCount < 3;
+    if (scoutSlot < 0) return;
     g.fleets.forEach(function (f) {
       if (f.empire !== emp.id || f.at === null || f.ships[scoutSlot] <= 0) return;
       var unexplored = g.stars.filter(function (s) {
@@ -295,11 +413,53 @@ globalThis.HOO = globalThis.HOO || {};
     });
   }
 
+  // ---------- planetary reserve ----------
+  function manageReserve(g, emp) {
+    // pump banked BC into the least developed colony (manual: Planetary Reserve
+    // can boost a planet's output; processColony caps the boost at 1 year's raw)
+    if (emp.reserve < 30) return;
+    var best = null, bestGap = 0;
+    HOO.Colony.colonies(g, emp.id).forEach(function (e) {
+      var c = e.colony;
+      if (c.inRebellion || c.quarantine) return;
+      if (c.transferFund && c.transferFund > 0) return; // already funded, let it drain
+      var mp = HOO.Colony.maxPop(emp, e.star);
+      var maxFact = mp * Math.min(emp.derived.controls, c.controls);
+      var gap = maxFact - c.factories;
+      if (gap > bestGap) { bestGap = gap; best = e; }
+    });
+    if (!best) return;
+    var raw = HOO.Colony.rawProduction(emp, best.star);
+    if (raw <= 0) return;
+    var grant = Math.min(emp.reserve, Math.max(30, raw));
+    emp.reserve -= grant;
+    best.colony.transferFund = (best.colony.transferFund || 0) + grant;
+  }
+
   // ---------- transports ----------
   function manageTransports(g, emp) {
     var cols = HOO.Colony.colonies(g, emp.id);
-    var crowded = cols.filter(function (e) { return e.colony.pop > HOO.Colony.maxPop(emp, e.star) * 0.85 && !e.colony.quarantine; });
-    var hungry = cols.filter(function (e) { return e.colony.pop < HOO.Colony.maxPop(emp, e.star) * 0.4; });
+
+    // put down rebellions first: land loyal troops to restore order
+    cols.forEach(function (dst) {
+      if (!dst.colony.inRebellion) return;
+      var enRoute = g.transports.some(function (t) { return t.empire === emp.id && t.to === dst.star.id; });
+      if (enRoute) return;
+      var srcs = cols.filter(function (e) {
+        return e !== dst && !e.colony.inRebellion && !e.colony.quarantine && e.colony.pop >= 8;
+      });
+      if (!srcs.length) return;
+      srcs.sort(function (a, b) {
+        return U.dist(dst.star.x, dst.star.y, a.star.x, a.star.y) - U.dist(dst.star.x, dst.star.y, b.star.x, b.star.y);
+      });
+      var src = srcs[0];
+      var rebels = dst.colony.rebels || Math.ceil(dst.colony.pop * 0.3);
+      var n = Math.min(Math.ceil(rebels * 1.5) + 2, Math.floor(src.colony.pop / 2));
+      if (n >= 2) HOO.Fleet.sendTransports(g, emp.id, src.star.id, dst.star.id, n);
+    });
+
+    var crowded = cols.filter(function (e) { return e.colony.pop > HOO.Colony.maxPop(emp, e.star) * 0.85 && !e.colony.quarantine && !e.colony.inRebellion; });
+    var hungry = cols.filter(function (e) { return e.colony.pop < HOO.Colony.maxPop(emp, e.star) * 0.4 && !e.colony.inRebellion; });
     crowded.forEach(function (src) {
       if (!hungry.length) return;
       hungry.sort(function (a, b) {
@@ -312,6 +472,14 @@ globalThis.HOO = globalThis.HOO || {};
   }
 
   // ---------- war ----------
+  function fleetArmed(emp, f) {
+    for (var i = 0; i < 6; i++) {
+      var d = emp.designs[i];
+      if (f.ships[i] > 0 && d && d.weapons.length) return true;
+    }
+    return false;
+  }
+
   function manageWar(g, emp) {
     var enemies = g.empires.filter(function (o) { return !o.dead && o.id !== emp.id && emp.relations[o.id].war; });
     var myPower = HOO.Turn.powerOf(g, emp);
@@ -329,6 +497,29 @@ globalThis.HOO = globalThis.HOO || {};
     });
 
     if (!enemies.length) return;
+
+    // orbital bombardment: armed fleets parked over an at-war colony pound it
+    // (manual: Bombarding Planets) — unless it is ripe for capture intact
+    enemies.forEach(function (en) {
+      HOO.Colony.colonies(g, en.id).forEach(function (e) {
+        var mine = HOO.Fleet.fleetsAt(g, e.star.id).filter(function (f) {
+          return f.empire === emp.id && fleetArmed(emp, f);
+        });
+        if (!mine.length) return;
+        var c = e.colony;
+        var pdef = HOO.CONST.PLANET_TYPES[e.star.planet.type];
+        var invadable = pdef.hostility <= emp.derived.maxHostility;
+        if (invadable && c.bases === 0 && c.pop <= 15) return; // save the factories for invasion
+        var rep = HOO.Ground.bombard(g, emp.id, e.star);
+        if (!rep) return;
+        var txt = 'The ' + HOO.DATA.raceById[emp.raceId].name + ' have bombarded ' + e.star.name + ': ' +
+          Math.round(rep.popKilled) + ' million dead, ' + Math.round(rep.factoriesLost) + ' factories destroyed.' +
+          (rep.destroyed ? ' The colony has been annihilated.' : '');
+        if (en.isPlayer) g.notices.push({ type: 'bad', starId: e.star.id, text: txt });
+        else g.notices.push({ type: 'info', text: txt, ifExplored: e.star.id });
+      });
+    });
+
     var target = enemies.sort(function (a, b) { return HOO.Turn.powerOf(g, a) - HOO.Turn.powerOf(g, b); })[0];
 
     // pick enemy colony to strike: weakest defended in range
@@ -365,8 +556,9 @@ globalThis.HOO = globalThis.HOO || {};
       }
     });
 
-    // invade colonies we've beaten down
+    // invade colonies we've beaten down (transports obey fuel range, like the player's)
     HOO.Colony.colonies(g, target.id).forEach(function (e) {
+      if (!HOO.Fleet.inRange(g, emp, e.star, null)) return;
       var mine = HOO.Fleet.fleetsAt(g, e.star.id).filter(function (f) { return f.empire === emp.id; });
       if (!mine.length) return;
       if (e.colony.bases > 0) return;
@@ -380,6 +572,38 @@ globalThis.HOO = globalThis.HOO || {};
         HOO.Fleet.sendTransports(g, emp.id, src.star.id, e.star.id, Math.floor(src.colony.pop * 0.4));
       }
     });
+  }
+
+  // ---------- Orion: assault the Guardian when mighty enough ----------
+  function manageGuardian(g, emp) {
+    if (!g.guardian.alive) return;
+    var orion = null;
+    g.stars.forEach(function (s) { if (s.orion) orion = s; });
+    if (!orion || !orion.explored[emp.id]) return;
+    // stay focused during wars; only occasionally muster the nerve
+    var atWar = g.empires.some(function (o) { return !o.dead && o.id !== emp.id && emp.relations[o.id].war; });
+    if (atWar || !U.chance(0.04)) return;
+    // commit the strongest idle armed fleet, and only when it measures up to the Guardian
+    var bestF = null, bestStr = 0;
+    g.fleets.forEach(function (f) {
+      if (f.empire !== emp.id || f.at === null) return;
+      if (!HOO.Fleet.inRange(g, emp, orion, f)) return;
+      var str = 0;
+      f.ships.forEach(function (n, slot) {
+        var d = emp.designs[slot];
+        if (d && !d.hasColonyBase && d.weapons.length) str += n * d.cost;
+      });
+      if (str > bestStr) { bestStr = str; bestF = f; }
+    });
+    if (!bestF || bestStr < g.guardian.maxHits * 1.5) return;
+    var counts = [0, 0, 0, 0, 0, 0];
+    for (var i = 0; i < 6; i++) {
+      var d2 = emp.designs[i];
+      if (d2 && !d2.hasColonyBase && d2.weapons.length) counts[i] = bestF.ships[i];
+    }
+    if (counts.some(function (n) { return n > 0; })) {
+      HOO.Fleet.sendFleet(g, emp.id, bestF.at, orion.id, counts);
+    }
   }
 
   // ---------- diplomacy ----------
@@ -418,11 +642,16 @@ globalThis.HOO = globalThis.HOO || {};
         }
       }
 
-      // friendly initiatives
-      if (!rel.war && rel.value > 10 && !other.isPlayer) {
+      // friendly initiatives (neutral parties will talk; evalProposal decides)
+      if (!rel.war && rel.value > -5 && !other.isPlayer) {
         if (rel.treaty === 'none' && U.chance(0.06)) {
           var r2 = HOO.Diplomacy.evalProposal(g, other.id, emp.id, 'nonAggression');
           if (r2.accept) { rel.treaty = 'nonAggression'; other.relations[emp.id].treaty = 'nonAggression'; }
+        }
+        // deepen a long pact into a full alliance
+        if (rel.treaty === 'nonAggression' && rel.value > 45 && U.chance(0.04)) {
+          var rA = HOO.Diplomacy.evalProposal(g, other.id, emp.id, 'alliance');
+          if (rA.accept) { rel.treaty = 'alliance'; other.relations[emp.id].treaty = 'alliance'; }
         }
         if (rel.trade === 0 && U.chance(0.08)) {
           var amt = Math.floor(HOO.Diplomacy.maxTrade(g, emp, other) * 0.6);
@@ -431,14 +660,48 @@ globalThis.HOO = globalThis.HOO || {};
             if (r3.accept) HOO.Diplomacy.formTrade(g, emp.id, other.id, amt);
           }
         }
+        // swap older technologies at a fair level match
+        if (U.chance(0.05)) {
+          var give = HOO.Diplomacy.tradableTechs(emp, other);
+          var want = HOO.Diplomacy.tradableTechs(other, emp);
+          if (give.length && want.length) {
+            var gv = give[give.length - 1];
+            var gt = null;
+            want.forEach(function (t) { if (!gt || Math.abs(t.level - gv.level) < Math.abs(gt.level - gv.level)) gt = t; });
+            if (gt && Math.abs(gt.level - gv.level) <= 5) HOO.Diplomacy.exchangeTech(g, emp.id, other.id, gv.id, gt.id);
+          }
+        }
+      }
+      // realpolitik: tribute to menacing giants, threats to the weak
+      if (!rel.war && !other.isPlayer) {
+        if (theirPower > myPower * 2 && rel.value < 0 && emp.reserve > 100 && U.chance(0.05)) {
+          HOO.Diplomacy.offerTribute(g, emp.id, other.id, Math.min(100, Math.floor(emp.reserve * 0.25)));
+        } else if (myPower > theirPower * 2.5 && rel.value < -20 && rel.treaty === 'none' && U.chance(0.04) &&
+          emp.personality !== 'pacifist' && emp.personality !== 'honorable') {
+          HOO.Diplomacy.evalProposal(g, other.id, emp.id, 'threat');
+        }
+      }
+      // call allies into our wars
+      if (!rel.war && rel.treaty === 'alliance' && !other.isPlayer && U.chance(0.06)) {
+        var foe = g.empires.filter(function (x) {
+          return !x.dead && x.id !== emp.id && x.id !== other.id && emp.relations[x.id].war;
+        }).sort(function (x, y) { return HOO.Turn.powerOf(g, x) - HOO.Turn.powerOf(g, y); })[0];
+        if (foe) HOO.Diplomacy.evalProposal(g, other.id, emp.id, 'declareWarOn', { target: foe.id });
       }
       // AI proposals to the player arrive as notices the player can act on
       if (!rel.war && other.isPlayer) {
-        if (rel.treaty === 'none' && rel.value > 25 && U.chance(0.05)) {
-          g.notices.push({ type: 'diplomacy', kind: 'napOffer', empId: emp.id, text: 'The ' + HOO.DATA.raceById[emp.raceId].name + ' propose a non-aggression pact.' });
+        var raceName = HOO.DATA.raceById[emp.raceId].name;
+        if (rel.treaty === 'nonAggression' && rel.value > 50 && U.chance(0.04)) {
+          g.notices.push({ type: 'diplomacy', kind: 'allianceOffer', empId: emp.id, text: 'The ' + raceName + ' propose a formal alliance.' });
+        } else if (rel.treaty === 'none' && rel.value > 25 && U.chance(0.05)) {
+          g.notices.push({ type: 'diplomacy', kind: 'napOffer', empId: emp.id, text: 'The ' + raceName + ' propose a non-aggression pact.' });
         } else if (rel.trade === 0 && rel.value > 10 && U.chance(0.06)) {
           var amt2 = Math.floor(HOO.Diplomacy.maxTrade(g, emp, other) * 0.5);
-          if (amt2 >= 10) g.notices.push({ type: 'diplomacy', kind: 'tradeOffer', empId: emp.id, amount: amt2, text: 'The ' + HOO.DATA.raceById[emp.raceId].name + ' propose a trade agreement of ' + amt2 + ' BC per year.' });
+          if (amt2 >= 10) g.notices.push({ type: 'diplomacy', kind: 'tradeOffer', empId: emp.id, amount: amt2, text: 'The ' + raceName + ' propose a trade agreement of ' + amt2 + ' BC per year.' });
+        } else if (myPower > theirPower * 2.5 && rel.value < -20 && U.chance(0.03) &&
+          emp.personality !== 'pacifist' && emp.personality !== 'honorable') {
+          var demand = Math.max(20, Math.round((emp.economy ? emp.economy.totalRaw : 100) * 0.05));
+          g.notices.push({ type: 'diplomacy', kind: 'tributeDemand', empId: emp.id, amount: demand, text: 'The ' + raceName + ' demand a tribute of ' + demand + ' BC, or there will be consequences.' });
         }
       }
     });

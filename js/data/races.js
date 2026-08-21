@@ -5,9 +5,9 @@ HOO.DATA = HOO.DATA || {};
 /*
   Mechanics fields follow the original manual exactly:
   shipDefense/+init (Alkari), groundBonus (Bulrathi), spy* (Darlok),
-  trade/diplomacy (Human), workerOutput (Klackon), factoryControls/freeRefit (Meklar),
-  shipAttack/firstStrike (Mrrshan), researchBonus (Psilon), popGrowth (Sakkra),
-  wasteImmune/landAnywhere/growthHalved (Silicoid).
+  trade/diplomacy (Human), workerOutput (Klackon), factoryControlBonus (Meklar),
+  shipAttack/firstStrike (Mrrshan), 0.8 researchCosts + extraTechChoices (Psilon),
+  popGrowth (Sakkra), wasteImmune/landAnywhere/growthHalved (Silicoid).
   researchCosts: multiplier per field (0.6 excellent / 0.8 good / 1.0 std / 1.25 poor).
 */
 
@@ -25,8 +25,8 @@ HOO.DATA.RACES = [
     id: 'guineapigs', name: 'Guinea Pigs', adj: 'Guinea Pig', glyph: '🦫', color: '#C96A3B', color2: '#7e3f20',
     trait: 'Unmatched ground troops',
     lore: 'Stocky philosopher-warriors who hold that honor is proven claw to claw, on the ground, where the Ancient Ones can see. Their boarding chants are audible through hull plating.',
-    bonusText: '+20 bonus in all ground combat',
-    groundBonus: 20,
+    bonusText: '+25 bonus in all ground combat',
+    groundBonus: 25,
     personality: 'aggressive', objective: 'ecologist',
     researchCosts: { computers: 1.25, construction: 0.8, forceFields: 1, planetology: 1, propulsion: 1, weapons: 0.8 }
   },
@@ -61,8 +61,8 @@ HOO.DATA.RACES = [
     id: 'mice', name: 'Mice', adj: 'Mouse', glyph: '🐭', color: '#9AA6BF', color2: '#5b657c',
     trait: 'Cybernetic automation',
     lore: 'Cybernetically-enhanced technologists who ceded nothing to their small stature and everything to the machine. Mouse foundries hum in the dark, tended by no visible hand.',
-    bonusText: 'Operate +2 factories per colonist; free factory refits',
-    factoryControlBonus: 2, freeRefit: true,
+    bonusText: 'Operate +2 factories per colonist',
+    factoryControlBonus: 2,
     personality: 'erratic', objective: 'industrialist',
     researchCosts: { computers: 0.6, construction: 1, forceFields: 1, planetology: 1.25, propulsion: 1, weapons: 1 }
   },
@@ -79,8 +79,8 @@ HOO.DATA.RACES = [
     id: 'rats', name: 'Rats', adj: 'Rat', glyph: '🐀', color: '#A98BE8', color2: '#6a53a0',
     trait: 'Brilliant researchers',
     lore: 'Hyper-intelligent researchers devoted to pure science, who publish their war declarations with citations. The Rat academies believe Orion is simply a problem set no one has finished.',
-    bonusText: '+50% to all research',
-    researchBonus: 0.5,
+    bonusText: 'All research at 80% cost; wider choice of techs',
+    extraTechChoices: 1,
     personality: 'pacifist', objective: 'technologist',
     researchCosts: { computers: 0.8, construction: 0.8, forceFields: 0.8, planetology: 0.8, propulsion: 0.8, weapons: 0.8 }
   },

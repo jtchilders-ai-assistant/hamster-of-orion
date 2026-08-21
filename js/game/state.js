@@ -15,14 +15,15 @@ globalThis.HOO = globalThis.HOO || {};
       large: { stars: 70, w: 1500, h: 1060, name: 'Large' },
       huge: { stars: 108, w: 1900, h: 1340, name: 'Huge' }
     },
+    // aiProd follows MOO's documented AI production handicaps: 50/75/100/110/125%
     DIFFICULTIES: {
-      simple: { name: 'Simple', aiProd: 0.6, researchFactor: 0.8, aiHostility: 0.5 },
-      easy: { name: 'Easy', aiProd: 0.8, researchFactor: 0.9, aiHostility: 0.75 },
+      simple: { name: 'Simple', aiProd: 0.5, researchFactor: 0.8, aiHostility: 0.5 },
+      easy: { name: 'Easy', aiProd: 0.75, researchFactor: 0.9, aiHostility: 0.75 },
       average: { name: 'Average', aiProd: 1.0, researchFactor: 1.0, aiHostility: 1.0 },
-      hard: { name: 'Hard', aiProd: 1.3, researchFactor: 1.1, aiHostility: 1.25 },
-      impossible: { name: 'Impossible', aiProd: 1.6, researchFactor: 1.25, aiHostility: 1.5 }
+      hard: { name: 'Hard', aiProd: 1.1, researchFactor: 1.1, aiHostility: 1.25 },
+      impossible: { name: 'Impossible', aiProd: 1.25, researchFactor: 1.25, aiHostility: 1.5 }
     },
-    // 14 environments. hostility: 0 = standard; 1..6 need controlled-env tech (see tech.js ladder)
+    // 13 environments (gaia arises only via Advanced Soil Enrichment). hostility: 0 = standard; 1..6 need controlled-env tech (see tech.js ladder)
     PLANET_TYPES: {
       terran: { name: 'Terran', size: [80, 100], hostility: 0, order: 13 },
       jungle: { name: 'Jungle', size: [60, 90], hostility: 0, order: 12 },
@@ -92,6 +93,9 @@ globalThis.HOO = globalThis.HOO || {};
     emp.techFlags[techId] = 1;
     emp.techs[t.cat].push(techId);
     recomputeEmpire(emp);
+    // acquiring a tech (breakthrough, theft, trade, spoils, capture) invalidates
+    // any active project researching it — re-pick so RP stops flowing into it
+    if (HOO.Research && emp.research) HOO.Research.ensureProjects(emp);
     return true;
   }
 
@@ -150,6 +154,7 @@ globalThis.HOO = globalThis.HOO || {};
     d.scanRange = sc ? sc.effect.range : HOO.CONST.BASE_SCANNER;
     d.shipScanRange = sc ? (sc.effect.shipRange || 0) : 0;
     d.scanShowsDest = !!(sc && sc.effect.showDest);
+    d.scanShowsPlanets = !!(sc && sc.effect.showPlanets);
 
     // robotics
     var rc = bestTech(emp, 'robotic');
@@ -165,9 +170,10 @@ globalThis.HOO = globalThis.HOO || {};
     var et = bestTech(emp, 'eco');
     d.wastePerBC = et ? et.effect.wastePerBC : 2;
 
-    // planetology worker output: 0.5 BC → 2 BC at planetology level 50
+    // planetology worker output (manual): (50 + planetology level) / 100 BC
+    // per colonist — 0.5 BC at level 0, ~1.0 BC at level 50
     var pl = techLevel(emp, 'planetology');
-    d.workerBC = (0.5 + 1.5 * Math.min(50, pl) / 50) * (race.workerOutput || 1);
+    d.workerBC = ((50 + Math.min(100, pl)) / 100) * (race.workerOutput || 1);
 
     // colonization
     var cz = bestTech(emp, 'colonize');
@@ -209,9 +215,7 @@ globalThis.HOO = globalThis.HOO || {};
     d.hasHypercomm = !!bestTech(emp, 'hypercomm');
     var ad = bestTech(emp, 'antidote');
     d.antidote = ad ? ad.effect.reduce : 0;
-
-    // security base = computer tech level (as %)
-    d.securityBase = techLevel(emp, 'computers');
+    // (spy security lives entirely in espionage.js — no derived stat here)
     return d;
   }
 
@@ -339,7 +343,8 @@ globalThis.HOO = globalThis.HOO || {};
       HOO.Fleet.addShips(g, emp.id, emp.homeStarId, 1, 1); // colony ship
       if (fighters) HOO.Fleet.addShips(g, emp.id, emp.homeStarId, 2, fighters);
 
-      // initial research projects
+      // per-game random tech-tree subset, then initial research projects
+      HOO.Research.generateTree(emp);
       HOO.Research.ensureProjects(emp);
     });
 
@@ -349,34 +354,80 @@ globalThis.HOO = globalThis.HOO || {};
 
   // ---------------- save / load ----------------
 
+  var SAVE_VERSION = 1;
+
+  function serialize() {
+    HOO.game.rngState = U.getRngState();
+    return JSON.stringify({ version: SAVE_VERSION, game: HOO.game });
+  }
+
+  // required top-level fields — reject anything that would crash the engine later
+  function validGame(g) {
+    return !!(g && typeof g === 'object' &&
+      typeof g.year === 'number' &&
+      Array.isArray(g.empires) && g.empires.length > 0 &&
+      Array.isArray(g.stars) && g.stars.length > 0 &&
+      Array.isArray(g.fleets) && Array.isArray(g.transports));
+  }
+
+  // parse + validate a save string and adopt it as HOO.game.
+  // Never throws: returns false on corrupt/incompatible data, HOO.game untouched.
+  function adoptSave(json) {
+    var g;
+    try {
+      var parsed = JSON.parse(json);
+      if (parsed && typeof parsed === 'object' && parsed.game) {
+        if ((parsed.version || 0) > SAVE_VERSION) return false; // from a newer build
+        g = parsed.game;
+      } else {
+        g = parsed; // legacy pre-versioning save: the bare game object
+      }
+      if (!validGame(g)) return false;
+      g.empires.forEach(recomputeEmpire); // throws on unknown race/tech ids → caught
+    } catch (e) { return false; }
+    HOO.game = g;
+    U.setRngState(g.rngState || g.seed || Date.now());
+    return true;
+  }
+
   function save(slot) {
     try {
-      HOO.game.rngState = U.getRngState();
-      var json = JSON.stringify(HOO.game);
-      localStorage.setItem('hoo_save_' + slot, json);
+      localStorage.setItem('hoo_save_' + slot, serialize());
       localStorage.setItem('hoo_save_' + slot + '_meta', JSON.stringify({
+        version: SAVE_VERSION,
         year: HOO.game.year,
         race: HOO.game.empires[0].raceId,
         size: HOO.game.size,
         when: Date.now()
       }));
       return true;
-    } catch (e) { return false; }
+    } catch (e) { return false; } // quota, private mode, blocked storage
   }
 
   function load(slot) {
-    var json = localStorage.getItem('hoo_save_' + slot);
+    var json = null;
+    try { json = localStorage.getItem('hoo_save_' + slot); } catch (e) { return false; }
     if (!json) return false;
-    var g = JSON.parse(json);
-    HOO.game = g;
-    U.setRngState(g.rngState || g.seed);
-    g.empires.forEach(recomputeEmpire);
-    return true;
+    return adoptSave(json);
   }
 
   function saveMeta(slot) {
-    var m = localStorage.getItem('hoo_save_' + slot + '_meta');
-    return m ? JSON.parse(m) : null;
+    try {
+      var m = localStorage.getItem('hoo_save_' + slot + '_meta');
+      var meta = m ? JSON.parse(m) : null;
+      return (meta && typeof meta === 'object') ? meta : null;
+    } catch (e) { return null; } // corrupt meta or blocked storage — treat as no save
+  }
+
+  // file-based backup: export the running game / import a previously exported string
+  function exportString() {
+    if (!HOO.game) return null;
+    try { return serialize(); } catch (e) { return null; }
+  }
+
+  function importString(json) {
+    if (typeof json !== 'string' || !json) return false;
+    return adoptSave(json);
   }
 
   function relationName(value) {
@@ -387,6 +438,7 @@ globalThis.HOO = globalThis.HOO || {};
 
   HOO.State = {
     newGame: newGame, save: save, load: load, saveMeta: saveMeta,
+    exportString: exportString, importString: importString,
     makeEmpire: makeEmpire, makeRelation: makeRelation,
     knows: knows, grantTech: grantTech, bestTech: bestTech, allKnown: allKnown,
     techLevel: techLevel, miniCost: miniCost, miniSize: miniSize,

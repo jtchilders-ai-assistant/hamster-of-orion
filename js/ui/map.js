@@ -15,21 +15,26 @@ globalThis.HOO = globalThis.HOO || {};
   var banner = null;
   var pulse = 0;
   var starfield = null;
+  var generation = 0;      // bumped per init(); stale render loops see it and stop
+  var dirty = true;        // something changed — draw on the next frame
+  var resizeBound = false; // the window resize listener is installed once, ever
+
+  function markDirty() { dirty = true; }
 
   function init(cv, wrapEl) {
     canvas = cv; wrap = wrapEl;
     ctx = canvas.getContext('2d');
+    // drop state tied to the previous frame's DOM / galaxy
+    hoverTip = null; banner = null; bannerText = null; starfield = null;
+    hoverStar = null; dragging = null; pointers = {}; pinch = null; suppressTap = false;
     resize();
-    window.addEventListener('resize', resize);
+    if (!resizeBound) {
+      resizeBound = true;
+      window.addEventListener('resize', function () { resize(); markDirty(); });
+    }
     fitView();
-
-    canvas.addEventListener('mousedown', onDown);
-    canvas.addEventListener('mousemove', onMove);
-    canvas.addEventListener('mouseup', onUp);
-    canvas.addEventListener('wheel', onWheel, { passive: false });
-    canvas.addEventListener('mouseleave', function () { hideTip(); dragging = null; });
-
-    requestAnimationFrame(tick);
+    bindInput();
+    startLoop();
   }
 
   function resize() {
@@ -48,6 +53,7 @@ globalThis.HOO = globalThis.HOO || {};
     view.scale = Math.min(sx, sy) * 0.95;
     view.x = (g.w - r.width / view.scale) / 2;
     view.y = (g.h - r.height / view.scale) / 2;
+    markDirty();
   }
 
   function w2s(x, y) { // world to screen (css px)
@@ -59,6 +65,107 @@ globalThis.HOO = globalThis.HOO || {};
 
   // ---------- interactions ----------
   var dragging = null;
+
+  // pointer events unify mouse + touch: tap selects, one-finger drag pans,
+  // pinch zooms. Mouse behavior is identical to the old mouse-only handlers.
+  var pointers = {};        // pointerId -> {x, y}
+  var pinch = null;         // {dist, cx, cy} while two touches are down
+  var suppressTap = false;  // a pinch just ended — don't treat the lift as a tap
+
+  function bindInput() {
+    if (window.PointerEvent) {
+      canvas.style.touchAction = 'none'; // stop the browser panning/zooming the page
+      canvas.addEventListener('pointerdown', onPointerDown);
+      canvas.addEventListener('pointermove', onPointerMove);
+      canvas.addEventListener('pointerup', onPointerUp);
+      canvas.addEventListener('pointercancel', onPointerCancel);
+      canvas.addEventListener('pointerleave', onPointerLeave);
+    } else {
+      canvas.addEventListener('mousedown', onDown);
+      canvas.addEventListener('mousemove', onMove);
+      canvas.addEventListener('mouseup', onUp);
+      canvas.addEventListener('mouseleave', function () { hideTip(); dragging = null; });
+    }
+    canvas.addEventListener('wheel', onWheel, { passive: false });
+  }
+
+  function pinchState() {
+    var ids = Object.keys(pointers);
+    var a = pointers[ids[0]], b = pointers[ids[1]];
+    var rect = canvas.getBoundingClientRect();
+    var dx = a.x - b.x, dy = a.y - b.y;
+    return {
+      dist: Math.max(10, Math.sqrt(dx * dx + dy * dy)),
+      cx: (a.x + b.x) / 2 - rect.left,
+      cy: (a.y + b.y) / 2 - rect.top
+    };
+  }
+
+  function onPointerDown(e) {
+    pointers[e.pointerId] = { x: e.clientX, y: e.clientY };
+    if (canvas.setPointerCapture) {
+      try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* stale pointer id */ }
+    }
+    var n = Object.keys(pointers).length;
+    if (n === 2) {
+      pinch = pinchState(); // second finger down: pan becomes pinch-zoom
+      dragging = null;
+      suppressTap = true;
+      hideTip();
+    } else if (n === 1) {
+      suppressTap = false;
+      if (e.pointerType !== 'mouse') hideTip();
+      onDown(e);
+    }
+    markDirty();
+  }
+
+  function onPointerMove(e) {
+    var pt = pointers[e.pointerId];
+    if (pt) { pt.x = e.clientX; pt.y = e.clientY; }
+    if (pinch) {
+      if (pt) {
+        var now = pinchState();
+        var factor = now.dist / pinch.dist;
+        var before = s2w(now.cx, now.cy);
+        view.scale = U.clamp(view.scale * factor, 0.25, 4);
+        var after = s2w(now.cx, now.cy);
+        view.x += before.x - after.x;
+        view.y += before.y - after.y;
+        // follow the midpoint so a two-finger drag also pans
+        view.x -= (now.cx - pinch.cx) / view.scale;
+        view.y -= (now.cy - pinch.cy) / view.scale;
+        pinch = now;
+        markDirty();
+      }
+      return;
+    }
+    onMove(e);
+  }
+
+  function onPointerUp(e) {
+    delete pointers[e.pointerId];
+    var remaining = Object.keys(pointers).length;
+    if (pinch) {
+      if (remaining < 2) { pinch = null; dragging = null; }
+      return;
+    }
+    if (remaining === 0) {
+      if (suppressTap) { suppressTap = false; dragging = null; return; }
+      onUp(e);
+    }
+    markDirty();
+  }
+
+  function onPointerCancel(e) {
+    delete pointers[e.pointerId];
+    if (Object.keys(pointers).length < 2) pinch = null;
+    dragging = null;
+  }
+
+  function onPointerLeave(e) {
+    if (e.pointerType === 'mouse') { hideTip(); dragging = null; }
+  }
 
   function starAt(wx, wy) {
     var g = HOO.game, best = null, bd = 14 / view.scale;
@@ -72,6 +179,8 @@ globalThis.HOO = globalThis.HOO || {};
   function fleetAt(wx, wy) {
     var g = HOO.game, best = null, bd = 10 / view.scale;
     g.fleets.forEach(function (f) {
+      // undrawn enemy fleets (outside scanner coverage) cannot be hovered or inspected
+      if (f.empire !== 0 && !visibleToPlayer(g, f)) return;
       var pos = fleetDrawPos(f);
       var d = U.dist(wx, wy, pos.x, pos.y);
       if (d < bd) { bd = d; best = f; }
@@ -101,11 +210,12 @@ globalThis.HOO = globalThis.HOO || {};
     if (dragging) {
       var dx = (mx - dragging.sx) / view.scale, dy = (my - dragging.sy) / view.scale;
       if (Math.abs(mx - dragging.sx) + Math.abs(my - dragging.sy) > 4) dragging.moved = true;
-      if (dragging.moved) { view.x = dragging.vx - dx; view.y = dragging.vy - dy; }
+      if (dragging.moved) { view.x = dragging.vx - dx; view.y = dragging.vy - dy; markDirty(); }
       return;
     }
     var w = s2w(mx, my);
     var s = starAt(w.x, w.y);
+    if (s !== hoverStar) markDirty();
     hoverStar = s;
     var f = !s && fleetAt(w.x, w.y);
     if (s) showTipStar(s, mx, my);
@@ -132,6 +242,7 @@ globalThis.HOO = globalThis.HOO || {};
   function onUp(e) {
     var wasDrag = dragging && dragging.moved;
     dragging = null;
+    markDirty();
     if (wasDrag) return;
     var rect = canvas.getBoundingClientRect();
     var w = s2w(e.clientX - rect.left, e.clientY - rect.top);
@@ -176,6 +287,7 @@ globalThis.HOO = globalThis.HOO || {};
   function clearSelection() {
     selectedFleet = null;
     cancelModesQuiet();
+    markDirty();
   }
 
   function cancelModesQuiet() {
@@ -190,6 +302,7 @@ globalThis.HOO = globalThis.HOO || {};
     view.x = s.x - r.width / view.scale / 2;
     view.y = s.y - r.height / view.scale / 2;
     selectedStar = starId;
+    markDirty();
   }
 
   function onWheel(e) {
@@ -202,13 +315,24 @@ globalThis.HOO = globalThis.HOO || {};
     var after = s2w(mx, my);
     view.x += before.x - after.x;
     view.y += before.y - after.y;
+    markDirty();
+  }
+
+  // manual (Advanced Space Scanner): planet details visible for any star in
+  // scanner range without a visit — the panel uses the same rule
+  function starKnown(g, s) {
+    if (s.explored[0]) return true;
+    var pl = g.empires[0];
+    return !!(pl.derived.scanShowsPlanets && HOO.Fleet.scannerSees(g, pl, s.x, s.y));
   }
 
   // ---------- tooltip ----------
   function showTipStar(s, mx, my) {
     var g = HOO.game;
-    var html = '<div class="t-name">' + U.esc(s.name) + '</div>';
-    if (!s.explored[0]) {
+    var known = starKnown(g, s);
+    // unexplored names stay hidden — same as the map labels and the sidebar
+    var html = '<div class="t-name">' + (known ? U.esc(s.name) : 'Uncharted System') + '</div>';
+    if (!known) {
       html += '<div class="t-sub">Unexplored ' + s.color + ' star</div>';
     } else if (!s.planet) {
       html += '<div class="t-sub">No habitable planets</div>';
@@ -230,12 +354,18 @@ globalThis.HOO = globalThis.HOO || {};
     var g = HOO.game;
     var emp = g.empires[f.empire];
     var html = '<div class="t-name" style="color:' + emp.color + '">' + U.esc(HOO.DATA.raceById[emp.raceId].name) + ' fleet</div>';
-    html += '<div class="t-sub">' + HOO.Fleet.shipCount(f) + ' ships' + (f.at === null ? ' · in transit (' + HOO.Fleet.eta(g, f) + ' yr)' : '') + '</div>';
+    var sub = HOO.Fleet.shipCount(f) + ' ships';
+    if (f.at === null) {
+      // enemy ETAs need the Advanced Space Scanner (manual: Deep Space Scanners)
+      var showEta = f.empire === 0 || g.empires[0].derived.scanShowsPlanets;
+      sub += showEta ? ' · in transit (' + HOO.Fleet.eta(g, f) + ' yr)' : ' · in transit';
+    }
+    html += '<div class="t-sub">' + sub + '</div>';
     tip(html, mx, my);
   }
 
   function tip(html, mx, my) {
-    if (!hoverTip) {
+    if (!hoverTip || !hoverTip.parentNode) {
       hoverTip = U.el('div', { cls: 'map-tip' });
       wrap.appendChild(hoverTip);
     }
@@ -247,25 +377,47 @@ globalThis.HOO = globalThis.HOO || {};
   function hideTip() { if (hoverTip) hoverTip.style.display = 'none'; }
 
   // ---------- modes ----------
-  function setDeployMode(m) { deployMode = m; }
-  function setTransportMode(m) { transportMode = m; }
-  function setRelocMode(m) { relocMode = m; }
+  function setDeployMode(m) { deployMode = m; markDirty(); }
+  function setTransportMode(m) { transportMode = m; markDirty(); }
+  function setRelocMode(m) { relocMode = m; markDirty(); }
   function cancelModes() {
     deployMode = null; transportMode = null; relocMode = null;
+    markDirty();
     if (selectedStar !== null) HOO.Panels.showStar(selectedStar);
   }
   function getModes() { return { deploy: deployMode, transport: transportMode, reloc: relocMode }; }
 
-  function select(starId) { selectedStar = starId; selectedFleet = null; }
-  function selectFleet(f) { selectedFleet = f; selectedStar = null; }
+  function select(starId) { selectedStar = starId; selectedFleet = null; markDirty(); }
+  function selectFleet(f) { selectedFleet = f; selectedStar = null; markDirty(); }
   function getSelected() { return { star: selectedStar, fleet: selectedFleet }; }
 
+  // fuel-range ring visibility (Game menu setting)
+  function setShowRanges(on) { view.showRanges = !!on; markDirty(); }
+  function getShowRanges() { return view.showRanges !== false; }
+
   // ---------- render loop ----------
-  function tick() {
-    if (!canvas.parentNode) return; // frame torn down
-    pulse += 0.04;
-    draw();
-    requestAnimationFrame(tick);
+  // One loop per init(); superseded loops exit via the generation counter, so
+  // loading a game mid-session never stacks a second 60fps loop. The map is a
+  // turn-based board: draw immediately when dirty, at ~30fps while the
+  // selection pulse animates, and at a slow self-healing heartbeat otherwise.
+  // Nothing draws while the tab is hidden.
+  function startLoop() {
+    var gen = ++generation;
+    var last = 0;
+    function frame(ts) {
+      if (gen !== generation) return;       // a newer init() owns the canvas now
+      if (!canvas.parentNode) return;       // frame torn down
+      requestAnimationFrame(frame);
+      if (document.hidden) return;
+      var animating = selectedStar !== null || selectedFleet !== null || dragging;
+      var wait = dirty ? 0 : (animating ? 33 : 250);
+      if (ts - last < wait) return;
+      pulse += Math.min(0.12, Math.max(0, (ts - last)) * 0.0024); // 0.04/frame at 60fps
+      last = ts;
+      dirty = false;
+      draw();
+    }
+    requestAnimationFrame(frame);
   }
 
   function draw() {
@@ -395,7 +547,8 @@ globalThis.HOO = globalThis.HOO || {};
       var legal = HOO.Fleet.inRange(g, emp, hoverStar, null) &&
         hoverStar.planet && hoverStar.planet.colony &&
         HOO.CONST.PLANET_TYPES[hoverStar.planet.type].hostility <= emp.derived.maxHostility;
-      var eta = Math.ceil(U.dist(from.x, from.y, hoverStar.x, hoverStar.y) / HOO.Galaxy.PARSEC / Math.max(1, emp.derived.warp - 1));
+      // nebula-aware ETA — matches the year the transports actually arrive
+      var eta = HOO.Fleet.travelYears(g, from.x, from.y, Math.max(1, emp.derived.warp - 1), hoverStar.x, hoverStar.y);
       return {
         src: from, dst: hoverStar, legal: legal,
         label: legal ? eta + ' yr' : 'invalid',
@@ -425,7 +578,8 @@ globalThis.HOO = globalThis.HOO || {};
       if (!hoverStar || (f.at !== null && hoverStar.id === f.at)) return { src: src, banner: bannerTxt };
       var probe = { ships: sel.counts };
       var legal3 = HOO.Fleet.inRange(g, emp, hoverStar, probe);
-      var eta3 = Math.max(1, Math.ceil(U.dist(src.x, src.y, hoverStar.x, hoverStar.y) / HOO.Galaxy.PARSEC / warp));
+      // nebula-aware ETA — matches the year the fleet actually arrives
+      var eta3 = HOO.Fleet.travelYears(g, src.x, src.y, warp, hoverStar.x, hoverStar.y);
       return {
         src: src, dst: hoverStar, legal: legal3,
         label: legal3 ? eta3 + ' yr' : 'out of range',
@@ -508,20 +662,43 @@ globalThis.HOO = globalThis.HOO || {};
     }
   }
 
+  // per-color/size glow sprites so drawStar doesn't build a fresh radial
+  // gradient for every star on every frame
+  var glowCache = {};
+  var glowCacheCount = 0;
+  function glowSprite(colorHex, r) {
+    var R = Math.max(1, Math.round(r * 2) / 2); // 0.5px buckets keep the cache small
+    var key = colorHex + ':' + R;
+    var c = glowCache[key];
+    if (!c) {
+      if (glowCacheCount > 240) { glowCache = {}; glowCacheCount = 0; } // zoom marathon safety valve
+      var size = Math.ceil(R * 6.4) + 2;
+      c = document.createElement('canvas');
+      c.width = c.height = size;
+      var g2 = c.getContext('2d');
+      var half = size / 2;
+      var grad = g2.createRadialGradient(half, half, 0, half, half, R * 3.2);
+      grad.addColorStop(0, colorHex);
+      grad.addColorStop(0.35, colorHex + '55');
+      grad.addColorStop(1, 'rgba(0,0,0,0)');
+      g2.fillStyle = grad;
+      g2.beginPath();
+      g2.arc(half, half, R * 3.2, 0, Math.PI * 2);
+      g2.fill();
+      glowCache[key] = c;
+      glowCacheCount++;
+    }
+    return c;
+  }
+
   function drawStar(s) {
     var g = HOO.game;
     var p = w2s(s.x, s.y);
     var r = (s.orion ? 6 : 4) * Math.max(0.6, Math.sqrt(view.scale));
 
-    // glow
-    var grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r * 3.2);
-    grad.addColorStop(0, s.colorHex);
-    grad.addColorStop(0.35, s.colorHex + '55');
-    grad.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = grad;
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, r * 3.2, 0, Math.PI * 2);
-    ctx.fill();
+    // glow (cached sprite)
+    var glow = glowSprite(s.colorHex, r);
+    ctx.drawImage(glow, p.x - glow.width / 2, p.y - glow.height / 2);
 
     ctx.fillStyle = s.colorHex;
     ctx.beginPath();
@@ -553,7 +730,7 @@ globalThis.HOO = globalThis.HOO || {};
     // name
     if (view.scale > 0.5) {
       var name = s.name;
-      var known2 = s.explored[0];
+      var known2 = starKnown(g, s); // explored, or covered by the Advanced Space Scanner
       ctx.font = '600 ' + Math.max(9, 10 * view.scale) + 'px "IBM Plex Mono", monospace';
       ctx.textAlign = 'center';
       if (s.planet && s.planet.colony && (known2 || s.planet.colony.empire === 0)) {
@@ -581,6 +758,8 @@ globalThis.HOO = globalThis.HOO || {};
     init: init, fitView: fitView, select: select, selectFleet: selectFleet, getSelected: getSelected,
     setDeployMode: setDeployMode, setTransportMode: setTransportMode, setRelocMode: setRelocMode,
     cancelModes: cancelModes, getModes: getModes,
-    centerOn: centerOn, clearSelection: clearSelection
+    centerOn: centerOn, clearSelection: clearSelection,
+    setShowRanges: setShowRanges, getShowRanges: getShowRanges,
+    requestDraw: markDirty
   };
 })();

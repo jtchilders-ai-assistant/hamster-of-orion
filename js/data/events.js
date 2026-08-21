@@ -61,8 +61,12 @@ HOO.DATA.EVENTS = [
     text: '{colony} has risen in open revolt. Loyalist forces must be transported in to restore order.'
   },
   {
-    id: 'monster', good: false, weight: 4, name: 'Space Monster',
-    text: 'Something vast has entered known space near {star}. It does not answer hails. It is moving from system to system, and nothing survives behind it.'
+    id: 'amoeba', good: false, weight: 2, name: 'Space Amoeba',
+    text: 'A vast amorphous creature has entered known space. Worlds in its wake are left radiated husks. Astrogators project its course: {star}.'
+  },
+  {
+    id: 'crystal', good: false, weight: 2, name: 'Space Crystal',
+    text: 'An immense crystalline entity has entered known space, stripping every world it passes of life. Astrogators project its course: {star}.'
   },
   {
     id: 'supernova', good: false, weight: 5, name: 'Super Nova',

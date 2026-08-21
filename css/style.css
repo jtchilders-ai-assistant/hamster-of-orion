@@ -114,6 +114,13 @@ button { font-family: inherit; color: inherit; }
   grid-template-rows: 46px auto 1fr 54px;
   height: 100%;
 }
+/* pin each child to its row: when the alert bar is empty it collapses to
+   display:none, and without explicit placement .main would fall into the
+   auto row (map frozen small) and .bottombar into the 1fr row */
+.frame > .topbar { grid-row: 1; }
+.frame > .alertbar { grid-row: 2; }
+.frame > .main { grid-row: 3; }
+.frame > .bottombar { grid-row: 4; }
 
 .topbar {
   display: flex;
@@ -230,6 +237,7 @@ button { font-family: inherit; color: inherit; }
   border-radius: 3px;
   cursor: pointer;
 }
+.ratio-bar:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 .ratio-fill {
   position: absolute; inset: 0 auto 0 0;
   background: linear-gradient(180deg, #3A79C9, #2A5B9C);
@@ -611,6 +619,23 @@ table.data td.r, table.data th.r { text-align: right; }
 
 /* preset buttons */
 .preset-row { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 10px; }
+
+/* ---------- small-viewport notice ---------- */
+
+.viewport-notice {
+  position: fixed;
+  left: 50%; bottom: 70px;
+  transform: translateX(-50%);
+  z-index: 90;
+  display: flex; align-items: center; gap: 10px;
+  background: var(--panel-2);
+  border: 1px solid var(--gold-dim);
+  border-radius: 5px;
+  padding: 8px 12px;
+  font-size: 12px; color: var(--muted);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+  max-width: calc(100vw - 24px);
+}
 
 @media (max-width: 900px) {
   .main { grid-template-columns: 1fr 300px; }

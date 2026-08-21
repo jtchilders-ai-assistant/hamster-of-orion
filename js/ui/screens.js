@@ -15,43 +15,205 @@ globalThis.HOO = globalThis.HOO || {};
       case 'planets': return planetsScreen();
       case 'tech': return techScreen();
       case 'status': return statusScreen();
+      case 'help': return helpScreen();
     }
   }
 
   // ================= GAME MENU =================
+  var SAVE_SLOTS = [1, 2, 3, 4, 5, 6]; // MOO 1993 offered six save slots
+
+  function doSave(slot) {
+    if (HOO.State.save(slot)) {
+      HOO.UI.closeAll();
+      HOO.UI.toast({ tag: 'Imperial Archives', text: 'Game saved to slot ' + slot + '.', kind: 'green', timeout: 5000 });
+    } else {
+      HOO.UI.dialog('Archive Failure',
+        'The game could <b>not</b> be saved — browser storage is full or blocked (private browsing?). ' +
+        'Use <b>Export Save</b> to download a backup file instead.');
+    }
+  }
+
+  function doLoad(slot) {
+    if (HOO.State.load(slot)) { HOO.UI.closeAll(); HOO.Main.rebuild(); }
+    else HOO.UI.dialog('Archive Damaged', 'Save slot ' + slot + ' could not be read — it may be corrupt or from a newer build.');
+  }
+
+  function deleteSave(slot) {
+    try {
+      localStorage.removeItem('hoo_save_' + slot);
+      localStorage.removeItem('hoo_save_' + slot + '_meta');
+    } catch (e) { /* blocked storage — nothing to delete anyway */ }
+  }
+
   function gameMenu() {
-    var content = el('div', { style: 'display:flex; flex-direction:column; gap:10px; max-width:340px;' });
-    [1, 2, 3].forEach(function (slot) {
+    var content = el('div', { style: 'display:flex; flex-direction:column; gap:8px; max-width:420px;' });
+    SAVE_SLOTS.forEach(function (slot) {
       var meta = HOO.State.saveMeta(slot);
-      var lbl = 'Save Slot ' + slot + (meta ? ' — cycle ' + meta.year + ' (' + meta.race + ')' : ' — empty');
+      var lbl = 'Slot ' + slot + (meta ? ' — cycle ' + meta.year + ' (' + meta.race + ')' : ' — empty');
       var row = el('div', { style: 'display:flex; gap:6px;' });
       row.appendChild(el('button', {
-        cls: 'btn', style: 'flex:1;', text: 'Save · ' + lbl,
+        cls: 'btn', style: 'flex:1; text-align:left;', text: 'Save · ' + lbl,
         onclick: function () {
-          HOO.State.save(slot);
-          HOO.UI.closeAll();
-          HOO.UI.toast({ tag: 'Imperial Archives', text: 'Game saved to slot ' + slot + '.', kind: 'green', timeout: 5000 });
+          if (meta) {
+            HOO.UI.dialog('Overwrite Slot ' + slot + '?',
+              'The archived game from cycle ' + meta.year + ' (' + meta.race + ') will be replaced.', [
+              { label: 'Overwrite', cls: 'danger', fn: function () { doSave(slot); } },
+              { label: 'Cancel', cls: '' }
+            ]);
+          } else {
+            doSave(slot);
+          }
         }
       }));
-      if (meta) row.appendChild(el('button', {
-        cls: 'btn', text: 'Load',
-        onclick: function () {
-          if (HOO.State.load(slot)) { HOO.UI.closeAll(); HOO.Main.rebuild(); }
-        }
-      }));
+      if (meta) {
+        row.appendChild(el('button', {
+          cls: 'btn', text: 'Load',
+          onclick: function () {
+            HOO.UI.dialog('Load Slot ' + slot + '?',
+              'Unsaved progress in the current game (orders, diplomacy, battles since the last autosave) will be lost.', [
+              { label: 'Load', cls: 'danger', fn: function () { doLoad(slot); } },
+              { label: 'Cancel', cls: '' }
+            ]);
+          }
+        }));
+        row.appendChild(el('button', {
+          cls: 'btn danger', text: '✕', title: 'Delete this save',
+          onclick: function () {
+            HOO.UI.dialog('Delete Slot ' + slot + '?', 'The archived game from cycle ' + meta.year + ' will be erased.', [
+              { label: 'Delete', cls: 'danger', fn: function () { deleteSave(slot); HOO.UI.closeAll(); gameMenu(); } },
+              { label: 'Cancel', cls: '' }
+            ]);
+          }
+        }));
+      }
       content.appendChild(row);
     });
+
+    // file backup: export / import the versioned save JSON
+    var fileIn = el('input', { type: 'file', accept: '.json,application/json', style: 'display:none;' });
+    fileIn.addEventListener('change', function () {
+      var file = fileIn.files && fileIn.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function () {
+        if (HOO.State.importString(String(reader.result))) { HOO.UI.closeAll(); HOO.Main.rebuild(); }
+        else HOO.UI.dialog('Import Failed', 'That file is not a valid Hamster of Orion save (or comes from a newer build).');
+      };
+      reader.readAsText(file);
+    });
+    var xfer = el('div', { style: 'display:flex; gap:6px;' }, [fileIn]);
+    xfer.appendChild(el('button', {
+      cls: 'btn', style: 'flex:1;', text: 'Export Save (file)',
+      onclick: function () {
+        var json = HOO.State.exportString();
+        if (!json) { HOO.UI.dialog('Export Failed', 'There is no game running to export.'); return; }
+        var blob = new Blob([json], { type: 'application/json' });
+        var a = el('a', { href: URL.createObjectURL(blob), download: 'hoo_save_' + HOO.game.year + '.json' });
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(function () { URL.revokeObjectURL(a.href); }, 5000);
+      }
+    }));
+    xfer.appendChild(el('button', {
+      cls: 'btn', style: 'flex:1;', text: 'Import Save (file)',
+      onclick: function () {
+        HOO.UI.dialog('Import Save?', 'The imported game will replace the current one. Unsaved progress will be lost.', [
+          { label: 'Choose File', fn: function () { fileIn.click(); } },
+          { label: 'Cancel', cls: '' }
+        ]);
+      }
+    }));
+    content.appendChild(xfer);
+
+    content.appendChild(el('hr', { cls: 'hr' }));
+    var rangeOn = !HOO.Map.getShowRanges || HOO.Map.getShowRanges();
+    content.appendChild(el('button', {
+      cls: 'btn', text: 'Fuel Range Rings: ' + (rangeOn ? 'ON' : 'OFF'),
+      onclick: function () {
+        if (HOO.Map.setShowRanges) HOO.Map.setShowRanges(!rangeOn);
+        HOO.UI.closeAll();
+        gameMenu();
+      }
+    }));
+    content.appendChild(el('button', { cls: 'btn', text: 'Message Log', onclick: function () { messageLog(); } }));
+    content.appendChild(el('button', { cls: 'btn', text: 'Help & Shortcuts', onclick: function () { helpScreen(); } }));
+
     content.appendChild(el('hr', { cls: 'hr' }));
     content.appendChild(el('button', {
       cls: 'btn danger', text: 'Abandon Game (Main Menu)',
       onclick: function () {
         HOO.UI.dialog('Abandon this galaxy?', 'The current game will be autosaved.', [
-          { label: 'Main Menu', cls: 'danger', fn: function () { HOO.State.save('auto'); HOO.UI.closeAll(); HOO.NewGame.showTitle(); } },
+          {
+            label: 'Main Menu', cls: 'danger', fn: function () {
+              var saved = HOO.State.save('auto');
+              HOO.UI.closeAll();
+              HOO.NewGame.showTitle();
+              if (!saved) {
+                HOO.UI.dialog('Archive Failure', 'The autosave failed — browser storage is full or blocked. The abandoned game was NOT preserved.');
+              }
+            }
+          },
           { label: 'Keep Playing', cls: '' }
         ]);
       }
     }));
-    HOO.UI.modal(content, { title: 'Imperial Archives', width: 480 });
+    HOO.UI.modal(content, { title: 'Imperial Archives', width: 500 });
+  }
+
+  // ================= MESSAGE LOG =================
+  function messageLog() {
+    var hist = (HOO.Notices && HOO.Notices.getHistory) ? HOO.Notices.getHistory() : [];
+    var content = el('div', {});
+    if (!hist.length) {
+      content.appendChild(el('p', { cls: 'muted-t', text: 'No reports this session yet. Turn reports and dispatches are archived here, even after their toasts fade.' }));
+    }
+    var list = el('div', { cls: 'picker-list' });
+    hist.slice().reverse().forEach(function (h) {
+      list.appendChild(el('div', { cls: 'gnn', style: 'margin-bottom:6px;' }, [
+        el('span', { cls: 'gnn-tag', text: 'Cycle ' + h.year + (h.name ? ' — ' + h.name : '') }),
+        el('div', { style: 'font-size:12.5px;', html: U.esc(h.text) })
+      ]));
+    });
+    content.appendChild(list);
+    HOO.UI.modal(content, { title: 'Message Log — this session', width: 700 });
+  }
+
+  // ================= HELP =================
+  function helpScreen() {
+    var content = el('div', {});
+    function h(t) { content.appendChild(el('div', { cls: 'eyebrow', style: 'margin-top:12px; display:block;', text: t })); }
+    function kv2(k, v) {
+      content.appendChild(el('div', { cls: 'kv' }, [
+        el('span', { cls: 'k mono', text: k }),
+        el('span', { cls: 'v', text: v })
+      ]));
+    }
+    h('Keyboard');
+    kv2('Enter', 'End the cycle (turn)');
+    kv2('Esc', 'Close screen · cancel order · deselect');
+    kv2('1-6', 'Stations: Design, Fleet, Races, Planets, Tech, Status');
+    kv2('G', 'Game menu — saves, settings, this help');
+    kv2('Tab / ⇧Tab', 'Cycle your colonies');
+    kv2('F', 'Cycle your fleets');
+    kv2('H', 'Center on your home world');
+    kv2('?', 'This help screen');
+    h('Running the Empire');
+    [
+      'Sliders: each colony splits its output between Ship, Def, Ind, Eco, and Tech. Eco snaps to the waste-cleanup minimum — click a bar\'s label to lock it.',
+      'Range: fleets can travel only within fuel range (rings on the map) of your colonies. Better fuel cells extend it; reserve tanks add 3 parsecs.',
+      'Contact: you meet an empire when colonies or fleets come close. Diplomacy, trade, and espionage all require contact.',
+      'Council: once two-thirds of the galaxy is settled, the High Council convenes to elect a Master of Orion. Two-thirds of all votes wins.',
+      'Victory: win the council vote, or be the last empire standing.'
+    ].forEach(function (t) {
+      content.appendChild(el('p', { cls: 'muted-t', style: 'font-size:12.5px; margin:4px 0;', text: t }));
+    });
+    h('About');
+    content.appendChild(el('p', {
+      cls: 'dim-t mono', style: 'font-size:11px;',
+      text: 'Hamster of Orion' + (HOO.VERSION ? ' · v' + HOO.VERSION : '') + ' — a from-scratch homage to Master of Orion (1993).'
+    }));
+    HOO.UI.modal(content, { title: 'Help — Commander\'s Primer', width: 640 });
   }
 
   // ================= SHIP DESIGN =================
@@ -217,6 +379,16 @@ globalThis.HOO = globalThis.HOO || {};
       }));
       var ctl = el('div', { style: 'display:flex; gap:4px; align-items:center;' });
       if (t) {
+        // MOO: missiles mount on a light 2-shot rack or a heavy 5-shot rack
+        // (the 2-rack is a third smaller and cheaper); compute() reads w.rack
+        if (t.effect.wclass === 'missile') {
+          var rk = w.rack === 2 ? 2 : 5;
+          ctl.appendChild(el('button', {
+            cls: 'btn small', text: rk + '-rack',
+            title: 'Missile rack: 5 shots per launcher, or 2 shots at 2/3 the size and cost',
+            onclick: function () { w.rack = rk === 2 ? 5 : 2; render(); }
+          }));
+        }
         ctl.appendChild(el('button', { cls: 'btn small', text: '−', onclick: function () { if (w.count > 1) w.count--; else spec.weapons.splice(idx, 1); render(); } }));
         ctl.appendChild(el('span', { cls: 'mono', text: String(w.count) }));
         ctl.appendChild(el('button', { cls: 'btn small', text: '+', onclick: function () { w.count++; render(); } }));
@@ -302,7 +474,7 @@ globalThis.HOO = globalThis.HOO || {};
     }
     d.weapons.forEach(function (w) {
       var e = T[w.id].effect;
-      row(w.count + '× ' + T[w.id].name, e.wclass, e.dmin + '-' + e.dmax + ' dmg · range ' + (e.range || 1));
+      row(w.count + '× ' + T[w.id].name + (w.rack === 2 ? ' (2-rack)' : ''), e.wclass, e.dmin + '-' + e.dmax + ' dmg · range ' + (e.range || 1));
     });
 
     section('Special Devices');
@@ -360,11 +532,14 @@ globalThis.HOO = globalThis.HOO || {};
     });
     content.appendChild(dRow);
 
-    // fleets table
+    // fleets table — count columns and their design-name headers share the
+    // same right alignment so a number reads under its own header
     var tbl = el('table', { cls: 'data' });
     var hdr = el('tr', {});
-    ['Station', 'ETA'].concat(emp.designs.map(function (d) { return d ? d.name : '—'; })).forEach(function (h) {
-      hdr.appendChild(el('th', { text: h }));
+    hdr.appendChild(el('th', { text: 'Station' }));
+    hdr.appendChild(el('th', { cls: 'r', text: 'ETA' }));
+    emp.designs.forEach(function (d) {
+      hdr.appendChild(el('th', { cls: 'r', text: d ? d.name : '—' }));
     });
     tbl.appendChild(hdr);
     g.fleets.filter(function (f) { return f.empire === 0; }).forEach(function (f) {
@@ -376,7 +551,7 @@ globalThis.HOO = globalThis.HOO || {};
         }
       });
       tr.appendChild(el('td', { text: f.at !== null ? g.stars[f.at].name : (g.stars[f.from] ? g.stars[f.from].name + '→' + g.stars[f.to].name : '→' + g.stars[f.to].name) }));
-      tr.appendChild(el('td', { text: f.at !== null ? '—' : String(HOO.Fleet.eta(g, f)) }));
+      tr.appendChild(el('td', { cls: 'r', text: f.at !== null ? '—' : String(HOO.Fleet.eta(g, f)) }));
       f.ships.forEach(function (n) { tr.appendChild(el('td', { cls: 'r', text: n ? String(n) : '' })); });
       tbl.appendChild(tr);
     });
@@ -393,15 +568,17 @@ globalThis.HOO = globalThis.HOO || {};
     var head = el('div', { style: 'display:flex; gap:8px; margin-bottom:12px; align-items:center;' });
     head.appendChild(el('button', { cls: 'btn small', text: 'Galactic Status', onclick: function () { statusScreen(); } }));
     head.appendChild(el('div', { cls: 'spacer', style: 'flex:1;' }));
-    // internal security slider
-    var secWrap = el('div', { style: 'width:300px;' });
-    secWrap.appendChild(HOO.UI.ratioRow({
+    // internal security slider (wider label column so "Security" isn't clipped)
+    var secWrap = el('div', { style: 'width:340px;' });
+    var secRow = HOO.UI.ratioRow({
       label: 'Security', cls: 'r-def',
       get: function () { return (player.securityAlloc || 0) * 5; },
       set: function (v) { player.securityAlloc = Math.round(v / 5); },
       pctLabel: function () { return (player.securityAlloc || 0) + '%'; },
       note: function () { return 'of production'; }
-    }));
+    });
+    secRow.style.gridTemplateColumns = '74px 1fr 88px';
+    secWrap.appendChild(secRow);
     head.appendChild(secWrap);
     content.appendChild(head);
 
@@ -456,10 +633,52 @@ globalThis.HOO = globalThis.HOO || {};
       [['hide', 'Hide'], ['espionage', 'Espionage'], ['sabotage', 'Sabotage']].forEach(function (m) {
         missions.appendChild(el('button', {
           cls: 'btn small' + (sp.mission === m[0] ? ' active' : ''), text: m[1],
-          onclick: function () { sp.mission = m[0]; HOO.UI.closeAll(); racesScreen(); }
+          onclick: function () {
+            HOO.Espionage.setSpyOrders(g, 0, emp.id, { mission: m[0] });
+            HOO.UI.closeAll();
+            racesScreen();
+          }
         }));
       });
       spyRow.appendChild(missions);
+      // mission-specific orders — the engine honors techTarget / sabTarget / sabStarId
+      var SEL_STYLE = 'width:100%; margin-top:4px; background:var(--void-2); border:1px solid var(--line-2); color:var(--ink); padding:4px 6px; border-radius:4px; font-size:11px;';
+      if (sp.mission === 'espionage') {
+        var selT = el('select', { style: SEL_STYLE, title: 'Which field our agents try to steal from' });
+        selT.appendChild(el('option', { value: '', text: 'Steal: any field (spies\' choice)' }));
+        HOO.CONST.FIELDS.forEach(function (fld) {
+          var o = el('option', { value: fld, text: 'Steal: ' + HOO.CONST.FIELD_NAMES[fld] });
+          if (sp.techTarget === fld) o.selected = true;
+          selT.appendChild(o);
+        });
+        selT.addEventListener('change', function () {
+          HOO.Espionage.setSpyOrders(g, 0, emp.id, { techTarget: selT.value || null });
+        });
+        spyRow.appendChild(selT);
+      } else if (sp.mission === 'sabotage') {
+        var selOp = el('select', { style: SEL_STYLE, title: 'What the saboteurs go after' });
+        [['', 'Sabotage: spies\' choice'], ['factories', 'Sabotage: factories'], ['bases', 'Sabotage: missile bases'], ['rebellion', 'Sabotage: incite rebellion']].forEach(function (op) {
+          var o = el('option', { value: op[0], text: op[1] });
+          if ((sp.sabTarget || '') === op[0]) o.selected = true;
+          selOp.appendChild(o);
+        });
+        selOp.addEventListener('change', function () {
+          HOO.Espionage.setSpyOrders(g, 0, emp.id, { sabTarget: selOp.value || null });
+        });
+        spyRow.appendChild(selOp);
+        var selCol = el('select', { style: SEL_STYLE, title: 'Which of their colonies to strike' });
+        selCol.appendChild(el('option', { value: '', text: 'Target: their largest colony' }));
+        HOO.Colony.colonies(g, emp.id).forEach(function (e2) {
+          if (!e2.star.explored[0]) return; // saboteurs can only be directed at charted systems
+          var o = el('option', { value: String(e2.star.id), text: 'Target: ' + e2.star.name });
+          if (sp.sabStarId === e2.star.id) o.selected = true;
+          selCol.appendChild(o);
+        });
+        selCol.addEventListener('change', function () {
+          HOO.Espionage.setSpyOrders(g, 0, emp.id, { sabStarId: selCol.value === '' ? null : parseInt(selCol.value, 10) });
+        });
+        spyRow.appendChild(selCol);
+      }
       card.appendChild(spyRow);
 
       var btns = el('div', { style: 'display:flex; gap:6px; margin-top:10px;' });
@@ -500,10 +719,11 @@ globalThis.HOO = globalThis.HOO || {};
     content.appendChild(list);
 
     function addOption(label, enabled, fn) {
-      list.appendChild(el('button', {
-        cls: 'btn', style: 'text-align:left;', text: label, disabled: enabled ? undefined : 'true',
-        onclick: fn
-      }));
+      var b = el('button', { cls: 'btn', style: 'text-align:left;', text: label, onclick: fn });
+      // set the attribute only when actually disabled — el() would otherwise
+      // stringify undefined and disable every option
+      if (!enabled) b.setAttribute('disabled', 'true');
+      list.appendChild(b);
     }
 
     function respond(accepted, acceptText, rejectText, after) {
@@ -561,6 +781,27 @@ globalThis.HOO = globalThis.HOO || {};
           respond(true, 'So the mask slips. We will remember this betrayal.', '', function () { HOO.UI.closeAll(); racesScreen(); });
         });
       }
+
+      // third-party pressure — the engine performs the break/declaration on accept
+      var breakTargets = [], warTargets = [];
+      g.empires.forEach(function (t3) {
+        if (t3.dead || t3.id === 0 || t3.id === emp.id) return;
+        if (!player.relations[t3.id] || !player.relations[t3.id].contact) return;
+        var rT = emp.relations[t3.id];
+        if (!rT || !rT.contact) return;
+        if (rT.treaty !== 'none') breakTargets.push(t3);
+        if (!rT.war) warTargets.push(t3);
+      });
+      if (breakTargets.length) {
+        addOption('Demand They Break a Treaty…', true, function () {
+          thirdPartyPicker(emp, breakTargets, 'breakAllianceWith');
+        });
+      }
+      if (warTargets.length) {
+        addOption('Urge Them to Declare War…', true, function () {
+          thirdPartyPicker(emp, warTargets, 'declareWarOn');
+        });
+      }
     }
 
     addOption('Offer Tribute (BC)', player.reserve >= 10, function () {
@@ -570,6 +811,13 @@ globalThis.HOO = globalThis.HOO || {};
       respond(true, 'Your gift of ' + U.fmt(amt) + ' BC is… noted. The ' + race.name + ' do not forget generosity.', '', function () { HOO.UI.closeAll(); racesScreen(); });
     });
 
+    // gifting knowledge (manual: tribute) — unlike an exchange, the giver may
+    // part with their newest secrets
+    var techGifts = HOO.Diplomacy.tributableTechs(player, emp);
+    addOption('Offer Tribute (Technology)', techGifts.length > 0, function () {
+      tributeTechPicker(emp, techGifts);
+    });
+
     var give = HOO.Diplomacy.tradableTechs(player, emp);
     var want = HOO.Diplomacy.tradableTechs(emp, player);
     addOption('Exchange Technology', give.length > 0 && want.length > 0 && !rel.war, function () {
@@ -577,6 +825,60 @@ globalThis.HOO = globalThis.HOO || {};
     });
 
     HOO.UI.modal(content, { title: 'Audience — ' + race.name, width: 640 });
+  }
+
+  // pick a technology to gift as tribute
+  function tributeTechPicker(emp, gifts) {
+    var g = HOO.game;
+    var race = HOO.DATA.raceById[emp.raceId];
+    var content = el('div', {});
+    content.appendChild(el('p', { cls: 'muted-t', text: 'A gift of knowledge. The newer the secret, the warmer the ' + race.name + ' memory of it.' }));
+    var list = el('div', { cls: 'picker-list' });
+    gifts.slice().reverse().slice(0, 14).forEach(function (t) { // newest first
+      list.appendChild(el('div', {
+        cls: 'design-slot', onclick: function () {
+          HOO.Diplomacy.tributeTech(g, 0, emp.id, t.id);
+          HOO.UI.dialog('The ' + race.name + ' respond',
+            '<div class="narrative"><span class="speaker">' + U.esc(emp.leaderName) + '</span>The secrets of ' + U.esc(t.name) + ' are… a generous gift. We will not forget it.</div>',
+            [{ label: 'Very Well', fn: function () { HOO.UI.closeAll(); racesScreen(); } }]);
+        }
+      }, [
+        el('div', { cls: 'ds-value', text: t.name }),
+        el('div', { cls: 'ds-stat', text: HOO.CONST.FIELD_NAMES[t.cat] + ' · level ' + t.level }),
+        el('div', {})
+      ]));
+    });
+    content.appendChild(list);
+    HOO.UI.modal(content, { title: 'Tribute — Technology', width: 620 });
+  }
+
+  // ask an empire to break a treaty with, or declare war on, a third empire
+  function thirdPartyPicker(emp, targets, kind) {
+    var g = HOO.game;
+    var race = HOO.DATA.raceById[emp.raceId];
+    var content = el('div', {});
+    content.appendChild(el('p', {
+      cls: 'muted-t',
+      text: kind === 'declareWarOn' ? 'Against whom should the ' + race.name + ' take up arms?' : 'Which of their treaties should be torn up?'
+    }));
+    var list = el('div', { style: 'display:flex; flex-direction:column; gap:6px;' });
+    targets.forEach(function (t3) {
+      var tRace = HOO.DATA.raceById[t3.raceId];
+      list.appendChild(el('button', {
+        cls: 'btn', style: 'text-align:left;', text: 'The ' + tRace.name,
+        onclick: function () {
+          var r = HOO.Diplomacy.evalProposal(g, emp.id, 0, kind, { target: t3.id });
+          var lines = kind === 'declareWarOn' ?
+            ['So be it. The ' + tRace.name + ' will feel our wrath.', 'We are not your sword to swing. No.'] :
+            ['Very well. Our treaty with the ' + tRace.name + ' is ash.', 'Our treaties are our own business. No.'];
+          HOO.UI.dialog('The ' + race.name + ' respond',
+            '<div class="narrative"><span class="speaker">' + U.esc(emp.leaderName) + '</span>' + (r.accept ? lines[0] : lines[1]) + '</div>',
+            [{ label: 'Very Well', fn: function () { HOO.UI.closeAll(); racesScreen(); } }]);
+        }
+      }));
+    });
+    content.appendChild(list);
+    HOO.UI.modal(content, { title: (kind === 'declareWarOn' ? 'Urge War' : 'Demand Treaty Break') + ' — ' + race.name, width: 520 });
   }
 
   function greeting(emp, relThem) {
@@ -663,46 +965,119 @@ globalThis.HOO = globalThis.HOO || {};
   }
 
   // ================= PLANETS =================
+  var planetsSort = { key: null, dir: 1 }; // remembered across openings this session
+
   function planetsScreen() {
     var g = HOO.game;
     var emp = g.empires[0];
     var content = el('div', {});
 
-    var tbl = el('table', { cls: 'data' });
-    var hdr = el('tr', {});
-    ['Colony', 'Pop', 'Δ', 'Fact', 'Waste', 'Bases', 'Shd', 'Prod', 'Building', 'Notes'].forEach(function (h) {
-      hdr.appendChild(el('th', { cls: h === 'Colony' || h === 'Building' || h === 'Notes' ? '' : 'r', text: h }));
-    });
-    tbl.appendChild(hdr);
-    HOO.Colony.colonies(g, 0).forEach(function (e) {
-      var c = e.colony, s = e.star, p = s.planet;
-      var tr = el('tr', {
-        cls: 'click', onclick: function () {
-          HOO.UI.closeAll();
-          HOO.Panels.showStar(s.id);
+    // column model: header, right-aligned?, sort accessor (null = unsortable)
+    var cols = [
+      { h: 'Colony', get: function (e) { return e.star.name; } },
+      { h: 'Pop', r: 1, get: function (e) { return e.colony.pop; } },
+      { h: 'Δ', r: 1, get: function (e) { return e.colony.lastGrowth || 0; } },
+      { h: 'Fact', r: 1, get: function (e) { return e.colony.factories; } },
+      { h: 'Waste', r: 1, get: function (e) { return e.star.planet.waste; } },
+      { h: 'Bases', r: 1, get: function (e) { return e.colony.bases; } },
+      { h: 'Shd', r: 1, get: function (e) { return e.colony.shield || 0; } },
+      { h: 'Prod', r: 1, get: function (e) { return e.colony.lastProd || 0; } },
+      { h: 'Building', get: function (e) { return e.colony.buildingStargate ? 'Star Gate' : (emp.designs[e.colony.buildDesign] ? emp.designs[e.colony.buildDesign].name : ''); } },
+      { h: 'Notes', get: null }
+    ];
+
+    var tblWrap = el('div', {});
+    function renderTable() {
+      U.clearEl(tblWrap);
+      var list = HOO.Colony.colonies(g, 0);
+      if (planetsSort.key !== null && cols[planetsSort.key] && cols[planetsSort.key].get) {
+        var getv = cols[planetsSort.key].get;
+        list.sort(function (a, b) {
+          var av = getv(a), bv = getv(b);
+          if (typeof av === 'string') return String(av).localeCompare(String(bv)) * planetsSort.dir;
+          return (av - bv) * planetsSort.dir;
+        });
+      }
+      var tbl = el('table', { cls: 'data' });
+      var hdr = el('tr', {});
+      cols.forEach(function (col, i) {
+        var th = el('th', {
+          cls: col.r ? 'r' : '',
+          text: col.h + (planetsSort.key === i ? (planetsSort.dir > 0 ? ' ▴' : ' ▾') : '')
+        });
+        if (col.get) {
+          th.style.cursor = 'pointer';
+          th.title = 'Sort by ' + col.h;
+          th.addEventListener('click', function () {
+            if (planetsSort.key === i) {
+              planetsSort.dir = -planetsSort.dir;
+            } else {
+              planetsSort.key = i;
+              // text columns read best ascending, numbers biggest-first
+              planetsSort.dir = (col.h === 'Colony' || col.h === 'Building') ? 1 : -1;
+            }
+            renderTable();
+          });
         }
+        hdr.appendChild(th);
       });
-      tr.appendChild(el('td', { text: s.name }));
-      tr.appendChild(el('td', { cls: 'r', text: String(Math.round(c.pop)) }));
-      var gr = Math.round(c.lastGrowth || 0);
-      tr.appendChild(el('td', { cls: 'r ' + (gr >= 0 ? 'good' : 'bad'), text: (gr >= 0 ? '+' : '') + gr }));
-      tr.appendChild(el('td', { cls: 'r', text: String(Math.round(c.factories)) }));
-      tr.appendChild(el('td', { cls: 'r ' + (p.waste > 0 ? 'bad' : ''), text: String(Math.round(p.waste)) }));
-      tr.appendChild(el('td', { cls: 'r', text: String(c.bases) }));
-      tr.appendChild(el('td', { cls: 'r', text: c.shield ? U.roman(c.shield) : '' }));
-      tr.appendChild(el('td', { cls: 'r', text: U.fmt(c.lastProd) }));
-      tr.appendChild(el('td', { text: c.buildingStargate ? 'Star Gate' : (emp.designs[c.buildDesign] ? emp.designs[c.buildDesign].name : '') }));
-      var notes = [];
-      var sp = HOO.CONST.SPECIALS[p.special];
-      if (sp.name) notes.push(sp.name);
-      var def = HOO.CONST.PLANET_TYPES[p.type];
-      if (def.hostility) notes.push('hostile');
-      if (c.stargate) notes.push('(*)');
-      if (c.inRebellion) notes.push('REBELLION');
-      tr.appendChild(el('td', { cls: 'dim-t', text: notes.join(' ') }));
-      tbl.appendChild(tr);
-    });
-    content.appendChild(tbl);
+      tbl.appendChild(hdr);
+
+      var tot = { pop: 0, gr: 0, fact: 0, waste: 0, bases: 0, prod: 0 };
+      list.forEach(function (e) {
+        var c = e.colony, s = e.star, p = s.planet;
+        var tr = el('tr', {
+          cls: 'click', onclick: function () {
+            HOO.UI.closeAll();
+            HOO.Panels.showStar(s.id);
+          }
+        });
+        tr.appendChild(el('td', { text: s.name }));
+        tr.appendChild(el('td', { cls: 'r', text: String(Math.round(c.pop)) }));
+        var gr = Math.round(c.lastGrowth || 0);
+        tr.appendChild(el('td', { cls: 'r ' + (gr >= 0 ? 'good' : 'bad'), text: (gr >= 0 ? '+' : '') + gr }));
+        tr.appendChild(el('td', { cls: 'r', text: String(Math.round(c.factories)) }));
+        tr.appendChild(el('td', { cls: 'r ' + (p.waste > 0 ? 'bad' : ''), text: String(Math.round(p.waste)) }));
+        tr.appendChild(el('td', { cls: 'r', text: String(c.bases) }));
+        tr.appendChild(el('td', { cls: 'r', text: c.shield ? U.roman(c.shield) : '' }));
+        tr.appendChild(el('td', { cls: 'r', text: U.fmt(c.lastProd) }));
+        tr.appendChild(el('td', { text: c.buildingStargate ? 'Star Gate' : (emp.designs[c.buildDesign] ? emp.designs[c.buildDesign].name : '') }));
+        var notes = [];
+        var sp = HOO.CONST.SPECIALS[p.special];
+        if (sp.name) notes.push(sp.name);
+        var def = HOO.CONST.PLANET_TYPES[p.type];
+        if (def.hostility) notes.push('hostile');
+        if (c.stargate) notes.push('(*)');
+        if (c.reloc !== null && c.reloc !== undefined && g.stars[c.reloc]) notes.push('reloc→' + g.stars[c.reloc].name);
+        var inbound = 0;
+        g.transports.forEach(function (t) { if (t.empire === 0 && t.to === s.id) inbound += t.pop; });
+        if (inbound > 0) notes.push('inbound ' + Math.round(inbound) + 'M');
+        if (c.transported) notes.push('out ' + Math.round(c.transported) + 'M');
+        if (c.inRebellion) notes.push('REBELLION');
+        tr.appendChild(el('td', { cls: 'dim-t', text: notes.join(' ') }));
+        tbl.appendChild(tr);
+        tot.pop += c.pop; tot.gr += c.lastGrowth || 0; tot.fact += c.factories;
+        tot.waste += p.waste; tot.bases += c.bases; tot.prod += c.lastProd || 0;
+      });
+
+      // empire totals footer
+      var trT = el('tr', {});
+      function totCell(txt, right) { trT.appendChild(el('td', { cls: (right ? 'r ' : '') + 'gold', style: 'border-top:1px solid var(--line-2); font-weight:600;', text: txt })); }
+      totCell('Total (' + list.length + ')');
+      totCell(String(Math.round(tot.pop)), 1);
+      totCell((tot.gr >= 0 ? '+' : '') + Math.round(tot.gr), 1);
+      totCell(String(Math.round(tot.fact)), 1);
+      totCell(String(Math.round(tot.waste)), 1);
+      totCell(String(tot.bases), 1);
+      totCell('', 1);
+      totCell(U.fmt(tot.prod), 1);
+      totCell('');
+      totCell('');
+      tbl.appendChild(trT);
+      tblWrap.appendChild(tbl);
+    }
+    renderTable();
+    content.appendChild(tblWrap);
 
     // economy summary + reserve tax
     var eco = emp.economy;
@@ -775,7 +1150,7 @@ globalThis.HOO = globalThis.HOO || {};
           wrap.appendChild(sel);
         }
       } else {
-        wrap.appendChild(el('div', { cls: 'dim-t mono', style: 'font-size:10.5px; padding-left:52px;', text: 'Field exhausted — refinements only' }));
+        wrap.appendChild(el('div', { cls: 'dim-t mono', style: 'font-size:10.5px; padding-left:52px;', text: 'No projects left this game — allocation flows to other fields' }));
       }
       right.appendChild(wrap);
     });
@@ -794,6 +1169,22 @@ globalThis.HOO = globalThis.HOO || {};
           el('div', { cls: 'ds-stat', text: 'lv ' + t.level })
         ]));
       });
+      // manual (Technology): each game offers only part of the tree — show
+      // what our own scientists can still reach; the rest must come from
+      // espionage, trade, or conquest and is hidden here
+      var upcoming = HOO.DATA.TECHS[activeField].filter(function (t) {
+        return !emp.techFlags[t.id] && HOO.Research.inTree(emp, t.id);
+      });
+      if (upcoming.length) {
+        listBox.appendChild(el('div', { cls: 'eyebrow', style: 'margin:10px 0 4px; display:block;', text: 'Within Reach This Game' }));
+        upcoming.forEach(function (t) {
+          listBox.appendChild(el('div', { cls: 'design-slot', style: 'cursor:default; opacity:0.5;' }, [
+            el('div', { cls: 'ds-value', text: t.name }),
+            el('div', { cls: 'ds-stat', text: 'undiscovered' }),
+            el('div', { cls: 'ds-stat', text: 'lv ' + t.level })
+          ]));
+        });
+      }
     }
     HOO.CONST.FIELDS.forEach(function (f) {
       var b = el('button', {
@@ -839,7 +1230,9 @@ globalThis.HOO = globalThis.HOO || {};
         var row = el('div', { style: 'display:grid; grid-template-columns:110px 1fr; gap:8px; align-items:center; margin:3px 0;' });
         row.appendChild(el('div', { cls: 'mono', style: 'font-size:11px; color:' + e.color, text: HOO.DATA.raceById[e.raceId].name }));
         var bar = el('div', { style: 'height:10px; background:var(--void-2); border:1px solid var(--line); border-radius:3px; overflow:hidden;' });
-        bar.appendChild(el('div', { style: 'height:100%; width:' + Math.round(Math.log(1 + v) / Math.log(1 + max) * 100) + '%; background:' + e.color + '; opacity:0.8;' }));
+        // any nonzero value gets a visible sliver — log scaling can round to 0%
+        var pctW = v > 0 ? Math.max(2, Math.round(Math.log(1 + v) / Math.log(1 + max) * 100)) : 0;
+        bar.appendChild(el('div', { style: 'height:100%; width:' + pctW + '%; background:' + e.color + '; opacity:0.8;' }));
         row.appendChild(bar);
         content.appendChild(row);
       });
@@ -847,5 +1240,8 @@ globalThis.HOO = globalThis.HOO || {};
     HOO.UI.modal(content, { title: 'Galactic Status', width: 640 });
   }
 
-  HOO.Screens = { open: open, audienceScreen: audienceScreen, statusScreen: statusScreen, designSpecs: designSpecs };
+  HOO.Screens = {
+    open: open, audienceScreen: audienceScreen, statusScreen: statusScreen, designSpecs: designSpecs,
+    helpScreen: helpScreen, messageLog: messageLog
+  };
 })();

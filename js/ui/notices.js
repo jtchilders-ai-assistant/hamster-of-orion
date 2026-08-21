@@ -48,6 +48,11 @@ globalThis.HOO = globalThis.HOO || {};
     HOO.UI.toast(opts);
   }
 
+  // session message log — dismissed toasts and digests can be re-read from
+  // the Game menu (Message Log). Not serialized; it lives with the session.
+  var history = [];
+  function getHistory() { return history; }
+
   // sequentially process turn results, then call done()
   function presentTurn(res, done) {
     var g = HOO.game;
@@ -59,7 +64,12 @@ globalThis.HOO = globalThis.HOO || {};
     });
 
     // 2. split notices: minor → toast feed, major → modal digest
-    var visible = res.notices.filter(function (n) { return !n.ifExplored || g.stars[n.ifExplored].explored[0]; });
+    // (== null: star id 0 is a legitimate ifExplored value)
+    var visible = res.notices.filter(function (n) { return n.ifExplored == null || g.stars[n.ifExplored].explored[0]; });
+    visible.forEach(function (n) {
+      history.push({ year: g.year, type: n.type, name: n.name, text: n.text });
+    });
+    if (history.length > 400) history.splice(0, history.length - 400);
     var minor = visible.filter(function (n) { return MINOR_TYPES[n.type]; });
     var interesting = visible.filter(function (n) { return !MINOR_TYPES[n.type]; });
     minor.forEach(toastMinor);
@@ -86,6 +96,19 @@ globalThis.HOO = globalThis.HOO || {};
     runNext();
   }
 
+  // notices pushed into g.notices during afterBattle (monster outcomes,
+  // deferred landings, guardian falls) arrive after presentTurn's snapshot —
+  // surface them as dispatches and log them so they aren't silently lost
+  function drainLateNotices(g, fromLen) {
+    var fresh = g.notices.slice(fromLen);
+    fresh.forEach(function (n) {
+      if (n.ifExplored != null && !g.stars[n.ifExplored].explored[0]) return;
+      history.push({ year: g.year, type: n.type, name: n.name, text: n.text });
+      toastMinor(n);
+    });
+    if (history.length > 400) history.splice(0, history.length - 400);
+  }
+
   // ---------- combat prompt ----------
   function promptCombat(pc, next) {
     var g = HOO.game;
@@ -109,7 +132,9 @@ globalThis.HOO = globalThis.HOO || {};
           label: 'Command the Battle', fn: function () {
             HOO.CombatUI.run(b, pc.meta, function (battle) {
               HOO.Combat.applyResults(g, battle);
+              var nlen = g.notices.length;
               HOO.Turn.afterBattle(g, pc.meta, battle);
+              drainLateNotices(g, nlen);
               afterPlayerBattle(pc, battle, next);
             });
           }
@@ -118,7 +143,9 @@ globalThis.HOO = globalThis.HOO || {};
           label: 'Auto-Resolve', fn: function () {
             HOO.Combat.autoResolve(b);
             HOO.Combat.applyResults(g, b);
+            var nlen = g.notices.length;
             HOO.Turn.afterBattle(g, pc.meta, b);
+            drainLateNotices(g, nlen);
             afterPlayerBattle(pc, b, next);
           }
         }
@@ -154,11 +181,11 @@ globalThis.HOO = globalThis.HOO || {};
 
     notices.forEach(function (n) {
       var box = el('div', { cls: 'gnn' });
+      // (discovery/spy notices are MINOR_TYPES and never reach the digest;
+      // their interactive handling lives in toastMinor)
       var tag = 'Dispatch';
       if (n.type === 'gnn' || n.type === 'event') tag = 'GNN · Galactic News Network';
-      else if (n.type === 'discovery') tag = 'Ministry of Science';
       else if (n.type === 'battle') tag = 'Fleet Command';
-      else if (n.type === 'spy') tag = 'Intelligence';
       else if (n.type === 'contact') tag = 'First Contact';
       else if (n.type === 'diplomacy') tag = 'Diplomatic Courier';
       else if (n.type === 'war') tag = 'GNN · War Report';
@@ -181,42 +208,31 @@ globalThis.HOO = globalThis.HOO || {};
         var row = el('div', { style: 'display:flex; gap:6px; margin-top:8px;' });
         var emp = g.empires[n.empId];
         row.appendChild(el('button', {
-          cls: 'btn small primary', text: 'Accept',
+          cls: 'btn small primary', text: n.kind === 'tributeDemand' ? 'Pay' : 'Accept',
           onclick: function () {
             var player = g.empires[0];
             if (n.kind === 'peaceOffer') HOO.Diplomacy.makePeace(g, 0, n.empId);
             if (n.kind === 'napOffer') { player.relations[n.empId].treaty = 'nonAggression'; emp.relations[0].treaty = 'nonAggression'; }
+            if (n.kind === 'allianceOffer') { player.relations[n.empId].treaty = 'alliance'; emp.relations[0].treaty = 'alliance'; }
             if (n.kind === 'tradeOffer') HOO.Diplomacy.formTrade(g, 0, n.empId, n.amount);
-            row.innerHTML = '<span class="good" style="font-size:12px;">Accepted.</span>';
+            if (n.kind === 'tributeDemand') {
+              // pay what the treasury can actually cover; paying soothes them
+              HOO.Diplomacy.offerTribute(g, 0, n.empId, Math.min(n.amount, Math.max(0, Math.floor(player.reserve))));
+              HOO.UI.refreshTopbar();
+            }
+            row.innerHTML = '<span class="good" style="font-size:12px;">' + (n.kind === 'tributeDemand' ? 'Paid.' : 'Accepted.') + '</span>';
           }
         }));
         row.appendChild(el('button', {
-          cls: 'btn small', text: 'Decline',
+          cls: 'btn small', text: n.kind === 'tributeDemand' ? 'Refuse' : 'Decline',
           onclick: function () {
-            HOO.Diplomacy.adjust(g, n.empId, 0, -3, false);
-            row.innerHTML = '<span class="muted-t" style="font-size:12px;">Declined.</span>';
+            // refusing a tribute demand stings far more than declining an offer
+            if (n.kind === 'tributeDemand') HOO.Diplomacy.adjust(g, n.empId, 0, -8, true);
+            else HOO.Diplomacy.adjust(g, n.empId, 0, -3, false);
+            row.innerHTML = '<span class="muted-t" style="font-size:12px;">' + (n.kind === 'tributeDemand' ? 'Refused.' : 'Declined.') + '</span>';
           }
         }));
         box.appendChild(row);
-      }
-      // tech discovery: prompt next research choice if multiple
-      if (n.type === 'discovery' && n.tech) {
-        var emp0 = g.empires[0];
-        var ch = HOO.Research.choices(emp0, n.tech.cat);
-        if (ch.length > 1) {
-          var row2 = el('div', { style: 'margin-top:8px;' });
-          row2.appendChild(el('div', { cls: 'dim-t', style: 'font-size:11px; margin-bottom:4px;', text: 'Direct our next ' + HOO.CONST.FIELD_NAMES[n.tech.cat] + ' project:' }));
-          ch.forEach(function (t) {
-            row2.appendChild(el('button', {
-              cls: 'btn small', style: 'margin:0 4px 4px 0;', text: t.name + ' (lv ' + t.level + ')',
-              onclick: function () {
-                HOO.Research.startProject(emp0, n.tech.cat, t.id);
-                row2.innerHTML = '<span class="good" style="font-size:12px;">Project: ' + U.esc(t.name) + '</span>';
-              }
-            }));
-          });
-          box.appendChild(row2);
-        }
       }
       content.appendChild(box);
     });
@@ -240,7 +256,7 @@ globalThis.HOO = globalThis.HOO || {};
 
     var needTxt = Math.ceil(record.totalVotes * 2 / 3) + ' of ' + record.totalVotes + ' votes';
     var intro = '<div class="narrative"><span class="speaker">The High Council</span>' +
-      'More than half the galaxy has been settled. The High Council convenes to elect a Master of Orion. ' +
+      'Two-thirds of the galaxy has been settled. The High Council convenes to elect a Master of Orion. ' +
       'The candidates: the <b>' + nameOf(c0) + '</b> and the <b>' + nameOf(c1) + '</b>. ' +
       'A two-thirds majority of ' + needTxt + ' is required.</div>';
 
@@ -256,8 +272,8 @@ globalThis.HOO = globalThis.HOO || {};
       buttons.push({ label: 'Vote — ' + nameOf(c1), fn: function () { finalizeWith(c1.id); } });
       buttons.push({ label: 'Abstain', cls: '', fn: function () { finalizeWith(null); } });
     } else {
-      buttons.push({ label: 'Hear the Votes', fn: function () { finalizeWith(playerIsCandidate ? 0 : null); } });
-      if (playerIsCandidate) buttons[0] = { label: 'Hear the Votes', fn: function () { finalizeWith(0); } };
+      // only reachable if the player has no vote record (e.g. eliminated mid-council)
+      buttons.push({ label: 'Hear the Votes', fn: function () { finalizeWith(null); } });
     }
 
     HOO.UI.dialog('The High Council Convenes', intro + '<div class="muted-t" style="font-size:12px;">Your delegation carries ' + record.votes[0].votes + ' vote(s).</div>', buttons, true);
@@ -349,5 +365,5 @@ globalThis.HOO = globalThis.HOO || {};
     ], true);
   }
 
-  HOO.Notices = { presentTurn: presentTurn, gameOverScreen: gameOverScreen };
+  HOO.Notices = { presentTurn: presentTurn, gameOverScreen: gameOverScreen, getHistory: getHistory };
 })();

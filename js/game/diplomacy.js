@@ -24,7 +24,16 @@ globalThis.HOO = globalThis.HOO || {};
     rel.value = U.clamp(rel.value + delta, -100, 100);
   }
 
-  function declareWar(g, whoId, onId) {
+  // does the player know about news involving these two empires?
+  function playerKnows(g, aId, bId) {
+    var player = g.empires[0];
+    if (!player || player.dead) return false;
+    if (player.id === aId || player.id === bId) return true;
+    var ra = player.relations[aId], rb = player.relations[bId];
+    return !!((ra && ra.contact) || (rb && rb.contact));
+  }
+
+  function declareWar(g, whoId, onId, noRipple) {
     var who = g.empires[whoId], on = g.empires[onId];
     if (!who || !on) return;
     [who.relations[onId], on.relations[whoId]].forEach(function (rel) {
@@ -36,9 +45,27 @@ globalThis.HOO = globalThis.HOO || {};
       rel.trade = 0; rel.tradePct = -30;
       rel.value = Math.min(rel.value, -60);
     });
-    if (g && g.notices && (who.isPlayer || on.isPlayer)) {
+    if (g && g.notices && playerKnows(g, whoId, onId)) {
       var a = HOO.DATA.raceById[who.raceId].name, b = HOO.DATA.raceById[on.raceId].name;
       g.notices.push({ type: 'war', text: 'The ' + a + ' have declared war on the ' + b + '!' });
+    }
+    // third parties react: the victim's allies are outraged and honour the pact
+    // (manual: Alliance — allies come to each other's aid); moot during the Final War
+    if (!noRipple && g && !(g.council && g.council.finalWar)) {
+      g.empires.forEach(function (third) {
+        if (third.dead || third.id === whoId || third.id === onId) return;
+        var relToVictim = third.relations[onId];
+        var relToAggr = third.relations[whoId];
+        if (!relToVictim || !relToAggr || !relToAggr.contact) return;
+        if (relToVictim.treaty === 'alliance') {
+          adjust(g, third.id, whoId, -25, true);
+          if (!relToAggr.war && U.rand() < 0.75) declareWar(g, third.id, whoId, true);
+        } else if (relToVictim.treaty === 'nonAggression') {
+          adjust(g, third.id, whoId, -8, true);
+        } else if (relToVictim.contact) {
+          adjust(g, third.id, whoId, -3, true); // bystanders disapprove of aggression
+        }
+      });
     }
   }
 
@@ -48,6 +75,10 @@ globalThis.HOO = globalThis.HOO || {};
       rel.war = false; rel.embassy = true;
       rel.value = Math.max(rel.value, -20);
     });
+    if (g && g.notices && playerKnows(g, aId, bId)) {
+      var an = HOO.DATA.raceById[a.raceId].name, bn = HOO.DATA.raceById[b.raceId].name;
+      g.notices.push({ type: 'war', text: 'The ' + an + ' and the ' + bn + ' have signed a peace treaty.' });
+    }
   }
 
   // yearly drift toward base value; war weariness; embassy return
@@ -65,7 +96,13 @@ globalThis.HOO = globalThis.HOO || {};
         if (rel.treaty === 'nonAggression') rel.value = U.clamp(rel.value + 0.5, -100, 100);
         if (rel.treaty === 'alliance') rel.value = U.clamp(rel.value + 1, -100, 100);
         if (rel.trade > 0) {
-          rel.tradePct = Math.min(100, rel.tradePct + U.rint(0, 5));
+          // one shared ramp per agreement, ~+5%/yr toward full profit
+          // (manual: Trade and Tribute); mirrored so both signatories match
+          if (emp.id < other.id) {
+            rel.tradePct = Math.min(100, rel.tradePct + U.rint(3, 7));
+            var relBack = other.relations[emp.id];
+            if (relBack) relBack.tradePct = rel.tradePct;
+          }
           rel.value = U.clamp(rel.value + 0.4, -100, 100);
         }
         if (rel.war) {
@@ -77,14 +114,32 @@ globalThis.HOO = globalThis.HOO || {};
     });
   }
 
-  // contact check: colonies within fuel range of each other's scanners
+  // force contact between two empires (e.g. after a battle); true if it was new
+  function makeContact(g, aId, bId) {
+    var a = g.empires[aId], b = g.empires[bId];
+    if (!a || !b || a.dead || b.dead || aId === bId) return false;
+    var relA = a.relations[bId], relB = b.relations[aId];
+    if (!relA || !relB || relA.contact) return false;
+    relA.contact = relB.contact = true;
+    return true;
+  }
+
+  // contact check: colonies within fuel range of each other's scanners,
+  // or a fleet arriving at a star the other empire holds or occupies
   function updateContacts(g) {
     var newContacts = [];
+    // index which stars each empire has fleets at
+    var fleetStars = {};
+    (g.fleets || []).forEach(function (f) {
+      if (f.at === null || f.at === undefined) return;
+      if (!fleetStars[f.empire]) fleetStars[f.empire] = {};
+      fleetStars[f.empire][f.at] = true;
+    });
     g.empires.forEach(function (a) {
       if (a.dead) return;
       g.empires.forEach(function (b) {
         if (b.dead || b.id <= a.id) return;
-        var relA = a.relations[b.id], relB = b.relations[a.id];
+        var relA = a.relations[b.id];
         if (relA.contact) return;
         // contact when either can reach the other's colony within range+scan
         var made = false;
@@ -94,10 +149,22 @@ globalThis.HOO = globalThis.HOO || {};
             if (d <= Math.max(a.derived.range, b.derived.range) + 2) made = true;
           });
         });
-        if (made) {
-          relA.contact = relB.contact = true;
-          newContacts.push([a, b]);
+        // a fleet in orbit over the other's colony, or both fleets sharing a system
+        if (!made) {
+          var fa = fleetStars[a.id] || {}, fb = fleetStars[b.id] || {};
+          Object.keys(fa).forEach(function (sid) {
+            if (made) return;
+            if (fb[sid]) { made = true; return; }
+            var col = g.stars[sid].planet && g.stars[sid].planet.colony;
+            if (col && col.empire === b.id) made = true;
+          });
+          Object.keys(fb).forEach(function (sid) {
+            if (made) return;
+            var col = g.stars[sid].planet && g.stars[sid].planet.colony;
+            if (col && col.empire === a.id) made = true;
+          });
         }
+        if (made && makeContact(g, a.id, b.id)) newContacts.push([a, b]);
       });
     });
     return newContacts;
@@ -177,6 +244,8 @@ globalThis.HOO = globalThis.HOO || {};
       case 'alliance':
         return { accept: v > 45 && !rel.war && ratio > 0.5 };
       case 'peace': {
+        // no separate peace once the council's ruling has been defied (manual: Winning the Game)
+        if (g.council && g.council.finalWar) return { accept: false, reason: 'finalWar' };
         var will = pers.peaceWill + (rel.warWeary > 6 ? 0.3 : 0) + (ratio > 1.5 ? 0.3 : 0) - (ratio < 0.6 ? 0.4 : 0);
         return { accept: rel.war && U.rand() < will };
       }
@@ -191,13 +260,15 @@ globalThis.HOO = globalThis.HOO || {};
           return { accept: true, tribute: trib };
         }
         adjust(g, aiId, byId, -12, true);
-        if (ratio < 0.8 && v < pers.warThreshold / 2) declareWar(g, aiId, byId);
+        // the threatener provoked this war — no ripple, or third parties would
+        // brand the threatened empire the aggressor
+        if (ratio < 0.8 && v < pers.warThreshold / 2) declareWar(g, aiId, byId, true);
         return { accept: false };
       }
       case 'breakAllianceWith': {
         var target = payload.target;
         var relT = ai.relations[target];
-        if (v > 40 && relT && relT.value < 0) {
+        if (v > 40 && relT && relT.treaty !== 'none' && relT.value < 0) {
           breakTradeAndTreaty(g, aiId, target, 'treaty');
           return { accept: true };
         }
@@ -205,7 +276,7 @@ globalThis.HOO = globalThis.HOO || {};
       }
       case 'declareWarOn': {
         var relW = ai.relations[payload.target];
-        if (v > 60 && relW && relW.value < -30) {
+        if (v > 60 && relW && !relW.war && relW.value < -30) {
           declareWar(g, aiId, payload.target);
           return { accept: true };
         }
@@ -239,11 +310,23 @@ globalThis.HOO = globalThis.HOO || {};
     return true;
   }
 
+  // techs `from` may gift as tribute: anything known that `to` lacks
+  // (unlike tradableTechs, the giver may part with their newest toys)
+  function tributableTechs(from, to) {
+    var out = [];
+    HOO.CONST.FIELDS.forEach(function (f) {
+      from.techs[f].forEach(function (tid) {
+        if (!to.techFlags[tid]) out.push(HOO.DATA.techById[tid]);
+      });
+    });
+    return out.sort(function (a, b) { return a.level - b.level; });
+  }
+
   HOO.Diplomacy = {
     adjust: adjust, declareWar: declareWar, makePeace: makePeace,
-    yearlyDrift: yearlyDrift, updateContacts: updateContacts,
+    yearlyDrift: yearlyDrift, updateContacts: updateContacts, makeContact: makeContact,
     maxTrade: maxTrade, formTrade: formTrade, breakTradeAndTreaty: breakTradeAndTreaty,
-    offerTribute: offerTribute, tributeTech: tributeTech,
+    offerTribute: offerTribute, tributeTech: tributeTech, tributableTechs: tributableTechs,
     evalProposal: evalProposal, tradableTechs: tradableTechs, exchangeTech: exchangeTech
   };
 })();

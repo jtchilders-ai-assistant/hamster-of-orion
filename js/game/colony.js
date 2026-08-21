@@ -20,7 +20,10 @@ globalThis.HOO = globalThis.HOO || {};
       upgradeProgress: 0, stargate: false, stargateProgress: 0, buildingStargate: false,
       reloc: null, transported: 0,
       inRebellion: false, rebels: 0,
-      quarantine: false, novaResearch: 0, plagueResearch: 0,
+      // event-progress fields (plague/plagueProgress/plagueNeed, novaThreat/
+      // novaProgress/novaNeed/novaYears) are attached by events_run.js when
+      // the corresponding event fires
+      quarantine: false,
       lastGrowth: 0, lastProd: 0, ecoStatus: ''
     };
   }
@@ -166,14 +169,26 @@ globalThis.HOO = globalThis.HOO || {};
       emp.reserve += taxed / 2;
       spend -= taxed;
     }
-    // reserve transfer earmarked to this colony (limited to raw production/year)
+    // reserve transfer earmarked to this colony (limited to raw production/year).
+    // The fund is drawn down after the eco auto-raise below, so ecoMinPct's
+    // spendEstimate sees the same transfer money this year actually spends.
+    var transferUse = 0;
     if (c.transferFund && c.transferFund > 0) {
-      var use = Math.min(c.transferFund, raw);
-      c.transferFund -= use;
-      spend += use;
-      if (c.transferFund < 0.5) c.transferFund = 0;
+      transferUse = Math.min(c.transferFund, raw);
+      spend += transferUse;
     }
     c.lastProd = spend;
+
+    // manual (Relocate): new ships may only be routed to one of our own
+    // colonies — cancel the order if the destination has since been lost
+    if (c.reloc !== null && c.reloc !== undefined) {
+      var rDest = g.stars[c.reloc];
+      var rCol = rDest && rDest.planet ? rDest.planet.colony : null;
+      if (!rCol || rCol.empire !== emp.id) {
+        c.reloc = null;
+        notices.push({ type: 'info', text: 'Ship relocation from ' + starObj.name + ' cancelled — the destination is no longer one of our colonies. New ships will stay in orbit.' });
+      }
+    }
 
     if (c.inRebellion) { c.ecoStatus = 'REBELLION'; return { research: 0, notices: notices }; }
 
@@ -183,6 +198,10 @@ globalThis.HOO = globalThis.HOO || {};
     if (spend > 0 && !(c.locks && c.locks.eco)) {
       var needPct = ecoMinPct(emp, starObj);
       if (needPct > c.alloc.eco) raiseEco(c, needPct);
+    }
+    if (transferUse > 0) {
+      c.transferFund -= transferUse;
+      if (c.transferFund < 0.5) c.transferFund = 0;
     }
 
     var mm = mineralMult(starObj);
@@ -261,7 +280,7 @@ globalThis.HOO = globalThis.HOO || {};
     // ---------- INDUSTRY ----------
     if (indBC > 0) {
       // refit factories to current robotic controls first
-      if (c.controls < d.controls && !race.freeRefit && c.factories > 0) {
+      if (c.controls < d.controls && c.factories > 0) {
         var refitCost = (factoryCostAt(emp, d.controls) - factoryCostAt(emp, c.controls)) * c.factories;
         c.refitProgress = (c.refitProgress || 0) + indBC;
         indBC = 0;
@@ -271,7 +290,7 @@ globalThis.HOO = globalThis.HOO || {};
           c.controls = d.controls;
         }
       } else if (c.controls < d.controls) {
-        c.controls = d.controls; // Mice refit free
+        c.controls = d.controls; // no factories built yet — nothing to refit
       }
       if (indBC > 0) {
         var mp = maxPop(emp, starObj);
@@ -307,8 +326,9 @@ globalThis.HOO = globalThis.HOO || {};
         c.ecoStatus = 'ATMOS';
         if (c.atmosProgress >= 200) {
           ecoBC = c.atmosProgress - 200; c.atmosProgress = 0;
+          // manual (Planetology): only the environment changes; planet size
+          // is untouched — further growth needs the Terraforming +N techs
           p.type = 'minimal'; p.envConverted = true;
-          p.size = Math.max(p.size, 40 + p.terraformed); p.baseSize = Math.max(p.baseSize, 40);
           notices.push({ type: 'eco', text: 'Atmospheric conversion complete: ' + starObj.name + ' now sustains open-air life.' });
         }
       }
@@ -320,6 +340,7 @@ globalThis.HOO = globalThis.HOO || {};
         if (c.soilProgress >= 150) {
           ecoBC = c.soilProgress - 150; c.soilProgress = 0;
           p.special = 'fertile';
+          applySoilBonus(p, 1.25);
           notices.push({ type: 'eco', text: 'Soil enrichment complete: ' + starObj.name + ' is now Fertile.' });
         }
       }
@@ -329,6 +350,7 @@ globalThis.HOO = globalThis.HOO || {};
         if (c.gaiaProgress >= 300) {
           ecoBC = c.gaiaProgress - 300; c.gaiaProgress = 0;
           p.special = 'gaia';
+          applySoilBonus(p, 1.5);
           notices.push({ type: 'eco', text: starObj.name + ' has been remade as a Gaia world.' });
         }
       }
@@ -382,18 +404,33 @@ globalThis.HOO = globalThis.HOO || {};
     }
   }
 
+  // manual (Planetology): Soil Enrichment raises max population 25%, Advanced
+  // Soil Enrichment 50%, both relative to the un-enriched planet. p.soilBonus
+  // records the multiplier already applied so fertile -> gaia only adds the
+  // difference; scaling baseSize keeps terraforming and bombardment composable.
+  function applySoilBonus(p, mult) {
+    var prev = p.soilBonus || 1;
+    if (mult <= prev) return;
+    p.baseSize = Math.round(p.baseSize * mult / prev);
+    p.soilBonus = mult;
+    p.size = p.baseSize + Math.floor(p.terraformed);
+  }
+
   // BC needed this year to fully clean the planet (assumes waste already accrued)
   function ecoCleanNeed(emp, starObj) {
     return starObj.planet.waste / emp.derived.wastePerBC;
   }
 
-  // the single source of truth for a colony's spendable BC estimate
-  // (mirrors processColony: economy ratio, AI difficulty bonus, reserve tax)
+  // the single source of truth for a colony's spendable BC estimate (mirrors
+  // processColony: economy ratio, AI difficulty bonus, reserve tax, and the
+  // year's reserve-transfer draw)
   function spendEstimate(emp, starObj) {
     var c = starObj.planet.colony;
-    var spend = rawProduction(emp, starObj) * (emp.economy ? emp.economy.ratio : 1);
+    var raw = rawProduction(emp, starObj);
+    var spend = raw * (emp.economy ? emp.economy.ratio : 1);
     if (!emp.isPlayer && c && c.aiBonus) spend *= c.aiBonus;
     if (emp.taxRate > 0) spend -= spend * emp.taxRate / 100;
+    if (c && c.transferFund && c.transferFund > 0) spend += Math.min(c.transferFund, raw);
     return Math.max(0, spend);
   }
 
@@ -428,7 +465,9 @@ globalThis.HOO = globalThis.HOO || {};
     var c = starObj.planet.colony;
     var mp = maxPop(emp, starObj);
     var mult = envGrowthMult(emp, starObj);
-    var growth = 0.2 * c.pop * (1 - c.pop / mp) * mult;
+    // manual (Growing Your Empire): ~10% logistic base rate, tapering as the
+    // planet fills, before race/environment modifiers
+    var growth = 0.1 * c.pop * (1 - c.pop / mp) * mult;
     if (c.pop > mp) growth = -(c.pop - mp) * 0.1 - 0.2;
     growth += (c.boostPop || 0);
     c.boostPop = 0;

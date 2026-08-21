@@ -119,13 +119,27 @@ globalThis.HOO = globalThis.HOO || {};
     return sendFleet(g, empId, fromStarId, toStarId, counts);
   }
 
+  // nebula-aware travel time from an arbitrary point: simulates the same yearly
+  // steps moveFleets/moveTransports take (warp clamps to 1 while inside a nebula)
+  function travelYears(g, fromX, fromY, warp, toX, toY) {
+    var x = fromX, y = fromY, years = 0;
+    while (years < 500) {
+      years++;
+      var w = inNebula(g, x, y) ? 1 : warp;
+      var step = w * PARSEC();
+      var d = U.dist(x, y, toX, toY);
+      if (step >= d) return years;
+      x += (toX - x) / d * step;
+      y += (toY - y) / d * step;
+    }
+    return years;
+  }
+
   function eta(g, f) {
     if (f.at !== null) return 0;
     if (f.gateJump) return 1;
     var to = g.stars[f.to];
-    var warp = fleetWarp(g, f);
-    var d = U.dist(f.x, f.y, to.x, to.y) / PARSEC();
-    return Math.max(1, Math.ceil(d / warp));
+    return travelYears(g, f.x, f.y, fleetWarp(g, f), to.x, to.y);
   }
 
   // advance all fleets one year; returns list of arrival events
@@ -141,6 +155,7 @@ globalThis.HOO = globalThis.HOO || {};
       var d = U.dist(f.x, f.y, to.x, to.y);
       if (f.gateJump || step >= d) {
         f.x = to.x; f.y = to.y; f.at = f.to; f.from = null; f.to = null; f.gateJump = false;
+        f.retreating = false; // retreat jump completed; fleet may take orders again
         // merge with existing orbiting fleet
         var other = null;
         for (var i = 0; i < g.fleets.length; i++) {
@@ -161,6 +176,24 @@ globalThis.HOO = globalThis.HOO || {};
     });
     cleanup(g);
     return arrivals;
+  }
+
+  // manual (Retreating): a fleet that fled combat must complete its jump to the
+  // friendly colony before it can accept new orders, hypercomm or not
+  function canRedirect(g, f) {
+    return f.at === null && !f.retreating;
+  }
+
+  // hyperspace comms mid-flight redirect; enforces the retreat lock and fuel range
+  function redirectFleet(g, empId, f, toStarId) {
+    if (f.at !== null || f.empire !== empId) return false;
+    if (f.retreating) return false;
+    var emp = g.empires[empId];
+    var dest = g.stars[toStarId];
+    if (!dest || !inRange(g, emp, dest, f)) return false;
+    f.to = toStarId;
+    f.gateJump = false; // a redirected jump is a normal flight, not a gate hop
+    return true;
   }
 
   function inNebula(g, x, y) {
@@ -228,7 +261,8 @@ globalThis.HOO = globalThis.HOO || {};
     newFleet: newFleet, fleetAt: fleetAt, fleetsAt: fleetsAt, addShips: addShips,
     shipCount: shipCount, cleanup: cleanup, fleetWarp: fleetWarp,
     rangeFrom: rangeFrom, inRange: inRange, sendFleet: sendFleet, sendNewShips: sendNewShips,
-    eta: eta, moveFleets: moveFleets, inNebula: inNebula,
+    eta: eta, travelYears: travelYears, moveFleets: moveFleets, inNebula: inNebula,
+    canRedirect: canRedirect, redirectFleet: redirectFleet,
     sendTransports: sendTransports, moveTransports: moveTransports, scannerSees: scannerSees
   };
 })();

@@ -19,6 +19,20 @@ globalThis.HOO = globalThis.HOO || {};
 
   function cheb(ax, ay, bx, by) { return Math.max(Math.abs(ax - bx), Math.abs(ay - by)); }
 
+  // effect data for a special device by its effect.special name (single source
+  // of truth for shoot-down percentages, displacement miss chance, etc.)
+  var specialFxCache = null;
+  function specialFx(name) {
+    if (!specialFxCache) {
+      specialFxCache = {};
+      Object.keys(HOO.DATA.techById).forEach(function (id) {
+        var e = HOO.DATA.techById[id].effect;
+        if (e && e.type === 'special' && e.special) specialFxCache[e.special] = e;
+      });
+    }
+    return specialFxCache[name] || {};
+  }
+
   // ---------- stack construction ----------
 
   function stackFromDesign(emp, slot, design, count, side) {
@@ -26,12 +40,15 @@ globalThis.HOO = globalThis.HOO || {};
       var t = HOO.DATA.techById[w.id];
       return {
         tech: t, count: w.count,
-        shotsLeft: t.effect.wclass === 'missile' ? (t.effect.shots || 5) : (t.effect.wclass === 'bomb' ? 10 : Infinity),
+        // missile racks come in 2- and 5-shot fits chosen at design time
+        shotsLeft: t.effect.wclass === 'missile' ? (w.rack || t.effect.shots || 5) :
+          ((t.effect.wclass === 'bomb' || t.effect.wclass === 'bio') ? 10 : Infinity),
         usedThisRound: false
       };
     });
     var specials = {};
     design.specials.forEach(function (sid) { specials[HOO.DATA.techById[sid].effect.special] = true; });
+    var race = HOO.DATA.raceById[emp.raceId];
     return {
       kind: 'ship', side: side, empId: emp.id, slot: slot,
       name: design.name, design: design,
@@ -39,9 +56,10 @@ globalThis.HOO = globalThis.HOO || {};
       hits: design.hits, attack: design.attack, defense: design.defense,
       shield: design.shieldCls, ecm: design.ecmMark,
       speed: design.combatSpeed, initiative: design.initiative,
+      firstStrike: !!(race && race.firstStrike), // race trait: fire first in round 1
       weapons: weapons, specials: specials,
-      x: 0, y: 0, done: false, retreated: false, cloaked: !!specials.cloak,
-      stasisLeft: 0, speedDrain: 0, compDrain: 0, autoRepairUsed: false,
+      x: 0, y: 0, done: false, retreated: false, retreating: false, cloaked: !!specials.cloak,
+      stasisLeft: 0, speedDrain: 0, compDrain: 0,
       missilesOn: true
     };
   }
@@ -66,8 +84,8 @@ globalThis.HOO = globalThis.HOO || {};
       ecm: (HOO.State.bestTech(emp, 'ecm') || { effect: { mark: 0 } }).effect.mark,
       speed: 0, initiative: (comp ? comp.effect.mark : 0) + 3,
       weapons: missile ? [{ tech: missile, count: 3, shotsLeft: Infinity, usedThisRound: false }] : [],
-      specials: {}, x: 0, y: 0, done: false, retreated: false, cloaked: false,
-      stasisLeft: 0, speedDrain: 0, compDrain: 0, autoRepairUsed: false, missilesOn: true,
+      specials: {}, x: 0, y: 0, done: false, retreated: false, retreating: false, cloaked: false,
+      stasisLeft: 0, speedDrain: 0, compDrain: 0, missilesOn: true,
       planetary: true
     };
   }
@@ -92,8 +110,8 @@ globalThis.HOO = globalThis.HOO || {};
       shield: mon.shield, ecm: mon.ecm || 5,
       speed: mon.speed, initiative: mon.initiative,
       weapons: weapons, specials: mon.specials || {},
-      x: 0, y: 0, done: false, retreated: false, cloaked: false,
-      stasisLeft: 0, speedDrain: 0, compDrain: 0, autoRepairUsed: false, missilesOn: true
+      x: 0, y: 0, done: false, retreated: false, retreating: false, cloaked: false,
+      stasisLeft: 0, speedDrain: 0, compDrain: 0, missilesOn: true
     };
   }
 
@@ -140,14 +158,29 @@ globalThis.HOO = globalThis.HOO || {};
         opts.star.planet.colony.empire === emp.id) b.interdictor = true;
     });
 
-    // positions: side 0 left column, side 1 right
+    // nebula: deflector shields are inoperative for every combatant (manual: Nebulas);
+    // bases already lose theirs in baseStack()
+    if (opts.star && opts.star.inNebula) {
+      b.stacks.forEach(function (s) { if (s.kind !== 'base') s.shield = 0; });
+    }
+
+    // positions: side 0 left column, side 1 right; never two stacks on one cell
     [0, 1].forEach(function (side) {
       var ss = b.stacks.filter(function (s) { return s.side === side; });
       var col = side === 0 ? 0 : COLS - 1;
+      var taken = {};
+      ss.forEach(function (s) {
+        if (s.planetary) {
+          s.x = COLS - 1; s.y = Math.floor(ROWS / 2);
+          taken[s.x + ',' + s.y] = true;
+        }
+      });
       ss.forEach(function (s, i) {
-        s.x = col;
-        s.y = Math.floor(ROWS / 2 - ss.length / 2 + i + ROWS) % ROWS;
-        if (s.planetary) { s.x = COLS - 1; s.y = Math.floor(ROWS / 2); }
+        if (s.planetary) return;
+        var y = Math.floor(ROWS / 2 - ss.length / 2 + i + ROWS) % ROWS;
+        while (taken[col + ',' + y]) y = (y + 1) % ROWS; // slide past occupied cells
+        s.x = col; s.y = y;
+        taken[col + ',' + y] = true;
       });
     });
 
@@ -167,8 +200,13 @@ globalThis.HOO = globalThis.HOO || {};
       if (s.stasisLeft > 0) s.stasisLeft--;
       s.weapons.forEach(function (w) { w.usedThisRound = false; });
     });
+    // first-strike races (Ferrets) always act first in the opening round
     b.order = b.stacks.filter(function (s) { return s.count > 0 && !s.retreated; })
-      .sort(function (a, c) { return (c.initiative) - (a.initiative) || U.rand() - 0.5; });
+      .sort(function (a, c) {
+        var ai = a.initiative + (b.round === 1 && a.firstStrike ? 1000 : 0);
+        var ci = c.initiative + (b.round === 1 && c.firstStrike ? 1000 : 0);
+        return ci - ai || U.rand() - 0.5;
+      });
     b.orderIdx = -1;
   }
 
@@ -182,8 +220,24 @@ globalThis.HOO = globalThis.HOO || {};
         continue;
       }
       var s = b.order[b.orderIdx];
-      if (s.count > 0 && !s.retreated && !s.done && s.stasisLeft <= 0) return s;
-      if (s.stasisLeft > 0) s.done = true;
+      if (s.count <= 0 || s.retreated || s.done) continue;
+      if (s.stasisLeft > 0) { s.done = true; continue; }
+      if (s.retreating) {
+        // a fleeing stack warps out at the start of its NEXT turn — it spent a
+        // full round exposed to enemy fire (manual: Retreating)
+        if (s.speedDrain >= s.speed) {
+          // warp dissipator snare: engines too drained to form a warp field
+          s.retreating = false;
+          log(b, stackLabel(s) + ' is snared — its drained engines cannot open a warp field.');
+        } else {
+          s.retreated = true; s.done = true;
+          log(b, stackLabel(s) + ' warps out of the battle.');
+          checkEnd(b);
+          if (b.over) return null;
+          continue;
+        }
+      }
+      return s;
     }
   }
 
@@ -195,7 +249,8 @@ globalThis.HOO = globalThis.HOO || {};
     });
   }
 
-  function effSpeed(s) { return Math.max(s.planetary ? 0 : 1, s.speed - s.speedDrain); }
+  // warp dissipator drain can immobilize a ship completely (speedDrain === speed)
+  function effSpeed(s) { return Math.max(0, s.speed - s.speedDrain); }
 
   function canMoveTo(b, s, x, y) {
     if (s.planetary) return false;
@@ -252,6 +307,7 @@ globalThis.HOO = globalThis.HOO || {};
   }
 
   function anyWeaponInRange(b, s, t) {
+    if (t.stasisLeft > 0) return false; // frozen stacks cannot be attacked
     for (var i = 0; i < s.weapons.length; i++) {
       var w = s.weapons[i];
       if (w.shotsLeft > 0 && inWeaponRange(b, s, t, w)) {
@@ -288,6 +344,7 @@ globalThis.HOO = globalThis.HOO || {};
   function fireWeapon(b, s, target, wi, isDefensive) {
     var w = s.weapons[wi];
     if (!w || w.usedThisRound || w.shotsLeft <= 0 || target.count <= 0) return 0;
+    if (target.stasisLeft > 0) return 0; // frozen stacks cannot be attacked
     var e = w.tech.effect;
     var wc = e.wclass;
     if (!inWeaponRange(b, s, target, w)) return 0;
@@ -316,23 +373,64 @@ globalThis.HOO = globalThis.HOO || {};
       return 0;
     }
 
-    // bombs & bio vs planet
-    if (wc === 'bomb' || wc === 'bio') {
-      if (!target.planetary) return 0;
-      var shots = s.count * w.count;
-      var dmgTot = 0;
-      var sh = shieldOf(target, s);
-      for (var i = 0; i < Math.min(shots, 300); i++) {
-        var roll = U.roll100();
-        var need = hitNeeded(effAttack, target.defense);
-        if (roll >= need) {
-          var dm = rollDamage(e.dmin, e.dmax, roll, need) - sh;
-          if (dm > 0) dmgTot += dm;
+    // biological weapons vs the colony: ignore all shields, kill population and
+    // scorch the planet itself; they never damage missile bases (manual)
+    if (wc === 'bio') {
+      if (!target.planetary || !target.star || !target.star.planet.colony) return 0;
+      var col = target.star.planet.colony;
+      var defBioEmp = b.g.empires[col.empire];
+      var kill = Math.max(0, e.dmax - (defBioEmp ? defBioEmp.derived.antidote : 0));
+      var bshots = s.count * w.count;
+      var popKilled = Math.min(col.pop, bshots * kill * 0.5);
+      var sizeLoss = bshots * kill * 0.25;
+      w.usedThisRound = true; w.shotsLeft--;
+      col.pop -= popKilled;
+      target.star.planet.size = Math.max(10, target.star.planet.size - sizeLoss);
+      target.star.planet.baseSize = Math.max(10, target.star.planet.baseSize - sizeLoss);
+      // everyone despises biological weapons (once per empire per battle)
+      if (s.empId >= 0) {
+        b.bioUsedBy = b.bioUsedBy || {};
+        if (!b.bioUsedBy[s.empId]) {
+          b.bioUsedBy[s.empId] = true;
+          b.g.empires.forEach(function (o) {
+            if (o.id === s.empId || o.dead) return;
+            HOO.Diplomacy.adjust(b.g, o.id, s.empId, -25, true);
+          });
         }
       }
-      if (shots > 300) dmgTot *= shots / 300;
+      if (col.pop <= 0.5) {
+        target.star.planet.colony = null;
+        target.count = 0; target.topDamage = 0; // the bases die with the colony
+        log(b, stackLabel(s) + ' releases ' + w.tech.name + ' — all life on the colony is extinguished.');
+        checkEnd(b);
+      } else {
+        log(b, stackLabel(s) + ' releases ' + w.tech.name + ' — ' + Math.round(popKilled) + ' million colonists perish.');
+      }
+      return popKilled;
+    }
+
+    // bombs vs planet: resolved shot by shot so a big run kills base after base
+    if (wc === 'bomb') {
+      if (!target.planetary) return 0;
+      var shots = s.count * w.count;
+      var dmgTot = 0, killedB = 0;
+      var sh = shieldOf(target, s);
+      var need = hitNeeded(effAttack, target.defense);
+      var sample = Math.min(shots, 300);
+      for (var i = 0; i < sample; i++) {
+        var roll = U.roll100();
+        if (roll >= need) {
+          var dm = rollDamage(e.dmin, e.dmax, roll, need) - sh;
+          if (dm > 0) { dmgTot += dm; killedB += applyDamage(b, target, dm, false); }
+        }
+        if (target.count <= 0) break;
+      }
+      if (shots > sample && target.count > 0) {
+        var extraB = dmgTot * (shots - sample) / sample;
+        killedB += applyDamage(b, target, extraB, true); // aggregated: kills base by base
+        dmgTot += extraB;
+      }
       w.usedThisRound = true; w.shotsLeft--;
-      var killedB = applyDamage(b, target, dmgTot, false);
       log(b, stackLabel(s) + ' bombs ' + target.name + ' — ' + Math.round(dmgTot) + ' damage' + (killedB ? ', ' + killedB + ' base(s) destroyed' : '') + '.');
       return dmgTot;
     }
@@ -340,7 +438,9 @@ globalThis.HOO = globalThis.HOO || {};
     // beams
     var defense = target.defense + (target.cloaked ? 5 : 0);
     if (e.wclass === 'heavy' || e.range > 1 || s.specials.heFocus) {
-      if (d > 1) defense += (d - 1); // extended range penalty
+      // disruptor bolts do not attenuate with distance (manual: no range penalty)
+      var noPen = e.noRangePenalty || w.tech.id === 'disruptor';
+      if (d > 1 && !noPen) defense += (d - 1); // extended range penalty
     }
     var need = hitNeeded(effAttack + (e.hitBonus || 0), defense);
     var sh = shieldOf(target, s);
@@ -351,6 +451,8 @@ globalThis.HOO = globalThis.HOO || {};
     var total = 0, killed = 0;
     var sample = Math.min(shots, 400);
     for (var k = 0; k < sample; k++) {
+      // displacement device: 1 in 3 of all direct-fire attacks simply miss
+      if (target.specials && target.specials.displacement && U.chance(specialFx('displacement').missChance || 1 / 3)) continue;
       var r2 = U.roll100();
       if (r2 >= need || need <= 0) {
         var dmg = rollDamage(e.dmin, e.dmax, r2, need);
@@ -370,7 +472,7 @@ globalThis.HOO = globalThis.HOO || {};
     }
     if (shots > sample && target.count > 0) {
       var scaledExtra = total * (shots - sample) / sample;
-      killed += applyDamage(b, target, scaledExtra, e.streaming);
+      killed += applyDamage(b, target, scaledExtra, true); // aggregated: multi-kill
       total += scaledExtra;
     }
     w.usedThisRound = true;
@@ -378,7 +480,7 @@ globalThis.HOO = globalThis.HOO || {};
     else log(b, stackLabel(s) + ' fires ' + w.tech.name + ' at ' + stackLabel(target) + ' — no effect.');
 
     // warp dissipator / tech nullifier side effects
-    if (s.specials.warpDissipator && target.kind === 'ship') target.speedDrain = Math.min(target.speed - 1, target.speedDrain + 1);
+    if (s.specials.warpDissipator && target.kind === 'ship') target.speedDrain = Math.min(target.speed, target.speedDrain + 1);
     if (s.specials.techNullifier && target.kind === 'ship') target.compDrain += U.rint(1, 3);
     return total;
   }
@@ -386,26 +488,31 @@ globalThis.HOO = globalThis.HOO || {};
   // fire everything available at target
   function fireAll(b, s, target) {
     var did = false;
-    // specials first
-    if (s.specials.stasis && s.stasisUsedRound !== b.round && target.kind !== 'monster') {
-      target.stasisLeft = 1;
+    // specials first — each activates at most once per combat round
+    if (s.specials.stasis && s.stasisUsedRound !== b.round && target.kind !== 'monster' && target.stasisLeft <= 0) {
+      // 2 so the freeze survives the beginRound decrement and holds a full round
+      target.stasisLeft = 2;
       s.stasisUsedRound = b.round;
       log(b, stackLabel(s) + ' locks ' + stackLabel(target) + ' in a stasis field.');
       did = true;
     }
-    if (s.specials.blackHole && cheb(s.x, s.y, target.x, target.y) <= 1 && target.kind === 'ship') {
+    if (s.specials.blackHole && s.blackHoleUsedRound !== b.round && target.stasisLeft <= 0 &&
+      cheb(s.x, s.y, target.x, target.y) <= 1 && target.kind === 'ship') {
+      s.blackHoleUsedRound = b.round;
       var pct = U.rint(25, 100) - target.shield * 2;
       var slain = Math.floor(target.count * U.clamp(pct, 0, 100) / 100);
       target.count -= slain;
       log(b, stackLabel(s) + ' opens a black hole — ' + slain + ' ships swallowed.');
       did = true;
     }
-    if (s.specials.pulsar || s.specials.ionicPulsar) {
+    if ((s.specials.pulsar || s.specials.ionicPulsar) && s.pulsarUsedRound !== b.round) {
+      s.pulsarUsedRound = b.round;
       b.stacks.forEach(function (t2) {
-        if (t2.side !== s.side && t2.count > 0 && !t2.retreated && cheb(s.x, s.y, t2.x, t2.y) <= 1) {
+        if (t2.side !== s.side && t2.count > 0 && !t2.retreated && t2.stasisLeft <= 0 &&
+          cheb(s.x, s.y, t2.x, t2.y) <= 1) {
           var maxD = s.specials.ionicPulsar ? 10 + s.count : 5 + s.count / 2;
           var dm = U.rand() * maxD * s.count;
-          applyDamage(b, t2, Math.max(0, dm - t2.shield), false);
+          applyDamage(b, t2, Math.max(0, dm - t2.shield), true); // aggregated wave: multi-kill
           log(b, stackLabel(s) + ' pulses energy waves into ' + stackLabel(t2) + '.');
         }
       });
@@ -431,13 +538,22 @@ globalThis.HOO = globalThis.HOO || {};
     b.missiles = b.missiles.filter(function (m) {
       var t = m.target;
       if (t.count <= 0 || t.retreated) return false;
+      if (t.stasisLeft > 0) {
+        // frozen stacks cannot be hit; missiles circle until fuel runs out
+        m.life--;
+        return m.life > 0;
+      }
       var d = cheb(m.x, m.y, t.x, t.y);
       if (d <= m.speed) {
-        // impact: anti-missile defenses
+        // impact: anti-missile defenses (manual: 85% base −5% per missile tech level
+        // for Anti-Missile Rockets; Zyro 75% and Lightning 100% at −1%/level)
         var destroyPct = 0;
-        if (t.specials && t.specials.lightning) destroyPct = 100 - m.tech.level;
-        else if (t.specials && t.specials.zyro) destroyPct = 75 - m.tech.level;
-        else if (t.specials && t.specials.antiMissile) destroyPct = 35 - m.tech.level;
+        if (t.specials && t.specials.lightning) destroyPct = (specialFx('lightning').shootDownPct || 100) - m.tech.level;
+        else if (t.specials && t.specials.zyro) destroyPct = (specialFx('zyro').shootDownPct || 75) - m.tech.level;
+        else if (t.specials && t.specials.antiMissile) {
+          var amFx = specialFx('antiMissile');
+          destroyPct = (amFx.shootDownPct || 85) - m.tech.level * (amFx.shootDownPctPerLevel || 5);
+        }
         var arriving = m.count;
         if (destroyPct > 0) arriving = Math.round(arriving * (1 - U.clamp(destroyPct, 0, 100) / 100));
 
@@ -447,6 +563,8 @@ globalThis.HOO = globalThis.HOO || {};
         var total = 0, killed = 0;
         var sample = Math.min(arriving, 400);
         for (var i = 0; i < sample; i++) {
+          // displacement device: 1 in 3 of all non-area attacks simply miss
+          if (t.specials && t.specials.displacement && U.chance(specialFx('displacement').missChance || 1 / 3)) continue;
           var roll = U.roll100();
           if (roll >= need || need <= 0) {
             var dmg = e.dmax; // missiles do full damage
@@ -462,7 +580,7 @@ globalThis.HOO = globalThis.HOO || {};
         }
         if (arriving > sample && t.count > 0) {
           var extra = total * (arriving - sample) / sample;
-          killed += applyDamage(b, t, extra, false);
+          killed += applyDamage(b, t, extra, true); // aggregated: multi-kill
           total += extra;
         }
         if (total > 0.5) log(b, m.tech.name + ' strike ' + stackLabel(t) + ' — ' + Math.round(total) + ' damage' + (killed ? ', ' + killed + ' destroyed' : '') + '.');
@@ -483,11 +601,11 @@ globalThis.HOO = globalThis.HOO || {};
 
   function endRound(b) {
     stepMissiles(b);
-    // auto repair
+    // auto repair: 15% / 30% of accumulated hull damage per turn (manual)
     b.stacks.forEach(function (s) {
       if (s.count <= 0 || s.retreated) return;
-      if (s.specials.advDamControl && s.topDamage > 0) s.topDamage = Math.max(0, s.topDamage - s.hits * 0.5);
-      else if (s.specials.autoRepair && s.topDamage > 0) s.topDamage = Math.max(0, s.topDamage - s.hits * 0.25);
+      if (s.specials.advDamControl && s.topDamage > 0) s.topDamage = Math.max(0, s.topDamage * 0.7);
+      else if (s.specials.autoRepair && s.topDamage > 0) s.topDamage = Math.max(0, s.topDamage * 0.85);
       if (s.kind === 'monster' && s.topDamage > 0) s.topDamage = Math.max(0, s.topDamage - s.hits * 0.02);
       // re-cloak if didn't fire this round
       if (s.specials.cloak && !s.cloaked) {
@@ -513,29 +631,49 @@ globalThis.HOO = globalThis.HOO || {};
   }
 
   function retreatStack(b, s) {
-    if (s.planetary || s.kind === 'monster') return false;
-    s.retreated = true; s.done = true;
-    log(b, stackLabel(s) + ' retreats from battle.');
-    // enemy gets parting shots
-    b.stacks.forEach(function (e) {
-      if (e.side === s.side || e.count <= 0 || e.retreated) return;
-      e.weapons.forEach(function (w, wi) {
-        var wc = w.tech.effect.wclass;
-        if ((wc === 'beam' || wc === 'heavy') && !w.usedThisRound && inWeaponRange(b, e, s, w)) {
-          fireWeapon(b, e, s, wi, true);
-        }
-      });
-    });
-    checkEnd(b);
+    if (s.planetary || s.kind === 'monster' || s.retreated) return false;
+    // warp dissipator: fully drained engines cannot form a warp field
+    if (s.speedDrain >= s.speed) {
+      log(b, stackLabel(s) + ' cannot retreat — its engines are drained.');
+      return false;
+    }
+    if (!s.retreating) {
+      // MOO: the stack comes about and warps out at the start of its NEXT turn,
+      // staying exposed to enemy fire for a full round in between
+      s.retreating = true;
+      log(b, stackLabel(s) + ' comes about to retreat — warping out next turn.');
+    }
+    s.done = true;
     return true;
   }
 
   // ---------- AI control of one stack ----------
 
+  // rough combat value of a stack: hull points plus punch of remaining weapons
+  function stackStrength(t) {
+    var wp = 0;
+    t.weapons.forEach(function (w) {
+      if (w.shotsLeft > 0) wp += w.count * (w.tech.effect.dmax || 0) * (w.tech.effect.autofire || 1);
+    });
+    return t.count * (t.hits + wp * 2);
+  }
+
   function aiAct(b, s) {
     if (s.stasisLeft > 0) { s.done = true; return; }
-    var enemies = alive(b, s.side === 0 ? 1 : 0);
+    var enemies = alive(b, s.side === 0 ? 1 : 0).filter(function (e) { return e.stasisLeft <= 0; });
     if (!enemies.length) { s.done = true; return; }
+
+    // hopeless odds: AI warships disengage to preserve the fleet rather than
+    // die in place (manual: the AI retreats when a battle is lost)
+    if (s.kind === 'ship' && s.empId > 0 && b.round >= 2) {
+      var mine = 0, theirs = 0;
+      b.stacks.forEach(function (t2) {
+        if (t2.count <= 0 || t2.retreated) return;
+        var st = stackStrength(t2);
+        if (t2.side === s.side) mine += st; else theirs += st;
+      });
+      if (theirs > mine * 8 && retreatStack(b, s)) { s.done = true; return; }
+    }
 
     // choose target: prefer planet for bombers, weakest effective otherwise
     var hasBombs = s.weapons.some(function (w) { return (w.tech.effect.wclass === 'bomb' || w.tech.effect.wclass === 'bio') && w.shotsLeft > 0; });
@@ -560,6 +698,7 @@ globalThis.HOO = globalThis.HOO || {};
     // unarmed ships flee to their edge
     if (!s.weapons.length && s.kind === 'ship') {
       retreatStack(b, s);
+      s.done = true;
       return;
     }
 
@@ -649,16 +788,13 @@ globalThis.HOO = globalThis.HOO || {};
       if (sd.fleets && sd.fleets.length) {
         // zero out original fleets, then place survivors
         sd.fleets.forEach(function (f) { f.ships = [0, 0, 0, 0, 0, 0]; });
-        var won = b.winner === side;
-        var stayCounts = survivors.slice();
-        if (won) for (var i = 0; i < 6; i++) stayCounts[i] += retreated[i]; // victors' retreaters rejoin
         var stay = sd.fleets[0];
-        stay.ships = stayCounts;
-        if (!won && retreated.some(function (n) { return n > 0; })) {
-          // losers' retreaters flee to nearest friendly colony
+        stay.ships = survivors.slice();
+        if (retreated.some(function (n) { return n > 0; })) {
+          // ALL retreaters — winners included — jump to the closest friendly
+          // colony other than the battle system (manual: Retreating)
           var nearest = nearestColonyStar(g, emp, b.star);
-          if (nearest && nearest.id !== b.star.id) {
-            HOO.Fleet.addShips(g, emp.id, b.star.id, 0, 0); // ensure fleet exists? send directly:
+          if (nearest) {
             var fleeing = {
               id: g.fleetSeq++, empire: emp.id, at: null,
               from: b.star.id, to: nearest.id,
@@ -667,7 +803,8 @@ globalThis.HOO = globalThis.HOO || {};
             };
             g.fleets.push(fleeing);
           } else {
-            for (i = 0; i < 6; i++) stay.ships[i] += retreated[i];
+            // nowhere left to run: the survivors hold at the battle star
+            for (var i = 0; i < 6; i++) stay.ships[i] += retreated[i];
           }
         }
       }
@@ -680,13 +817,32 @@ globalThis.HOO = globalThis.HOO || {};
     HOO.Fleet.cleanup(g);
   }
 
+  // closest friendly colony OTHER than the battle star, so defenders retreating
+  // from their own system actually leave it
   function nearestColonyStar(g, emp, fromStar) {
     var best = null, bd = Infinity;
     HOO.Colony.colonies(g, emp.id).forEach(function (e) {
+      if (fromStar && e.star.id === fromStar.id) return;
       var d = U.dist(fromStar.x, fromStar.y, e.star.x, e.star.y);
       if (d < bd) { bd = d; best = e.star; }
     });
     return best;
+  }
+
+  // per-design casualty report for the after-action screen
+  function casualtySummary(b) {
+    var sides = [[], []];
+    b.stacks.forEach(function (s) {
+      sides[s.side].push({
+        name: s.name, kind: s.kind,
+        start: s.startCount, left: s.count,
+        lost: Math.max(0, s.startCount - s.count),
+        // only stacks that actually warped out — mid-retreat stacks stay in
+        // orbit as survivors (see applyResults), so don't report them as gone
+        retreated: !!s.retreated
+      });
+    });
+    return sides;
   }
 
   function stackLabel(s) {
@@ -708,6 +864,7 @@ globalThis.HOO = globalThis.HOO || {};
     retreatStack: retreatStack, checkEnd: checkEnd, alive: alive,
     inWeaponRange: inWeaponRange, anyWeaponInRange: anyWeaponInRange,
     hitNeeded: hitNeeded, cheb: cheb, effSpeed: effSpeed, stackLabel: stackLabel,
+    casualtySummary: casualtySummary,
     COLS: COLS, ROWS: ROWS
   };
 })();

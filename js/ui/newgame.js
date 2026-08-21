@@ -22,20 +22,24 @@ globalThis.HOO = globalThis.HOO || {};
     ]));
 
     var menu = el('div', { cls: 'title-menu' });
+    function tryLoad(slot) {
+      if (HOO.State.load(slot)) HOO.Main.rebuild();
+      else HOO.UI.dialog('Archive Damaged', 'This save could not be read — it may be corrupt or from a newer build.');
+    }
     var hasAuto = !!HOO.State.saveMeta('auto');
     if (hasAuto) {
       menu.appendChild(el('button', {
         cls: 'btn primary', text: 'Continue Game',
-        onclick: function () { if (HOO.State.load('auto')) HOO.Main.rebuild(); }
+        onclick: function () { tryLoad('auto'); }
       }));
     }
     menu.appendChild(el('button', { cls: 'btn' + (hasAuto ? '' : ' primary'), text: 'New Game', onclick: showSetup }));
-    [1, 2, 3].forEach(function (slot) {
+    [1, 2, 3, 4, 5, 6].forEach(function (slot) {
       var meta = HOO.State.saveMeta(slot);
       if (meta) {
         menu.appendChild(el('button', {
-          cls: 'btn', text: 'Load — cycle ' + meta.year + ' (' + meta.race + ')',
-          onclick: function () { if (HOO.State.load(slot)) HOO.Main.rebuild(); }
+          cls: 'btn', text: 'Load ' + slot + ' — cycle ' + meta.year + ' (' + meta.race + ')',
+          onclick: function () { tryLoad(slot); }
         }));
       }
     });
@@ -81,13 +85,20 @@ globalThis.HOO = globalThis.HOO || {};
       return { v: n, label: String(n) };
     }), function (v) { opts.opponents = v; }, opts.opponents));
 
-    // names
+    // names (manual: the player names both the emperor and the home world)
+    var inputStyle = 'width:100%; background:var(--void-2); border:1px solid var(--line-2); color:var(--ink); padding:7px 9px; border-radius:4px; margin-top:4px;';
     var nameGroup = el('div', { cls: 'opt-group' });
     nameGroup.appendChild(el('span', { cls: 'eyebrow', text: 'Eternal Consciousness (optional name)' }));
     nameGroup.appendChild(el('input', {
       placeholder: 'Leader name…',
-      style: 'width:100%; background:var(--void-2); border:1px solid var(--line-2); color:var(--ink); padding:7px 9px; border-radius:4px; margin-top:4px;',
+      style: inputStyle,
       oninput: function () { opts.leaderName = this.value; }
+    }));
+    nameGroup.appendChild(el('span', { cls: 'eyebrow', style: 'display:block; margin-top:10px;', text: 'Home World (optional name)' }));
+    nameGroup.appendChild(el('input', {
+      placeholder: 'Home world name…',
+      style: inputStyle,
+      oninput: function () { opts.homeName = this.value; }
     }));
     left.appendChild(nameGroup);
 

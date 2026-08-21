@@ -26,7 +26,8 @@ globalThis.HOO = globalThis.HOO || {};
 
   function shouldConvene(g) {
     if (g.council.finalWar || g.gameOver) return false;
-    if (colonizedFraction(g) <= 0.5) return false;
+    // manual: the council first convenes once two-thirds of the galaxy is colonized
+    if (colonizedFraction(g) < 2 / 3) return false;
     var alive = g.empires.filter(function (e) { return !e.dead; });
     if (alive.length < 2) return false;
     return (g.year - (g.council.lastVote || 0)) >= 25 || !g.council.formed;
@@ -52,9 +53,11 @@ globalThis.HOO = globalThis.HOO || {};
       var v = votesOf(g, emp);
       record.totalVotes += v;
       var choice = null;
-      if (emp.id === cand[0].id) choice = cand[0].id;
+      // the player always chooses freely — even as a candidate they may
+      // vote for themselves, the rival, or abstain (manual: Winning the Game)
+      if (emp.isPlayer) choice = 'PLAYER_CHOICE';
+      else if (emp.id === cand[0].id) choice = cand[0].id;
       else if (emp.id === cand[1].id) choice = cand[1].id;
-      else if (emp.isPlayer) { choice = 'PLAYER_CHOICE'; }
       else {
         // vote by relations (+ Orion holder sway, Hamster council bonus)
         var s0 = score(g, emp, cand[0]), s1 = score(g, emp, cand[1]);
@@ -111,7 +114,8 @@ globalThis.HOO = globalThis.HOO || {};
       if (emp.dead || emp.id === rebelId) return;
       var rel = emp.relations[rebelId];
       if (rel) {
-        HOO.Diplomacy.declareWar(g, emp.id, rebelId);
+        // noRipple: the united galaxy's wars are set explicitly below
+        HOO.Diplomacy.declareWar(g, emp.id, rebelId, true);
         rel.permanentPenalty -= 30;
       }
       // the galaxy unites

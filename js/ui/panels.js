@@ -43,6 +43,14 @@ globalThis.HOO = globalThis.HOO || {};
     ]));
   }
 
+  // manual (Advanced Space Scanner): full planet and colony details for any
+  // star inside scanner range, without a visit
+  function starScanned(g, s) {
+    if (s.explored[0]) return true;
+    var pl = g.empires[0];
+    return !!(pl.derived.scanShowsPlanets && HOO.Fleet.scannerSees(g, pl, s.x, s.y));
+  }
+
   function showStar(starId) {
     var g = HOO.game;
     var s = g.stars[starId];
@@ -51,9 +59,10 @@ globalThis.HOO = globalThis.HOO || {};
     var sb = sidebar();
     U.clearEl(sb);
 
-    var eyebrow = el('div', { cls: 'eyebrow', text: s.orion ? 'The Galactic Core' : (s.color + ' star') });
-    if (!s.explored[0]) {
-      sb.appendChild(section(s.name === undefined ? 'Unknown' : (s.explored[0] ? s.name : 'Uncharted System'), [
+    var scanOnly = !s.explored[0] && starScanned(g, s);
+    var eyebrow = el('div', { cls: 'eyebrow', text: (s.orion ? 'The Galactic Core' : (s.color + ' star')) + (scanOnly ? ' · deep scan' : '') });
+    if (!starScanned(g, s)) {
+      sb.appendChild(section('Uncharted System', [
         eyebrow,
         el('p', { cls: 'muted-t', style: 'margin-top:8px', text: 'This system has not been explored. Send a ship to chart it.' })
       ]));
@@ -95,15 +104,24 @@ globalThis.HOO = globalThis.HOO || {};
       } else {
         var pl = g.empires[0];
         var canland = HOO.Ground.canColonize(g, pl, s);
-        bits.push(el('p', {
-          cls: canland ? 'good' : 'muted-t', style: 'margin-top:8px; font-size:12.5px;',
-          text: canland ? 'Colonization possible with a colony ship.' :
-            (def.hostility > pl.derived.maxHostility ? 'Environment too hostile for our colony technology.' : 'Uncolonized.')
-        }));
-        // colonize button if colony ship in orbit
         var fleet = HOO.Fleet.fleetAt(g, 0, s.id);
         var hasColShip = fleet && pl.designs.some(function (d, i) { return d && d.hasColonyBase && fleet.ships[i] > 0; });
-        if (canland && hasColShip) {
+        // the orbiting ship's frozen base module must cover this environment
+        var shipCanLand = canland && hasColShip && HOO.Ground.canColonize(g, pl, s, fleet);
+        var landText;
+        if (canland && hasColShip && !shipCanLand) {
+          landText = 'This colony ship’s base module predates our environmental tech — a newly designed colony ship is required.';
+        } else if (canland) {
+          landText = 'Colonization possible with a colony ship.';
+        } else {
+          landText = def.hostility > pl.derived.maxHostility ? 'Environment too hostile for our colony technology.' : 'Uncolonized.';
+        }
+        bits.push(el('p', {
+          cls: shipCanLand || (canland && !hasColShip) ? 'good' : 'muted-t', style: 'margin-top:8px; font-size:12.5px;',
+          text: landText
+        }));
+        // colonize button if a capable colony ship is in orbit
+        if (shipCanLand) {
           bits.push(el('button', {
             cls: 'btn primary', style: 'margin-top:10px; width:100%;', text: 'Found Colony',
             onclick: function () {
@@ -164,7 +182,9 @@ globalThis.HOO = globalThis.HOO || {};
     var sp = HOO.CONST.SPECIALS[p.special];
     var mp = HOO.Colony.maxPop(emp, s);
     var raw = HOO.Colony.rawProduction(emp, s);
-    var spend = raw * (emp.economy ? emp.economy.ratio : 1);
+    // single source of truth shared with the engine and every bar note:
+    // includes the maintenance ratio, reserve tax, and transferred funds
+    var spend = HOO.Colony.spendEstimate(emp, s);
 
     var head = [];
     head.push(el('div', { cls: 'eyebrow', text: def.name + (sp.name ? ' · ' + sp.name : '') + (s.inNebula ? ' · nebula' : '') }));
@@ -202,6 +222,10 @@ globalThis.HOO = globalThis.HOO || {};
             if (v < minPct) v = minPct;
           }
           HOO.UI.rebalance(c.alloc, key, v, c.locks);
+          // dragging any other bar must not squeeze eco below the clean
+          // minimum either — enforce now so bars and notes show what the
+          // engine will actually spend, instead of a silent end-of-turn fixup
+          enforceEcoFloor(emp, s, c);
           Object.keys(rows).forEach(function (k2) { rows[k2]._update(); });
         },
         note: noteFns[key],
@@ -294,6 +318,29 @@ globalThis.HOO = globalThis.HOO || {};
     c.locks = {};
   }
 
+  // mirror of the engine's end-of-turn eco auto-raise (colony.js raiseEco):
+  // keep an unlocked Eco bar at the clean minimum whenever any bar changes,
+  // stealing proportionally from the unlocked ship/def/ind/tech bars
+  function enforceEcoFloor(emp, starObj, c) {
+    var locks = c.locks || {};
+    if (locks.eco) return;
+    var minPct = HOO.Colony.ecoMinPct(emp, starObj);
+    if (c.alloc.eco >= minPct) return;
+    var keys = ['ship', 'def', 'ind', 'tech'];
+    var lockedSum = 0;
+    keys.forEach(function (k) { if (locks[k]) lockedSum += c.alloc[k]; });
+    var needPct = Math.min(minPct, 100 - lockedSum);
+    if (needPct <= c.alloc.eco) return;
+    var free = keys.filter(function (k) { return !locks[k]; });
+    var freeSum = 0;
+    free.forEach(function (k) { freeSum += c.alloc[k]; });
+    var take = Math.min(needPct - c.alloc.eco, freeSum);
+    c.alloc.eco += take;
+    if (freeSum > 0) {
+      free.forEach(function (k) { c.alloc[k] = Math.max(0, c.alloc[k] - take * c.alloc[k] / freeSum); });
+    }
+  }
+
   // spendable BC this colony will have next turn (shared with the engine)
   function colonySpend(emp, s) {
     return HOO.Colony.spendEstimate(emp, s);
@@ -334,7 +381,7 @@ globalThis.HOO = globalThis.HOO || {};
     var maxFact = mp * Math.min(d.controls, c.controls);
     if (c.factories >= maxFact) return 'MAX';
     if (c.alloc.ind <= 0) return '—';
-    if (c.controls < d.controls && !HOO.DATA.raceById[emp.raceId].freeRefit && c.factories > 0) return 'REFIT';
+    if (c.controls < d.controls && c.factories > 0) return 'REFIT';
     var bc = colonySpend(emp, s) * c.alloc.ind / 100 * HOO.Colony.mineralMult(s);
     var nf = bc / HOO.Colony.factoryCostAt(emp, c.controls);
     if (nf <= 0) return '—';
@@ -370,8 +417,6 @@ globalThis.HOO = globalThis.HOO || {};
   function techNote(emp, s, c) {
     if (c.quarantine || c.novaThreat) return '0 RP';
     var rp = colonySpend(emp, s) * c.alloc.tech / 100 * HOO.Colony.researchMult(s);
-    var race = HOO.DATA.raceById[emp.raceId];
-    if (race.researchBonus) rp *= (1 + race.researchBonus);
     return U.fmt(rp, 0) + ' RP';
   }
 
@@ -540,8 +585,20 @@ globalThis.HOO = globalThis.HOO || {};
     var race = HOO.DATA.raceById[emp.raceId];
 
     var head = [el('div', { cls: 'eyebrow', style: 'color:' + emp.color, text: race.name + ' fleet' })];
-    if (f.at !== null) head.push(kv('Position', 'Orbiting ' + g.stars[f.at].name));
-    else head.push(kv('In transit', g.stars[f.from] ? (g.stars[f.from].name + ' → ' + g.stars[f.to].name + ' · ' + HOO.Fleet.eta(g, f) + ' yr') : ('→ ' + g.stars[f.to].name)));
+    if (f.at !== null) {
+      head.push(kv('Position', 'Orbiting ' + g.stars[f.at].name));
+    } else if (f.empire === 0) {
+      head.push(kv('In transit', g.stars[f.from] ? (g.stars[f.from].name + ' → ' + g.stars[f.to].name + ' · ' + HOO.Fleet.eta(g, f) + ' yr') : ('→ ' + g.stars[f.to].name)));
+    } else {
+      // manual (Deep Space Scanners): an enemy fleet's destination is revealed
+      // only by the Improved Space Scanner; destination + ETA by the Advanced
+      var d0 = g.empires[0].derived;
+      head.push(kv('Position', 'Deep space — in transit'));
+      if (d0.scanShowsDest) {
+        head.push(kv('Destination', g.stars[f.to].name +
+          (d0.scanShowsPlanets ? ' · ETA ' + HOO.Fleet.eta(g, f) + ' yr' : '')));
+      }
+    }
 
     if (f.empire !== 0) {
       // enemy fleet scan
@@ -549,7 +606,6 @@ globalThis.HOO = globalThis.HOO || {};
       f.ships.forEach(function (n, slot) {
         if (n > 0 && emp.designs[slot]) rows.push(kv(emp.designs[slot].name, String(n)));
       });
-      if (f.at === null && g.empires[0].derived.scanShowsDest) head.push(kv('Destination', g.stars[f.to].name));
       sb.appendChild(section('Fleet Scan', head.concat(rows)));
       return;
     }
@@ -613,13 +669,18 @@ globalThis.HOO = globalThis.HOO || {};
     var emp = g.empires[0];
     var f = currentSel.fleet;
 
-    // in-transit redirect via hyperspace comms
+    // in-transit redirect via hyperspace comms — the engine guards retreat
+    // locks and clears any pending star-gate jump (manual: gates link colonies
+    // only; a redirected fleet flies normally)
     if (f.at === null) {
-      if (!HOO.Fleet.inRange(g, emp, destStar, f)) {
+      if (!HOO.Fleet.canRedirect(g, f)) {
+        HOO.UI.toast({ tag: 'Helm', text: 'That fleet is retreating and must complete its jump.', kind: 'red', timeout: 6000 });
+        return;
+      }
+      if (!HOO.Fleet.redirectFleet(g, 0, f, destStar.id)) {
         HOO.UI.toast({ tag: 'Helm', text: destStar.name + ' is beyond fuel range.', kind: 'red', timeout: 6000 });
         return;
       }
-      f.to = destStar.id;
       HOO.UI.toast({ tag: 'Helm', text: 'Fleet redirected to ' + destStar.name + ' — ETA ' + HOO.Fleet.eta(g, f) + ' yr.', kind: 'green', timeout: 6000 });
       showFleet(f);
       return;

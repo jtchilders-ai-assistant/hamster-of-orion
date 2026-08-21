@@ -7,10 +7,20 @@ globalThis.HOO = globalThis.HOO || {};
   var el = U.el;
   var C = function () { return HOO.Combat; };
 
-  var overlay, canvas, ctx, logEl, titleEl, btnRow;
-  var battle, playerSide, current, awaiting, autoMode, onDoneCb;
+  var overlay, screenEl, canvas, ctx, logEl, titleEl, btnRow, infoEl;
+  var battle, playerSide, current, awaiting, autoMode, onDoneCb, finished;
   var cellW = 72, cellH = 64, pad = 8;
   var hoverCell = null;
+
+  // combat has its own control surface: swallow global hotkeys (Enter, G, 1-6,
+  // Tab, Escape...) while the battle overlay is up, since it bypasses HOO.UI's
+  // overlay registry and hasOverlay() cannot see it
+  function keyBlock(e) {
+    if (e.key === 'Escape' || e.key === 'Tab') e.preventDefault();
+    e.stopPropagation();
+  }
+
+  function isActive() { return !!overlay; }
 
   function run(b, meta, onDone) {
     battle = b;
@@ -19,9 +29,11 @@ globalThis.HOO = globalThis.HOO || {};
     autoMode = false;
     awaiting = false;
     current = null;
+    finished = false;
 
     overlay = el('div', { cls: 'station-overlay', style: 'z-index:80;' });
-    var screen = el('div', { cls: 'combat-screen', style: 'width:min(1100px, calc(100vw - 30px)); height:min(780px, calc(100vh - 30px)); border:1px solid var(--line-2); border-radius:8px; overflow:hidden;' });
+    var screen = el('div', { cls: 'combat-screen', style: 'position:relative; width:min(1100px, calc(100vw - 30px)); height:min(780px, calc(100vh - 30px)); border:1px solid var(--line-2); border-radius:8px; overflow:hidden;' });
+    screenEl = screen;
 
     var top = el('div', { cls: 'combat-top' });
     titleEl = el('div', { style: 'font-family:var(--font-display); font-weight:700; letter-spacing:0.06em; text-transform:uppercase;', text: 'Battle of ' + b.star.name });
@@ -39,6 +51,10 @@ globalThis.HOO = globalThis.HOO || {};
     gw.appendChild(canvas);
     screen.appendChild(gw);
 
+    // per-stack readout: acting/hovered stack's hull, shields, initiative...
+    infoEl = el('div', { cls: 'mono', style: 'padding:4px 16px; font-size:11px; color:#B7C1D9; min-height:20px; border-top:1px solid var(--line); background:var(--void-2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;' });
+    screen.appendChild(infoEl);
+
     var bottom = el('div', { cls: 'combat-bottom' });
     btnRow = el('div', { style: 'display:flex; gap:6px;' });
     bottom.appendChild(btnRow);
@@ -48,6 +64,7 @@ globalThis.HOO = globalThis.HOO || {};
 
     overlay.appendChild(screen);
     document.body.appendChild(overlay);
+    document.addEventListener('keydown', keyBlock, true);
 
     canvas.addEventListener('click', onClick);
     canvas.addEventListener('mousemove', onHover);
@@ -70,15 +87,19 @@ globalThis.HOO = globalThis.HOO || {};
     btnRow.appendChild(el('button', {
       cls: 'btn small', text: 'Missiles',
       title: 'Toggle missile fire for the current stack',
-      onclick: function () { if (current) { current.missilesOn = !current.missilesOn; log(current.missilesOn ? 'Missiles armed.' : 'Missiles held.'); } }
+      // only the player's own stack, on its own turn — never enemy/AI stacks
+      onclick: function () { if (awaiting && current) { current.missilesOn = !current.missilesOn; log(current.missilesOn ? 'Missiles armed.' : 'Missiles held.'); } }
     }));
     btnRow.appendChild(el('button', {
       cls: 'btn small danger', text: 'Retreat',
       onclick: function () {
         if (awaiting && current) {
-          C().retreatStack(battle, current);
-          awaiting = false;
-          step();
+          if (C().retreatStack(battle, current)) {
+            awaiting = false;
+            step();
+          } else {
+            renderLog(); // e.g. warp dissipator has drained the engines
+          }
         }
       }
     }));
@@ -94,7 +115,9 @@ globalThis.HOO = globalThis.HOO || {};
     var roundEl = document.getElementById('combat-round');
     if (roundEl) roundEl.textContent = 'Round ' + battle.round + ' / ' + HOO.CONST.COMBAT_MAX_TURNS;
     var curEl = document.getElementById('combat-current');
-    if (curEl) curEl.textContent = s.name + ' ×' + s.count + ' — ' + armamentSummary(s);
+    if (curEl) curEl.textContent = (s.side === playerSide ? 'Your move: ' : 'Enemy: ') +
+      C().stackLabel(s) + ' — ' + armamentSummary(s);
+    setInfo('Now acting (' + (s.side === playerSide ? 'yours' : 'enemy') + '): ' + stackInfo(s));
 
     if (s.side === playerSide && !autoMode && s.kind !== 'monster') {
       awaiting = true;
@@ -120,17 +143,85 @@ globalThis.HOO = globalThis.HOO || {};
   }
 
   function finish() {
+    if (finished) return;
+    finished = true;
+    awaiting = false;
     render();
     renderLog();
-    setTimeout(function () {
-      if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
-      if (onDoneCb) onDoneCb(battle);
-    }, 700);
+    setTimeout(showReport, 700);
+  }
+
+  // after-action casualty report: per-design losses on both sides
+  function showReport() {
+    if (!screenEl) return;
+    var sides = C().casualtySummary(battle);
+    var playerWon = battle.winner !== null && battle.winner === playerSide;
+    var verdict = battle.winner === null ? 'Mutual Annihilation' : (playerWon ? 'Victory' : 'Defeat');
+    var box = el('div', { style: 'position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:min(560px, 92%); background:var(--void-2); border:1px solid var(--line-2); border-radius:8px; padding:16px 20px; z-index:5;' });
+    box.appendChild(el('div', {
+      style: 'font-family:var(--font-display); font-weight:700; letter-spacing:0.06em; text-transform:uppercase; margin-bottom:10px;',
+      text: verdict + ' — ' + battle.star.name
+    }));
+    var cols = el('div', { style: 'display:flex; gap:24px;' });
+    [playerSide, 1 - playerSide].forEach(function (side, idx) {
+      var col = el('div', { style: 'flex:1; min-width:0;' });
+      col.appendChild(el('div', {
+        cls: 'mono',
+        style: 'font-size:10px; color:#8492AF; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:6px;',
+        text: idx === 0 ? 'Your Forces' : 'Enemy Forces'
+      }));
+      var rows = sides[side];
+      if (!rows.length) col.appendChild(el('div', { cls: 'mono', style: 'font-size:11px;', text: '—' }));
+      rows.forEach(function (r) {
+        var word = r.kind === 'base' ? 'destroyed' : 'lost';
+        var txt = r.name + ': ' + r.lost + ' of ' + r.start + ' ' + word;
+        if (r.retreated) txt += ', survivors retreated';
+        else if (r.left > 0) txt += ', ' + r.left + ' remain';
+        col.appendChild(el('div', { cls: 'mono', style: 'font-size:11px; margin-bottom:3px;', text: txt }));
+      });
+      cols.appendChild(col);
+    });
+    box.appendChild(cols);
+    var row = el('div', { style: 'display:flex; justify-content:flex-end; margin-top:14px;' });
+    row.appendChild(el('button', { cls: 'btn', text: 'Continue', onclick: closeOverlay }));
+    box.appendChild(row);
+    screenEl.appendChild(box);
+  }
+
+  // tear down: unhook the hotkey blocker so map shortcuts work again
+  function closeOverlay() {
+    document.removeEventListener('keydown', keyBlock, true);
+    if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+    overlay = null; screenEl = null; canvas = null; ctx = null; logEl = null; infoEl = null;
+    current = null; awaiting = false;
+    var cb = onDoneCb, b = battle;
+    onDoneCb = null; battle = null;
+    if (cb) cb(b);
   }
 
   function armamentSummary(s) {
     if (!s.weapons.length) return 'unarmed';
     return s.weapons.map(function (w) { return w.count + '× ' + w.tech.name; }).join(', ');
+  }
+
+  function setInfo(txt) { if (infoEl) infoEl.textContent = txt || ''; }
+
+  // condensed stat line: top ship's hull, stack count, shield class, ECM...
+  function stackInfo(s) {
+    var top = Math.max(0, Math.ceil(s.hits - s.topDamage));
+    var bits = [
+      'hull ' + top + '/' + s.hits + (s.count > 1 ? ' (top of ' + s.count + ')' : ''),
+      'shield ' + s.shield,
+      'ECM ' + (s.ecm || 0),
+      'att ' + s.attack,
+      'def ' + s.defense,
+      'speed ' + C().effSpeed(s),
+      'init ' + s.initiative
+    ];
+    if (s.cloaked) bits.push('cloaked');
+    if (s.stasisLeft > 0) bits.push('in stasis');
+    if (s.retreating) bits.push('retreating');
+    return C().stackLabel(s) + ' — ' + bits.join(' · ');
   }
 
   // why an attack click on an enemy did nothing
@@ -176,6 +267,9 @@ globalThis.HOO = globalThis.HOO || {};
       if (t && t.side !== current.side && C().anyWeaponInRange(battle, current, t)) canvas.style.cursor = 'crosshair';
       else if (!t && C().canMoveTo(battle, current, hoverCell.x, hoverCell.y)) canvas.style.cursor = 'pointer';
     }
+    // hover readout; falls back to whoever is acting
+    if (t) setInfo(stackInfo(t));
+    else if (current && !battle.over) setInfo('Now acting (' + (current.side === playerSide ? 'yours' : 'enemy') + '): ' + stackInfo(current));
     render();
   }
 
@@ -247,6 +341,13 @@ globalThis.HOO = globalThis.HOO || {};
       }
     }
 
+    // the world under contention sits on the defender's side; the base stack
+    // paints its own planet, so scenery only fills in when no bases remain
+    if (battle.star && battle.star.planet) {
+      var baseAlive = battle.stacks.some(function (s) { return s.kind === 'base' && s.count > 0 && !s.retreated; });
+      if (!baseAlive) drawPlanetScenery();
+    }
+
     // missiles in flight
     battle.missiles.forEach(function (m) {
       var px = pad + m.x * cellW + cellW / 2, py = pad + m.y * cellH + cellH / 2;
@@ -264,6 +365,22 @@ globalThis.HOO = globalThis.HOO || {};
       if (s.count <= 0 || s.retreated) return;
       drawStack(s);
     });
+  }
+
+  // colony planet drawn in the map's art style (radial gradient disc)
+  function drawPlanetScenery() {
+    var colony = battle.star.planet.colony;
+    var g = HOO.game;
+    var color = (colony && g.empires[colony.empire]) ? g.empires[colony.empire].color : '#8492AF';
+    var px = pad + (C().COLS - 1) * cellW + cellW / 2;
+    var py = pad + Math.floor(C().ROWS / 2) * cellH + cellH / 2 - 6;
+    var grad = ctx.createRadialGradient(px, py, 2, px, py, 18);
+    grad.addColorStop(0, color);
+    grad.addColorStop(1, '#1E2842');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(px, py, 16, 0, Math.PI * 2);
+    ctx.fill();
   }
 
   function drawStack(s) {
@@ -323,15 +440,27 @@ globalThis.HOO = globalThis.HOO || {};
     }
     ctx.restore();
 
-    // label
+    // label: wrap long names onto two lines instead of truncating
     ctx.font = '600 10px "IBM Plex Mono", monospace';
     ctx.textAlign = 'center';
     ctx.fillStyle = '#E9EEF8';
-    ctx.fillText(String(s.count), px, py + 18);
+    ctx.fillText(String(s.count), px, py + 16);
     ctx.fillStyle = '#8492AF';
     ctx.font = '9px "IBM Plex Mono", monospace';
-    var nm = s.name.length > 11 ? s.name.slice(0, 10) + '…' : s.name;
-    ctx.fillText(nm, px, py + 28);
+    var nm = s.name;
+    if (nm.length > 11) {
+      var brk = nm.lastIndexOf(' ', 11);
+      if (brk > 2) {
+        var rest = nm.slice(brk + 1);
+        if (rest.length > 12) rest = rest.slice(0, 11) + '…';
+        ctx.fillText(nm.slice(0, brk), px, py + 25);
+        ctx.fillText(rest, px, py + 34);
+      } else {
+        ctx.fillText(nm.slice(0, 10) + '…', px, py + 25);
+      }
+    } else {
+      ctx.fillText(nm, px, py + 25);
+    }
     // damage bar on top ship
     if (s.topDamage > 0) {
       var frac = 1 - s.topDamage / s.hits;
@@ -350,5 +479,17 @@ globalThis.HOO = globalThis.HOO || {};
     logEl.scrollTop = logEl.scrollHeight;
   }
 
-  HOO.CombatUI = { run: run };
+  // forceClose: emergency teardown for fault recovery (main.js rebuild) —
+  // removes the capture-phase key blocker and clears all module state without
+  // running the completion callback
+  function forceClose() {
+    document.removeEventListener('keydown', keyBlock, true);
+    if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+    overlay = null; screenEl = null; canvas = null; ctx = null; logEl = null; infoEl = null;
+    current = null; awaiting = false; onDoneCb = null; battle = null;
+  }
+
+  // isActive: true while the tactical overlay is up — global hotkey handlers
+  // can use it as a guard in addition to the capture-phase key blocker here
+  HOO.CombatUI = { run: run, isActive: isActive, forceClose: forceClose };
 })();

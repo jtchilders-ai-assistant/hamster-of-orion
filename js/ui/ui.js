@@ -121,9 +121,19 @@ globalThis.HOO = globalThis.HOO || {};
       t.classList.add('fadeout');
       setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); }, 500);
     }
+    // sticky/button toasts carry decisions (e.g. the next-research choice) and
+    // must never be silently evicted by a busy turn
+    t._sticky = !!(opts.sticky || (opts.buttons && opts.buttons.length));
     toastStack.appendChild(t);
-    // cap the stack
-    while (toastStack.children.length > 7) toastStack.removeChild(toastStack.firstChild);
+    // cap the stack: evict the oldest non-sticky toast first
+    while (toastStack.children.length > 7) {
+      var victim = null;
+      for (var vi = 0; vi < toastStack.children.length; vi++) {
+        if (!toastStack.children[vi]._sticky) { victim = toastStack.children[vi]; break; }
+      }
+      if (!victim) break; // everything left is sticky — let the stack grow rather than eat a choice
+      toastStack.removeChild(victim);
+    }
     if (!opts.sticky && !(opts.buttons && opts.buttons.length)) {
       setTimeout(dismiss, opts.timeout || 14000);
     }
@@ -161,6 +171,11 @@ globalThis.HOO = globalThis.HOO || {};
     opts = opts || {};
     var ov = el('div', { cls: 'station-overlay' });
     var station = el('div', { cls: 'station', style: opts.width ? ('width:min(' + opts.width + 'px, calc(100vw - 40px))') : '' });
+    // dialog semantics for assistive tech; tabindex so focus can land on the container
+    station.setAttribute('role', 'dialog');
+    station.setAttribute('aria-modal', 'true');
+    if (opts.title) station.setAttribute('aria-label', opts.title);
+    station.tabIndex = -1;
     if (opts.title) {
       var head = el('div', { cls: 'station-head' }, [
         el('h1', { text: opts.title }),
@@ -176,20 +191,44 @@ globalThis.HOO = globalThis.HOO || {};
     if (!opts.noClose) {
       ov.addEventListener('mousedown', function (e) { if (e.target === ov) close(ov); });
     }
+    // remember the noClose flag so Escape (implicit close) can respect it,
+    // and where focus was so we can hand it back on close
+    ov._noClose = !!opts.noClose;
+    ov._returnFocus = document.activeElement;
+    // keep Tab cycling inside the dialog instead of walking the background
+    ov.addEventListener('keydown', function (e) {
+      if (e.key !== 'Tab') return;
+      var focusables = ov.querySelectorAll('button:not(:disabled), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+      if (!focusables.length) { e.preventDefault(); return; }
+      var first = focusables[0], last = focusables[focusables.length - 1];
+      if (e.shiftKey && (document.activeElement === first || !ov.contains(document.activeElement))) {
+        last.focus(); e.preventDefault();
+      } else if (!e.shiftKey && (document.activeElement === last || !ov.contains(document.activeElement))) {
+        first.focus(); e.preventDefault();
+      }
+    });
     document.body.appendChild(ov);
     overlays.push(ov);
+    station.focus();
     return ov;
   }
 
   function close(ov) {
+    var implicit = !ov; // no argument = Escape / generic top-of-stack close
     if (!ov) ov = overlays[overlays.length - 1];
     if (!ov) return;
+    // noClose modals carry queue continuations (combat prompts, council votes);
+    // an implicit close would drop the continuation and soft-lock the turn
+    if (implicit && ov._noClose) return;
     var i = overlays.indexOf(ov);
     if (i >= 0) overlays.splice(i, 1);
     if (ov.parentNode) ov.parentNode.removeChild(ov);
+    var rf = ov._returnFocus;
+    if (rf && rf.focus && document.contains(rf)) rf.focus();
   }
 
-  function closeAll() { while (overlays.length) close(); }
+  // force-close everything, including noClose modals (used on rebuild/load)
+  function closeAll() { while (overlays.length) close(overlays[overlays.length - 1]); }
 
   function hasOverlay() { return overlays.length > 0; }
 
@@ -213,6 +252,17 @@ globalThis.HOO = globalThis.HOO || {};
   }
 
   // ---------- ratio bar widget ----------
+  // one shared pair of window listeners services every ratio bar: rows are
+  // rebuilt on every panel render, so per-row window listeners would leak
+  // (and retain dead DOM/colony objects) by the thousands over a session
+  var activeDrag = null; // { set, update, pctFromEvent }
+  window.addEventListener('mousemove', function (e) {
+    if (!activeDrag) return;
+    activeDrag.set(activeDrag.pctFromEvent(e));
+    activeDrag.update();
+  });
+  window.addEventListener('mouseup', function () { activeDrag = null; });
+
   /*
     opts: {label, cls, get():pct, set(pct), note():string, lockable, locked(), toggleLock()}
   */
@@ -240,20 +290,39 @@ globalThis.HOO = globalThis.HOO || {};
       var r = bar.getBoundingClientRect();
       return U.clamp(Math.round((e.clientX - r.left) / r.width * 100), 0, 100);
     }
-    var dragging = false;
     bar.addEventListener('mousedown', function (e) {
       if (opts.locked && opts.locked()) return;
-      dragging = true;
       opts.set(pctFromEvent(e));
       update();
+      activeDrag = { set: opts.set, update: update, pctFromEvent: pctFromEvent };
       e.preventDefault();
     });
-    window.addEventListener('mousemove', function (e) {
-      if (!dragging) return;
-      opts.set(pctFromEvent(e));
+
+    // keyboard slider semantics: the allocation bars are the core economic
+    // verb of the game and must work without a mouse
+    bar.tabIndex = 0;
+    bar.setAttribute('role', 'slider');
+    if (opts.label) bar.setAttribute('aria-label', opts.label);
+    bar.setAttribute('aria-valuemin', '0');
+    bar.setAttribute('aria-valuemax', '100');
+    bar.addEventListener('keydown', function (e) {
+      if (opts.locked && opts.locked()) return;
+      var v = Math.round(opts.get());
+      var target = null;
+      switch (e.key) {
+        case 'ArrowLeft': case 'ArrowDown': target = v - (e.shiftKey ? 10 : 1); break;
+        case 'ArrowRight': case 'ArrowUp': target = v + (e.shiftKey ? 10 : 1); break;
+        case 'PageDown': target = v - 10; break;
+        case 'PageUp': target = v + 10; break;
+        case 'Home': target = 0; break;
+        case 'End': target = 100; break;
+        default: return;
+      }
+      opts.set(U.clamp(target, 0, 100));
       update();
+      e.preventDefault();
+      e.stopPropagation();
     });
-    window.addEventListener('mouseup', function () { dragging = false; });
 
     function update() {
       var v = opts.get();
@@ -266,6 +335,9 @@ globalThis.HOO = globalThis.HOO || {};
       var isLocked = opts.locked && opts.locked();
       row.classList.toggle('locked', !!isLocked);
       label.classList.toggle('locked', !!isLocked);
+      bar.setAttribute('aria-valuenow', String(Math.round(v)));
+      bar.setAttribute('aria-valuetext', pctText);
+      bar.setAttribute('aria-disabled', isLocked ? 'true' : 'false');
       if (opts.onUpdate) opts.onUpdate();
     }
     row.appendChild(label);
@@ -281,28 +353,35 @@ globalThis.HOO = globalThis.HOO || {};
     var keys = Object.keys(alloc);
     var lockedSum = 0;
     keys.forEach(function (k) { if (locks[k] && k !== changedKey) lockedSum += alloc[k]; });
+    var freeKeys = keys.filter(function (k) { return k !== changedKey && !locks[k]; });
+    if (freeKeys.length === 0) {
+      // every other bar is locked: nothing can absorb a change, so the lone
+      // unlocked bar is pinned to the remainder (bars always total 100%)
+      alloc[changedKey] = Math.max(0, 100 - lockedSum);
+      return;
+    }
     newVal = U.clamp(newVal, 0, 100 - lockedSum);
     alloc[changedKey] = newVal;
-    var freeKeys = keys.filter(function (k) { return k !== changedKey && !locks[k]; });
     var remaining = 100 - lockedSum - newVal;
     var currentFree = 0;
     freeKeys.forEach(function (k) { currentFree += alloc[k]; });
-    if (freeKeys.length === 0) return;
     if (currentFree <= 0) {
       var each = remaining / freeKeys.length;
       freeKeys.forEach(function (k) { alloc[k] = each; });
     } else {
       freeKeys.forEach(function (k) { alloc[k] = alloc[k] / currentFree * remaining; });
     }
-    // round while preserving sum
+    // round while preserving sum; never drive a bar below zero
     var sum = 0;
     keys.forEach(function (k) { alloc[k] = Math.round(alloc[k]); sum += alloc[k]; });
     var diff = 100 - sum;
-    for (var i = 0; i < keys.length && diff !== 0; i++) {
-      var k2 = freeKeys.length ? freeKeys[i % freeKeys.length] : changedKey;
-      alloc[k2] += diff > 0 ? 1 : -1;
-      diff += diff > 0 ? -1 : 1;
+    var guard = keys.length * 4;
+    for (var i = 0; diff !== 0 && guard > 0; i++, guard--) {
+      var k2 = freeKeys[i % freeKeys.length];
+      if (diff > 0) { alloc[k2] += 1; diff -= 1; }
+      else if (alloc[k2] > 0) { alloc[k2] -= 1; diff += 1; } // skip bars already at 0
     }
+    if (diff !== 0) alloc[changedKey] = U.clamp(alloc[changedKey] + diff, 0, 100 - lockedSum);
   }
 
   function setWheelSpinning(on) {

@@ -37,10 +37,19 @@ globalThis.HOO = globalThis.HOO || {};
   function weaponCost(emp, t) { return Math.max(0.25, HOO.State.miniCost(emp, t, t.effect.cost)); }
   function specialStats(emp, t) {
     var st = HOO.DATA.SPECIAL_STATS[t.effect.special];
+    var size = st.size, cost = st.cost;
+    if (t.effect.special === 'colonyBase') {
+      // controlled-environment base modules are bulkier and dearer (manual:
+      // Ship Design); races that land anywhere carry no extra gear
+      var race = HOO.DATA.raceById[emp.raceId];
+      var hs = (race && race.landAnywhere) ? 0 : Math.min(6, (emp.derived && emp.derived.maxHostility) || 0);
+      size *= 1 + hs * 0.05;
+      cost *= 1 + hs * 0.05;
+    }
     return {
-      size: Math.max(1, Math.round(HOO.State.miniSize(emp, t, st.size))),
+      size: Math.max(1, Math.round(HOO.State.miniSize(emp, t, size))),
       power: st.power,
-      cost: Math.max(0.5, HOO.State.miniCost(emp, t, st.cost))
+      cost: Math.max(0.5, HOO.State.miniCost(emp, t, cost))
     };
   }
   function compSize(emp, t, hullId) { // computers & ecm
@@ -98,10 +107,21 @@ globalThis.HOO = globalThis.HOO || {};
       var t = HOO.DATA.techById[w.id];
       if (!t || t.effect.type !== 'weapon') return;
       var sz = weaponSize(emp, t);
+      var wcost = weaponCost(emp, t);
+      var rack = 0;
+      if (t.effect.wclass === 'missile') {
+        // MOO offers 2-shot and 5-shot missile racks; the listed size/cost is
+        // the 5-rack, the 2-rack saves a third of both
+        rack = w.rack === 2 ? 2 : 5;
+        if (rack === 2) {
+          sz = Math.max(1, Math.round(sz * 2 / 3));
+          wcost = Math.max(0.25, wcost * 2 / 3);
+        }
+      }
       used += sz * w.count;
       powerNeed += (t.effect.power || 0) * w.count;
-      cost += weaponCost(emp, t) * w.count;
-      wlist.push({ id: w.id, count: w.count });
+      cost += wcost * w.count;
+      wlist.push(rack ? { id: w.id, count: w.count, rack: rack } : { id: w.id, count: w.count });
     });
 
     var slist = [];
@@ -133,11 +153,15 @@ globalThis.HOO = globalThis.HOO || {};
     var attack = (comp ? comp.effect.mark : 0) + (race.shipAttack || 0);
     var defense = h.defense + man + (race.shipDefense || 0);
     var initiative = man + (comp ? comp.effect.mark : 0) + (race.initBonus || 0);
-    var hasScanner = slist.some(function (s) { return HOO.DATA.techById[s].effect.special === 'battleScanner'; });
-    if (hasScanner) { initiative += 3; attack += 1; }
+    // battle scanner: initiative bonus from tech data (manual: +3, no attack bonus)
+    var scannerTech = null;
+    slist.forEach(function (s) { if (HOO.DATA.techById[s].effect.special === 'battleScanner') scannerTech = HOO.DATA.techById[s]; });
+    if (scannerTech) initiative += (scannerTech.effect.initBonus || 3);
 
     var range = 0; // extra fuel range
     if (slist.some(function (s) { return HOO.DATA.techById[s].effect.special === 'reserveFuel'; })) range = 3;
+
+    var hasColony = slist.some(function (s) { return HOO.DATA.techById[s].effect.special === 'colonyBase'; });
 
     return {
       name: spec.name, hullId: h.id, engineId: spec.engineId,
@@ -145,13 +169,17 @@ globalThis.HOO = globalThis.HOO || {};
       armorId: spec.armorId, doubleArmor: !!spec.doubleArmor,
       weapons: wlist, specials: slist,
       warp: warp, maneuver: man,
-      combatSpeed: Math.max(1, Math.floor(man / 2)),
+      // manual movement table rounds UP: classes 1-2 move 1, 3-4 move 2, ...
+      combatSpeed: Math.max(1, Math.ceil(man / 2)),
       hits: hits, attack: attack, defense: defense, initiative: initiative,
       shieldCls: shld ? shld.effect.cls : 0, ecmMark: ecm ? ecm.effect.mark : 0,
       spaceUsed: Math.round(used), spaceTotal: Math.round(space),
       cost: Math.max(2, Math.round(cost)),
       extraRange: range,
-      hasColonyBase: slist.some(function (s) { return HOO.DATA.techById[s].effect.special === 'colonyBase'; }),
+      hasColonyBase: hasColony,
+      // capability of the installed base module is frozen at design time (manual:
+      // old colony ships cannot settle newly-unlocked hostile worlds)
+      colonyHostility: hasColony ? ((race.landAnywhere) ? 99 : ((emp.derived && emp.derived.maxHostility) || 0)) : -1,
       valid: used <= space
     };
   }

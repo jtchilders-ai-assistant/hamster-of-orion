@@ -50,8 +50,9 @@ globalThis.HOO = globalThis.HOO || {};
       var framed = null;
 
       for (var i = 0; i < sp.count; i++) {
-        // defender security roll per spy network
-        var roll = U.roll100() + secBonus + Math.max(0, defLv - attLv);
+        // defender security roll per spy network — signed computer-tech
+        // differential and the spy race's espionage bonus aid evasion (manual p.43)
+        var roll = U.roll100() + secBonus + (defLv - attLv) - (spyRace.spyBonus || 0);
         if (hiding) roll -= 30;
         if (roll <= 0) {
           // mistaken identity: another race may be framed
@@ -73,6 +74,7 @@ globalThis.HOO = globalThis.HOO || {};
           break;
         } else {
           confessed = true;
+          sp.count = 0; // the confession compromises the entire spy ring (manual p.43)
           notices.push({ to: defender.id, text: 'A captured ' + spyRace.adj + ' spy has confessed, exposing the entire network.' });
           HOO.Diplomacy.adjust(g, defender.id, spyEmp.id, -10, true);
           break;
@@ -80,11 +82,15 @@ globalThis.HOO = globalThis.HOO || {};
       }
       if (confessed || hiding || infiltrators <= 0) return;
 
-      // one infiltration roll for the year
-      var iroll = U.roll100() + Math.max(0, attLv - defLv) + (spyRace.spyBonus || 0);
+      // one infiltration roll for the year (signed tech differential, manual p.43)
+      var iroll = U.roll100() + (attLv - defLv) + (spyRace.spyBonus || 0);
       if (iroll < 85) return;
-      var frameOther = iroll >= 100 && framed;
-      var blame = frameOther ? framed : spyEmp;
+      // spectacular infiltrations may plant evidence implicating a third race
+      if (iroll >= 100 && !framed) {
+        var others2 = g.empires.filter(function (o) { return !o.dead && o.id !== defender.id && o.id !== spyEmp.id; });
+        if (others2.length && U.chance(0.5)) framed = U.pick(others2);
+      }
+      var blame = framed || spyEmp;
 
       if (sp.mission === 'espionage') {
         var field = sp.techTarget || U.pick(HOO.CONST.FIELDS);
@@ -105,19 +111,30 @@ globalThis.HOO = globalThis.HOO || {};
           HOO.Diplomacy.adjust(g, defender.id, blame.id, -8, true);
         }
       } else if (sp.mission === 'sabotage') {
-        // choose a target colony (largest)
+        // choose a target colony: the ordered star if still held, else the largest
         var cols = HOO.Colony.colonies(g, defender.id);
         if (!cols.length) return;
-        cols.sort(function (a, b2) { return b2.colony.factories - a.colony.factories; });
-        var target = cols[0];
-        var wLv = HOO.State.techLevel(spyEmp, 'weapons');
-        var mode = sp.sabTarget || (target.colony.bases > 2 ? 'bases' : 'factories');
+        var target = null;
+        if (sp.sabStarId !== undefined && sp.sabStarId !== null) {
+          cols.forEach(function (c) { if (c.star.id === sp.sabStarId) target = c; });
+        }
+        if (!target) {
+          cols.sort(function (a, b2) { return b2.colony.factories - a.colony.factories; });
+          target = cols[0];
+        }
+        var mode = sp.sabTarget;
+        if (!mode) {
+          // auto-select: knock out defenses first, occasionally stir rebellion on big worlds
+          if (target.colony.bases > 2) mode = 'bases';
+          else if (target.colony.pop >= 40 && U.chance(0.25)) mode = 'rebellion';
+          else mode = 'factories';
+        }
         if (mode === 'bases' && target.colony.bases > 0) {
           var destroyed = 0;
           for (var k2 = 0; k2 < infiltrators; k2++) {
-            if (U.chance(0.5 * Math.max(1, wLv / 10) / Math.max(1, Math.ceil(wLv / 10)))) destroyed++;
+            if (U.chance(0.5)) destroyed += U.rint(1, 2); // manual p.44: 1-2 bases per success
           }
-          destroyed = Math.min(target.colony.bases, Math.max(0, destroyed * Math.floor(Math.max(1, wLv / 10))));
+          destroyed = Math.min(target.colony.bases, destroyed);
           if (destroyed) {
             target.colony.bases -= destroyed;
             notices.push({ to: defender.id, text: 'Saboteurs have destroyed ' + destroyed + ' missile base(s) on ' + target.star.name + '. Evidence points to the ' + HOO.DATA.raceById[blame.raceId].name + '.' });
@@ -137,7 +154,7 @@ globalThis.HOO = globalThis.HOO || {};
           HOO.Diplomacy.adjust(g, defender.id, blame.id, -12, true);
         } else {
           var lost = 0;
-          for (var k3 = 0; k3 < infiltrators; k3++) lost += U.rint(1, 5) * Math.max(1, Math.floor(wLv / 10));
+          for (var k3 = 0; k3 < infiltrators; k3++) lost += U.rint(1, 5); // manual p.44: 1-5 factories
           lost = Math.min(Math.floor(target.colony.factories), lost);
           if (lost) {
             target.colony.factories -= lost;
@@ -161,5 +178,22 @@ globalThis.HOO = globalThis.HOO || {};
     return notices;
   }
 
-  HOO.Espionage = { spyCost: spyCost, resolveAll: resolveAll };
+  // UI/AI hook: set a spy network's standing orders against one empire.
+  // orders = { mission: 'hide'|'espionage'|'sabotage',
+  //            techTarget: field name or null (null = spy's choice),
+  //            sabTarget: 'factories'|'bases'|'rebellion' or null (null = auto),
+  //            sabStarId: star id or null (null = defender's largest colony) }
+  function setSpyOrders(g, empId, targetEmpId, orders) {
+    var emp = g.empires[empId];
+    if (!emp) return null;
+    var sp = emp.spies[targetEmpId] || (emp.spies[targetEmpId] = { count: 0, mission: 'hide', alloc: 0, fund: 0 });
+    orders = orders || {};
+    if (orders.mission) sp.mission = orders.mission;
+    if ('techTarget' in orders) sp.techTarget = orders.techTarget;
+    if ('sabTarget' in orders) sp.sabTarget = orders.sabTarget;
+    if ('sabStarId' in orders) sp.sabStarId = orders.sabStarId;
+    return sp;
+  }
+
+  HOO.Espionage = { spyCost: spyCost, resolveAll: resolveAll, setSpyOrders: setSpyOrders };
 })();
