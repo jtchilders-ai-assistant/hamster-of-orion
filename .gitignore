@@ -12,3 +12,6 @@ Thumbs.db
 # node artifacts (tests run from a scratch dir, but just in case)
 node_modules/
 npm-debug.log*
+
+# Claude Code session config (dev-only, not part of the game)
+.claude/
