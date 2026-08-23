@@ -19,9 +19,35 @@ globalThis.HOO = globalThis.HOO || {};
   // Tab, Escape...) while the battle overlay is up, since it bypasses HOO.UI's
   // overlay registry and hasOverlay() cannot see it
   function keyBlock(e) {
-    // Tab must keep moving focus, or the battle controls are unreachable
-    // without a mouse; only Escape is swallowed (a battle cannot be dismissed)
-    if (e.key === 'Escape') e.preventDefault();
+    if (e.key === 'Escape') {
+      e.preventDefault();
+    } else if (!e.altKey && !e.ctrlKey && !e.metaKey) {
+      var k = e.key.toLowerCase();
+      if (k === 'a') {
+        autoMode = !autoMode;
+        buildButtons();
+        if (awaiting && autoMode) actAI();
+        e.preventDefault();
+      } else if (k === 'd' && awaiting && current) {
+        current.done = true; awaiting = false; step();
+        e.preventDefault();
+      } else if (k === 'm' && awaiting && current) {
+        current.missilesOn = !current.missilesOn;
+        log(current.missilesOn ? 'Missiles armed.' : 'Missiles held.');
+        renderLog();
+        e.preventDefault();
+      } else if (k === 'r' && awaiting && current) {
+        if (C().retreatStack(battle, current)) {
+          awaiting = false; step();
+        } else {
+          renderLog();
+        }
+        e.preventDefault();
+      } else if ((k === 'c' || e.key === 'Enter') && finished) {
+        closeOverlay();
+        e.preventDefault();
+      }
+    }
     e.stopPropagation();
   }
 
@@ -87,21 +113,21 @@ globalThis.HOO = globalThis.HOO || {};
   function buildButtons() {
     U.clearEl(btnRow);
     btnRow.appendChild(el('button', {
-      cls: 'btn small' + (autoMode ? ' active' : ''), text: 'Auto',
+      cls: 'btn small' + (autoMode ? ' active' : ''), text: '(A)uto',
       onclick: function () { autoMode = !autoMode; buildButtons(); if (awaiting && autoMode) { actAI(); } }
     }));
     btnRow.appendChild(el('button', {
-      cls: 'btn small', text: 'Done',
+      cls: 'btn small', text: '(D)one',
       onclick: function () { if (awaiting && current) { current.done = true; awaiting = false; step(); } }
     }));
     btnRow.appendChild(el('button', {
-      cls: 'btn small', text: 'Missiles',
+      cls: 'btn small', text: '(M)issiles',
       title: 'Toggle missile fire for the current stack',
       // only the player's own stack, on its own turn — never enemy/AI stacks
       onclick: function () { if (awaiting && current) { current.missilesOn = !current.missilesOn; log(current.missilesOn ? 'Missiles armed.' : 'Missiles held.'); } }
     }));
     btnRow.appendChild(el('button', {
-      cls: 'btn small danger', text: 'Retreat',
+      cls: 'btn small danger', text: '(R)etreat',
       onclick: function () {
         if (awaiting && current) {
           if (C().retreatStack(battle, current)) {
@@ -193,7 +219,7 @@ globalThis.HOO = globalThis.HOO || {};
     });
     box.appendChild(cols);
     var row = el('div', { style: 'display:flex; justify-content:flex-end; margin-top:14px;' });
-    row.appendChild(el('button', { cls: 'btn', text: 'Continue', onclick: closeOverlay }));
+    row.appendChild(el('button', { cls: 'btn', text: '(C)ontinue', onclick: closeOverlay }));
     box.appendChild(row);
     screenEl.appendChild(box);
   }
