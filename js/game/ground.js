@@ -101,8 +101,8 @@ globalThis.HOO = globalThis.HOO || {};
         var perShot;
         if (e.wclass === 'bio') {
           var kill = Math.max(0, e.dmax - defEmp.derived.antidote);
-          bioKill += shots * kill * 0.5;
-          sizeLoss += shots * kill * 0.25;
+          bioKill += shots * kill;
+          sizeLoss += shots * kill * 0.5;
           return;
         }
         // same to-hit math as tactical combat (bases defend at 1)
@@ -126,11 +126,11 @@ globalThis.HOO = globalThis.HOO || {};
       var basesLost = Math.min(c.bases, whole);
       c.bases -= basesLost;
       report.basesLost = basesLost;
-      report.popKilled += damage / 400;
-      report.factoriesLost += damage / 100;
+      report.popKilled += damage / 40;
+      report.factoriesLost += damage / 20;
     } else if (damage > 0) {
-      report.popKilled += damage / 200;
-      report.factoriesLost += damage / 50;
+      report.popKilled += damage / 20;
+      report.factoriesLost += damage / 10;
     }
 
     if (bioKill > 0) {
