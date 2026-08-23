@@ -141,21 +141,48 @@ globalThis.HOO = globalThis.HOO || {};
       if (p.colony && p.colony.empire !== 0) {
         var myFleet = HOO.Fleet.fleetAt(g, 0, s.id);
         if (myFleet) {
-          sb.appendChild(section('Orbital Operations', [
-            el('button', {
-              cls: 'btn danger', style: 'width:100%;', text: 'Bombard Colony',
-              onclick: function () { confirmBombard(s); }
-            })
-          ]));
+          var bCount = HOO.Ground.fleetBombs(g.empires[0], myFleet);
+          var alreadyBombarded = (myFleet.bombardedYear === g.year);
+          var btnText = 'Bombard Colony';
+          var btnDisabled = false;
+          var subNote = '';
+          if (bCount <= 0) {
+            btnText = 'Bombard Colony (0 bombs)';
+            btnDisabled = true;
+            subNote = 'Orbiting ships carry no bomb ordnance.';
+          } else if (alreadyBombarded) {
+            btnText = 'Bombardment Expended';
+            btnDisabled = true;
+            subNote = 'Fleet has dropped its bombs for Cycle ' + g.year + '.';
+          } else {
+            btnText = 'Bombard Colony (' + bCount + (bCount === 1 ? ' bomb' : ' bombs') + ')';
+          }
+          var btnAttrs = {
+            cls: 'btn danger' + (btnDisabled ? ' disabled' : ''),
+            style: 'width:100%;' + (btnDisabled ? ' opacity:0.5; cursor:not-allowed;' : ''),
+            text: btnText,
+            onclick: function () { if (!btnDisabled) confirmBombard(s); }
+          };
+          if (btnDisabled) btnAttrs.disabled = 'true';
+          var ops = [ el('button', btnAttrs) ];
+          if (subNote) {
+            ops.push(el('div', { cls: 'dim-t mono', style: 'font-size:11px; margin-top:4px; text-align:center;', text: subNote }));
+          }
+          sb.appendChild(section('Orbital Operations', ops));
         }
       }
     }
   }
 
-  function confirmBombard(s) {
+  function confirmBombard(s, fromFleet) {
     var g = HOO.game;
+    var myFleet = fromFleet || HOO.Fleet.fleetAt(g, 0, s.id);
+    if (!myFleet) return;
+    var bCount = HOO.Ground.fleetBombs(g.empires[0], myFleet);
+    if (bCount <= 0 || myFleet.bombardedYear === g.year) return;
+
     HOO.UI.dialog('Bombard ' + s.name + '?',
-      'Orbital bombardment will kill colonists and destroy industry. The galaxy will remember.',
+      'Orbital bombardment will drop ' + bCount + (bCount === 1 ? ' bomb' : ' bombs') + ' to kill colonists and destroy industry on ' + U.esc(s.name) + '. The galaxy will remember.',
       [
         {
           label: 'Commence Bombardment', cls: 'danger', fn: function () {
@@ -165,7 +192,8 @@ globalThis.HOO = globalThis.HOO || {};
                 Math.round(rep.factoriesLost) + ' factories destroyed' + (rep.basesLost ? ', ' + rep.basesLost + ' bases levelled' : '') + '.';
               if (rep.destroyed) txt += ' The colony has been wiped out.';
               HOO.UI.dialog('Bombardment Report', txt);
-              showStar(s.id);
+              if (fromFleet && g.fleets.indexOf(fromFleet) >= 0) showFleet(fromFleet);
+              else showStar(s.id);
             }
           }
         },
@@ -643,6 +671,39 @@ globalThis.HOO = globalThis.HOO || {};
       currentSel = null;
     }
     sb.appendChild(section('Fleet Deployment', rows2));
+    if (f.at !== null) {
+      var atStar = g.stars[f.at];
+      if (atStar && atStar.planet && atStar.planet.colony && atStar.planet.colony.empire !== 0) {
+        var bCount = HOO.Ground.fleetBombs(emp, f);
+        var alreadyBombarded = (f.bombardedYear === g.year);
+        var btnText = 'Bombard Colony';
+        var btnDisabled = false;
+        var subNote = '';
+        if (bCount <= 0) {
+          btnText = 'Bombard Colony (0 bombs)';
+          btnDisabled = true;
+          subNote = 'Fleet carries no bomb ordnance.';
+        } else if (alreadyBombarded) {
+          btnText = 'Bombardment Expended';
+          btnDisabled = true;
+          subNote = 'Fleet has dropped its bombs for Cycle ' + g.year + '.';
+        } else {
+          btnText = 'Bombard Colony (' + bCount + (bCount === 1 ? ' bomb' : ' bombs') + ')';
+        }
+        var btnAttrs = {
+          cls: 'btn danger' + (btnDisabled ? ' disabled' : ''),
+          style: 'width:100%;' + (btnDisabled ? ' opacity:0.5; cursor:not-allowed;' : ''),
+          text: btnText,
+          onclick: function () { if (!btnDisabled) confirmBombard(atStar, f); }
+        };
+        if (btnDisabled) btnAttrs.disabled = 'true';
+        var ops = [ el('button', btnAttrs) ];
+        if (subNote) {
+          ops.push(el('div', { cls: 'dim-t mono', style: 'font-size:11px; margin-top:4px; text-align:center;', text: subNote }));
+        }
+        sb.appendChild(section('Orbital Operations', ops));
+      }
+    }
   }
 
   function getCurrentSel() { return currentSel; }

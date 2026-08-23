@@ -47,14 +47,46 @@ globalThis.HOO = globalThis.HOO || {};
   }
 
   // ---------- bombardment ----------
+  // total bomb ordnance across all ships in a fleet
+  function fleetBombs(emp, f) {
+    if (!f || !emp) return 0;
+    var total = 0;
+    f.ships.forEach(function (n, slot) {
+      if (n <= 0) return;
+      var dsg = emp.designs[slot];
+      if (!dsg) return;
+      dsg.weapons.forEach(function (w) {
+        var t = HOO.DATA.techById[w.id];
+        if (t && t.effect && (t.effect.wclass === 'bomb' || t.effect.wclass === 'bio')) {
+          total += n * (w.count || 1);
+        }
+      });
+    });
+    return total;
+  }
+
+  function canBombard(g, attId, star) {
+    var emp = g.empires[attId];
+    if (!emp) return false;
+    var c = star.planet && star.planet.colony;
+    if (!c || c.empire === attId) return false;
+    var fleet = HOO.Fleet.fleetAt(g, attId, star.id);
+    if (!fleet) return false;
+    if (fleet.bombardedYear === g.year) return false;
+    return fleetBombs(emp, fleet) > 0;
+  }
+
   // one year's orbital bombardment; returns report
   function bombard(g, attId, star) {
     var emp = g.empires[attId];
-    var c = star.planet.colony;
+    var c = star.planet && star.planet.colony;
     if (!c) return null;
     var defEmp = g.empires[c.empire];
     var fleet = HOO.Fleet.fleetAt(g, attId, star.id);
     if (!fleet) return null;
+    if (!canBombard(g, attId, star)) return null;
+
+    fleet.bombardedYear = g.year;
 
     var shield = star.inNebula ? 0 : c.shield;
     var damage = 0, bioKill = 0, sizeLoss = 0;
@@ -77,9 +109,7 @@ globalThis.HOO = globalThis.HOO || {};
         var need = HOO.Combat.hitNeeded(dsg.attack + (e.hitBonus || 0) + (e.targeting || 0), 1);
         var pHit = U.clamp((101 - need) / 100, 0, 1);
         if (e.wclass === 'bomb') perShot = Math.max(0, (e.dmin + e.dmax) / 2 - shield);
-        else if (e.wclass === 'missile') perShot = Math.max(0, e.dmax - shield) * 0.6; // limited racks
-        else if (e.wclass === 'torpedo') perShot = Math.max(0, (e.dmax * 0.5) - shield) * 0.5; // fires every other turn
-        else perShot = Math.max(0, ((e.dmin + e.dmax) / 2) * 0.5 - shield); // beams halved by atmosphere
+        else return; // only bombs and bio weapons can be used for orbital bombardment now
         damage += shots * perShot * pHit;
       });
     });
@@ -292,6 +322,7 @@ globalThis.HOO = globalThis.HOO || {};
 
   HOO.Ground = {
     canColonize: canColonize, colonize: colonize, bombard: bombard,
+    fleetBombs: fleetBombs, canBombard: canBombard,
     resolveLanding: resolveLanding, groundBattle: groundBattle, lootTech: lootTech
   };
 })();

@@ -223,12 +223,14 @@ globalThis.HOO = globalThis.HOO || {};
     var playerWon = b.winner !== null && b.sides[b.winner] && b.sides[b.winner].empId === 0;
     var summary = playerWon ? 'Victory. The system is ours to command.' :
       (b.winner === null ? 'Mutual annihilation over ' + U.esc(star.name) + '.' : 'Defeat. Surviving ships have withdrawn.');
-    // offer bombardment if we won over an enemy colony
+    // offer bombardment if we won over an enemy colony and have bombs available
     var buttons = [{ label: 'Continue', fn: next }];
     if (playerWon && star.planet && star.planet.colony && star.planet.colony.empire !== 0 &&
-      HOO.Fleet.fleetAt(g, 0, star.id)) {
+      HOO.Ground.canBombard(g, 0, star)) {
+      var f0 = HOO.Fleet.fleetAt(g, 0, star.id);
+      var bCount = HOO.Ground.fleetBombs(g.empires[0], f0);
       buttons.unshift({
-        label: 'Bombard the Colony', cls: 'danger', fn: function () {
+        label: 'Bombard Colony (' + bCount + (bCount === 1 ? ' bomb' : ' bombs') + ')', cls: 'danger', fn: function () {
           var rep = HOO.Ground.bombard(g, 0, star);
           var txt = rep ? ('Bombardment of ' + U.esc(star.name) + ': ' + Math.round(rep.popKilled) + ' million dead, ' + Math.round(rep.factoriesLost) + ' factories destroyed.' + (rep.destroyed ? ' The colony is no more.' : '')) : 'No effective ordnance.';
           HOO.UI.dialog('Bombardment Report', txt, [{ label: 'Continue', fn: next }], true);

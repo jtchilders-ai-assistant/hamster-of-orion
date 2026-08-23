@@ -12,7 +12,8 @@ globalThis.HOO = globalThis.HOO || {};
       at: atStar, from: null, to: null,
       x: g.stars[atStar].x, y: g.stars[atStar].y,
       ships: [0, 0, 0, 0, 0, 0],
-      retreating: false
+      retreating: false,
+      bombardedYear: 0
     };
     g.fleets.push(f);
     return f;
@@ -104,7 +105,8 @@ globalThis.HOO = globalThis.HOO || {};
       at: null, from: fromStarId, to: toStarId,
       x: from.x, y: from.y,
       ships: moving, retreating: false,
-      gateJump: !!(gateFrom && gateTo)
+      gateJump: !!(gateFrom && gateTo),
+      bombardedYear: src.bombardedYear || 0
     };
     g.fleets.push(f);
     cleanup(g);
@@ -164,6 +166,7 @@ globalThis.HOO = globalThis.HOO || {};
         }
         if (other) {
           for (i = 0; i < 6; i++) other.ships[i] += f.ships[i];
+          if (f.bombardedYear === g.year || other.bombardedYear === g.year) other.bombardedYear = g.year;
           f.ships = [0, 0, 0, 0, 0, 0];
           arrivals.push({ fleet: other, star: g.stars[other.at] });
         } else {
